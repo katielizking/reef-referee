@@ -104,12 +104,26 @@ export function ScorecardPanel({ scorecard }: { scorecard: Scorecard }) {
     <div className="space-y-4">
       <div className="rounded-2xl border bg-card p-5">
         <div className="flex items-center gap-4">
-          <ScoreRing score={s.overall} />
+          {s.overall === null ? (
+            <div className="flex h-[120px] w-[120px] shrink-0 items-center justify-center rounded-full border-2 border-dashed border-muted-foreground/30 text-3xl font-semibold text-muted-foreground">
+              —
+            </div>
+          ) : (
+            <ScoreRing score={s.overall} />
+          )}
           <div>
             <p className="text-xs uppercase tracking-wide text-muted-foreground">Overall score</p>
             <p className="mt-1 text-sm text-muted-foreground">
-              Weighted from compatibility, bioload, space, biome and legality.
+              {s.overall === null
+                ? "Add fish to get a score"
+                : "Weighted from compatibility, bioload, space, biome and legality."}
             </p>
+            {s.capReason && (
+              <p className="mt-2 flex items-start gap-1 text-xs font-medium text-amber-700">
+                <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+                <span>{s.capReason}</span>
+              </p>
+            )}
             {s.biome.badge === "true-biotope" && (
               <div className="mt-2 inline-flex items-center gap-1 rounded-full bg-emerald-100 px-3 py-1 text-xs font-medium text-emerald-700">
                 <Sparkles className="h-3.5 w-3.5" /> True biotope
@@ -118,6 +132,7 @@ export function ScorecardPanel({ scorecard }: { scorecard: Scorecard }) {
           </div>
         </div>
       </div>
+
 
       {s.legality.illegalSpecies.length > 0 && (
         <div className="rounded-2xl border border-red-200 bg-red-50 p-4 text-red-900">
