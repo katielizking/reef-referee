@@ -1,81 +1,54 @@
-# Platform audit — top recommendations
+# Replace 2D TankVisual with a 3D scene driven by TankState
 
-I audited the Builder, navigation, save/share flow, mobile behaviour, and SEO. The scoring engine and data model are strong; the gaps are almost all in the shell around them. Here's what I'd fix, in priority order.
+Add a WebGL aquarium built with React Three Fiber that reads directly from the existing `TankState` — no parallel store, no toy add-buttons. The current SVG `TankVisual` is removed; the 3D scene takes its place on the builder (`/`) and shared view (`/t/$slug`).
 
-## What's working well (leave alone)
-- Scoring engine, biotope/legality logic, pre-stock checklist copy.
-- Route-level SEO on `/`, `/quiz`, `/shops`, `/guides`, `/t/$slug` basics.
-- Anonymous auth wiring and saved-tank list mechanics.
+## Dependencies
 
-## Priority 1 — Critical UX & functional fixes
+```
+bun add three @react-three/fiber@^9 @react-three/drei zustand
+bun add -d @types/three
+```
 
-1. **Mobile: score is buried at the bottom of a long form.**
-   On <1024px the three columns stack Setup → Visual → Scorecard, so the user scrolls past a huge fish/plant/hardscape list before seeing whether their tank scores well.
-   Fix: on mobile, pin a compact "Overall score" summary bar to the bottom of the viewport (tap to expand the full scorecard in a sheet). Sticky scorecard on `lg+` stays as-is.
+`zustand` is pulled in only because a couple of drei helpers list it as a peer; we do not create a new store.
 
-2. **Search dropdowns never close.**
-   `TankSetupPanel` species/plants/hardscape adders open results on focus but have no outside-click, Escape, or blur handler. Dropdowns stay open over other fields; on mobile the keyboard traps.
-   Fix: add outside-click + Escape to close, and close after add.
+## Files
 
-3. **Tank dimensions accept 0 with no warning.**
-   `DimField` allows `0`, producing a 0 L tank that can still be saved and shared.
-   Fix: enforce `min=10cm` per side, show red border + helper text below the input, and block Save when litres < 20.
+- `src/components/tank3d/TankScene.tsx` — new. `<Canvas>` + lighting + `OrbitControls` + `<Aquarium>`. Props: `{ state: TankState }`. Camera distance derived from the largest tank dimension.
+- `src/components/tank3d/Aquarium.tsx` — new. Renders glass box, substrate slab, water tint, and maps `state.species / plants / hardscape` to meshes. Uses the existing axes: `length_cm` = X (width on screen), `height_cm` = Y, `width_cm` = Z (depth). Scale: 10 cm = 1 scene unit.
+- `src/components/tank3d/FishMesh.tsx` — new. Procedural fish (body / tail / fin / eyes) with the gentle swim animation from the snippet. Colour derived from the species row (see below); size scaled from `species.adult_size_cm`, clamped to fit the tank. Shoaling species (`is_schooling` / `min_group_size`) rendered as a cluster with per-fish phase + offset so they move as a school. Vertical band anchored by `swim_zone` (top / mid / bottom).
+- `src/components/tank3d/PlantMesh.tsx` — new. Procedural stems at substrate level with a subtle sway; count driven by the plant row's quantity, position jittered deterministically by row id + index.
+- `src/components/tank3d/HardscapeMesh.tsx` — new. Dodecahedron rocks / cylinder driftwood / flat leaf-litter discs picked by `hardscape.type`, placed on the substrate.
+- `src/components/tank3d/palette.ts` — new. Small helpers: species → colour (biotope-based fallback with a deterministic hue-per-id nudge so different species look different), substrate colour from `hardscape` (sand / gravel / soil) with a neutral default.
+- `src/components/tank3d/ClientOnlyCanvas.tsx` — new. Wraps `TankScene` in `<ClientOnly>` + `React.lazy` so `three` / `@react-three/fiber` never load during SSR. See TanStack execution model rules in project knowledge.
+- `src/components/TankVisual.tsx` — deleted. Every import site swaps to the new component.
+- `src/routes/index.tsx` and `src/routes/t.$slug.tsx` — swap `<TankVisual state={state} />` for `<ClientOnlyCanvas state={state} />`. Wrap the scene in a fixed-aspect container so layout stays stable during hydration.
 
-4. **Prohibited species can be added to a tank.**
-   The "Prohibited" filter chip surfaces banned species and the "Add" action still works, silently tanking the score after the fact.
-   Fix: in the Prohibited view, replace the add button with a "View guide" link and a small "Not legal to keep in AU" note. Keep the filter for education.
+## Interaction
 
-5. **No default filter → first save always hits the checklist block.**
-   `filter` starts `null`, so any new user with fish gets a blocking "add a filter" fix on their first save.
-   Fix: once dimensions are set, auto-select the smallest filter whose rated litres ≥ tank litres; user can change it. Show "auto-picked, tap to change".
+- Click a fish mesh → selects that species row. A thin lime ring appears under every fish of that group, and the corresponding `<li>` in `TankSetupPanel` gets a matching highlight.
+- Selection state lives locally in `TankScene` (`useState<string | null>` keyed by species id). No changes to `TankState`.
+- "Remove" is handled by the existing setup panel's stepper — a small floating chip in the scene ("Rainbowfish ×6 — remove") calls the same removal path that the panel already uses via a callback prop `onRemoveSpecies(id)` exposed by `index.tsx`.
+- No drag-to-reposition in this pass. Positions are deterministic from the row id so the scene doesn't jump on every re-render.
+- Camera: `OrbitControls` with rotate + zoom enabled, pan disabled, distance clamped to the tank size.
 
-## Priority 2 — Accessibility
+## Adult-size scaling and schooling
 
-6. **Icon-only buttons have no accessible names.** `QtyStepper` +/−/trash buttons (used once per row) are silent to screen readers.
-   Fix: `aria-label` on the three buttons ("Decrease quantity of {name}", etc.), `aria-hidden` on decorative Lucide icons.
+- Each fish mesh is scaled so its long axis matches `adult_size_cm` in scene units, then clamped to at most 40% of the tank's shortest dimension so a hopelessly-oversized species still renders but looks visibly cramped. This is a visual cue only; the scorecard still owns the actual judgement.
+- Schoolers (`is_schooling === true`) are laid out on a jittered grid sized to `quantity`; each fish gets its own phase so the school drifts rather than moving as one rigid block. Non-schoolers are spaced individually across their swim zone.
 
-7. **Score rings announce nothing.** The SVG number is inside an `aria-hidden` group.
-   Fix: wrap each ring in a container with `aria-label={\`${label} score ${n} out of 100\`}` and `role="img"`.
+## SSR and performance
 
-8. **`TankVisual` SVG has no accessible description.**
-   Fix: add `role="img"` + `aria-label` summarising contents (e.g. "Tank preview: 3 species, 2 plants, 1 piece of driftwood").
+- `<ClientOnlyCanvas>` gates the entire three.js import graph behind hydration — static route imports must not pull `three` in.
+- `dpr={[1, 1.75]}`, shadows off in v1, `frameloop="demand"` when nothing is animating (fall back to `"always"` when at least one fish is present).
+- Reduced-motion: when `prefers-reduced-motion: reduce`, `useFrame` early-returns so fish and plants sit still.
+- Shared view (`/t/$slug`) uses the same component; users on very small screens still see it, but the ClientOnly boundary shows a lightweight "Loading preview" panel until the WebGL bundle is ready.
 
-## Priority 3 — Save & share clarity
+## Out of scope for this pass
 
-9. **"Saved tanks" quietly disappear across browsers/incognito** with no explanation at save time.
-   Fix: below the Save button, add a one-liner: "Saved to this browser. Copy the share link if you want to open it elsewhere." After save, show a share-link dialog with a Copy button, not just a toast.
+- Drag-and-drop repositioning, saved custom positions, GLB models, water caustics / physics, mobile static fallback image. Called out here so we can sequence them next.
 
-10. **Defensive check on `share_slug`.** `saveTank()` relies on a DB default; if it ever returns null the app builds `/t/undefined`.
-    Fix: if `row.share_slug` is falsy, throw a friendly error before navigating.
+## Verification
 
-11. **Hero secondary CTA "Explore the tools" links to `/saved`** — which is empty for first-time visitors.
-    Fix: point it at `/quiz` (the actual "find your fish" tool).
-
-## Priority 4 — Discoverability & content
-
-12. **First-time users see three fully-populated panels with no sequencing.**
-    Fix: add a tiny 4-step progress strip above the builder ("Dimensions → Filter → Fish → Save"), each step lights up as it's satisfied. Removes the hero CTA duplication.
-
-13. **Empty states missing under each adder.**
-    Fix: "No fish yet — search above to add some." (same for plants/hardscape).
-
-14. **Filter/tank size mismatch is only visible deep in the scorecard.**
-    Fix: inline warning next to the filter dropdown when rated litres < tank litres.
-
-## Priority 5 — SEO polish
-
-15. Add `canonical` on `species.$id.tsx` (missing) and `og:image` on `t.$slug.tsx` (share previews currently have no image — use a static default from `/public` for now; server-rendered tank preview is a bigger project).
-16. Add per-page `twitter:title` / `twitter:description` on the leaf routes that already set `og:*`.
-
-## Out of scope (flag only, no changes this round)
-- Second guide article (content, not code).
-- Server-rendered tank preview image for social sharing.
-- RLS policy audit for `tanks` / join tables.
-
-## Technical notes
-- Mobile score bar: new `MobileScoreBar` component rendered from `routes/index.tsx`, uses shadcn `Sheet` for the expand state, `lg:hidden`.
-- Dropdown close: extract a small `useOutsideClick(ref, onClose)` hook and reuse in `TankSetupPanel` and `ItemAdder`.
-- Progress strip: derive from existing `state` — no new state needed.
-- Auto filter: pure function in `src/lib/scoring` or a new `src/lib/defaults.ts`.
-
-Ready to implement all Priority 1–3 items in one pass, and Priority 4–5 in a follow-up — or reorder if you'd prefer something else first.
+- Build passes; `three` does not appear in the SSR chunk (spot-check the build output).
+- Playwright pass on `/`: after adding 6 rainbowfish + a plant + a rock, screenshot shows a school in the mid zone, plant on the substrate, and a rock; clicking a fish flashes the selection ring; the scorecard on the right is unchanged.
+- `/t/$slug` renders the same scene read-only (no interaction changes required — clicking is a no-op because the setup panel isn't present).
