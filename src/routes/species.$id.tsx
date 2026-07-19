@@ -1,6 +1,6 @@
-import { createFileRoute, Link, useRouter, notFound } from "@tanstack/react-router";
+import { createFileRoute, Link, useRouter, useNavigate, notFound } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
-import { ArrowLeft, Fish, Ruler, Droplet, Thermometer, Users, Waves, AlertTriangle, Info, Leaf } from "lucide-react";
+import { ArrowLeft, Fish, Ruler, Droplet, Thermometer, Users, Waves, AlertTriangle, Info, Leaf, Plus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import type { Species } from "@/lib/types";
 import { BIOTOPE_LABEL } from "@/lib/types";
@@ -144,6 +144,7 @@ function SpeciesGuide() {
         </div>
         <h1 className="font-display text-3xl font-bold text-foreground md:text-4xl">{s.common_name}</h1>
         <p className="italic text-muted-foreground">{s.scientific_name}</p>
+        <AddToTankButton species={s} />
       </header>
 
       <section className="mt-8">
@@ -190,6 +191,32 @@ function SpeciesGuide() {
     </div>
   );
 }
+
+function AddToTankButton({ species }: { species: Species }) {
+  const navigate = useNavigate();
+  const prohibited = species.legal_status === "prohibited";
+  function handleAdd() {
+    sessionStorage.setItem("fishtankr:pending-add", species.id);
+    navigate({ to: "/", hash: "builder" });
+  }
+  return (
+    <div className="mt-2">
+      <button
+        onClick={handleAdd}
+        className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-sm transition hover:bg-primary/90"
+      >
+        <Plus className="h-4 w-4" /> Add to my tank
+      </button>
+      {prohibited && (
+        <p className="mt-2 text-xs text-muted-foreground">
+          Heads up — this species is prohibited in Australia and will cap your tank's overall score.
+        </p>
+      )}
+    </div>
+  );
+}
+
+
 
 function ScoreBlock({ title, body }: { title: string; body: string }) {
   return (

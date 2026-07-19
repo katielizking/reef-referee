@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Loader2, Save, Share2 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -59,6 +59,23 @@ function Builder() {
 
   const ready = species.data && plants.data && hardscape.data && filters.data;
   const showHero = state.species.length === 0;
+
+  useEffect(() => {
+    if (!species.data) return;
+    const pendingId = sessionStorage.getItem("fishtankr:pending-add");
+    if (!pendingId) return;
+    sessionStorage.removeItem("fishtankr:pending-add");
+    const found = species.data.find((s) => s.id === pendingId);
+    if (!found) return;
+    setState((prev) => {
+      if (prev.species.some((row) => row.species.id === pendingId)) {
+        toast.info(`${found.common_name} is already in your tank`);
+        return prev;
+      }
+      toast.success(`Added ${found.common_name} to your tank`);
+      return { ...prev, species: [...prev.species, { species: found, quantity: 1 }] };
+    });
+  }, [species.data]);
 
   async function doSave(share: boolean) {
     try {
