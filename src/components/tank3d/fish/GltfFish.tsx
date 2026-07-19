@@ -44,14 +44,32 @@ export function GltfFish({
   // are still shared across all clones.
   const scene = useMemo(() => cloneSkinnedScene(gltf.scene), [gltf.scene]);
 
-  const scale = useMemo(
-    () =>
-      computeRenderScale({
-        adultLengthCm: asset.adultLengthCm,
-        modelReferenceLengthCm: asset.modelReferenceLengthCm,
-      }),
-    [asset.adultLengthCm, asset.modelReferenceLengthCm],
-  );
+  // Measure the actual loaded bounding box rather than trusting the
+  // exporter's declared units. The GLB ships in metres (4cm ≈ 0.04 model
+  // units), so treating modelReferenceLengthCm as scene units directly
+  // would render the fish 100× too small.
+  const { scale, localBbox } = useMemo(() => {
+    const box = new THREE.Box3().setFromObject(gltf.scene);
+    const size = new THREE.Vector3();
+    box.getSize(size);
+    const measured = Math.max(size.x, size.y, size.z);
+    const targetSceneUnits = asset.adultLengthCm / 10; // CM_PER_UNIT = 10
+    const s =
+      !Number.isFinite(measured) || measured <= 0
+        ? computeRenderScale({
+            adultLengthCm: asset.adultLengthCm,
+            modelReferenceLengthCm: asset.modelReferenceLengthCm,
+          })
+        : targetSceneUnits / measured;
+    return {
+      scale: s,
+      localBbox: [
+        Math.max(size.x, 0.02),
+        Math.max(size.y, 0.01),
+        Math.max(size.z, 0.01),
+      ] as [number, number, number],
+    };
+  }, [gltf.scene, asset.adultLengthCm, asset.modelReferenceLengthCm]);
 
   const rotationY = useMemo(
     () => forwardAxisRotationY(asset.orientation?.forwardAxis ?? "+x"),
@@ -155,9 +173,15 @@ export function GltfFish({
       }}
     >
       <primitive object={scene} />
+      {/* Invisible pointer hitbox sized to the model's local bbox so
+          translucent fins are not relied on for click/tap selection. */}
+      <mesh visible={false}>
+        <boxGeometry args={[localBbox[0] * 1.15, localBbox[1] * 1.4, localBbox[2] * 1.4]} />
+        <meshBasicMaterial transparent opacity={0} depthWrite={false} />
+      </mesh>
       {selected && (
-        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.4, 0]}>
-          <ringGeometry args={[0.48, 0.61, 36]} />
+        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -localBbox[1] * 0.6, 0]}>
+          <ringGeometry args={[localBbox[0] * 0.55, localBbox[0] * 0.7, 36]} />
           <meshBasicMaterial color="#B8E84A" transparent opacity={0.9} toneMapped={false} />
         </mesh>
       )}

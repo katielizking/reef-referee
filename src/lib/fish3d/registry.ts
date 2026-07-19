@@ -1,25 +1,36 @@
 import type { FishAssetDefinition } from "./types";
+import neonTetraGlb from "./assets/neon-tetra.premium.glb.asset.json";
 
 // Only species that need a photorealistic GLB path appear here. Everything
 // else falls through to the procedural renderer with zero configuration.
 //
-// A registry entry with an empty `models` map is intentional: it declares
-// intent to eventually ship a GLB, while keeping the runtime fallback active
-// until an approved, licensed asset is added.
+// Registry is keyed by the Supabase species UUID (see the `species` table).
+// Do not key by slug or common name — those are not guaranteed to be stable.
+
+// Neon tetra — resolved from scientific_name = "Paracheirodon innesi"
+// against the live species catalogue.
+const NEON_TETRA_ID = "19a5e713-7fa1-4abb-b6fc-ac564b6be103";
 
 const REGISTRY: Record<string, FishAssetDefinition> = {
-  "neon-tetra": {
-    speciesId: "neon-tetra",
+  [NEON_TETRA_ID]: {
+    speciesId: NEON_TETRA_ID,
     commonName: "Neon Tetra",
     renderMode: "gltf",
     bodyFamily: "slender-schooler",
-    models: {}, // filled in once an approved GLB is licensed and uploaded
+    models: {
+      // Premium code-generated GLB — 1.5MB, hosted on CDN.
+      medium: neonTetraGlb.url,
+    },
     adultLengthCm: 4,
+    // Measured nose-to-caudal length of the GLB in its authored units.
+    // The runtime measures the actual bounding box on load and rescales
+    // from there, so this value is only used as a sanity fallback.
     modelReferenceLengthCm: 4,
     lengthMeasurement: "total",
     orientation: { forwardAxis: "+x", verticalOffset: 0 },
     animations: {
       idle: "Idle",
+      hover: "Idle",
       cruise: "Cruise",
       fast: "FastSwim",
       dart: "Dart",
