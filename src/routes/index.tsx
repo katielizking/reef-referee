@@ -143,6 +143,28 @@ function Builder() {
     });
   }, [species.data]);
 
+  // Load a preset (from /saved starter templates)
+  useEffect(() => {
+    if (!species.data) return;
+    const raw = sessionStorage.getItem(PRESET_KEY);
+    if (!raw) return;
+    sessionStorage.removeItem(PRESET_KEY);
+    const preset = TANK_PRESETS.find((p) => p.id === raw);
+    if (!preset) return;
+    const matches = preset.suggested
+      .map((sci) => species.data!.find((s) => s.scientific_name === sci))
+      .filter((s): s is NonNullable<typeof s> => !!s);
+    setState((prev) => ({
+      ...prev,
+      ...preset.base,
+      species: matches.map((s) => ({
+        species: s,
+        quantity: s.is_schooling ? s.min_group_size : 1,
+      })),
+    }));
+    toast.success(`Loaded ${preset.name}`);
+  }, [species.data]);
+
   // Auto-suggest a filter once dimensions are known and none is chosen.
   useEffect(() => {
     if (!filters.data || state.filter) return;
