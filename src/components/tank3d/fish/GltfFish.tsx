@@ -42,7 +42,7 @@ export function GltfFish({
   // SkeletonUtils.clone gives each instance its own bone hierarchy so the
   // AnimationMixer can pose them independently. Static geometry and textures
   // are still shared across all clones.
-  const scene = useMemo(() => SkeletonUtils.clone(gltf.scene), [gltf.scene]);
+  const scene = useMemo(() => cloneSkinnedScene(gltf.scene), [gltf.scene]);
 
   const scale = useMemo(
     () =>
