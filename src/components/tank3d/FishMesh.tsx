@@ -18,6 +18,8 @@ interface FishGroupProps {
   interior: { x: number; y: number; z: number; substrateY: number };
   selected: boolean;
   onSelect: () => void;
+  /** Optional override for the school's vertical centre (in world Y). */
+  centerY?: number;
 }
 
 const CM_PER_UNIT = 10;
@@ -38,7 +40,7 @@ interface FishInstance {
   speed: number;
 }
 
-export function FishGroup({ species, quantity, interior, selected, onSelect }: FishGroupProps) {
+export function FishGroup({ species, quantity, interior, selected, onSelect, centerY }: FishGroupProps) {
   const colour = useMemo(() => speciesColour(species), [species]);
   const profile = useMemo(() => fishVisualProfile(species), [species]);
   const reduced = useReducedMotion();
@@ -49,7 +51,8 @@ export function FishGroup({ species, quantity, interior, selected, onSelect }: F
   const fishLen = Math.max(0.12, Math.min(rawLen, maxLen));
 
   const instances = useMemo<FishInstance[]>(() => {
-    const yCentre = zoneY(species.swim_zone, interior);
+    const yCentre = centerY ?? zoneY(species.swim_zone, interior);
+
     const school = species.is_schooling && quantity > 1;
     const out: FishInstance[] = [];
     const clusterR = Math.min(interior.x, interior.z) * (school ? 0.35 : 0.45);
@@ -82,7 +85,9 @@ export function FishGroup({ species, quantity, interior, selected, onSelect }: F
     interior.y,
     interior.z,
     interior.substrateY,
+    centerY,
   ]);
+
 
   return (
     <group>

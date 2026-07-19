@@ -5,6 +5,10 @@ import { toast } from "sonner";
 
 import { TankSetupPanel } from "@/components/TankSetupPanel";
 import { ClientOnlyTankScene } from "@/components/tank3d/ClientOnlyTankScene";
+import { SelectedObjectPanel } from "@/components/tank3d/SelectedObjectPanel";
+import { SceneToolbar } from "@/components/tank3d/SceneToolbar";
+import { useTankHistory } from "@/components/tank3d/useTankHistory";
+import { useEditorStore } from "@/components/tank3d/editorStore";
 import { ScorecardPanel } from "@/components/Scorecard";
 import { MobileScoreBar } from "@/components/MobileScoreBar";
 import { HeroTankIllustration } from "@/components/BrandLogo";
@@ -13,6 +17,7 @@ import { scoreTank } from "@/lib/scoring";
 import { pickDefaultFilter } from "@/lib/defaults";
 import type { TankState } from "@/lib/types";
 import { useFilters, useHardscape, usePlants, useSpecies, saveTank } from "@/lib/data";
+
 
 
 export const Route = createFileRoute("/")({
@@ -59,9 +64,21 @@ function Builder() {
 
   const scorecard = useMemo(() => scoreTank(state), [state]);
   const gate = useSaveGate(scorecard, state);
+  const history = useTankHistory(state, setState);
+  const selected = useEditorStore((s) => s.selected);
 
   const ready = species.data && plants.data && hardscape.data && filters.data;
   const showHero = state.species.length === 0;
+
+  const dims = useMemo(() => {
+    const CM_PER_UNIT = 10;
+    const x = Math.max(state.length_cm, 20) / CM_PER_UNIT;
+    const y = Math.max(state.height_cm, 20) / CM_PER_UNIT;
+    const z = Math.max(state.width_cm, 20) / CM_PER_UNIT;
+    const substrateHeight = Math.min(0.4, y * 0.15);
+    return { x, y, z, substrateY: -y / 2 + substrateHeight };
+  }, [state.length_cm, state.width_cm, state.height_cm]);
+
 
   useEffect(() => {
     if (!species.data) return;
@@ -105,6 +122,14 @@ function Builder() {
     const pick = pickDefaultFilter(filters.data, state);
     if (pick) setState((s) => (s.filter ? s : { ...s, filter: pick }));
   }, [filters.data, state.filter, state.length_cm, state.width_cm, state.height_cm]);
+
+  // Capture a history snapshot when the state has settled after any edit
+  // (drag commits itself synchronously on pointer-up).
+  useEffect(() => {
+    const t = setTimeout(() => history.commit(), 500);
+    return () => clearTimeout(t);
+  }, [state, history]);
+
 
 
   async function doSave(share: boolean) {
@@ -218,21 +243,50 @@ function Builder() {
             />
           </div>
           <div className="space-y-4">
-            <ClientOnlyTankScene
-              state={state}
-              onRemoveSpecies={(id) =>
-                setState((s) => ({ ...s, species: s.species.filter((x) => x.species.id !== id) }))
-              }
-            />
-
-            <div className="rounded-3xl border bg-card p-4 text-sm text-muted-foreground">
-              <p>
-                <span className="font-semibold text-foreground">Here's what's happening below the surface.</span>{" "}
-                Aim for a single biotope for a "True biotope" badge, keep bioload comfortably
-                under 100%, and give schooling species enough room to shoal.
-              </p>
+            <div className="relative">
+              <ClientOnlyTankScene
+                state={state}
+                setState={setState}
+                commit={history.commit}
+                onRemoveSpecies={(id) =>
+                  setState((s) => ({
+                    ...s,
+                    species: s.species.filter((x) => x.species.id !== id),
+                  }))
+                }
+              />
+              <SceneToolbar
+                canUndo={history.canUndo}
+                canRedo={history.canRedo}
+                onUndo={history.undo}
+                onRedo={history.redo}
+                onResetLayout={() => {
+                  setState((s) => ({ ...s, overrides: {} }));
+                  history.commit();
+                }}
+              />
             </div>
+
+            {selected ? (
+              <SelectedObjectPanel
+                state={state}
+                setState={setState}
+                interior={dims}
+                commit={history.commit}
+              />
+            ) : (
+              <div className="rounded-3xl border bg-card p-4 text-sm text-muted-foreground">
+                <p>
+                  <span className="font-semibold text-foreground">
+                    Tap any fish, plant or décor to edit it.
+                  </span>{" "}
+                  Drag to reposition, then rotate, resize, duplicate or remove
+                  from the panel that appears. Undo with ⌘Z.
+                </p>
+              </div>
+            )}
           </div>
+
           <div className="space-y-4 lg:sticky lg:top-20 lg:self-start">
             <PreStockChecklist
               scorecard={scorecard}

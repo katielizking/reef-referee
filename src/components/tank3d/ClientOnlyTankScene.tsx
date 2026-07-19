@@ -14,6 +14,8 @@ function Fallback() {
 
 interface Props {
   state: TankState;
+  setState?: (updater: (s: TankState) => TankState) => void;
+  commit?: () => void;
   onRemoveSpecies?: (speciesId: string) => void;
   interactive?: boolean;
 }

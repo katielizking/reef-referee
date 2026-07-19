@@ -1,54 +1,102 @@
-# Replace 2D TankVisual with a 3D scene driven by TankState
+## Goal
 
-Add a WebGL aquarium built with React Three Fiber that reads directly from the existing `TankState` — no parallel store, no toy add-buttons. The current SVG `TankVisual` is removed; the 3D scene takes its place on the builder (`/`) and shared view (`/t/$slug`).
+Turn the 3D tank from a procedural preview into an editable scene. Users can select any object, move it (with type-aware rules), rotate/resize plants and décor, duplicate or delete it, and undo/redo — with a compact side panel on desktop and a bottom sheet on mobile.
 
-## Dependencies
+## What changes for the user
 
+- Click/tap any fish, plant, rock, wood, leaf litter or equipment → selection outline appears.
+- Drag on the scene floor to move; on mobile, one-finger drag on the selected object.
+- Right-hand "Selected" panel (desktop) / bottom sheet (mobile) shows:
+  - Name and type
+  - Position (X / Z, plus Y for driftwood and floating plants)
+  - Rotation (Y axis; free axis for driftwood)
+  - Size (0.5×–1.6× of natural)
+  - Duplicate · Remove buttons
+- Undo/Redo buttons in the scene toolbar (⌘Z / ⌘⇧Z on desktop).
+
+## Placement rules the scene enforces
+
+| Type | Movement | Y (vertical) | Rotate | Resize |
+|---|---|---|---|---|
+| Fish | X/Z inside usable water; Y inside its swim-zone band | auto by zone, small manual nudge | – | – |
+| Rooted plant | X/Z inside footprint | sits on substrate | Y | yes |
+| Floating plant | X/Z inside footprint | locked to water surface | Y | yes |
+| Rock / cave | X/Z inside footprint | sits on substrate (base rests on slab) | Y | yes |
+| Driftwood | X/Z inside footprint, Y within tank | free X/Y/Z rotation | free | yes |
+| Equipment (filter, heater) | snaps to nearest back/side glass | Y within tank | – | – |
+| Substrate | not selectable (slab as today) | – | – | – |
+
+All objects are clamped to stay fully inside the glass every frame based on an approximate bounding radius.
+
+## Data model changes
+
+Move from "row + quantity + hashed positions" to per-instance placements while keeping catalog rows intact.
+
+New `TankState` fields (client-only for now):
 ```
-bun add three @react-three/fiber@^9 @react-three/drei zustand
-bun add -d @types/three
+placements: Array<{
+  id: string;               // uuid, stable across edits
+  kind: "fish" | "plant" | "hardscape" | "equipment";
+  refId: string;            // species/plant/hardscape/filter id
+  pos: [x, y, z];           // scene units
+  rot: [x, y, z];           // radians
+  scale: number;            // 0.5..1.6
+}>
 ```
 
-`zustand` is pulled in only because a couple of drei helpers list it as a peer; we do not create a new store.
+Migration path:
+- Adding a species/plant/hardscape row expands into N placements at hashed positions (same look as today for untouched tanks).
+- The old `species/plants/hardscape` arrays stay as the source of truth for scoring and Supabase persistence; placements are derived on load and rewritten on save.
+
+Persistence:
+- Add `placements JSONB` column to `tanks` (nullable). On save we serialise the array; on load we hydrate. Existing tanks with `NULL` fall back to procedural placement.
+- Quantity on the catalog rows is recomputed from `placements.filter(kind==="…" && refId===…).length` before writing tank_species / tank_plants / tank_hardscape so scoring stays intact.
+
+Equipment:
+- Add a lightweight `EquipmentKind` union (`"filter" | "heater"`) rendered as a simple back-glass box. Placement uses `kind: "equipment"`. Adding a filter in the setup panel auto-creates one equipment placement on the back wall; removing the filter removes it.
+
+## Interaction implementation
+
+Libraries already installed: `three`, `@react-three/fiber`, `@react-three/drei`, `zustand`. No new deps required — drei ships `<PivotControls>` and `<Html>` which we use for gizmos and the selection halo, plus a small custom drag-plane handler for mobile-friendly single-touch drag.
+
+- Selection: raycast on pointerdown; `selectedId` in a small zustand store to avoid re-rendering the whole scene on hover.
+- Outline: a slightly enlarged wireframe copy of the mesh, tinted with the brand accent, toggled by `selected`.
+- Drag (desktop + mobile): pointer events on the object project onto an invisible plane whose orientation matches the object's constraint (XZ plane for substrate objects, YZ or XY for back-glass equipment, water-surface plane for floating plants). Constrained clamp runs each move.
+- Rotate / resize: desktop uses a compact numeric-plus-slider control in the side panel (no 3D handles → works identically on mobile). Only the Y-rotation slider is shown for most types; driftwood exposes X/Y/Z rotation.
+- Undo/redo: a bounded (50-entry) history ring of `TankState` snapshots kept in the same zustand store; keyboard shortcuts on desktop, buttons in the scene toolbar. Snapshots are pushed on commit (pointerup, slider release, add/remove/duplicate), never during continuous drag.
+
+## UI additions
+
+- `SceneToolbar` above the canvas: Undo, Redo, "Reset layout" (recomputes procedural positions).
+- `SelectedObjectPanel` (desktop, replaces the current "here's what's happening" info card while something is selected).
+- `SelectedObjectSheet` (mobile, shadcn Sheet from bottom).
+- Empty-state remains the same when nothing is selected.
 
 ## Files
 
-- `src/components/tank3d/TankScene.tsx` — new. `<Canvas>` + lighting + `OrbitControls` + `<Aquarium>`. Props: `{ state: TankState }`. Camera distance derived from the largest tank dimension.
-- `src/components/tank3d/Aquarium.tsx` — new. Renders glass box, substrate slab, water tint, and maps `state.species / plants / hardscape` to meshes. Uses the existing axes: `length_cm` = X (width on screen), `height_cm` = Y, `width_cm` = Z (depth). Scale: 10 cm = 1 scene unit.
-- `src/components/tank3d/FishMesh.tsx` — new. Procedural fish (body / tail / fin / eyes) with the gentle swim animation from the snippet. Colour derived from the species row (see below); size scaled from `species.adult_size_cm`, clamped to fit the tank. Shoaling species (`is_schooling` / `min_group_size`) rendered as a cluster with per-fish phase + offset so they move as a school. Vertical band anchored by `swim_zone` (top / mid / bottom).
-- `src/components/tank3d/PlantMesh.tsx` — new. Procedural stems at substrate level with a subtle sway; count driven by the plant row's quantity, position jittered deterministically by row id + index.
-- `src/components/tank3d/HardscapeMesh.tsx` — new. Dodecahedron rocks / cylinder driftwood / flat leaf-litter discs picked by `hardscape.type`, placed on the substrate.
-- `src/components/tank3d/palette.ts` — new. Small helpers: species → colour (biotope-based fallback with a deterministic hue-per-id nudge so different species look different), substrate colour from `hardscape` (sand / gravel / soil) with a neutral default.
-- `src/components/tank3d/ClientOnlyCanvas.tsx` — new. Wraps `TankScene` in `<ClientOnly>` + `React.lazy` so `three` / `@react-three/fiber` never load during SSR. See TanStack execution model rules in project knowledge.
-- `src/components/TankVisual.tsx` — deleted. Every import site swaps to the new component.
-- `src/routes/index.tsx` and `src/routes/t.$slug.tsx` — swap `<TankVisual state={state} />` for `<ClientOnlyCanvas state={state} />`. Wrap the scene in a fixed-aspect container so layout stays stable during hydration.
+New:
+- `src/components/tank3d/placements.ts` — types, ID helpers, procedural expansion, constraint clamp per kind.
+- `src/components/tank3d/editorStore.ts` — zustand store: `selectedId`, `hoverId`, undo/redo stack, commit helpers.
+- `src/components/tank3d/SelectionOutline.tsx` — wireframe halo primitive.
+- `src/components/tank3d/DragHandler.tsx` — pointer→plane projection with per-kind clamp.
+- `src/components/tank3d/EquipmentMesh.tsx` — back/side-glass equipment rendering.
+- `src/components/tank3d/SelectedObjectPanel.tsx` and `SelectedObjectSheet.tsx`.
+- `src/components/tank3d/SceneToolbar.tsx`.
 
-## Interaction
+Modified:
+- `TankScene.tsx` — iterate `state.placements` instead of grouped rows; wire selection, drag, outline, toolbar.
+- `FishMesh.tsx`, `PlantMesh.tsx`, `HardscapeMesh.tsx` — accept a single placement + `selected` and drop the internal position generator (moved to `placements.ts`).
+- `src/lib/types.ts` — add `PlacementRow` and `placements` on `TankState` + `TankRow`.
+- `src/lib/data.ts` — save/load placements JSON; regenerate quantities from placements.
+- `src/routes/index.tsx` and `src/routes/t.$slug.tsx` — hydrate placements on load; shared view remains read-only (`interactive={false}` disables drag/gizmos but keeps selection info hidden).
+- Supabase migration: `alter table public.tanks add column placements jsonb;` — no RLS change, no grant change.
 
-- Click a fish mesh → selects that species row. A thin lime ring appears under every fish of that group, and the corresponding `<li>` in `TankSetupPanel` gets a matching highlight.
-- Selection state lives locally in `TankScene` (`useState<string | null>` keyed by species id). No changes to `TankState`.
-- "Remove" is handled by the existing setup panel's stepper — a small floating chip in the scene ("Rainbowfish ×6 — remove") calls the same removal path that the panel already uses via a callback prop `onRemoveSpecies(id)` exposed by `index.tsx`.
-- No drag-to-reposition in this pass. Positions are deterministic from the row id so the scene doesn't jump on every re-render.
-- Camera: `OrbitControls` with rotate + zoom enabled, pan disabled, distance clamped to the tank size.
+## Scoring impact
 
-## Adult-size scaling and schooling
-
-- Each fish mesh is scaled so its long axis matches `adult_size_cm` in scene units, then clamped to at most 40% of the tank's shortest dimension so a hopelessly-oversized species still renders but looks visibly cramped. This is a visual cue only; the scorecard still owns the actual judgement.
-- Schoolers (`is_schooling === true`) are laid out on a jittered grid sized to `quantity`; each fish gets its own phase so the school drifts rather than moving as one rigid block. Non-schoolers are spaced individually across their swim zone.
-
-## SSR and performance
-
-- `<ClientOnlyCanvas>` gates the entire three.js import graph behind hydration — static route imports must not pull `three` in.
-- `dpr={[1, 1.75]}`, shadows off in v1, `frameloop="demand"` when nothing is animating (fall back to `"always"` when at least one fish is present).
-- Reduced-motion: when `prefers-reduced-motion: reduce`, `useFrame` early-returns so fish and plants sit still.
-- Shared view (`/t/$slug`) uses the same component; users on very small screens still see it, but the ClientOnly boundary shows a lightweight "Loading preview" panel until the WebGL bundle is ready.
+None. Scoring reads the grouped `species/plants/hardscape` arrays, which we keep in sync with placements before scoring runs.
 
 ## Out of scope for this pass
 
-- Drag-and-drop repositioning, saved custom positions, GLB models, water caustics / physics, mobile static fallback image. Called out here so we can sequence them next.
-
-## Verification
-
-- Build passes; `three` does not appear in the SSR chunk (spot-check the build output).
-- Playwright pass on `/`: after adding 6 rainbowfish + a plant + a rock, screenshot shows a school in the mid zone, plant on the substrate, and a rock; clicking a fish flashes the selection ring; the scorecard on the right is unchanged.
-- `/t/$slug` renders the same scene read-only (no interaction changes required — clicking is a no-op because the setup panel isn't present).
+- Snap-to-grid, alignment guides, group selection, copy/paste between tanks.
+- Persisting per-fish position (fish are still animated; drag sets their "home" anchor and school centre, and the swim animation orbits from there).
+- Equipment catalog beyond filter and a single generic heater placeholder.

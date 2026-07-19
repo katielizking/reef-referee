@@ -9,20 +9,24 @@ interface PlantClumpProps {
   plant: Plant;
   quantity: number;
   interior: { x: number; y: number; z: number; substrateY: number };
+  /** Override the Y at which the clump sits (defaults to interior.substrateY). */
+  groundY?: number;
 }
 
-export function PlantClump({ plant, quantity, interior }: PlantClumpProps) {
+export function PlantClump({ plant, quantity, interior, groundY }: PlantClumpProps) {
   const reduced = useReducedMotion();
+  const y = groundY ?? interior.substrateY;
   const positions = useMemo(() => {
     const out: Array<{ pos: [number, number, number]; scale: number; phase: number }> = [];
     for (let i = 0; i < quantity; i++) {
       const x = hashRange(plant.id, i * 5 + 1, -interior.x * 0.42, interior.x * 0.42);
       const z = hashRange(plant.id, i * 5 + 2, -interior.z * 0.42, interior.z * 0.42);
       const s = hashRange(plant.id, i * 5 + 3, 0.55, 0.85);
-      out.push({ pos: [x, interior.substrateY, z], scale: s, phase: hashRange(plant.id, i * 5 + 4, 0, Math.PI * 2) });
+      out.push({ pos: [x, y, z], scale: s, phase: hashRange(plant.id, i * 5 + 4, 0, Math.PI * 2) });
     }
     return out;
-  }, [plant.id, quantity, interior.x, interior.z, interior.substrateY]);
+  }, [plant.id, quantity, interior.x, interior.z, y]);
+
 
   return (
     <>

@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useEffect } from "react";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
@@ -6,18 +6,35 @@ import type { TankState } from "@/lib/types";
 import { FishGroup } from "./FishMesh";
 import { PlantClump } from "./PlantMesh";
 import { HardscapeClump } from "./HardscapeMesh";
+import { EquipmentMesh } from "./EquipmentMesh";
+import { DragGroup } from "./DragGroup";
 import { substrateColour } from "./palette";
+import { useEditorStore } from "./editorStore";
+import {
+  getPlacement,
+  setPlacement,
+  type PlacementKind,
+  type PlacementOverride,
+} from "./placements";
 
 const CM_PER_UNIT = 10;
 
 interface Props {
   state: TankState;
+  setState?: (updater: (s: TankState) => TankState) => void;
+  commit?: () => void;
   onRemoveSpecies?: (speciesId: string) => void;
   interactive?: boolean;
 }
 
-export default function TankScene({ state, onRemoveSpecies, interactive = true }: Props) {
-  const [selected, setSelected] = useState<string | null>(null);
+export default function TankScene({
+  state,
+  setState,
+  commit,
+  interactive = true,
+}: Props) {
+  const select = useEditorStore((s) => s.select);
+  const selected = useEditorStore((s) => s.selected);
 
   const dims = useMemo(() => {
     const x = Math.max(state.length_cm, 20) / CM_PER_UNIT;
@@ -35,7 +52,29 @@ export default function TankScene({ state, onRemoveSpecies, interactive = true }
   const subColour = substrateColour(state);
 
   const hasFish = state.species.length > 0;
-  const selectedRow = selected ? state.species.find((s) => s.species.id === selected) : null;
+
+  // Clear selection when it points at a deleted row.
+  useEffect(() => {
+    if (!selected) return;
+    const exists =
+      (selected.kind === "fish" && state.species.some((r) => r.species.id === selected.refId)) ||
+      (selected.kind === "plant" && state.plants.some((r) => r.plant.id === selected.refId)) ||
+      (selected.kind === "hardscape" &&
+        state.hardscape.some((r) => r.hardscape.id === selected.refId)) ||
+      (selected.kind === "equipment" && !!state.filter);
+    if (!exists) select(null);
+  }, [selected, state.species, state.plants, state.hardscape, state.filter, select]);
+
+  function onChangePlacement(next: PlacementOverride) {
+    if (!setState) return;
+    setState((s) => ({ ...s, overrides: setPlacement(s.overrides ?? {}, next) }));
+  }
+  function doCommit() {
+    commit?.();
+  }
+  function onSelect(kind: PlacementKind, refId: string) {
+    select({ kind, refId });
+  }
 
   return (
     <div className="relative h-[480px] w-full overflow-hidden rounded-3xl border bg-gradient-to-b from-[#e8f4f6] to-[#c9e5eb]">
@@ -44,7 +83,7 @@ export default function TankScene({ state, onRemoveSpecies, interactive = true }
         dpr={[1, 1.75]}
         camera={{ position: [camDistance * 0.7, camDistance * 0.35, camDistance * 0.9], fov: 40 }}
         frameloop={hasFish ? "always" : "demand"}
-        onPointerMissed={() => setSelected(null)}
+        onPointerMissed={() => select(null)}
       >
         <color attach="background" args={["#dcefef"]} />
         <ambientLight intensity={0.75} />
@@ -70,26 +109,106 @@ export default function TankScene({ state, onRemoveSpecies, interactive = true }
         </mesh>
 
         {/* Hardscape */}
-        {state.hardscape.map(({ hardscape, quantity }) => (
-          <HardscapeClump key={hardscape.id} item={hardscape} quantity={quantity} interior={interior} />
-        ))}
+        {state.hardscape.map(({ hardscape, quantity }) => {
+          if (hardscape.type === "substrate") return null;
+          const placement = getPlacement(state.overrides, "hardscape", hardscape.id, interior);
+          const isSel = selected?.kind === "hardscape" && selected?.refId === hardscape.id;
+          return (
+            <DragGroup
+              key={hardscape.id}
+              placement={placement}
+              interior={interior}
+              selected={isSel}
+              onSelect={() => onSelect("hardscape", hardscape.id)}
+              onChange={onChangePlacement}
+              onCommit={doCommit}
+              interactive={interactive}
+            >
+              <group scale={placement.scale}>
+                <HardscapeClump
+                  item={hardscape}
+                  quantity={quantity}
+                  interior={interior}
+                  groundY={0}
+                />
+              </group>
+            </DragGroup>
+          );
+        })}
 
         {/* Plants */}
-        {state.plants.map(({ plant, quantity }) => (
-          <PlantClump key={plant.id} plant={plant} quantity={quantity} interior={interior} />
-        ))}
+        {state.plants.map(({ plant, quantity }) => {
+          const placement = getPlacement(state.overrides, "plant", plant.id, interior);
+          const isSel = selected?.kind === "plant" && selected?.refId === plant.id;
+          return (
+            <DragGroup
+              key={plant.id}
+              placement={placement}
+              interior={interior}
+              selected={isSel}
+              onSelect={() => onSelect("plant", plant.id)}
+              onChange={onChangePlacement}
+              onCommit={doCommit}
+              interactive={interactive}
+            >
+              <group scale={placement.scale}>
+                <PlantClump
+                  plant={plant}
+                  quantity={quantity}
+                  interior={interior}
+                  groundY={0}
+                />
+              </group>
+            </DragGroup>
+          );
+        })}
 
         {/* Fish */}
-        {state.species.map(({ species, quantity }) => (
-          <FishGroup
-            key={species.id}
-            species={species}
-            quantity={quantity}
-            interior={interior}
-            selected={selected === species.id}
-            onSelect={() => interactive && setSelected(species.id)}
-          />
-        ))}
+        {state.species.map(({ species, quantity }) => {
+          const placement = getPlacement(state.overrides, "fish", species.id, interior);
+          const isSel = selected?.kind === "fish" && selected?.refId === species.id;
+          const hasOverride = !!state.overrides?.[`fish:${species.id}`];
+          return (
+            <DragGroup
+              key={species.id}
+              placement={placement}
+              interior={interior}
+              selected={isSel}
+              onSelect={() => onSelect("fish", species.id)}
+              onChange={onChangePlacement}
+              onCommit={doCommit}
+              interactive={interactive}
+            >
+              <FishGroup
+                species={species}
+                quantity={quantity}
+                interior={interior}
+                selected={isSel}
+                onSelect={() => onSelect("fish", species.id)}
+                centerY={hasOverride ? placement.anchor[1] : undefined}
+              />
+            </DragGroup>
+          );
+        })}
+
+        {/* Equipment (filter) */}
+        {state.filter && (() => {
+          const placement = getPlacement(state.overrides, "equipment", "filter", interior);
+          const isSel = selected?.kind === "equipment" && selected?.refId === "filter";
+          return (
+            <DragGroup
+              placement={placement}
+              interior={interior}
+              selected={isSel}
+              onSelect={() => onSelect("equipment", "filter")}
+              onChange={onChangePlacement}
+              onCommit={doCommit}
+              interactive={interactive}
+            >
+              <EquipmentMesh />
+            </DragGroup>
+          );
+        })()}
 
         <OrbitControls
           enablePan={false}
@@ -97,37 +216,13 @@ export default function TankScene({ state, onRemoveSpecies, interactive = true }
           maxDistance={largest * 3}
           minPolarAngle={Math.PI * 0.15}
           maxPolarAngle={Math.PI * 0.55}
+          makeDefault
         />
       </Canvas>
 
-      {interactive && selectedRow && (
-        <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between gap-3 rounded-2xl border bg-card/95 px-3 py-2 shadow-lg backdrop-blur sm:right-auto sm:max-w-sm">
-          <div className="min-w-0">
-            <p className="truncate text-sm font-semibold text-foreground">
-              {selectedRow.species.common_name} × {selectedRow.quantity}
-            </p>
-            <p className="truncate text-xs text-muted-foreground">
-              {selectedRow.species.scientific_name}
-            </p>
-          </div>
-          {onRemoveSpecies && (
-            <button
-              type="button"
-              onClick={() => {
-                onRemoveSpecies(selectedRow.species.id);
-                setSelected(null);
-              }}
-              className="rounded-lg border px-2.5 py-1 text-xs font-semibold text-coral hover:bg-coral/10"
-            >
-              Remove
-            </button>
-          )}
-        </div>
-      )}
-
       {!hasFish && (
         <div className="pointer-events-none absolute inset-x-0 top-3 text-center text-xs text-muted-foreground">
-          Drag to rotate · scroll to zoom
+          Drag to rotate · scroll to zoom · click objects to edit
         </div>
       )}
     </div>
