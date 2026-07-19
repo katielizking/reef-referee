@@ -187,17 +187,19 @@ function SpeciesAdder({
 }) {
   const [q, setQ] = useState("");
   const [showResults, setShowResults] = useState(false);
+  const [legalFilter, setLegalFilter] = useState<"all" | "permitted" | "native" | "prohibited">("all");
   const results = useMemo(() => {
     const term = q.trim().toLowerCase();
-    if (!term) return species.slice(0, 8);
-    return species
+    const base = legalFilter === "all" ? species : species.filter((s) => s.legal_status === legalFilter);
+    if (!term) return base.slice(0, 8);
+    return base
       .filter(
         (s) =>
           s.common_name.toLowerCase().includes(term) ||
           s.scientific_name.toLowerCase().includes(term),
       )
       .slice(0, 12);
-  }, [q, species]);
+  }, [q, species, legalFilter]);
 
   function add(sp: Species) {
     setState((s) => {
