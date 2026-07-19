@@ -148,6 +148,20 @@ export function ScorecardPanel({ scorecard }: { scorecard: Scorecard }) {
         </div>
       )}
 
+      {s.legality.nativeNotes.length > 0 && (
+        <div className="rounded-2xl border bg-muted/40 p-4 text-foreground/80">
+          <p className="text-sm font-medium text-foreground">
+            Australian natives — check your state's rules:
+          </p>
+          <ul className="mt-2 space-y-1 text-sm">
+            {s.legality.nativeNotes.map((n, i) => (
+              <li key={i}>· {n}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+
       <SubCard
         title="Species compatibility"
         score={s.compatibility.score}
