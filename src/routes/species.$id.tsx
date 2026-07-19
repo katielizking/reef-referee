@@ -160,6 +160,8 @@ function Stat({ icon: Icon, label, value }: { icon: typeof Ruler; label: string;
 function SpeciesGuide() {
   const { id } = Route.useParams();
   const { data: s } = useSuspenseQuery(speciesByIdQuery(id));
+  const { data: allSpecies } = useSuspenseQuery(allSpeciesQuery);
+  const related = findRelated(s, allSpecies);
 
   const zoneLabel = { top: "Top", mid: "Mid-water", bottom: "Bottom" }[s.swim_zone];
   const temperament = s.temperament.charAt(0).toUpperCase() + s.temperament.slice(1);
