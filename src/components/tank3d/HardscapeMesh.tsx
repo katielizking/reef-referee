@@ -6,12 +6,15 @@ interface HardscapeClumpProps {
   item: Hardscape;
   quantity: number;
   interior: { x: number; y: number; z: number; substrateY: number };
+  /** Override the Y at which the clump sits (defaults to interior.substrateY). */
+  groundY?: number;
 }
 
-export function HardscapeClump({ item, quantity, interior }: HardscapeClumpProps) {
+export function HardscapeClump({ item, quantity, interior, groundY }: HardscapeClumpProps) {
   const colour = hardscapeColour(item);
   // Substrate is drawn separately as a slab; skip meshes for substrate rows.
   if (item.type === "substrate") return null;
+  const y = groundY ?? interior.substrateY;
 
   const nodes = useMemo(() => {
     const out: Array<{ pos: [number, number, number]; scale: number; rot: number }> = [];
@@ -20,10 +23,11 @@ export function HardscapeClump({ item, quantity, interior }: HardscapeClumpProps
       const z = hashRange(item.id, i * 4 + 2, -interior.z * 0.4, interior.z * 0.4);
       const s = hashRange(item.id, i * 4 + 3, 0.6, 1.1);
       const r = hashRange(item.id, i * 4 + 4, 0, Math.PI * 2);
-      out.push({ pos: [x, interior.substrateY, z], scale: s, rot: r });
+      out.push({ pos: [x, y, z], scale: s, rot: r });
     }
     return out;
-  }, [item.id, quantity, interior.x, interior.z, interior.substrateY]);
+  }, [item.id, quantity, interior.x, interior.z, y]);
+
 
   return (
     <>
