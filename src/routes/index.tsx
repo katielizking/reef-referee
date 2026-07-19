@@ -99,6 +99,14 @@ function Builder() {
     });
   }, [species.data]);
 
+  // Auto-suggest a filter once dimensions are known and none is chosen.
+  useEffect(() => {
+    if (!filters.data || state.filter) return;
+    const pick = pickDefaultFilter(filters.data, state);
+    if (pick) setState((s) => (s.filter ? s : { ...s, filter: pick }));
+  }, [filters.data, state.filter, state.length_cm, state.width_cm, state.height_cm]);
+
+
   async function doSave(share: boolean) {
     try {
       setSaving(true);
