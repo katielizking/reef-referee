@@ -62,18 +62,37 @@ function Builder() {
 
   useEffect(() => {
     if (!species.data) return;
-    const pendingId = sessionStorage.getItem("fishtankr:pending-add");
-    if (!pendingId) return;
+    const raw = sessionStorage.getItem("fishtankr:pending-add");
+    if (!raw) return;
     sessionStorage.removeItem("fishtankr:pending-add");
-    const found = species.data.find((s) => s.id === pendingId);
-    if (!found) return;
+    let ids: string[] = [];
+    try {
+      const parsed = JSON.parse(raw);
+      ids = Array.isArray(parsed) ? parsed : [raw];
+    } catch {
+      ids = [raw];
+    }
     setState((prev) => {
-      if (prev.species.some((row) => row.species.id === pendingId)) {
-        toast.info(`${found.common_name} is already in your tank`);
+      const toAdd = ids
+        .map((id) => species.data!.find((s) => s.id === id))
+        .filter((s): s is NonNullable<typeof s> => !!s)
+        .filter((s) => !prev.species.some((row) => row.species.id === s.id));
+      if (toAdd.length === 0) {
+        toast.info("Those fish are already in your tank");
         return prev;
       }
-      toast.success(`Added ${found.common_name} to your tank`);
-      return { ...prev, species: [...prev.species, { species: found, quantity: 1 }] };
+      toast.success(
+        toAdd.length === 1
+          ? `Added ${toAdd[0].common_name} to your tank`
+          : `Added ${toAdd.length} species to your tank`,
+      );
+      return {
+        ...prev,
+        species: [
+          ...prev.species,
+          ...toAdd.map((s) => ({ species: s, quantity: 1 })),
+        ],
+      };
     });
   }, [species.data]);
 
