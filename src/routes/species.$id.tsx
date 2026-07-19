@@ -69,7 +69,11 @@ function findRelated(target: Species, all: Species[]): Array<{ s: Species; reaso
 }
 
 export const Route = createFileRoute("/species/$id")({
-  loader: ({ context, params }) => context.queryClient.ensureQueryData(speciesByIdQuery(params.id)),
+  loader: ({ context, params }) =>
+    Promise.all([
+      context.queryClient.ensureQueryData(speciesByIdQuery(params.id)),
+      context.queryClient.ensureQueryData(allSpeciesQuery),
+    ]).then(([s]) => s),
   head: ({ loaderData }) => {
     if (!loaderData) {
       return { meta: [{ title: "Species — FishTankr" }, { name: "robots", content: "noindex" }] };
