@@ -6,7 +6,7 @@ import { Loader2 } from "lucide-react";
 import { loadTankBySlug } from "@/lib/data";
 import { scoreTank, litresOf } from "@/lib/scoring";
 import type { TankState } from "@/lib/types";
-import { TankVisual } from "@/components/TankVisual";
+import { ClientOnlyTankScene } from "@/components/tank3d/ClientOnlyTankScene";
 import { ScorecardPanel } from "@/components/Scorecard";
 
 const tankQuery = (slug: string) =>
@@ -119,7 +119,7 @@ function SharedTankBody() {
       </div>
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,340px)]">
         <div className="space-y-4">
-          <TankVisual state={state} />
+          <ClientOnlyTankScene state={state} interactive={false} />
           <ContentsList state={state} />
         </div>
         <div>
