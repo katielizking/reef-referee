@@ -2,7 +2,7 @@ import { useFrame } from "@react-three/fiber";
 import { useGLTF } from "@react-three/drei";
 import { useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
-import { SkeletonUtils } from "three/examples/jsm/utils/SkeletonUtils.js";
+import { clone as cloneSkinnedScene } from "three/examples/jsm/utils/SkeletonUtils.js";
 import type { FishMeshProps } from "../FishMesh";
 import type { FishAnimationState, FishAssetDefinition } from "@/lib/fish3d/types";
 import { computeRenderScale, forwardAxisRotationY } from "@/lib/fish3d/scaling";
