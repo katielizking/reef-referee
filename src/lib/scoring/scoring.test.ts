@@ -47,7 +47,7 @@ const cory = mkSpecies({
   biotope_region: "amazon_blackwater",
   is_schooling: true,
   min_group_size: 5,
-  bioload_factor: 0.8,
+  bioload_factor: 1.2,
   adult_size_cm: 6,
   min_tank_litres: 60,
   native_ph_min: 5.5,
