@@ -211,6 +211,7 @@ export default function TankScene({
           );
         })()}
 
+        <CameraRig defaultDistance={camDistance} />
         <OrbitControls
           enablePan={false}
           minDistance={largest * 0.8}
@@ -220,6 +221,14 @@ export default function TankScene({
           makeDefault
         />
       </Canvas>
+
+      <div className="pointer-events-none absolute inset-x-0 bottom-3 flex justify-center">
+        <span className="rounded-full bg-card/85 px-3 py-1 text-[11px] text-muted-foreground shadow-sm backdrop-blur">
+          {hasFish
+            ? "Tap fish · plants · hardscape to edit"
+            : "Drag to rotate · scroll to zoom · click objects to edit"}
+        </span>
+      </div>
 
       {!hasFish && (
         <div className="pointer-events-none absolute inset-x-0 top-3 text-center text-xs text-muted-foreground">
