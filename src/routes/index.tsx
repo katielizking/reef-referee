@@ -5,6 +5,10 @@ import { toast } from "sonner";
 
 import { TankSetupPanel } from "@/components/TankSetupPanel";
 import { ClientOnlyTankScene } from "@/components/tank3d/ClientOnlyTankScene";
+import { SelectedObjectPanel } from "@/components/tank3d/SelectedObjectPanel";
+import { SceneToolbar } from "@/components/tank3d/SceneToolbar";
+import { useTankHistory } from "@/components/tank3d/useTankHistory";
+import { useEditorStore } from "@/components/tank3d/editorStore";
 import { ScorecardPanel } from "@/components/Scorecard";
 import { MobileScoreBar } from "@/components/MobileScoreBar";
 import { HeroTankIllustration } from "@/components/BrandLogo";
@@ -13,6 +17,7 @@ import { scoreTank } from "@/lib/scoring";
 import { pickDefaultFilter } from "@/lib/defaults";
 import type { TankState } from "@/lib/types";
 import { useFilters, useHardscape, usePlants, useSpecies, saveTank } from "@/lib/data";
+
 
 
 export const Route = createFileRoute("/")({
