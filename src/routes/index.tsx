@@ -218,7 +218,13 @@ function Builder() {
             />
           </div>
           <div className="space-y-4">
-            <TankVisual state={state} />
+            <ClientOnlyTankScene
+              state={state}
+              onRemoveSpecies={(id) =>
+                setState((s) => ({ ...s, species: s.species.filter((x) => x.species.id !== id) }))
+              }
+            />
+
             <div className="rounded-3xl border bg-card p-4 text-sm text-muted-foreground">
               <p>
                 <span className="font-semibold text-foreground">Here's what's happening below the surface.</span>{" "}
