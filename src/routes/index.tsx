@@ -58,7 +58,21 @@ function Builder() {
   const [state, setState] = useState<TankState>(DEFAULT_STATE);
   const [saving, setSaving] = useState(false);
   const [savedId, setSavedId] = useState<string | undefined>(undefined);
+  const [openSteps, setOpenSteps] = useState<StepId[]>(["tank"]);
+  const [heroDismissed, setHeroDismissed] = useState(true); // start true to avoid SSR flash
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    setHeroDismissed(window.localStorage.getItem(HERO_DISMISS_KEY) === "1");
+  }, []);
+
+  function dismissHero() {
+    setHeroDismissed(true);
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem(HERO_DISMISS_KEY, "1");
+    }
+  }
 
   const species = useSpecies();
   const plants = usePlants();
@@ -71,7 +85,16 @@ function Builder() {
   const selected = useEditorStore((s) => s.selected);
 
   const ready = species.data && plants.data && hardscape.data && filters.data;
-  const showHero = state.species.length === 0;
+  const showHero = !heroDismissed && state.species.length === 0;
+
+  function jumpToStep(id: StepId) {
+    setOpenSteps((prev) => (prev.includes(id) ? prev : [...prev, id]));
+    requestAnimationFrame(() => {
+      const el = document.getElementById(`step-${id}`);
+      if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  }
+
 
   const dims = useMemo(() => {
     const CM_PER_UNIT = 10;
