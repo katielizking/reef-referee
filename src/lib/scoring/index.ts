@@ -246,7 +246,6 @@ function scoreBiome(
   const cohesion = counts[dominant] / total; // 0..1
 
   // Water authenticity
-  const { BIOTOPE_WATER } = require("../types") as typeof import("../types");
   const water = BIOTOPE_WATER[dominant];
   const phFit = state.target_ph >= water.ph_min && state.target_ph <= water.ph_max ? 1 : Math.max(0, 1 - Math.min(Math.abs(state.target_ph - water.ph_min), Math.abs(state.target_ph - water.ph_max)) / 2);
   const tempFit = state.target_temp_c >= water.temp_min && state.target_temp_c <= water.temp_max ? 1 : Math.max(0, 1 - Math.min(Math.abs(state.target_temp_c - water.temp_min), Math.abs(state.target_temp_c - water.temp_max)) / 4);
