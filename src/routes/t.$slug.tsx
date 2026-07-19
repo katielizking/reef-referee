@@ -21,45 +21,48 @@ const tankQuery = (slug: string) =>
 
 export const Route = createFileRoute("/t/$slug")({
   loader: ({ context, params }) => context.queryClient.ensureQueryData(tankQuery(params.slug)),
-  head: ({ loaderData }) => {
+  head: ({ loaderData, params }) => {
     const name = loaderData?.tank.name ?? "Shared tank";
     return {
       meta: [
-        { title: `${name} — Fishtankr` },
+        { title: `${name} — FishTankr` },
         {
           name: "description",
-          content: `${name}: a freshwater aquarium designed with Fishtankr.`,
+          content: `${name}: an aquarium designed with FishTankr.`,
         },
-        { property: "og:title", content: `${name} — Fishtankr` },
+        { property: "og:title", content: `${name} — FishTankr` },
         {
           property: "og:description",
-          content: `A freshwater aquarium design shared from Fishtankr.`,
+          content: `An aquarium design shared from FishTankr — smarter tanks, happier fish.`,
         },
+        { property: "og:type", content: "article" },
+        { property: "og:url", content: `/t/${params.slug}` },
       ],
+      links: [{ rel: "canonical", href: `/t/${params.slug}` }],
     };
   },
   component: SharedTank,
   errorComponent: ({ error }) => (
     <main className="mx-auto max-w-3xl px-4 py-12 text-center">
-      <h1 className="text-xl font-semibold">Couldn't load this tank</h1>
+      <h1 className="font-display text-xl font-semibold">Couldn't load this tank</h1>
       <p className="mt-2 text-sm text-muted-foreground">{error.message}</p>
       <Link
         to="/"
-        className="mt-6 inline-flex rounded-xl bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
+        className="mt-6 inline-flex rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:brightness-95"
       >
-        Back to builder
+        Back to the builder
       </Link>
     </main>
   ),
   notFoundComponent: () => (
     <main className="mx-auto max-w-3xl px-4 py-12 text-center">
-      <h1 className="text-xl font-semibold">Tank not found</h1>
+      <h1 className="font-display text-xl font-semibold">Tank not found</h1>
       <p className="mt-2 text-sm text-muted-foreground">The share link may be wrong or expired.</p>
       <Link
         to="/"
-        className="mt-6 inline-flex rounded-xl bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
+        className="mt-6 inline-flex rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:brightness-95"
       >
-        Back to builder
+        Back to the builder
       </Link>
     </main>
   ),
@@ -103,8 +106,12 @@ function SharedTankBody() {
   return (
     <main className="mx-auto max-w-6xl px-4 py-6">
       <div className="mb-6">
-        <p className="text-xs uppercase tracking-wide text-muted-foreground">Shared tank</p>
-        <h1 className="text-2xl font-semibold tracking-tight">{state.name}</h1>
+        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+          Shared tank
+        </p>
+        <h1 className="font-display text-2xl font-semibold tracking-tight text-foreground">
+          {state.name}
+        </h1>
         <p className="text-sm text-muted-foreground">
           {state.length_cm}×{state.width_cm}×{state.height_cm} cm · {litres} L ·{" "}
           {state.filter ? state.filter.name : "no filter set"}
@@ -120,7 +127,7 @@ function SharedTankBody() {
           <div className="mt-4">
             <Link
               to="/"
-              className="inline-flex rounded-xl bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+              className="inline-flex rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:brightness-95"
             >
               Design your own
             </Link>
@@ -168,7 +175,7 @@ function ContentsList({ state }: { state: TankState }) {
 function ListCard({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="rounded-2xl border bg-card p-4">
-      <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+      <h3 className="mb-2 font-display text-xs font-semibold uppercase tracking-wide text-muted-foreground">
         {title}
       </h3>
       <ul>{children}</ul>

@@ -272,7 +272,7 @@ function SpeciesAdder({
                   <div className="text-sm font-medium">
                     {sp.common_name}
                     {!sp.legal_in_australia && (
-                      <span className="ml-2 rounded bg-red-100 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-red-700">
+                      <span className="ml-2 rounded bg-coral/20 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-foreground">
                         Not AU legal
                       </span>
                     )}
@@ -527,7 +527,7 @@ function QtyStepper({
       </button>
       <button
         onClick={onRemove}
-        className="ml-1 rounded-lg p-1 text-muted-foreground hover:bg-red-50 hover:text-red-600"
+        className="ml-1 rounded-lg p-1 text-muted-foreground hover:bg-coral/15 hover:text-coral"
       >
         <X className="h-3.5 w-3.5" />
       </button>

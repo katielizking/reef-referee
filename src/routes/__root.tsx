@@ -12,6 +12,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "@/components/ui/sonner";
+import { BrandLogo } from "@/components/BrandLogo";
 import { supabase } from "@/integrations/supabase/client";
 
 
@@ -19,17 +20,19 @@ function NotFoundComponent() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
-        <h1 className="text-7xl font-bold text-foreground">404</h1>
-        <h2 className="mt-4 text-xl font-semibold text-foreground">Page not found</h2>
+        <h1 className="font-display text-6xl font-bold text-foreground">404</h1>
+        <h2 className="mt-4 font-display text-xl font-semibold text-foreground">
+          Nothing swimming here
+        </h2>
         <p className="mt-2 text-sm text-muted-foreground">
-          The page you're looking for doesn't exist or has been moved.
+          The page you're after may have moved. Let's get you back to your tank.
         </p>
         <div className="mt-6">
           <Link
             to="/"
-            className="inline-flex items-center justify-center rounded-xl bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+            className="inline-flex items-center justify-center rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:brightness-95"
           >
-            Back to builder
+            Back to the builder
           </Link>
         </div>
       </div>
@@ -47,11 +50,11 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
-        <h1 className="text-xl font-semibold tracking-tight text-foreground">
-          Something went wrong
+        <h1 className="font-display text-xl font-semibold tracking-tight text-foreground">
+          Something's not quite right
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Try again or head back to the builder.
+          Give it another go, or head back to the builder.
         </p>
         <div className="mt-6 flex flex-wrap justify-center gap-2">
           <button
@@ -59,15 +62,15 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
               router.invalidate();
               reset();
             }}
-            className="inline-flex items-center justify-center rounded-xl bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+            className="inline-flex items-center justify-center rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:brightness-95"
           >
             Try again
           </button>
           <a
             href="/"
-            className="inline-flex items-center justify-center rounded-xl border bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted"
+            className="inline-flex items-center justify-center rounded-xl border bg-card px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted"
           >
-            Back to builder
+            Back to the builder
           </a>
         </div>
       </div>
@@ -75,9 +78,9 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   );
 }
 
-const TITLE = "Fishtankr — design and score your freshwater tank";
+const TITLE = "FishTankr — Smarter tanks. Happier fish.";
 const DESC =
-  "Design your freshwater aquarium and get an instant score on stocking, bioload, biotope authenticity and Australian legality.";
+  "Simple tools that make fishkeeping easier to understand and better for the animals in our care. Plan a setup, check your stocking and see the biology behind a healthy aquarium.";
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   head: () => ({
@@ -86,9 +89,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: TITLE },
       { name: "description", content: DESC },
+      { name: "theme-color", content: "#37B8C6" },
       { property: "og:title", content: TITLE },
       { property: "og:description", content: DESC },
       { property: "og:type", content: "website" },
+      { property: "og:site_name", content: "FishTankr" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [
@@ -97,9 +102,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
+        href: "https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap",
       },
-      { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+      { rel: "icon", href: "/favicon.png", type: "image/png" },
     ],
   }),
   shellComponent: RootShell,
@@ -150,36 +155,57 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <div className="min-h-screen">
-
-        <header className="border-b bg-card/60 backdrop-blur">
+      <div className="flex min-h-screen flex-col bg-background">
+        <header className="sticky top-0 z-30 border-b border-border/70 bg-background/85 backdrop-blur">
           <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3">
-            <Link to="/" className="flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary text-primary-foreground">
-                <span aria-hidden>🐟</span>
-              </div>
-              <span className="text-lg font-semibold tracking-tight">Fishtankr</span>
+            <Link to="/" aria-label="FishTankr home" className="rounded-lg">
+              <BrandLogo />
             </Link>
-            <nav className="flex items-center gap-1 text-sm">
+            <nav aria-label="Primary" className="flex items-center gap-1 text-sm">
               <Link
                 to="/"
-                className="rounded-lg px-3 py-1.5 text-muted-foreground hover:text-foreground"
-                activeProps={{ className: "rounded-lg px-3 py-1.5 bg-muted text-foreground" }}
+                className="rounded-lg px-3 py-1.5 font-medium text-muted-foreground transition-colors hover:text-foreground"
+                activeProps={{
+                  className:
+                    "rounded-lg px-3 py-1.5 font-medium bg-muted text-foreground",
+                }}
                 activeOptions={{ exact: true }}
               >
                 Builder
               </Link>
               <Link
                 to="/saved"
-                className="rounded-lg px-3 py-1.5 text-muted-foreground hover:text-foreground"
-                activeProps={{ className: "rounded-lg px-3 py-1.5 bg-muted text-foreground" }}
+                className="rounded-lg px-3 py-1.5 font-medium text-muted-foreground transition-colors hover:text-foreground"
+                activeProps={{
+                  className:
+                    "rounded-lg px-3 py-1.5 font-medium bg-muted text-foreground",
+                }}
               >
-                Saved tanks
+                My tanks
               </Link>
             </nav>
           </div>
         </header>
-        <Outlet />
+
+        <div className="flex-1">
+          <Outlet />
+        </div>
+
+        <footer className="mt-16 border-t border-border/70 bg-card/50">
+          <div className="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-6 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-center gap-2">
+              <BrandLogo size={22} showWordmark={false} />
+              <span className="font-display font-semibold text-foreground">
+                Smarter tanks. Happier fish.
+              </span>
+            </div>
+            <p className="max-w-md text-xs sm:text-right">
+              This is a guide, not a guarantee. Always check the needs of each species
+              and follow the rules in your state.
+            </p>
+          </div>
+        </footer>
+
         <Toaster />
       </div>
     </QueryClientProvider>

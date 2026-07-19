@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { TankSetupPanel } from "@/components/TankSetupPanel";
 import { TankVisual } from "@/components/TankVisual";
 import { ScorecardPanel } from "@/components/Scorecard";
+import { HeroTankIllustration } from "@/components/BrandLogo";
 import { scoreTank } from "@/lib/scoring";
 import type { TankState } from "@/lib/types";
 import { useFilters, useHardscape, usePlants, useSpecies, saveTank } from "@/lib/data";
@@ -13,13 +14,15 @@ import { useFilters, useHardscape, usePlants, useSpecies, saveTank } from "@/lib
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Fishtankr — Design and score your freshwater tank" },
+      { title: "FishTankr — Smarter tanks. Happier fish." },
       {
         name: "description",
         content:
-          "Design a freshwater aquarium and get an instant score on stocking, bioload, biotope authenticity and Australian legality.",
+          "Plan your setup, check your stocking and understand the biology behind a healthy aquarium with simple tools built around fish welfare.",
       },
+      { property: "og:url", content: "/" },
     ],
+    links: [{ rel: "canonical", href: "/" }],
   }),
   component: Builder,
 });
@@ -53,6 +56,7 @@ function Builder() {
   const scorecard = useMemo(() => scoreTank(state), [state]);
 
   const ready = species.data && plants.data && hardscape.data && filters.data;
+  const showHero = state.species.length === 0;
 
   async function handleSave(share = false) {
     try {
@@ -62,34 +66,73 @@ function Builder() {
       if (share) {
         const url = `${window.location.origin}/t/${row.share_slug}`;
         await navigator.clipboard.writeText(url).catch(() => {});
-        toast.success("Share link copied to clipboard", { description: url });
+        toast.success("Share link copied", { description: url });
       } else {
         toast.success("Tank saved");
       }
     } catch (err) {
       console.error(err);
-      toast.error("Couldn't save tank", {
-        description: err instanceof Error ? err.message : "Try again.",
+      toast.error("Couldn't save this tank", {
+        description: err instanceof Error ? err.message : "Try again in a moment.",
       });
     } finally {
       setSaving(false);
     }
   }
 
+  function scrollToBuilder() {
+    const el = document.getElementById("builder");
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
   return (
     <main className="mx-auto max-w-7xl px-4 py-6">
-      <div className="mb-6 flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
+      {showHero && (
+        <section className="mb-8 grid gap-6 rounded-3xl border bg-card p-6 sm:p-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,380px)] lg:items-center">
+          <div>
+            <span className="inline-flex items-center rounded-full bg-lime/30 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-foreground">
+              Know before you stock
+            </span>
+            <h1 className="mt-3 font-display text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+              Smarter tanks. Happier fish.
+            </h1>
+            <p className="mt-3 max-w-xl text-base text-muted-foreground">
+              Plan your setup, check your stocking and understand the biology behind a
+              healthy aquarium with simple tools built around fish welfare.
+            </p>
+            <div className="mt-5 flex flex-wrap gap-3">
+              <button
+                onClick={scrollToBuilder}
+                className="inline-flex items-center justify-center rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm transition-all hover:brightness-95"
+              >
+                Check my tank
+              </button>
+              <button
+                onClick={() => navigate({ to: "/saved" })}
+                className="inline-flex items-center justify-center rounded-xl border bg-card px-5 py-2.5 text-sm font-semibold text-foreground transition-colors hover:bg-muted"
+              >
+                Explore the tools
+              </button>
+            </div>
+          </div>
+          <HeroTankIllustration className="mx-auto w-full max-w-md" />
+        </section>
+      )}
+
+      <div id="builder" className="mb-6 flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Design your tank</h1>
+          <h2 className="font-display text-2xl font-semibold tracking-tight text-foreground">
+            Design your tank
+          </h2>
           <p className="text-sm text-muted-foreground">
-            Add livestock, plants and hardscape. Your scorecard updates instantly.
+            Add livestock, plants and hardscape. Your scorecard updates as you go.
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <button
             onClick={() => handleSave(false)}
             disabled={saving}
-            className="inline-flex items-center gap-1.5 rounded-xl border bg-card px-3 py-2 text-sm font-medium hover:bg-muted disabled:opacity-60"
+            className="inline-flex items-center gap-1.5 rounded-xl border bg-card px-3 py-2 text-sm font-semibold text-foreground transition-colors hover:bg-muted disabled:opacity-60"
           >
             {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
             Save
@@ -97,16 +140,10 @@ function Builder() {
           <button
             onClick={() => handleSave(true)}
             disabled={saving}
-            className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-3 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-60"
+            className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:brightness-95 disabled:opacity-60"
           >
             <Share2 className="h-4 w-4" />
             Share
-          </button>
-          <button
-            onClick={() => navigate({ to: "/saved" })}
-            className="hidden rounded-xl border bg-card px-3 py-2 text-sm hover:bg-muted sm:inline-flex"
-          >
-            Saved tanks
           </button>
         </div>
       </div>
@@ -131,13 +168,13 @@ function Builder() {
             <TankVisual state={state} />
             <div className="rounded-3xl border bg-card p-4 text-sm text-muted-foreground">
               <p>
-                <span className="font-medium text-foreground">Tip:</span> Aim for one biotope region
-                for a "True biotope" badge, keep bioload comfortably under 100%, and give schooling
-                species enough room to shoal.
+                <span className="font-semibold text-foreground">Here's what's happening below the surface.</span>{" "}
+                Aim for a single biotope for a "True biotope" badge, keep bioload comfortably
+                under 100%, and give schooling species enough room to shoal.
               </p>
             </div>
           </div>
-          <div className="lg:sticky lg:top-4 lg:self-start">
+          <div className="lg:sticky lg:top-20 lg:self-start">
             <ScorecardPanel scorecard={scorecard} />
           </div>
         </div>

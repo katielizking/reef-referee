@@ -30,62 +30,69 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  --color-sand: var(--sand);
-  --color-teal: var(--teal);
-  --color-deep: var(--deep);
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --color-ink: var(--ink);
+  --color-blue: var(--blue);
+  --color-lime: var(--lime);
+  --color-coral: var(--coral);
+  --color-foam: var(--foam);
+  --color-warn: var(--warn);
+  --font-sans: "DM Sans", "Manrope", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Sora", "DM Sans", ui-sans-serif, system-ui, sans-serif;
 }
 
 :root {
-  --radius: 0.9rem;
-  /* Aquatic palette */
-  --background: oklch(0.985 0.005 220);        /* off white, faintly cool */
-  --foreground: oklch(0.22 0.05 240);          /* deep navy ink */
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.22 0.05 240);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.22 0.05 240);
-  --primary: oklch(0.42 0.11 220);             /* deep blue */
-  --primary-foreground: oklch(0.985 0.005 220);
-  --secondary: oklch(0.94 0.03 210);
-  --secondary-foreground: oklch(0.28 0.06 235);
-  --muted: oklch(0.96 0.015 220);
-  --muted-foreground: oklch(0.5 0.04 235);
-  --accent: oklch(0.68 0.11 195);              /* teal */
-  --accent-foreground: oklch(0.15 0.05 240);
-  --destructive: oklch(0.62 0.2 27);
-  --destructive-foreground: oklch(0.985 0.005 220);
-  --border: oklch(0.9 0.02 220);
-  --input: oklch(0.9 0.02 220);
-  --ring: oklch(0.6 0.1 210);
-  --sand: oklch(0.92 0.05 85);                 /* warm sand */
-  --teal: oklch(0.68 0.11 195);
-  --deep: oklch(0.32 0.09 235);                /* deep tank blue */
+  --radius: 1rem;
+
+  /* FishTankr brand palette */
+  --ink: #12232E;
+  --blue: #37B8C6;
+  --lime: #B8E84A;
+  --coral: #FF7868;
+  --foam: #F4F8F5;
+  --warn: #E39A2B;
+
+  /* Mapped shadcn tokens */
+  --background: #F4F8F5;
+  --foreground: #12232E;
+  --card: #FFFFFF;
+  --card-foreground: #12232E;
+  --popover: #FFFFFF;
+  --popover-foreground: #12232E;
+  --primary: #37B8C6;
+  --primary-foreground: #FFFFFF;
+  --secondary: #F4F8F5;
+  --secondary-foreground: #12232E;
+  --muted: #EEF3F1;
+  --muted-foreground: #556570;
+  --accent: #B8E84A;
+  --accent-foreground: #12232E;
+  --destructive: #FF7868;
+  --destructive-foreground: #FFFFFF;
+  --border: rgba(18, 35, 46, 0.10);
+  --input: rgba(18, 35, 46, 0.14);
+  --ring: #37B8C6;
 }
 
 .dark {
-  --background: oklch(0.16 0.04 240);
-  --foreground: oklch(0.96 0.01 220);
-  --card: oklch(0.22 0.05 240);
-  --card-foreground: oklch(0.96 0.01 220);
-  --popover: oklch(0.22 0.05 240);
-  --popover-foreground: oklch(0.96 0.01 220);
-  --primary: oklch(0.72 0.12 200);
-  --primary-foreground: oklch(0.16 0.04 240);
-  --secondary: oklch(0.28 0.06 240);
-  --secondary-foreground: oklch(0.96 0.01 220);
-  --muted: oklch(0.26 0.05 240);
-  --muted-foreground: oklch(0.72 0.03 220);
-  --accent: oklch(0.55 0.12 200);
-  --accent-foreground: oklch(0.985 0.005 220);
-  --destructive: oklch(0.68 0.2 22);
-  --destructive-foreground: oklch(0.985 0.005 220);
-  --border: oklch(1 0 0 / 12%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.6 0.09 210);
-  --sand: oklch(0.7 0.06 85);
-  --teal: oklch(0.6 0.12 195);
-  --deep: oklch(0.28 0.09 235);
+  --background: #0E1A22;
+  --foreground: #F4F8F5;
+  --card: #16242E;
+  --card-foreground: #F4F8F5;
+  --popover: #16242E;
+  --popover-foreground: #F4F8F5;
+  --primary: #37B8C6;
+  --primary-foreground: #0E1A22;
+  --secondary: #1A2A34;
+  --secondary-foreground: #F4F8F5;
+  --muted: #1A2A34;
+  --muted-foreground: #9BA9B2;
+  --accent: #B8E84A;
+  --accent-foreground: #0E1A22;
+  --destructive: #FF7868;
+  --destructive-foreground: #0E1A22;
+  --border: rgba(244, 248, 245, 0.10);
+  --input: rgba(244, 248, 245, 0.14);
+  --ring: #37B8C6;
 }
 
 @layer base {
@@ -96,5 +103,15 @@
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    letter-spacing: -0.01em;
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-ring);
+    outline-offset: 2px;
+    border-radius: 6px;
   }
 }
