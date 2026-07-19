@@ -308,11 +308,23 @@ function SpeciesAdder({
             key={s.species.id}
             className="flex items-center justify-between rounded-xl border bg-card px-3 py-2 text-sm"
           >
-            <div className="min-w-0">
-              <p className="truncate font-medium">{s.species.common_name}</p>
-              <p className="truncate text-xs text-muted-foreground">
-                {BIOTOPE_LABEL[s.species.biotope_region]}
-              </p>
+            <div className="flex min-w-0 items-center gap-1.5">
+              <div className="min-w-0">
+                <p className="truncate font-medium">{s.species.common_name}</p>
+                <p className="truncate text-xs text-muted-foreground">
+                  {BIOTOPE_LABEL[s.species.biotope_region]}
+                </p>
+              </div>
+              <Link
+                to="/species/$id"
+                params={{ id: s.species.id }}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`View guide for ${s.species.common_name}`}
+                className="rounded-lg p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
+              >
+                <Info className="h-4 w-4" />
+              </Link>
             </div>
             <QtyStepper
               value={s.quantity}
