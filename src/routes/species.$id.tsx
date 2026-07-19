@@ -242,6 +242,39 @@ function SpeciesGuide() {
         </div>
       </section>
 
+      {related.length > 0 && (
+        <section className="mt-10">
+          <h2 className="font-display text-xl font-semibold text-foreground">Related species</h2>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Peaceful matches based on swim zone, temperament and water parameters.
+          </p>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            {related.map(({ s: r, reason }) => (
+              <Link
+                key={r.id}
+                to="/species/$id"
+                params={{ id: r.id }}
+                className="group flex flex-col gap-1 rounded-2xl border bg-card p-4 transition hover:border-primary hover:shadow-sm"
+              >
+                <div className="flex items-start justify-between gap-2">
+                  <div>
+                    <div className="font-display text-base font-semibold text-foreground group-hover:text-primary">
+                      {r.common_name}
+                    </div>
+                    <div className="text-xs italic text-muted-foreground">{r.scientific_name}</div>
+                  </div>
+                  <span className="shrink-0 rounded-full bg-muted px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                    {BIOTOPE_LABEL[r.biotope_region]}
+                  </span>
+                </div>
+                <div className="mt-1 text-xs text-muted-foreground">{reason}</div>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
+
+
       <p className="mt-10 rounded-xl bg-muted/60 px-4 py-3 text-xs text-muted-foreground">
         This is a guide, not a guarantee. Individual fish vary — always check the needs of each species and your local regulations before you buy.
       </p>
