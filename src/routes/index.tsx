@@ -1,9 +1,10 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { Loader2, Save, Share2 } from "lucide-react";
+import { Loader2, Save, Share2, X } from "lucide-react";
 import { toast } from "sonner";
 
 import { TankSetupPanel } from "@/components/TankSetupPanel";
+import { BuilderSteps, type StepId } from "@/components/BuilderSteps";
 import { ClientOnlyTankScene } from "@/components/tank3d/ClientOnlyTankScene";
 import { SelectedObjectPanel } from "@/components/tank3d/SelectedObjectPanel";
 import { SceneToolbar } from "@/components/tank3d/SceneToolbar";
@@ -17,6 +18,8 @@ import { scoreTank } from "@/lib/scoring";
 import { pickDefaultFilter } from "@/lib/defaults";
 import type { TankState } from "@/lib/types";
 import { useFilters, useHardscape, usePlants, useSpecies, saveTank } from "@/lib/data";
+
+const HERO_DISMISS_KEY = "fishtankr:hero-dismissed";
 
 
 
