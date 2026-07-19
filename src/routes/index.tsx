@@ -123,6 +123,14 @@ function Builder() {
     if (pick) setState((s) => (s.filter ? s : { ...s, filter: pick }));
   }, [filters.data, state.filter, state.length_cm, state.width_cm, state.height_cm]);
 
+  // Capture a history snapshot when the state has settled after any edit
+  // (drag commits itself synchronously on pointer-up).
+  useEffect(() => {
+    const t = setTimeout(() => history.commit(), 500);
+    return () => clearTimeout(t);
+  }, [state, history]);
+
+
 
   async function doSave(share: boolean) {
     try {
