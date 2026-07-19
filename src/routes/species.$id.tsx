@@ -1,6 +1,6 @@
-import { createFileRoute, Link, useRouter, notFound } from "@tanstack/react-router";
+import { createFileRoute, Link, useRouter, useNavigate, notFound } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
-import { ArrowLeft, Fish, Ruler, Droplet, Thermometer, Users, Waves, AlertTriangle, Info, Leaf } from "lucide-react";
+import { ArrowLeft, Fish, Ruler, Droplet, Thermometer, Users, Waves, AlertTriangle, Info, Leaf, Plus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import type { Species } from "@/lib/types";
 import { BIOTOPE_LABEL } from "@/lib/types";
