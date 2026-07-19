@@ -265,17 +265,21 @@ function Builder() {
           <Loader2 className="h-6 w-6 animate-spin" />
         </div>
       ) : (
-        <div className="grid gap-6 lg:grid-cols-[minmax(0,320px)_minmax(0,1fr)_minmax(0,340px)]">
-          <div className="rounded-3xl border bg-card p-5">
-            <TankSetupPanel
-              state={state}
-              setState={setState}
-              species={species.data!}
-              plants={plants.data!}
-              hardscape={hardscape.data!}
-              filters={filters.data!}
-            />
-          </div>
+        <>
+          <BuilderSteps state={state} onJump={jumpToStep} />
+          <div className="grid gap-6 lg:grid-cols-[minmax(0,320px)_minmax(0,1fr)_minmax(0,340px)]">
+            <div className="rounded-3xl border bg-card p-3 sm:p-4">
+              <TankSetupPanel
+                state={state}
+                setState={setState}
+                species={species.data!}
+                plants={plants.data!}
+                hardscape={hardscape.data!}
+                filters={filters.data!}
+                openSteps={openSteps}
+                setOpenSteps={setOpenSteps}
+              />
+            </div>
           <div className="space-y-4">
             <div className="relative">
               <ClientOnlyTankScene
