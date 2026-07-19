@@ -81,46 +81,25 @@ export interface FullTank {
 }
 
 export async function loadTankBySlug(slug: string): Promise<FullTank | null> {
-  const { data: tank, error } = await supabase
-    .from("tanks")
-    .select("*")
-    .eq("share_slug", slug)
-    .maybeSingle();
+  const { data, error } = await supabase.rpc("get_shared_tank", { p_slug: slug });
   if (error) throw error;
-  if (!tank) return null;
-
-  const [filterRes, sp, pl, hs] = await Promise.all([
-    tank.filter_id
-      ? supabase.from("filters").select("*").eq("id", tank.filter_id).maybeSingle()
-      : Promise.resolve({ data: null, error: null }),
-    supabase
-      .from("tank_species")
-      .select("quantity, species:species(*)")
-      .eq("tank_id", tank.id),
-    supabase.from("tank_plants").select("quantity, plant:plants(*)").eq("tank_id", tank.id),
-    supabase
-      .from("tank_hardscape")
-      .select("quantity, hardscape:hardscape(*)")
-      .eq("tank_id", tank.id),
-  ]);
-
+  if (!data) return null;
+  const payload = data as unknown as {
+    tank: TankRow;
+    filter: Filter | null;
+    species: Array<{ quantity: number; species: Species }>;
+    plants: Array<{ quantity: number; plant: Plant }>;
+    hardscape: Array<{ quantity: number; hardscape: Hardscape }>;
+  };
   return {
-    tank: tank as unknown as TankRow,
-    filter: (filterRes.data as Filter | null) ?? null,
-    species: ((sp.data ?? []) as Array<{ quantity: number; species: Species }>).map((r) => ({
-      quantity: r.quantity,
-      species: r.species,
-    })),
-    plants: ((pl.data ?? []) as Array<{ quantity: number; plant: Plant }>).map((r) => ({
-      quantity: r.quantity,
-      plant: r.plant,
-    })),
-    hardscape: ((hs.data ?? []) as Array<{ quantity: number; hardscape: Hardscape }>).map((r) => ({
-      quantity: r.quantity,
-      hardscape: r.hardscape,
-    })),
+    tank: payload.tank,
+    filter: payload.filter ?? null,
+    species: payload.species ?? [],
+    plants: payload.plants ?? [],
+    hardscape: payload.hardscape ?? [],
   };
 }
+
 
 export async function saveTank(
   state: import("./types").TankState,
