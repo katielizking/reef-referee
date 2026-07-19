@@ -64,9 +64,21 @@ function Builder() {
 
   const scorecard = useMemo(() => scoreTank(state), [state]);
   const gate = useSaveGate(scorecard, state);
+  const history = useTankHistory(state, setState);
+  const selected = useEditorStore((s) => s.selected);
 
   const ready = species.data && plants.data && hardscape.data && filters.data;
   const showHero = state.species.length === 0;
+
+  const dims = useMemo(() => {
+    const CM_PER_UNIT = 10;
+    const x = Math.max(state.length_cm, 20) / CM_PER_UNIT;
+    const y = Math.max(state.height_cm, 20) / CM_PER_UNIT;
+    const z = Math.max(state.width_cm, 20) / CM_PER_UNIT;
+    const substrateHeight = Math.min(0.4, y * 0.15);
+    return { x, y, z, substrateY: -y / 2 + substrateHeight };
+  }, [state.length_cm, state.width_cm, state.height_cm]);
+
 
   useEffect(() => {
     if (!species.data) return;
