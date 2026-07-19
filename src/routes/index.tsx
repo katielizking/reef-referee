@@ -243,16 +243,18 @@ function Builder() {
         <div className="flex flex-wrap gap-2">
           <button
             onClick={() => handleSave(false)}
-            disabled={saving}
-            className="inline-flex items-center gap-1.5 rounded-xl border bg-card px-3 py-2 text-sm font-semibold text-foreground transition-colors hover:bg-muted disabled:opacity-60"
+            disabled={saving || state.species.length === 0}
+            title={state.species.length === 0 ? "Add fish to save" : undefined}
+            className="inline-flex items-center gap-1.5 rounded-xl border bg-card px-3 py-2 text-sm font-semibold text-foreground transition-colors hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
             Save
           </button>
           <button
             onClick={() => handleSave(true)}
-            disabled={saving}
-            className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:brightness-95 disabled:opacity-60"
+            disabled={saving || state.species.length === 0}
+            title={state.species.length === 0 ? "Add fish to share" : undefined}
+            className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:brightness-95 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Share2 className="h-4 w-4" />
             Share
