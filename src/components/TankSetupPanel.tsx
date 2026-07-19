@@ -187,17 +187,19 @@ function SpeciesAdder({
 }) {
   const [q, setQ] = useState("");
   const [showResults, setShowResults] = useState(false);
+  const [legalFilter, setLegalFilter] = useState<"all" | "permitted" | "native" | "prohibited">("all");
   const results = useMemo(() => {
     const term = q.trim().toLowerCase();
-    if (!term) return species.slice(0, 8);
-    return species
+    const base = legalFilter === "all" ? species : species.filter((s) => s.legal_status === legalFilter);
+    if (!term) return base.slice(0, 8);
+    return base
       .filter(
         (s) =>
           s.common_name.toLowerCase().includes(term) ||
           s.scientific_name.toLowerCase().includes(term),
       )
       .slice(0, 12);
-  }, [q, species]);
+  }, [q, species, legalFilter]);
 
   function add(sp: Species) {
     setState((s) => {
@@ -222,6 +224,27 @@ function SpeciesAdder({
   return (
     <section className="space-y-2">
       <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Fish</h3>
+      <div className="flex flex-wrap gap-1.5">
+        {([
+          ["all", "All"],
+          ["permitted", "Permitted"],
+          ["native", "Natives"],
+          ["prohibited", "Prohibited"],
+        ] as const).map(([key, label]) => (
+          <button
+            key={key}
+            type="button"
+            onClick={() => setLegalFilter(key)}
+            className={`rounded-full border px-2.5 py-0.5 text-xs transition ${
+              legalFilter === key
+                ? "border-primary bg-primary text-primary-foreground"
+                : "bg-background text-muted-foreground hover:bg-muted"
+            }`}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
       <div className="relative">
         <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         <input
@@ -264,6 +287,7 @@ function SpeciesAdder({
           </div>
         )}
       </div>
+
 
       <ul className="space-y-2">
         {state.species.map((s) => (
