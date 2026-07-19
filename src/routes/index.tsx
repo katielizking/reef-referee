@@ -192,7 +192,15 @@ function Builder() {
   return (
     <main className="mx-auto max-w-7xl px-4 py-6 pb-24 lg:pb-6">
       {showHero && (
-        <section className="mb-8 grid gap-6 rounded-3xl border bg-card p-6 sm:p-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,380px)] lg:items-center">
+        <section className="relative mb-8 grid gap-6 rounded-3xl border bg-card p-6 sm:p-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,380px)] lg:items-center">
+          <button
+            type="button"
+            onClick={dismissHero}
+            aria-label="Dismiss welcome"
+            className="absolute right-3 top-3 rounded-full p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+          >
+            <X className="h-4 w-4" aria-hidden />
+          </button>
           <div>
             <span className="inline-flex items-center rounded-full bg-lime/30 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-foreground">
               Know before you stock
@@ -206,7 +214,7 @@ function Builder() {
             </p>
             <div className="mt-5 flex flex-wrap gap-3">
               <button
-                onClick={scrollToBuilder}
+                onClick={() => { dismissHero(); scrollToBuilder(); }}
                 className="inline-flex items-center justify-center rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm transition-all hover:brightness-95"
               >
                 Check my tank
