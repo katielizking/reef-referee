@@ -265,6 +265,7 @@ export type Database = {
           share_slug: string
           target_ph: number
           target_temp_c: number
+          user_id: string | null
           width_cm: number
         }
         Insert: {
@@ -280,6 +281,7 @@ export type Database = {
           share_slug?: string
           target_ph?: number
           target_temp_c?: number
+          user_id?: string | null
           width_cm: number
         }
         Update: {
@@ -295,6 +297,7 @@ export type Database = {
           share_slug?: string
           target_ph?: number
           target_temp_c?: number
+          user_id?: string | null
           width_cm?: number
         }
         Relationships: [
