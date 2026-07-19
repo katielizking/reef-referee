@@ -13,7 +13,7 @@ import { fishBehaviourProfile, type FishBehaviourProfile } from "./fishBehaviour
 import { useReducedMotion } from "./useReducedMotion";
 import { FishRenderer } from "./fish/FishRenderer";
 
-export type { FishGroupProps, FishMeshProps };
+export type { FishGroupProps };
 
 
 interface FishGroupProps {
