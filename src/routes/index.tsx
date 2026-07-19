@@ -1,9 +1,10 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { Loader2, Save, Share2 } from "lucide-react";
+import { Loader2, Save, Share2, X } from "lucide-react";
 import { toast } from "sonner";
 
 import { TankSetupPanel } from "@/components/TankSetupPanel";
+import { BuilderSteps, type StepId } from "@/components/BuilderSteps";
 import { ClientOnlyTankScene } from "@/components/tank3d/ClientOnlyTankScene";
 import { SelectedObjectPanel } from "@/components/tank3d/SelectedObjectPanel";
 import { SceneToolbar } from "@/components/tank3d/SceneToolbar";
@@ -17,6 +18,8 @@ import { scoreTank } from "@/lib/scoring";
 import { pickDefaultFilter } from "@/lib/defaults";
 import type { TankState } from "@/lib/types";
 import { useFilters, useHardscape, usePlants, useSpecies, saveTank } from "@/lib/data";
+
+const HERO_DISMISS_KEY = "fishtankr:hero-dismissed";
 
 
 
@@ -55,7 +58,21 @@ function Builder() {
   const [state, setState] = useState<TankState>(DEFAULT_STATE);
   const [saving, setSaving] = useState(false);
   const [savedId, setSavedId] = useState<string | undefined>(undefined);
+  const [openSteps, setOpenSteps] = useState<StepId[]>(["tank"]);
+  const [heroDismissed, setHeroDismissed] = useState(true); // start true to avoid SSR flash
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    setHeroDismissed(window.localStorage.getItem(HERO_DISMISS_KEY) === "1");
+  }, []);
+
+  function dismissHero() {
+    setHeroDismissed(true);
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem(HERO_DISMISS_KEY, "1");
+    }
+  }
 
   const species = useSpecies();
   const plants = usePlants();
@@ -68,7 +85,16 @@ function Builder() {
   const selected = useEditorStore((s) => s.selected);
 
   const ready = species.data && plants.data && hardscape.data && filters.data;
-  const showHero = state.species.length === 0;
+  const showHero = !heroDismissed && state.species.length === 0;
+
+  function jumpToStep(id: StepId) {
+    setOpenSteps((prev) => (prev.includes(id) ? prev : [...prev, id]));
+    requestAnimationFrame(() => {
+      const el = document.getElementById(`step-${id}`);
+      if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  }
+
 
   const dims = useMemo(() => {
     const CM_PER_UNIT = 10;
@@ -166,7 +192,15 @@ function Builder() {
   return (
     <main className="mx-auto max-w-7xl px-4 py-6 pb-24 lg:pb-6">
       {showHero && (
-        <section className="mb-8 grid gap-6 rounded-3xl border bg-card p-6 sm:p-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,380px)] lg:items-center">
+        <section className="relative mb-8 grid gap-6 rounded-3xl border bg-card p-6 sm:p-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,380px)] lg:items-center">
+          <button
+            type="button"
+            onClick={dismissHero}
+            aria-label="Dismiss welcome"
+            className="absolute right-3 top-3 rounded-full p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+          >
+            <X className="h-4 w-4" aria-hidden />
+          </button>
           <div>
             <span className="inline-flex items-center rounded-full bg-lime/30 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-foreground">
               Know before you stock
@@ -180,7 +214,7 @@ function Builder() {
             </p>
             <div className="mt-5 flex flex-wrap gap-3">
               <button
-                onClick={scrollToBuilder}
+                onClick={() => { dismissHero(); scrollToBuilder(); }}
                 className="inline-flex items-center justify-center rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm transition-all hover:brightness-95"
               >
                 Check my tank
@@ -231,17 +265,21 @@ function Builder() {
           <Loader2 className="h-6 w-6 animate-spin" />
         </div>
       ) : (
-        <div className="grid gap-6 lg:grid-cols-[minmax(0,320px)_minmax(0,1fr)_minmax(0,340px)]">
-          <div className="rounded-3xl border bg-card p-5">
-            <TankSetupPanel
-              state={state}
-              setState={setState}
-              species={species.data!}
-              plants={plants.data!}
-              hardscape={hardscape.data!}
-              filters={filters.data!}
-            />
-          </div>
+        <>
+          <BuilderSteps state={state} onJump={jumpToStep} />
+          <div className="grid gap-6 lg:grid-cols-[minmax(0,320px)_minmax(0,1fr)_minmax(0,340px)]">
+            <div className="rounded-3xl border bg-card p-3 sm:p-4">
+              <TankSetupPanel
+                state={state}
+                setState={setState}
+                species={species.data!}
+                plants={plants.data!}
+                hardscape={hardscape.data!}
+                filters={filters.data!}
+                openSteps={openSteps}
+                setOpenSteps={setOpenSteps}
+              />
+            </div>
           <div className="space-y-4">
             <div className="relative">
               <ClientOnlyTankScene
@@ -298,6 +336,7 @@ function Builder() {
             <ScorecardPanel scorecard={scorecard} />
           </div>
         </div>
+        </>
       )}
       {ready && <MobileScoreBar scorecard={scorecard} />}
     </main>

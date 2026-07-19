@@ -92,13 +92,23 @@ function ScoreRing({
       />
       <text
         x="50%"
-        y="50%"
+        y="46%"
         dominantBaseline="middle"
         textAnchor="middle"
         className="fill-foreground font-display font-semibold"
         fontSize={size * 0.3}
       >
         {score}
+      </text>
+      <text
+        x="50%"
+        y="68%"
+        dominantBaseline="middle"
+        textAnchor="middle"
+        className="fill-muted-foreground"
+        fontSize={size * 0.11}
+      >
+        / 100
       </text>
     </svg>
   );
@@ -120,11 +130,19 @@ function SubCard({ title, score, weightPct, reasons, fixes, extra }: SubCardProp
   return (
     <div className="rounded-2xl border bg-card p-4">
       <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-            {title} · {weightPct}%
-          </p>
-          <div className="font-display text-2xl font-semibold text-foreground">{score}</div>
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-2">
+            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              {title}
+            </p>
+            <span className="rounded-full bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground" title={`Contributes ${weightPct}% to overall`}>
+              {weightPct}% weight
+            </span>
+          </div>
+          <div className="mt-1 flex items-baseline gap-1">
+            <span className="font-display text-2xl font-semibold text-foreground">{score}</span>
+            <span className="text-xs text-muted-foreground">/ 100</span>
+          </div>
         </div>
         {extra}
       </div>
