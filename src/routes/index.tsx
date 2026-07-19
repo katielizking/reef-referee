@@ -4,7 +4,7 @@ import { Loader2, Save, Share2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { TankSetupPanel } from "@/components/TankSetupPanel";
-import { TankVisual } from "@/components/TankVisual";
+import { ClientOnlyTankScene } from "@/components/tank3d/ClientOnlyTankScene";
 import { ScorecardPanel } from "@/components/Scorecard";
 import { MobileScoreBar } from "@/components/MobileScoreBar";
 import { HeroTankIllustration } from "@/components/BrandLogo";
