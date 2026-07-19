@@ -16,6 +16,7 @@ import { HeroTankIllustration } from "@/components/BrandLogo";
 import { PreStockChecklist, useSaveGate } from "@/components/PreStockChecklist";
 import { scoreTank } from "@/lib/scoring";
 import { pickDefaultFilter } from "@/lib/defaults";
+import { PRESET_KEY, TANK_PRESETS } from "@/lib/presets";
 import type { TankState } from "@/lib/types";
 import { useFilters, useHardscape, usePlants, useSpecies, saveTank } from "@/lib/data";
 
@@ -142,6 +143,28 @@ function Builder() {
     });
   }, [species.data]);
 
+  // Load a preset (from /saved starter templates)
+  useEffect(() => {
+    if (!species.data) return;
+    const raw = sessionStorage.getItem(PRESET_KEY);
+    if (!raw) return;
+    sessionStorage.removeItem(PRESET_KEY);
+    const preset = TANK_PRESETS.find((p) => p.id === raw);
+    if (!preset) return;
+    const matches = preset.suggested
+      .map((sci) => species.data!.find((s) => s.scientific_name === sci))
+      .filter((s): s is NonNullable<typeof s> => !!s);
+    setState((prev) => ({
+      ...prev,
+      ...preset.base,
+      species: matches.map((s) => ({
+        species: s,
+        quantity: s.is_schooling ? s.min_group_size : 1,
+      })),
+    }));
+    toast.success(`Loaded ${preset.name}`);
+  }, [species.data]);
+
   // Auto-suggest a filter once dimensions are known and none is chosen.
   useEffect(() => {
     if (!filters.data || state.filter) return;
@@ -243,16 +266,18 @@ function Builder() {
         <div className="flex flex-wrap gap-2">
           <button
             onClick={() => handleSave(false)}
-            disabled={saving}
-            className="inline-flex items-center gap-1.5 rounded-xl border bg-card px-3 py-2 text-sm font-semibold text-foreground transition-colors hover:bg-muted disabled:opacity-60"
+            disabled={saving || state.species.length === 0}
+            title={state.species.length === 0 ? "Add fish to save" : undefined}
+            className="inline-flex items-center gap-1.5 rounded-xl border bg-card px-3 py-2 text-sm font-semibold text-foreground transition-colors hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
             Save
           </button>
           <button
             onClick={() => handleSave(true)}
-            disabled={saving}
-            className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:brightness-95 disabled:opacity-60"
+            disabled={saving || state.species.length === 0}
+            title={state.species.length === 0 ? "Add fish to share" : undefined}
+            className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:brightness-95 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Share2 className="h-4 w-4" />
             Share

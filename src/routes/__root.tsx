@@ -156,58 +156,123 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <div className="flex min-h-screen flex-col bg-background">
-        <header className="sticky top-0 z-30 border-b border-border/70 bg-background/85 backdrop-blur">
-          <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3">
-            <Link to="/" aria-label="FishTankr home" className="rounded-lg">
-              <BrandLogo />
-            </Link>
-            <nav aria-label="Primary" className="flex flex-wrap items-center gap-0.5 text-sm">
-              {[
-                { to: "/", label: "Builder", exact: true },
-                { to: "/quiz", label: "Quiz" },
-                { to: "/guides", label: "Guides" },
-                { to: "/shops", label: "Shops" },
-                { to: "/blog", label: "Blog" },
-                { to: "/saved", label: "My tanks" },
-              ].map((item) => (
-                <Link
-                  key={item.to}
-                  to={item.to}
-                  className="rounded-lg px-2.5 py-1.5 font-medium text-muted-foreground transition-colors hover:text-foreground"
-                  activeProps={{
-                    className:
-                      "rounded-lg px-2.5 py-1.5 font-medium bg-muted text-foreground",
-                  }}
-                  activeOptions={item.exact ? { exact: true } : undefined}
-                >
-                  {item.label}
-                </Link>
-              ))}
-            </nav>
-          </div>
-        </header>
+        <SiteHeader />
 
         <div className="flex-1">
           <Outlet />
         </div>
 
-        <footer className="mt-16 border-t border-border/70 bg-card/50">
-          <div className="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-6 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex items-center gap-2">
-              <BrandLogo size={22} showWordmark={false} />
-              <span className="font-display font-semibold text-foreground">
-                Smarter tanks. Happier fish.
-              </span>
-            </div>
-            <p className="max-w-md text-xs sm:text-right">
-              This is a guide, not a guarantee. Always check the needs of each species
-              and follow the rules in your state.
-            </p>
-          </div>
-        </footer>
+        <SiteFooter />
 
         <Toaster />
       </div>
     </QueryClientProvider>
+  );
+}
+
+const NAV_ITEMS: Array<{ to: string; label: string; exact?: boolean }> = [
+  { to: "/", label: "Builder", exact: true },
+  { to: "/quiz", label: "Quiz" },
+  { to: "/species", label: "Species" },
+  { to: "/guides", label: "Guides" },
+  { to: "/shops", label: "Shops" },
+  { to: "/blog", label: "Blog" },
+  { to: "/saved", label: "My tanks" },
+];
+
+function SiteHeader() {
+  const [open, setOpen] = useState(false);
+  return (
+    <header className="sticky top-0 z-30 border-b border-border/70 bg-background/85 backdrop-blur">
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3">
+        <Link to="/" aria-label="FishTankr home" className="rounded-lg">
+          <BrandLogo />
+        </Link>
+        <nav aria-label="Primary" className="hidden md:flex items-center gap-1 text-sm">
+          {NAV_ITEMS.map((item) => (
+            <Link
+              key={item.to}
+              to={item.to}
+              className="rounded-md px-2.5 py-1.5 font-medium text-muted-foreground transition-colors hover:text-foreground"
+              activeProps={{
+                className:
+                  "rounded-md px-2.5 py-1.5 font-medium text-foreground border-b-2 border-primary -mb-[2px]",
+              }}
+              activeOptions={item.exact ? { exact: true } : undefined}
+            >
+              {item.label}
+            </Link>
+          ))}
+        </nav>
+        <button
+          type="button"
+          className="inline-flex items-center justify-center rounded-lg border p-2 md:hidden"
+          aria-label={open ? "Close menu" : "Open menu"}
+          aria-expanded={open}
+          onClick={() => setOpen((v) => !v)}
+        >
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+            {open ? (
+              <>
+                <path d="M6 6l12 12" />
+                <path d="M6 18L18 6" />
+              </>
+            ) : (
+              <>
+                <path d="M4 7h16" />
+                <path d="M4 12h16" />
+                <path d="M4 17h16" />
+              </>
+            )}
+          </svg>
+        </button>
+      </div>
+      {open && (
+        <nav aria-label="Mobile" className="border-t bg-background md:hidden">
+          <div className="mx-auto flex max-w-7xl flex-col px-2 py-2 text-sm">
+            {NAV_ITEMS.map((item) => (
+              <Link
+                key={item.to}
+                to={item.to}
+                onClick={() => setOpen(false)}
+                className="rounded-lg px-3 py-2 font-medium text-muted-foreground hover:bg-muted"
+                activeProps={{ className: "rounded-lg px-3 py-2 font-semibold bg-muted text-foreground" }}
+                activeOptions={item.exact ? { exact: true } : undefined}
+              >
+                {item.label}
+              </Link>
+            ))}
+          </div>
+        </nav>
+      )}
+    </header>
+  );
+}
+
+function SiteFooter() {
+  return (
+    <footer className="mt-16 border-t border-border/70 bg-card/50">
+      <div className="mx-auto grid max-w-7xl gap-6 px-4 py-8 sm:grid-cols-[1fr_auto] sm:items-start">
+        <div>
+          <div className="flex items-center gap-2">
+            <BrandLogo size={22} showWordmark={false} />
+            <span className="font-display font-semibold text-foreground">
+              Smarter tanks. Happier fish.
+            </span>
+          </div>
+          <p className="mt-2 max-w-md text-xs text-muted-foreground">
+            A guide, not a guarantee. Always check the needs of each species
+            and the rules in your state.
+          </p>
+        </div>
+        <nav aria-label="Footer" className="flex flex-wrap gap-x-4 gap-y-2 text-xs text-muted-foreground">
+          <Link to="/species" className="hover:text-foreground">Species</Link>
+          <Link to="/guides" className="hover:text-foreground">Guides</Link>
+          <Link to="/blog" className="hover:text-foreground">Blog</Link>
+          <Link to="/shops" className="hover:text-foreground">Shops</Link>
+          <a href="/sitemap.xml" className="hover:text-foreground">Sitemap</a>
+        </nav>
+      </div>
+    </footer>
   );
 }

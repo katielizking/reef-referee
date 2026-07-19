@@ -1,6 +1,7 @@
-import { useMemo, useEffect } from "react";
-import { Canvas } from "@react-three/fiber";
+import { useMemo, useEffect, useRef } from "react";
+import { Canvas, useThree } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
+import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import * as THREE from "three";
 import type { TankState } from "@/lib/types";
 import { FishGroup } from "./FishMesh";
@@ -210,6 +211,7 @@ export default function TankScene({
           );
         })()}
 
+        <CameraRig defaultDistance={camDistance} />
         <OrbitControls
           enablePan={false}
           minDistance={largest * 0.8}
@@ -220,11 +222,40 @@ export default function TankScene({
         />
       </Canvas>
 
-      {!hasFish && (
-        <div className="pointer-events-none absolute inset-x-0 top-3 text-center text-xs text-muted-foreground">
-          Drag to rotate · scroll to zoom · click objects to edit
-        </div>
-      )}
+      <div className="pointer-events-none absolute inset-x-0 bottom-3 flex justify-center">
+        <span className="rounded-full bg-card/85 px-3 py-1 text-[11px] text-muted-foreground shadow-sm backdrop-blur">
+          {hasFish
+            ? "Tap fish · plants · hardscape to edit"
+            : "Drag to rotate · scroll to zoom · click objects to edit"}
+        </span>
+      </div>
     </div>
   );
 }
+
+function CameraRig({ defaultDistance }: { defaultDistance: number }) {
+  const { camera, controls } = useThree() as unknown as {
+    camera: THREE.PerspectiveCamera;
+    controls: OrbitControlsImpl | null;
+  };
+  const preset = useEditorStore((s) => s.cameraPreset);
+  const token = useEditorStore((s) => s.cameraToken);
+  const lastToken = useRef(0);
+
+  useEffect(() => {
+    if (!preset || token === lastToken.current) return;
+    lastToken.current = token;
+    const d = defaultDistance;
+    let pos: [number, number, number] = [d * 0.7, d * 0.35, d * 0.9];
+    if (preset === "front") pos = [0, 0, d * 1.1];
+    else if (preset === "iso") pos = [d * 0.7, d * 0.5, d * 0.9];
+    else if (preset === "top") pos = [0, d * 1.2, 0.001];
+    camera.position.set(...pos);
+    camera.lookAt(0, 0, 0);
+    controls?.target.set(0, 0, 0);
+    controls?.update();
+  }, [preset, token, defaultDistance, camera, controls]);
+
+  return null;
+}
+

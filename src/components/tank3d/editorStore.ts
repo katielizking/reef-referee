@@ -6,18 +6,27 @@ interface Selection {
   refId: string;
 }
 
+export type CameraPreset = "front" | "iso" | "top";
+
 interface EditorState {
   selected: Selection | null;
   hovered: Selection | null;
+  cameraPreset: CameraPreset | null;
+  cameraToken: number;
   select: (sel: Selection | null) => void;
   hover: (sel: Selection | null) => void;
+  setCameraPreset: (p: CameraPreset) => void;
 }
 
 export const useEditorStore = create<EditorState>((set) => ({
   selected: null,
   hovered: null,
+  cameraPreset: null,
+  cameraToken: 0,
   select: (selected) => set({ selected }),
   hover: (hovered) => set({ hovered }),
+  setCameraPreset: (cameraPreset) =>
+    set((s) => ({ cameraPreset, cameraToken: s.cameraToken + 1 })),
 }));
 
 export function useSelected() {
