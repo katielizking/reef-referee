@@ -1,6 +1,7 @@
-import { useMemo, useEffect } from "react";
-import { Canvas } from "@react-three/fiber";
+import { useMemo, useEffect, useRef } from "react";
+import { Canvas, useThree } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
+import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import * as THREE from "three";
 import type { TankState } from "@/lib/types";
 import { FishGroup } from "./FishMesh";
