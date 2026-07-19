@@ -90,7 +90,19 @@ export interface TankState {
   species: Array<{ species: Species; quantity: number }>;
   plants: Array<{ plant: Plant; quantity: number }>;
   hardscape: Array<{ hardscape: Hardscape; quantity: number }>;
+  /** Per-group anchor / rotation / scale overrides, keyed as "kind:refId". */
+  overrides?: Record<
+    string,
+    {
+      kind: "fish" | "plant" | "hardscape" | "equipment";
+      refId: string;
+      anchor: [number, number, number];
+      rotY: number;
+      scale: number;
+    }
+  >;
 }
+
 
 export const BIOTOPE_LABEL: Record<BiotopeRegion, string> = {
   amazon_blackwater: "Amazon blackwater",
