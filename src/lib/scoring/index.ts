@@ -266,7 +266,6 @@ function scoreBiome(
 
   const reasons: string[] = [];
   const fixes: string[] = [];
-  const { BIOTOPE_LABEL } = require("../types") as typeof import("../types");
   const dominantLabel = BIOTOPE_LABEL[dominant];
 
   reasons.push(`Dominant biotope: ${dominantLabel} (${Math.round(cohesion * 100)}% of stock).`);
