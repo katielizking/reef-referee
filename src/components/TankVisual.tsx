@@ -133,9 +133,15 @@ export function TankVisual({ state }: { state: TankState }) {
     );
   });
 
+  const fishCount = state.species.reduce((n, s) => n + s.quantity, 0);
+  const plantCount = state.plants.reduce((n, p) => n + p.quantity, 0);
+  const hardCount = state.hardscape.reduce((n, h) => n + h.quantity, 0);
+  const summary = `Tank preview: ${fishCount} fish across ${state.species.length} species, ${plantCount} plants, ${hardCount} hardscape items.`;
+
   return (
     <div className="rounded-3xl border bg-card p-4">
-      <svg viewBox={`0 0 ${W} ${H}`} className="w-full">
+      <svg viewBox={`0 0 ${W} ${H}`} className="w-full" role="img" aria-label={summary}>
+
         <defs>
           <linearGradient id="water" x1="0" x2="0" y1="0" y2="1">
             <stop offset="0%" stopColor="oklch(0.85 0.06 210)" />
