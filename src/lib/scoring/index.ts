@@ -1,4 +1,4 @@
-import type { BiotopeRegion, TankState } from "../types";
+import { BIOTOPE_LABEL, BIOTOPE_WATER, type BiotopeRegion, type TankState } from "../types";
 
 export interface SubScore {
   score: number;
