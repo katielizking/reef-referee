@@ -6,11 +6,14 @@ import { toast } from "sonner";
 import { TankSetupPanel } from "@/components/TankSetupPanel";
 import { TankVisual } from "@/components/TankVisual";
 import { ScorecardPanel } from "@/components/Scorecard";
+import { MobileScoreBar } from "@/components/MobileScoreBar";
 import { HeroTankIllustration } from "@/components/BrandLogo";
 import { PreStockChecklist, useSaveGate } from "@/components/PreStockChecklist";
 import { scoreTank } from "@/lib/scoring";
+import { pickDefaultFilter } from "@/lib/defaults";
 import type { TankState } from "@/lib/types";
 import { useFilters, useHardscape, usePlants, useSpecies, saveTank } from "@/lib/data";
+
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -96,6 +99,14 @@ function Builder() {
     });
   }, [species.data]);
 
+  // Auto-suggest a filter once dimensions are known and none is chosen.
+  useEffect(() => {
+    if (!filters.data || state.filter) return;
+    const pick = pickDefaultFilter(filters.data, state);
+    if (pick) setState((s) => (s.filter ? s : { ...s, filter: pick }));
+  }, [filters.data, state.filter, state.length_cm, state.width_cm, state.height_cm]);
+
+
   async function doSave(share: boolean) {
     try {
       setSaving(true);
@@ -128,7 +139,7 @@ function Builder() {
   }
 
   return (
-    <main className="mx-auto max-w-7xl px-4 py-6">
+    <main className="mx-auto max-w-7xl px-4 py-6 pb-24 lg:pb-6">
       {showHero && (
         <section className="mb-8 grid gap-6 rounded-3xl border bg-card p-6 sm:p-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,380px)] lg:items-center">
           <div>
@@ -228,6 +239,8 @@ function Builder() {
           </div>
         </div>
       )}
+      {ready && <MobileScoreBar scorecard={scorecard} />}
     </main>
+
   );
 }

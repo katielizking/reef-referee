@@ -1,9 +1,10 @@
-import { useMemo, useState } from "react";
-import { Search, Plus, Minus, X, Info } from "lucide-react";
+import { useMemo, useRef, useState } from "react";
+import { Search, Plus, Minus, X, Info, AlertTriangle } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import type { Filter, Hardscape, MaintenanceFrequency, Plant, PlantDensity, Species, TankState } from "@/lib/types";
 import { BIOTOPE_LABEL } from "@/lib/types";
 import { litresOf } from "@/lib/scoring";
+import { useOutsideClick } from "@/hooks/useOutsideClick";
 
 interface Props {
   state: TankState;
@@ -14,8 +15,15 @@ interface Props {
   filters: Filter[];
 }
 
+const MIN_DIM = 10;
+
 export function TankSetupPanel({ state, setState, species, plants, hardscape, filters }: Props) {
   const litres = Math.round(litresOf(state));
+  const dimInvalid =
+    state.length_cm < MIN_DIM || state.width_cm < MIN_DIM || state.height_cm < MIN_DIM;
+  const filterUndersized =
+    state.filter && litres > 0 && state.filter.rated_litres < litres;
+
   return (
     <div className="space-y-6">
       <section className="space-y-3">
@@ -34,6 +42,12 @@ export function TankSetupPanel({ state, setState, species, plants, hardscape, fi
           <DimField label="Width (cm)" value={state.width_cm} onChange={(v) => setState((s) => ({ ...s, width_cm: v }))} />
           <DimField label="Height (cm)" value={state.height_cm} onChange={(v) => setState((s) => ({ ...s, height_cm: v }))} />
         </div>
+        {dimInvalid && (
+          <p className="flex items-center gap-1.5 text-xs font-medium text-coral">
+            <AlertTriangle className="h-3.5 w-3.5" aria-hidden />
+            Each side needs to be at least {MIN_DIM} cm.
+          </p>
+        )}
         <div className="rounded-xl bg-muted px-3 py-2 text-sm">
           <span className="text-muted-foreground">Volume</span>{" "}
           <span className="font-semibold">{litres} L</span>
@@ -55,6 +69,7 @@ export function TankSetupPanel({ state, setState, species, plants, hardscape, fi
             value={state.target_ph}
             onChange={(e) => setState((s) => ({ ...s, target_ph: Number(e.target.value) }))}
             className="w-full accent-[var(--color-teal)]"
+            aria-label="Target pH"
           />
         </label>
         <label className="block text-sm">
@@ -70,6 +85,7 @@ export function TankSetupPanel({ state, setState, species, plants, hardscape, fi
             value={state.target_temp_c}
             onChange={(e) => setState((s) => ({ ...s, target_temp_c: Number(e.target.value) }))}
             className="w-full accent-[var(--color-teal)]"
+            aria-label="Target temperature"
           />
         </label>
       </section>
@@ -83,6 +99,7 @@ export function TankSetupPanel({ state, setState, species, plants, hardscape, fi
             const f = filters.find((x) => x.id === e.target.value) ?? null;
             setState((s) => ({ ...s, filter: f }));
           }}
+          aria-label="Filter"
         >
           <option value="">Choose a filter…</option>
           {filters.map((f) => (
@@ -91,6 +108,15 @@ export function TankSetupPanel({ state, setState, species, plants, hardscape, fi
             </option>
           ))}
         </select>
+        {filterUndersized && (
+          <p className="flex items-start gap-1.5 rounded-lg bg-warn/15 px-2.5 py-1.5 text-xs font-medium text-foreground">
+            <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-warn" aria-hidden />
+            <span>
+              This filter is rated for {state.filter!.rated_litres} L but your tank is {litres} L.
+              Consider a larger filter.
+            </span>
+          </p>
+        )}
         <Segmented<MaintenanceFrequency>
           label="Maintenance"
           value={state.maintenance_frequency}
@@ -130,13 +156,17 @@ function DimField({
   value: number;
   onChange: (v: number) => void;
 }) {
+  const invalid = value < MIN_DIM;
   return (
     <label className="block text-sm">
       <span className="mb-1 block text-xs text-muted-foreground">{label}</span>
       <input
         type="number"
-        min={0}
-        className="w-full rounded-xl border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
+        min={MIN_DIM}
+        aria-invalid={invalid || undefined}
+        className={`w-full rounded-xl border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring ${
+          invalid ? "border-coral" : ""
+        }`}
         value={value}
         onChange={(e) => onChange(Number(e.target.value) || 0)}
       />
@@ -158,10 +188,12 @@ function Segmented<T extends string>({
   return (
     <div>
       <p className="mb-1 text-xs text-muted-foreground">{label}</p>
-      <div className="inline-flex flex-wrap gap-1 rounded-xl bg-muted p-1">
+      <div className="inline-flex flex-wrap gap-1 rounded-xl bg-muted p-1" role="group" aria-label={label}>
         {options.map((o) => (
           <button
             key={o.value}
+            type="button"
+            aria-pressed={value === o.value}
             className={`rounded-lg px-3 py-1.5 text-xs transition ${
               value === o.value
                 ? "bg-card text-foreground shadow-sm"
@@ -189,6 +221,9 @@ function SpeciesAdder({
   const [q, setQ] = useState("");
   const [showResults, setShowResults] = useState(false);
   const [legalFilter, setLegalFilter] = useState<"all" | "permitted" | "native" | "prohibited">("all");
+  const containerRef = useRef<HTMLDivElement>(null);
+  useOutsideClick(containerRef, () => setShowResults(false), showResults);
+
   const results = useMemo(() => {
     const term = q.trim().toLowerCase();
     const base = legalFilter === "all" ? species : species.filter((s) => s.legal_status === legalFilter);
@@ -203,6 +238,7 @@ function SpeciesAdder({
   }, [q, species, legalFilter]);
 
   function add(sp: Species) {
+    if (sp.legal_status === "prohibited") return;
     setState((s) => {
       const existing = s.species.find((x) => x.species.id === sp.id);
       if (existing) {
@@ -235,6 +271,7 @@ function SpeciesAdder({
           <button
             key={key}
             type="button"
+            aria-pressed={legalFilter === key}
             onClick={() => setLegalFilter(key)}
             className={`rounded-full border px-2.5 py-0.5 text-xs transition ${
               legalFilter === key
@@ -246,8 +283,14 @@ function SpeciesAdder({
           </button>
         ))}
       </div>
-      <div className="relative">
-        <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+      {legalFilter === "prohibited" && (
+        <p className="flex items-start gap-1.5 rounded-lg bg-coral/10 px-2.5 py-1.5 text-xs font-medium text-foreground">
+          <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-coral" aria-hidden />
+          <span>These species can't legally be kept in Australia. Browse for reference only.</span>
+        </p>
+      )}
+      <div className="relative" ref={containerRef}>
+        <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" aria-hidden />
         <input
           className="w-full rounded-xl border bg-background py-2 pl-9 pr-3 text-sm outline-none focus:ring-2 focus:ring-ring"
           placeholder="Search species…"
@@ -257,95 +300,133 @@ function SpeciesAdder({
             setShowResults(true);
           }}
           onFocus={() => setShowResults(true)}
+          aria-label="Search species"
         />
         {showResults && (
           <div className="absolute z-10 mt-1 max-h-72 w-full overflow-auto rounded-xl border bg-popover shadow-lg">
             {results.length === 0 && (
               <div className="p-3 text-sm text-muted-foreground">No species match.</div>
             )}
-            {results.map((sp) => (
-              <div
-                key={sp.id}
-                className="flex w-full items-start justify-between gap-2 border-b p-3 text-left last:border-b-0 hover:bg-muted"
-              >
-                <button className="flex flex-1 items-start gap-2 text-left" onClick={() => add(sp)}>
-                  <div className="flex-1">
-                    <div className="text-sm font-medium">
-                      {sp.common_name}
-                      {!sp.legal_in_australia && (
-                        <span className="ml-2 rounded bg-coral/20 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-foreground">
-                          Not AU legal
-                        </span>
-                      )}
-                    </div>
-                    <div className="text-xs text-muted-foreground">
-                      {sp.scientific_name} · {BIOTOPE_LABEL[sp.biotope_region]}
-                    </div>
-                  </div>
-                  <Plus className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-                </button>
-                <Link
-                  to="/species/$id"
-                  params={{ id: sp.id }}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={(e) => e.stopPropagation()}
-                  aria-label={`View guide for ${sp.common_name}`}
-                  className="rounded-lg p-1.5 text-muted-foreground hover:bg-background hover:text-foreground"
+            {results.map((sp) => {
+              const prohibited = sp.legal_status === "prohibited";
+              return (
+                <div
+                  key={sp.id}
+                  className="flex w-full items-start justify-between gap-2 border-b p-3 text-left last:border-b-0 hover:bg-muted"
                 >
-                  <Info className="h-4 w-4" />
-                </Link>
-              </div>
-            ))}
+                  {prohibited ? (
+                    <Link
+                      to="/species/$id"
+                      params={{ id: sp.id }}
+                      onClick={() => setShowResults(false)}
+                      className="flex flex-1 items-start gap-2 text-left"
+                    >
+                      <div className="flex-1">
+                        <div className="text-sm font-medium">
+                          {sp.common_name}
+                          <span className="ml-2 rounded bg-coral/20 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-foreground">
+                            Prohibited
+                          </span>
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          {sp.scientific_name} · view guide
+                        </div>
+                      </div>
+                      <Info className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" aria-hidden />
+                    </Link>
+                  ) : (
+                    <button
+                      type="button"
+                      className="flex flex-1 items-start gap-2 text-left"
+                      onClick={() => add(sp)}
+                      aria-label={`Add ${sp.common_name} to tank`}
+                    >
+                      <div className="flex-1">
+                        <div className="text-sm font-medium">
+                          {sp.common_name}
+                          {!sp.legal_in_australia && (
+                            <span className="ml-2 rounded bg-coral/20 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-foreground">
+                              Not AU legal
+                            </span>
+                          )}
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          {sp.scientific_name} · {BIOTOPE_LABEL[sp.biotope_region]}
+                        </div>
+                      </div>
+                      <Plus className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden />
+                    </button>
+                  )}
+                  <Link
+                    to="/species/$id"
+                    params={{ id: sp.id }}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={(e) => e.stopPropagation()}
+                    aria-label={`View guide for ${sp.common_name}`}
+                    className="rounded-lg p-1.5 text-muted-foreground hover:bg-background hover:text-foreground"
+                  >
+                    <Info className="h-4 w-4" aria-hidden />
+                  </Link>
+                </div>
+              );
+            })}
           </div>
         )}
       </div>
 
 
-      <ul className="space-y-2">
-        {state.species.map((s) => (
-          <li
-            key={s.species.id}
-            className="flex items-center justify-between rounded-xl border bg-card px-3 py-2 text-sm"
-          >
-            <div className="flex min-w-0 items-center gap-1.5">
-              <div className="min-w-0">
-                <p className="truncate font-medium">{s.species.common_name}</p>
-                <p className="truncate text-xs text-muted-foreground">
-                  {BIOTOPE_LABEL[s.species.biotope_region]}
-                </p>
+      {state.species.length === 0 ? (
+        <p className="rounded-lg border border-dashed bg-background px-3 py-2 text-xs text-muted-foreground">
+          No fish yet — search above to add some.
+        </p>
+      ) : (
+        <ul className="space-y-2">
+          {state.species.map((s) => (
+            <li
+              key={s.species.id}
+              className="flex items-center justify-between rounded-xl border bg-card px-3 py-2 text-sm"
+            >
+              <div className="flex min-w-0 items-center gap-1.5">
+                <div className="min-w-0">
+                  <p className="truncate font-medium">{s.species.common_name}</p>
+                  <p className="truncate text-xs text-muted-foreground">
+                    {BIOTOPE_LABEL[s.species.biotope_region]}
+                  </p>
+                </div>
+                <Link
+                  to="/species/$id"
+                  params={{ id: s.species.id }}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`View guide for ${s.species.common_name}`}
+                  className="rounded-lg p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
+                >
+                  <Info className="h-4 w-4" aria-hidden />
+                </Link>
               </div>
-              <Link
-                to="/species/$id"
-                params={{ id: s.species.id }}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={`View guide for ${s.species.common_name}`}
-                className="rounded-lg p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
-              >
-                <Info className="h-4 w-4" />
-              </Link>
-            </div>
-            <QtyStepper
-              value={s.quantity}
-              onChange={(v) =>
-                setState((st) => ({
-                  ...st,
-                  species: st.species
-                    .map((x) => (x.species.id === s.species.id ? { ...x, quantity: v } : x))
-                    .filter((x) => x.quantity > 0),
-                }))
-              }
-              onRemove={() =>
-                setState((st) => ({
-                  ...st,
-                  species: st.species.filter((x) => x.species.id !== s.species.id),
-                }))
-              }
-            />
-          </li>
-        ))}
-      </ul>
+              <QtyStepper
+                itemLabel={s.species.common_name}
+                value={s.quantity}
+                onChange={(v) =>
+                  setState((st) => ({
+                    ...st,
+                    species: st.species
+                      .map((x) => (x.species.id === s.species.id ? { ...x, quantity: v } : x))
+                      .filter((x) => x.quantity > 0),
+                  }))
+                }
+                onRemove={() =>
+                  setState((st) => ({
+                    ...st,
+                    species: st.species.filter((x) => x.species.id !== s.species.id),
+                  }))
+                }
+              />
+            </li>
+          ))}
+        </ul>
+      )}
     </section>
   );
 }
@@ -456,6 +537,9 @@ interface ItemAdderProps<T extends { id: string }> {
 function ItemAdder<T extends { id: string }>(props: ItemAdderProps<T>) {
   const [q, setQ] = useState("");
   const [open, setOpen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  useOutsideClick(containerRef, () => setOpen(false), open);
+
   const results = useMemo(() => {
     const term = q.trim().toLowerCase();
     const list = term
@@ -469,8 +553,8 @@ function ItemAdder<T extends { id: string }>(props: ItemAdderProps<T>) {
       <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
         {props.title}
       </h3>
-      <div className="relative">
-        <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+      <div className="relative" ref={containerRef}>
+        <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" aria-hidden />
         <input
           className="w-full rounded-xl border bg-background py-2 pl-9 pr-3 text-sm outline-none focus:ring-2 focus:ring-ring"
           placeholder={`Search ${props.title.toLowerCase()}…`}
@@ -480,12 +564,15 @@ function ItemAdder<T extends { id: string }>(props: ItemAdderProps<T>) {
             setOpen(true);
           }}
           onFocus={() => setOpen(true)}
+          aria-label={`Search ${props.title.toLowerCase()}`}
         />
         {open && (
           <div className="absolute z-10 mt-1 max-h-64 w-full overflow-auto rounded-xl border bg-popover shadow-lg">
             {results.map((it) => (
               <button
                 key={it.id}
+                type="button"
+                aria-label={`Add ${props.getLabel(it)}`}
                 className="flex w-full items-start justify-between gap-2 border-b p-3 text-left last:border-b-0 hover:bg-muted"
                 onClick={() => {
                   props.onAdd(it);
@@ -497,31 +584,38 @@ function ItemAdder<T extends { id: string }>(props: ItemAdderProps<T>) {
                   <div className="text-sm font-medium">{props.getLabel(it)}</div>
                   <div className="text-xs text-muted-foreground">{props.getSubtitle(it)}</div>
                 </div>
-                <Plus className="h-4 w-4 shrink-0 text-primary" />
+                <Plus className="h-4 w-4 shrink-0 text-primary" aria-hidden />
               </button>
             ))}
           </div>
         )}
       </div>
 
-      <ul className="space-y-2">
-        {props.current.map(({ id, item, quantity }) => (
-          <li
-            key={id}
-            className="flex items-center justify-between rounded-xl border bg-card px-3 py-2 text-sm"
-          >
-            <div className="min-w-0">
-              <p className="truncate font-medium">{props.getLabel(item)}</p>
-              <p className="truncate text-xs text-muted-foreground">{props.getSubtitle(item)}</p>
-            </div>
-            <QtyStepper
-              value={quantity}
-              onChange={(v) => props.onChangeQty(id, v)}
-              onRemove={() => props.onRemove(id)}
-            />
-          </li>
-        ))}
-      </ul>
+      {props.current.length === 0 ? (
+        <p className="rounded-lg border border-dashed bg-background px-3 py-2 text-xs text-muted-foreground">
+          No {props.title.toLowerCase()} yet — search above to add some.
+        </p>
+      ) : (
+        <ul className="space-y-2">
+          {props.current.map(({ id, item, quantity }) => (
+            <li
+              key={id}
+              className="flex items-center justify-between rounded-xl border bg-card px-3 py-2 text-sm"
+            >
+              <div className="min-w-0">
+                <p className="truncate font-medium">{props.getLabel(item)}</p>
+                <p className="truncate text-xs text-muted-foreground">{props.getSubtitle(item)}</p>
+              </div>
+              <QtyStepper
+                itemLabel={props.getLabel(item)}
+                value={quantity}
+                onChange={(v) => props.onChangeQty(id, v)}
+                onRemove={() => props.onRemove(id)}
+              />
+            </li>
+          ))}
+        </ul>
+      )}
     </section>
   );
 }
@@ -530,31 +624,41 @@ function QtyStepper({
   value,
   onChange,
   onRemove,
+  itemLabel,
 }: {
   value: number;
   onChange: (v: number) => void;
   onRemove: () => void;
+  itemLabel: string;
 }) {
   return (
     <div className="flex items-center gap-1">
       <button
+        type="button"
         onClick={() => onChange(Math.max(0, value - 1))}
+        aria-label={`Decrease quantity of ${itemLabel}`}
         className="rounded-lg border p-1 text-muted-foreground hover:bg-muted"
       >
-        <Minus className="h-3.5 w-3.5" />
+        <Minus className="h-3.5 w-3.5" aria-hidden />
       </button>
-      <span className="w-6 text-center text-sm font-medium">{value}</span>
+      <span className="w-6 text-center text-sm font-medium" aria-live="polite">
+        {value}
+      </span>
       <button
+        type="button"
         onClick={() => onChange(value + 1)}
+        aria-label={`Increase quantity of ${itemLabel}`}
         className="rounded-lg border p-1 text-muted-foreground hover:bg-muted"
       >
-        <Plus className="h-3.5 w-3.5" />
+        <Plus className="h-3.5 w-3.5" aria-hidden />
       </button>
       <button
+        type="button"
         onClick={onRemove}
+        aria-label={`Remove ${itemLabel}`}
         className="ml-1 rounded-lg p-1 text-muted-foreground hover:bg-coral/15 hover:text-coral"
       >
-        <X className="h-3.5 w-3.5" />
+        <X className="h-3.5 w-3.5" aria-hidden />
       </button>
     </div>
   );

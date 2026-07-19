@@ -1,94 +1,81 @@
-## New sections to add to FishTankr
+# Platform audit — top recommendations
 
-Four new top-level pages, each reachable from the header nav. Order below is the recommended build order (cheapest → most involved).
+I audited the Builder, navigation, save/share flow, mobile behaviour, and SEO. The scoring engine and data model are strong; the gaps are almost all in the shell around them. Here's what I'd fix, in priority order.
 
----
+## What's working well (leave alone)
+- Scoring engine, biotope/legality logic, pre-stock checklist copy.
+- Route-level SEO on `/`, `/quiz`, `/shops`, `/guides`, `/t/$slug` basics.
+- Anonymous auth wiring and saved-tank list mechanics.
 
-### 1. Cycling your tank guide — `/guides/cycling`
+## Priority 1 — Critical UX & functional fixes
 
-Static, long-form educational content (SEO-friendly). No database.
+1. **Mobile: score is buried at the bottom of a long form.**
+   On <1024px the three columns stack Setup → Visual → Scorecard, so the user scrolls past a huge fish/plant/hardscape list before seeing whether their tank scores well.
+   Fix: on mobile, pin a compact "Overall score" summary bar to the bottom of the viewport (tap to expand the full scorecard in a sheet). Sticky scorecard on `lg+` stays as-is.
 
-- New route `src/routes/guides.cycling.tsx` with proper `head()` metadata (title, description, og:title, og:description, canonical).
-- Structured sections: What cycling is → Ammonia/Nitrite/Nitrogen cycle diagram → Fishless cycle (recommended) → Fish-in cycle (with welfare warning) → Signs cycling is complete → Common mistakes → When to add fish.
-- FAQ block at the bottom with JSON-LD `FAQPage` schema for rich results.
-- Cross-links to `/` (builder) and `/species/$id` guides.
-- Uses existing FishTankr palette + Sora/DM Sans. Sidebar/anchor TOC for jumping between sections.
-- Extensible: `src/routes/guides.index.tsx` as a hub so more guides (algae, water changes, planted tanks) can slot in later without re-planning.
+2. **Search dropdowns never close.**
+   `TankSetupPanel` species/plants/hardscape adders open results on focus but have no outside-click, Escape, or blur handler. Dropdowns stay open over other fields; on mobile the keyboard traps.
+   Fix: add outside-click + Escape to close, and close after add.
 
----
+3. **Tank dimensions accept 0 with no warning.**
+   `DimField` allows `0`, producing a 0 L tank that can still be saved and shared.
+   Fix: enforce `min=10cm` per side, show red border + helper text below the input, and block Save when litres < 20.
 
-### 2. Blog for SEO — `/blog` and `/blog/$slug`
+4. **Prohibited species can be added to a tank.**
+   The "Prohibited" filter chip surfaces banned species and the "Add" action still works, silently tanking the score after the fact.
+   Fix: in the Prohibited view, replace the add button with a "View guide" link and a small "Not legal to keep in AU" note. Keep the filter for education.
 
-MDX-free markdown-in-DB approach so the user can add posts without redeploying.
+5. **No default filter → first save always hits the checklist block.**
+   `filter` starts `null`, so any new user with fish gets a blocking "add a filter" fix on their first save.
+   Fix: once dimensions are set, auto-select the smallest filter whose rated litres ≥ tank litres; user can change it. Show "auto-picked, tap to change".
 
-- New Supabase table `public.blog_posts`: `id`, `slug` (unique), `title`, `excerpt`, `body_markdown`, `cover_image_url`, `published`, `published_at`, `updated_at`, `author_name`, `tags text[]`, plus SEO fields `meta_title`, `meta_description`.
-- RLS: `SELECT` allowed to `anon` + `authenticated` when `published = true`. Writes are locked (admin-only via `user_roles` + `has_role`, so we're future-proof even though no admin UI ships in v1).
-- Seed with 4 launch posts targeting Australian aquarium keywords (e.g. "Best beginner fish for a 60L tank in Australia", "Are neon tetras legal in Australia", "How to choose a filter for a planted tank", "AqAdvisor alternatives 2026").
-- Routes:
-    - `/blog` — list with cover, title, excerpt, tags, date. Loader uses `queryClient.ensureQueryData`.
-    - `/blog/$slug` — full post, renders markdown via `react-markdown` + `remark-gfm`. Per-post `head()` with `og:image` from `cover_image_url`, JSON-LD `BlogPosting`.
-- Sitemap: add a server route `src/routes/sitemap[.]xml.ts` that enumerates published posts + static routes so Google can crawl them.
+## Priority 2 — Accessibility
 
----
+6. **Icon-only buttons have no accessible names.** `QtyStepper` +/−/trash buttons (used once per row) are silent to screen readers.
+   Fix: `aria-label` on the three buttons ("Decrease quantity of {name}", etc.), `aria-hidden` on decorative Lucide icons.
 
-### 3. What fish should I get? — `/quiz`
+7. **Score rings announce nothing.** The SVG number is inside an `aria-hidden` group.
+   Fix: wrap each ring in a container with `aria-label={\`${label} score ${n} out of 100\`}` and `role="img"`.
 
-Interactive multi-step quiz that recommends 3–5 species from the existing `species` table. Pure client-side scoring; no DB writes.
+8. **`TankVisual` SVG has no accessible description.**
+   Fix: add `role="img"` + `aria-label` summarising contents (e.g. "Tank preview: 3 species, 2 plants, 1 piece of driftwood").
 
-- New route `src/routes/quiz.tsx` with progress bar + one question per step.
-- Questions (7 total, all multiple choice, all shape a scoring vector):
-    1. Tank size (litres, bucketed).
-    2. Experience level (beginner / some / experienced).
-    3. Vibe (peaceful community / colourful showpiece / biotope purist / oddballs).
-    4. Water hardness preference (soft / neutral / hard — maps to biome).
-    5. Willingness to do weekly maintenance (low / medium / high).
-    6. Australian legality strictness (permitted only / natives welcome).
-    7. Schooling vs centrepiece preference.
-- Scoring: each species gets a match score based on adult size vs tank, biome fit, temperament, legality filter, and care difficulty (derived from existing fields). Reuses logic that already lives in `src/lib/scoring/`.
-- Result screen: top matches as cards linking to `/species/$id`, plus a "Start a tank with these" button that pre-seeds the builder via the existing `sessionStorage` `fishtankr:pending-add` mechanism (extended to accept an array).
-- No persistence in v1. Optional follow-up: save quiz result against the anonymous auth user.
+## Priority 3 — Save & share clarity
 
----
+9. **"Saved tanks" quietly disappear across browsers/incognito** with no explanation at save time.
+   Fix: below the Save button, add a one-liner: "Saved to this browser. Copy the share link if you want to open it elsewhere." After save, show a share-link dialog with a Copy button, not just a toast.
 
-### 4. Nearby aquarium shops map — `/shops`
+10. **Defensive check on `share_slug`.** `saveTank()` relies on a DB default; if it ever returns null the app builds `/t/undefined`.
+    Fix: if `row.share_slug` is falsy, throw a friendly error before navigating.
 
-Highest-effort section — needs a data source and a map library. Australia-only in v1.
+11. **Hero secondary CTA "Explore the tools" links to `/saved`** — which is empty for first-time visitors.
+    Fix: point it at `/quiz` (the actual "find your fish" tool).
 
-Two options for shop data, pick one:
+## Priority 4 — Discoverability & content
 
-- **Option A — Curated database (recommended for launch).** New table `public.aquarium_shops` with `name`, `address`, `suburb`, `state`, `postcode`, `lat`, `lng`, `website`, `phone`, `specialties text[]` (e.g. planted, marine, rare), `verified_at`. Seed with ~40 known Australian LFS across capital cities. Public `SELECT` policy. Predictable, no API cost, ranks in Google for "aquarium shop {suburb}".
-- **Option B — Google Places live search.** Use the Google Maps Platform connector's Places API (New) through the gateway. Fresher data but every visit costs API calls and results are generic (no "planted specialist" tagging).
+12. **First-time users see three fully-populated panels with no sequencing.**
+    Fix: add a tiny 4-step progress strip above the builder ("Dimensions → Filter → Fish → Save"), each step lights up as it's satisfied. Removes the hero CTA duplication.
 
-Recommendation: ship A now, layer B on later as an "also search nearby" enhancement.
+13. **Empty states missing under each adder.**
+    Fix: "No fish yet — search above to add some." (same for plants/hardscape).
 
-- Map lib: Google Maps JS API via the managed connector's browser key (no user setup, referrer-restricted to `*.lovable.app` — fine until custom domain).
-- Route `src/routes/shops.tsx`:
-    - Left: filter panel (state, specialty chips, search).
-    - Right: map with markers; clicking a marker opens a details card.
-    - Mobile: list-first with a "Show map" toggle.
-- Per-shop detail page `/shops/$id` for SEO (indexable page per store, JSON-LD `LocalBusiness`).
-- Geolocation opt-in: "Use my location" button re-centres map and sorts list by distance (Haversine, client-side).
+14. **Filter/tank size mismatch is only visible deep in the scorecard.**
+    Fix: inline warning next to the filter dropdown when rated litres < tank litres.
 
----
+## Priority 5 — SEO polish
 
-### Header nav update
+15. Add `canonical` on `species.$id.tsx` (missing) and `og:image` on `t.$slug.tsx` (share previews currently have no image — use a static default from `/public` for now; server-rendered tank preview is a bigger project).
+16. Add per-page `twitter:title` / `twitter:description` on the leaf routes that already set `og:*`.
 
-Update `src/routes/__root.tsx` nav to: **Builder · Quiz · Guides · Shops · Blog · Saved**. Collapses to a hamburger on mobile.
+## Out of scope (flag only, no changes this round)
+- Second guide article (content, not code).
+- Server-rendered tank preview image for social sharing.
+- RLS policy audit for `tanks` / join tables.
 
-### Technical notes for the builder to reference later
+## Technical notes
+- Mobile score bar: new `MobileScoreBar` component rendered from `routes/index.tsx`, uses shadcn `Sheet` for the expand state, `lg:hidden`.
+- Dropdown close: extract a small `useOutsideClick(ref, onClose)` hook and reuse in `TankSetupPanel` and `ItemAdder`.
+- Progress strip: derive from existing `state` — no new state needed.
+- Auto filter: pure function in `src/lib/scoring` or a new `src/lib/defaults.ts`.
 
-- All new content routes get real `head()` metadata — no reused home-page copy.
-- `/blog`, `/blog/$slug`, `/shops`, `/shops/$id`, `/guides/cycling`, `/species/$id` all listed in `sitemap.xml` (server route, not static).
-- Blog and shops need seed migrations that include `GRANT SELECT ... TO anon, authenticated` before enabling RLS.
-- Quiz reuses existing species data — zero new tables.
-
----
-
-### Suggested build order
-
-1. Cycling guide (1 route, no DB, immediate SEO win).
-2. Quiz (1 route, reuses existing data).
-3. Blog (1 table + 2 routes + sitemap).
-4. Shops (1 table + map integration + connector wiring).
-
-Want me to proceed with all four in this order, or cut/reorder any? Also happy to expand any section (e.g. full question list for the quiz, or the exact seed shop list) before we start.
+Ready to implement all Priority 1–3 items in one pass, and Priority 4–5 in a follow-up — or reorder if you'd prefer something else first.
