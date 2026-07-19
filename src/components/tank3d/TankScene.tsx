@@ -229,12 +229,6 @@ export default function TankScene({
             : "Drag to rotate · scroll to zoom · click objects to edit"}
         </span>
       </div>
-
-      {!hasFish && (
-        <div className="pointer-events-none absolute inset-x-0 top-3 text-center text-xs text-muted-foreground">
-          Drag to rotate · scroll to zoom · click objects to edit
-        </div>
-      )}
     </div>
   );
 }
