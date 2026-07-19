@@ -14,6 +14,111 @@ export type Database = {
   }
   public: {
     Tables: {
+      aquarium_shops: {
+        Row: {
+          address: string | null
+          created_at: string
+          description: string | null
+          id: string
+          lat: number | null
+          lng: number | null
+          name: string
+          phone: string | null
+          postcode: string | null
+          slug: string
+          specialties: string[]
+          state: string | null
+          suburb: string | null
+          verified_at: string | null
+          website: string | null
+        }
+        Insert: {
+          address?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          name: string
+          phone?: string | null
+          postcode?: string | null
+          slug: string
+          specialties?: string[]
+          state?: string | null
+          suburb?: string | null
+          verified_at?: string | null
+          website?: string | null
+        }
+        Update: {
+          address?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          name?: string
+          phone?: string | null
+          postcode?: string | null
+          slug?: string
+          specialties?: string[]
+          state?: string | null
+          suburb?: string | null
+          verified_at?: string | null
+          website?: string | null
+        }
+        Relationships: []
+      }
+      blog_posts: {
+        Row: {
+          author_name: string | null
+          body_markdown: string
+          cover_image_url: string | null
+          created_at: string
+          excerpt: string | null
+          id: string
+          meta_description: string | null
+          meta_title: string | null
+          published: boolean
+          published_at: string | null
+          slug: string
+          tags: string[]
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          author_name?: string | null
+          body_markdown: string
+          cover_image_url?: string | null
+          created_at?: string
+          excerpt?: string | null
+          id?: string
+          meta_description?: string | null
+          meta_title?: string | null
+          published?: boolean
+          published_at?: string | null
+          slug: string
+          tags?: string[]
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          author_name?: string | null
+          body_markdown?: string
+          cover_image_url?: string | null
+          created_at?: string
+          excerpt?: string | null
+          id?: string
+          meta_description?: string | null
+          meta_title?: string | null
+          published?: boolean
+          published_at?: string | null
+          slug?: string
+          tags?: string[]
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       filters: {
         Row: {
           id: string
