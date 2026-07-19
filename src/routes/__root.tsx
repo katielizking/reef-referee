@@ -154,6 +154,7 @@ function RootComponent() {
           </div>
         </header>
         <Outlet />
+        <Toaster />
       </div>
     </QueryClientProvider>
   );
