@@ -147,13 +147,3 @@ function SelectionRing({
     </mesh>
   );
 }
-
-
-function SelectionRing() {
-  return (
-    <mesh position={[0, 0.02, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-      <ringGeometry args={[0.55, 0.68, 32]} />
-      <meshBasicMaterial color="#22d3ee" transparent opacity={0.85} toneMapped={false} />
-    </mesh>
-  );
-}
