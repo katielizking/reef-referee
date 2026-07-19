@@ -2,7 +2,9 @@ export type BiotopeRegion =
   | "amazon_blackwater"
   | "lake_malawi"
   | "se_asian_stream"
-  | "australian_native";
+  | "australian_native"
+  | "unmapped";
+
 
 export type SwimZone = "top" | "mid" | "bottom";
 export type Temperament = "peaceful" | "semi-aggressive" | "aggressive";
@@ -95,6 +97,7 @@ export const BIOTOPE_LABEL: Record<BiotopeRegion, string> = {
   lake_malawi: "Lake Malawi rift",
   se_asian_stream: "Southeast Asian stream",
   australian_native: "Australian native",
+  unmapped: "Other / mixed",
 };
 
 export const BIOTOPE_WATER: Record<
@@ -105,4 +108,6 @@ export const BIOTOPE_WATER: Record<
   lake_malawi: { ph_min: 7.6, ph_max: 8.6, temp_min: 24, temp_max: 28 },
   se_asian_stream: { ph_min: 5.5, ph_max: 7.5, temp_min: 22, temp_max: 28 },
   australian_native: { ph_min: 6.5, ph_max: 8.0, temp_min: 18, temp_max: 28 },
+  unmapped: { ph_min: 6.5, ph_max: 7.5, temp_min: 22, temp_max: 27 },
 };
+
