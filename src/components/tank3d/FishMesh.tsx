@@ -11,6 +11,10 @@ import {
 } from "./fishVisuals";
 import { fishBehaviourProfile, type FishBehaviourProfile } from "./fishBehaviours";
 import { useReducedMotion } from "./useReducedMotion";
+import { FishRenderer } from "./fish/FishRenderer";
+
+export type { FishGroupProps };
+
 
 interface FishGroupProps {
   species: Species;
@@ -94,8 +98,10 @@ export function FishGroup({ species, quantity, interior, selected, onSelect, cen
   return (
     <group>
       {instances.map((inst, idx) => (
-        <FishMesh
+        <FishRenderer
           key={idx}
+          species={species}
+          quantity={quantity}
           speciesId={species.id}
           instanceIndex={idx}
           basePosition={inst.offset}
@@ -115,7 +121,8 @@ export function FishGroup({ species, quantity, interior, selected, onSelect, cen
   );
 }
 
-interface FishMeshProps {
+
+export interface FishMeshProps {
   speciesId: string;
   instanceIndex: number;
   basePosition: [number, number, number];
@@ -130,6 +137,7 @@ interface FishMeshProps {
   showFineDetail: boolean;
   onSelect: () => void;
 }
+
 
 function makeTailShape(style: FishTailStyle, length: number, height: number): THREE.Shape {
   const shape = new THREE.Shape();
@@ -308,7 +316,7 @@ function Markings({ pattern, profile, speciesId, instanceIndex, colour }: Markin
   );
 }
 
-function FishMesh({
+export function ProceduralFish({
   speciesId,
   instanceIndex,
   basePosition,
