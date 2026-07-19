@@ -1,4 +1,5 @@
 import { Link, createFileRoute, notFound } from "@tanstack/react-router";
+import type { ReactNode } from "react";
 
 type Guide = {
   slug: string;
@@ -7,7 +8,7 @@ type Guide = {
   minutes: number;
   sections: { id: string; heading: string }[];
   faqs: { q: string; a: string }[];
-  body: () => JSX.Element;
+  body: () => ReactNode;
 };
 
 const guides: Record<string, Guide> = {

@@ -118,7 +118,7 @@ function ShopPage() {
             Known for
           </p>
           <div className="mt-2 flex flex-wrap gap-1.5">
-            {shop.specialties.map((s) => (
+            {shop.specialties.map((s: string) => (
               <span
                 key={s}
                 className="rounded-full bg-muted px-2.5 py-1 text-xs text-muted-foreground"

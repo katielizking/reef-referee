@@ -19,7 +19,7 @@ type Shop = {
   description: string | null;
 };
 
-export const Route = createFileRoute("/shops")({
+export const Route = createFileRoute("/shops/")({
   head: () => ({
     meta: [
       { title: "Australian aquarium shops directory | FishTankr" },

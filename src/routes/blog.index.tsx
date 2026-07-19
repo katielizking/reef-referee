@@ -13,7 +13,7 @@ type BlogListItem = {
   published_at: string | null;
 };
 
-export const Route = createFileRoute("/blog")({
+export const Route = createFileRoute("/blog/")({
   head: () => ({
     meta: [
       { title: "FishTankr Blog — freshwater fishkeeping in Australia" },
