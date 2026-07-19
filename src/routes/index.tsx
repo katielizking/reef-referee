@@ -239,6 +239,8 @@ function Builder() {
           </div>
         </div>
       )}
+      {ready && <MobileScoreBar scorecard={scorecard} />}
     </main>
+
   );
 }
