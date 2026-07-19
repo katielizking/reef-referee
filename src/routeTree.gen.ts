@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as SavedRouteImport } from './routes/saved'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as TSlugRouteImport } from './routes/t.$slug'
+import { Route as SpeciesIdRouteImport } from './routes/species.$id'
 
 const SavedRoute = SavedRouteImport.update({
   id: '/saved',
@@ -28,34 +29,43 @@ const TSlugRoute = TSlugRouteImport.update({
   path: '/t/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SpeciesIdRoute = SpeciesIdRouteImport.update({
+  id: '/species/$id',
+  path: '/species/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/saved': typeof SavedRoute
+  '/species/$id': typeof SpeciesIdRoute
   '/t/$slug': typeof TSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/saved': typeof SavedRoute
+  '/species/$id': typeof SpeciesIdRoute
   '/t/$slug': typeof TSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/saved': typeof SavedRoute
+  '/species/$id': typeof SpeciesIdRoute
   '/t/$slug': typeof TSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/saved' | '/t/$slug'
+  fullPaths: '/' | '/saved' | '/species/$id' | '/t/$slug'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/saved' | '/t/$slug'
-  id: '__root__' | '/' | '/saved' | '/t/$slug'
+  to: '/' | '/saved' | '/species/$id' | '/t/$slug'
+  id: '__root__' | '/' | '/saved' | '/species/$id' | '/t/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   SavedRoute: typeof SavedRoute
+  SpeciesIdRoute: typeof SpeciesIdRoute
   TSlugRoute: typeof TSlugRoute
 }
 
@@ -82,12 +92,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/species/$id': {
+      id: '/species/$id'
+      path: '/species/$id'
+      fullPath: '/species/$id'
+      preLoaderRoute: typeof SpeciesIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   SavedRoute: SavedRoute,
+  SpeciesIdRoute: SpeciesIdRoute,
   TSlugRoute: TSlugRoute,
 }
 export const routeTree = rootRouteImport

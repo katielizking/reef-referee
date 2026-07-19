@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
-import { Search, Plus, Minus, X } from "lucide-react";
+import { Search, Plus, Minus, X, Info } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import type { Filter, Hardscape, MaintenanceFrequency, Plant, PlantDensity, Species, TankState } from "@/lib/types";
 import { BIOTOPE_LABEL } from "@/lib/types";
 import { litresOf } from "@/lib/scoring";
