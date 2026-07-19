@@ -184,12 +184,12 @@ export function PreStockChecklist({ scorecard, state, pendingSave, onCancelSave,
   const mustFix = items.filter((i) => i.severity === "must-fix");
   const worthLook = items.filter((i) => i.severity === "worth-look");
   const info = items.filter((i) => i.severity === "info");
-  const [open, setOpen] = useState(mustFix.length > 0);
+  const [open, setOpen] = useState(mustFix.length > 0 || worthLook.length > 0);
   const [guardOn, setGuardOn] = useGuard();
 
   useEffect(() => {
-    if (mustFix.length > 0) setOpen(true);
-  }, [mustFix.length]);
+    if (mustFix.length > 0 || worthLook.length > 0) setOpen(true);
+  }, [mustFix.length, worthLook.length]);
 
   const noFish = state.species.length === 0;
 
