@@ -180,7 +180,14 @@ function Builder() {
               </p>
             </div>
           </div>
-          <div className="lg:sticky lg:top-20 lg:self-start">
+          <div className="space-y-4 lg:sticky lg:top-20 lg:self-start">
+            <PreStockChecklist
+              scorecard={scorecard}
+              state={state}
+              pendingSave={gate.pendingSave}
+              onCancelSave={gate.cancel}
+              onConfirmSave={() => gate.confirm(doSave)}
+            />
             <ScorecardPanel scorecard={scorecard} />
           </div>
         </div>
