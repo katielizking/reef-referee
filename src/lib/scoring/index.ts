@@ -6,9 +6,14 @@ export interface SubScore {
   fixes: string[];
 }
 
+export interface CompatibilitySubScore extends SubScore {
+  criticalConflicts: string[];
+}
+
 export interface Scorecard {
-  overall: number;
-  compatibility: SubScore;
+  overall: number | null;
+  capReason: string | null;
+  compatibility: CompatibilitySubScore;
   bioload: SubScore & { loadPercent: number };
   space: SubScore;
   biome: SubScore & { badge?: "true-biotope"; dominantRegion?: BiotopeRegion };
@@ -40,7 +45,11 @@ export function scoreTank(state: TankState): Scorecard {
   const biome = scoreBiome(state);
   const legality = scoreLegality(state);
 
-  const overall = Math.round(
+  if (state.species.length === 0) {
+    return { overall: null, capReason: null, compatibility, bioload, space, biome, legality };
+  }
+
+  const weighted = Math.round(
     compatibility.score * WEIGHTS.compatibility +
       bioload.score * WEIGHTS.bioload +
       space.score * WEIGHTS.space +
@@ -48,15 +57,49 @@ export function scoreTank(state: TankState): Scorecard {
       legality.score * WEIGHTS.legality,
   );
 
-  return { overall, compatibility, bioload, space, biome, legality };
+  const caps: Array<{ cap: number; reason: string }> = [];
+  if (legality.illegalSpecies.length > 0) {
+    caps.push({
+      cap: 30,
+      reason: "Score capped: contains species that are illegal to keep in Australia.",
+    });
+  }
+  if (bioload.loadPercent > 110) {
+    caps.push({
+      cap: 45,
+      reason: "Score capped: the tank is overstocked beyond safe limits.",
+    });
+  }
+  if (compatibility.criticalConflicts.length > 0) {
+    caps.push({
+      cap: 40,
+      reason: "Score capped: a predator will eat smaller tankmates.",
+    });
+  }
+
+  let overall = weighted;
+  let capReason: string | null = null;
+  if (caps.length > 0) {
+    const lowest = caps.reduce((a, b) => (a.cap <= b.cap ? a : b));
+    if (lowest.cap < weighted) {
+      overall = lowest.cap;
+      capReason = lowest.reason;
+    } else {
+      capReason = lowest.reason;
+      overall = Math.min(weighted, lowest.cap);
+    }
+  }
+
+  return { overall, capReason, compatibility, bioload, space, biome, legality };
 }
 
 // ============== 1. COMPATIBILITY ==============
-function scoreCompatibility(state: TankState): SubScore {
-  if (state.species.length === 0) return { ...empty };
+function scoreCompatibility(state: TankState): CompatibilitySubScore {
+  if (state.species.length === 0) return { ...empty, criticalConflicts: [] };
   let score = 100;
   const reasons: string[] = [];
   const fixes: string[] = [];
+  const criticalConflicts: string[] = [];
 
   // Schooling shortfall
   for (const { species: sp, quantity } of state.species) {
@@ -104,6 +147,7 @@ function scoreCompatibility(state: TankState): SubScore {
         const pr = a.predatory ? b : a;
         reasons.push(`${p.common_name} will likely eat ${pr.common_name}.`);
         fixes.push(`Remove ${pr.common_name} or ${p.common_name}.`);
+        criticalConflicts.push(`${p.common_name} → ${pr.common_name}`);
       }
 
       // pH range non-overlap
@@ -127,7 +171,7 @@ function scoreCompatibility(state: TankState): SubScore {
   }
 
   if (reasons.length === 0) reasons.push("All added species get along.");
-  return { score: clamp(score), reasons, fixes };
+  return { score: clamp(score), reasons, fixes, criticalConflicts };
 }
 
 // ============== 2. BIOLOAD ==============
@@ -137,7 +181,6 @@ function scoreBioload(state: TankState): SubScore & { loadPercent: number } {
 
   const turnoverLph = state.filter?.turnover_lph ?? 0;
   const turnoverRatio = litres > 0 ? turnoverLph / litres : 0;
-  // filter factor: 4x turnover = 1.0, scale linearly, cap between 0.4 and 1.4
   const filterFactor = clamp(0.4 + (turnoverRatio / 4) * 0.7, 0.4, 1.4) / 1;
 
   const plantFactor = {
@@ -153,7 +196,6 @@ function scoreBioload(state: TankState): SubScore & { loadPercent: number } {
     monthly: 0.85,
   }[state.maintenance_frequency];
 
-  // Capacity: roughly 1 bioload unit per 5 L in a baseline tank
   const capacity = (litres / 5) * filterFactor * plantFactor * maintenanceFactor;
 
   const load = state.species.reduce(
@@ -162,7 +204,6 @@ function scoreBioload(state: TankState): SubScore & { loadPercent: number } {
   );
   const loadPercent = capacity > 0 ? Math.round((load / capacity) * 100) : 0;
 
-  // Ideal band: 70-85%
   let score = 100;
   if (loadPercent < 40) score = 70 + loadPercent * 0.5;
   else if (loadPercent <= 70) score = 85 + (loadPercent - 40);
@@ -218,7 +259,6 @@ function scoreSpace(state: TankState): SubScore {
       );
       fixes.push(`Use a longer tank (at least ${requiredLength} cm) for ${sp.common_name}.`);
     }
-    // Heavy stocking of large species
     if (sp.adult_size_cm >= 15 && quantity > 1 && litres / quantity < sp.min_tank_litres) {
       score -= 5;
     }
@@ -235,7 +275,6 @@ function scoreBiome(
   if (state.species.length === 0)
     return { ...empty, score: 0, reasons: ["Add some fish to score biome replication."] };
 
-  // Dominant region by headcount share
   const counts: Record<string, number> = {};
   let total = 0;
   for (const { species: sp, quantity } of state.species) {
@@ -243,20 +282,17 @@ function scoreBiome(
     total += quantity;
   }
   const dominant = Object.entries(counts).sort((a, b) => b[1] - a[1])[0][0] as BiotopeRegion;
-  const cohesion = counts[dominant] / total; // 0..1
+  const cohesion = counts[dominant] / total;
 
-  // Water authenticity
   const water = BIOTOPE_WATER[dominant];
   const phFit = state.target_ph >= water.ph_min && state.target_ph <= water.ph_max ? 1 : Math.max(0, 1 - Math.min(Math.abs(state.target_ph - water.ph_min), Math.abs(state.target_ph - water.ph_max)) / 2);
   const tempFit = state.target_temp_c >= water.temp_min && state.target_temp_c <= water.temp_max ? 1 : Math.max(0, 1 - Math.min(Math.abs(state.target_temp_c - water.temp_min), Math.abs(state.target_temp_c - water.temp_max)) / 4);
   const waterAuthenticity = (phFit + tempFit) / 2;
 
-  // Hardscape match
   const hardscapeMatch = state.hardscape.length === 0
     ? 0.5
     : state.hardscape.filter((h) => h.hardscape.biotope_region === dominant).length / state.hardscape.length;
 
-  // Plant match
   const plantMatch = state.plants.length === 0
     ? 0.5
     : state.plants.filter((p) => p.plant.biotope_region === dominant).length / state.plants.length;
