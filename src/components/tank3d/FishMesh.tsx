@@ -85,7 +85,9 @@ export function FishGroup({ species, quantity, interior, selected, onSelect, cen
     interior.y,
     interior.z,
     interior.substrateY,
+    centerY,
   ]);
+
 
   return (
     <group>
