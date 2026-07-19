@@ -124,7 +124,7 @@ function SubCard({ title, score, weightPct, reasons, fixes, extra }: SubCardProp
           <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
             {title} · {weightPct}%
           </p>
-          <div className={`font-display text-2xl font-semibold ${toneClass(score)}`}>{score}</div>
+          <div className="font-display text-2xl font-semibold text-foreground">{score}</div>
         </div>
         {extra}
       </div>
