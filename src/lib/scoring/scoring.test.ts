@@ -21,10 +21,14 @@ function mkSpecies(overrides: Partial<Species> & { id: string; common_name: stri
     native_temp_min_c: 24,
     native_temp_max_c: 28,
     native_habitat_type: "stream",
+
     legal_in_australia: true,
+    legal_status: "permitted",
+    legal_note: null,
     ...overrides,
   } as Species;
 }
+
 
 const tetra = mkSpecies({
   id: "tetra",
@@ -90,6 +94,9 @@ const illegal = mkSpecies({
   common_name: "Banned Cichlid",
   biotope_region: "amazon_blackwater",
   legal_in_australia: false,
+  legal_status: "prohibited",
+  legal_note: "Test prohibited species.",
+
   bioload_factor: 1,
   adult_size_cm: 8,
   min_tank_litres: 80,
@@ -211,4 +218,30 @@ describe("scoreTank", () => {
     expect(typeof s.overall).toBe("number");
     expect(s.capReason).toBeNull();
   });
+
+  it("native species surfaces nativeNotes without penalising legality", () => {
+    const nativeFish = mkSpecies({
+      id: "native",
+      common_name: "Pacific Blue Eye",
+      biotope_region: "australian_native",
+      legal_status: "native",
+      legal_note: "Australian native - check state permit rules.",
+      native_ph_min: 6.5,
+      native_ph_max: 8.0,
+      native_temp_min_c: 20,
+      native_temp_max_c: 28,
+    });
+    const s = scoreTank(
+      baseState({
+        target_ph: 7.2,
+        target_temp_c: 24,
+        species: [{ species: nativeFish, quantity: 6 }],
+      }),
+    );
+    expect(s.legality.nativeNotes).toContain("Australian native - check state permit rules.");
+    expect(s.legality.score).toBe(100);
+    expect(s.legality.illegalSpecies).toEqual([]);
+    expect(s.capReason).toBeNull();
+  });
+
 });
