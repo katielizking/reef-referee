@@ -7,6 +7,7 @@ import { TankSetupPanel } from "@/components/TankSetupPanel";
 import { TankVisual } from "@/components/TankVisual";
 import { ScorecardPanel } from "@/components/Scorecard";
 import { HeroTankIllustration } from "@/components/BrandLogo";
+import { PreStockChecklist, useSaveGate } from "@/components/PreStockChecklist";
 import { scoreTank } from "@/lib/scoring";
 import type { TankState } from "@/lib/types";
 import { useFilters, useHardscape, usePlants, useSpecies, saveTank } from "@/lib/data";
