@@ -261,10 +261,11 @@ export type Database = {
           maintenance_frequency: string
           name: string
           plant_density: string
-          session_id: string
+          session_id: string | null
           share_slug: string
           target_ph: number
           target_temp_c: number
+          user_id: string | null
           width_cm: number
         }
         Insert: {
@@ -276,10 +277,11 @@ export type Database = {
           maintenance_frequency?: string
           name: string
           plant_density?: string
-          session_id: string
+          session_id?: string | null
           share_slug?: string
           target_ph?: number
           target_temp_c?: number
+          user_id?: string | null
           width_cm: number
         }
         Update: {
@@ -291,10 +293,11 @@ export type Database = {
           maintenance_frequency?: string
           name?: string
           plant_density?: string
-          session_id?: string
+          session_id?: string | null
           share_slug?: string
           target_ph?: number
           target_temp_c?: number
+          user_id?: string | null
           width_cm?: number
         }
         Relationships: [

@@ -1,7 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { Filter, Hardscape, Plant, Species, TankRow } from "./types";
-import { getSessionId } from "./session";
+
+async function currentUserId(): Promise<string | null> {
+  const { data } = await supabase.auth.getUser();
+  return data.user?.id ?? null;
+}
 
 export function useSpecies() {
   return useQuery({
@@ -55,12 +59,12 @@ export function useSessionTanks() {
   return useQuery({
     queryKey: ["tanks", "session"],
     queryFn: async () => {
-      const sid = getSessionId();
-      if (!sid) return [] as TankRow[];
+      const uid = await currentUserId();
+      if (!uid) return [] as TankRow[];
       const { data, error } = await supabase
         .from("tanks")
         .select("*")
-        .eq("session_id", sid)
+        .eq("user_id", uid)
         .order("created_at", { ascending: false });
       if (error) throw error;
       return data as unknown as TankRow[];
@@ -122,10 +126,7 @@ export async function saveTank(
   state: import("./types").TankState,
   existingId?: string,
 ): Promise<TankRow> {
-  const sid = getSessionId();
-
   const payload = {
-    session_id: sid,
     name: state.name || "Untitled tank",
     length_cm: state.length_cm,
     width_cm: state.width_cm,
