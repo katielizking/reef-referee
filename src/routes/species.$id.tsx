@@ -144,6 +144,7 @@ function SpeciesGuide() {
         </div>
         <h1 className="font-display text-3xl font-bold text-foreground md:text-4xl">{s.common_name}</h1>
         <p className="italic text-muted-foreground">{s.scientific_name}</p>
+        <AddToTankButton species={s} />
       </header>
 
       <section className="mt-8">
