@@ -44,6 +44,7 @@ interface FishInstance {
 export function FishGroup({ species, quantity, interior, selected, onSelect, centerY }: FishGroupProps) {
   const colour = useMemo(() => speciesColour(species), [species]);
   const profile = useMemo(() => fishVisualProfile(species), [species]);
+  const behaviour = useMemo(() => fishBehaviourProfile(species), [species]);
   const reduced = useReducedMotion();
 
   // Models are normalised to approximately one scene unit from nose to tail.
