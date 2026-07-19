@@ -44,14 +44,24 @@ export function GltfFish({
   // are still shared across all clones.
   const scene = useMemo(() => cloneSkinnedScene(gltf.scene), [gltf.scene]);
 
-  const scale = useMemo(
-    () =>
-      computeRenderScale({
+  // Measure the actual loaded bounding box rather than trusting the
+  // exporter's declared units. The GLB ships in metres (4cm ≈ 0.04 model
+  // units), so treating modelReferenceLengthCm as scene units directly
+  // would render the fish 100× too small.
+  const scale = useMemo(() => {
+    const box = new THREE.Box3().setFromObject(gltf.scene);
+    const size = new THREE.Vector3();
+    box.getSize(size);
+    const measured = Math.max(size.x, size.y, size.z);
+    const targetSceneUnits = asset.adultLengthCm / 10; // CM_PER_UNIT = 10
+    if (!Number.isFinite(measured) || measured <= 0) {
+      return computeRenderScale({
         adultLengthCm: asset.adultLengthCm,
         modelReferenceLengthCm: asset.modelReferenceLengthCm,
-      }),
-    [asset.adultLengthCm, asset.modelReferenceLengthCm],
-  );
+      });
+    }
+    return targetSceneUnits / measured;
+  }, [gltf.scene, asset.adultLengthCm, asset.modelReferenceLengthCm]);
 
   const rotationY = useMemo(
     () => forwardAxisRotationY(asset.orientation?.forwardAxis ?? "+x"),
