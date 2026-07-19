@@ -6,7 +6,7 @@ import { Loader2 } from "lucide-react";
 import { loadTankBySlug } from "@/lib/data";
 import { scoreTank, litresOf } from "@/lib/scoring";
 import type { TankState } from "@/lib/types";
-import { TankVisual } from "@/components/TankVisual";
+import { ClientOnlyTankScene } from "@/components/tank3d/ClientOnlyTankScene";
 import { ScorecardPanel } from "@/components/Scorecard";
 
 const tankQuery = (slug: string) =>
