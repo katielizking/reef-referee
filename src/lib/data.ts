@@ -84,7 +84,7 @@ export async function loadTankBySlug(slug: string): Promise<FullTank | null> {
   const { data, error } = await supabase.rpc("get_shared_tank", { p_slug: slug });
   if (error) throw error;
   if (!data) return null;
-  const payload = data as {
+  const payload = data as unknown as {
     tank: TankRow;
     filter: Filter | null;
     species: Array<{ quantity: number; species: Species }>;
