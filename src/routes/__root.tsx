@@ -161,28 +161,28 @@ function RootComponent() {
             <Link to="/" aria-label="FishTankr home" className="rounded-lg">
               <BrandLogo />
             </Link>
-            <nav aria-label="Primary" className="flex items-center gap-1 text-sm">
-              <Link
-                to="/"
-                className="rounded-lg px-3 py-1.5 font-medium text-muted-foreground transition-colors hover:text-foreground"
-                activeProps={{
-                  className:
-                    "rounded-lg px-3 py-1.5 font-medium bg-muted text-foreground",
-                }}
-                activeOptions={{ exact: true }}
-              >
-                Builder
-              </Link>
-              <Link
-                to="/saved"
-                className="rounded-lg px-3 py-1.5 font-medium text-muted-foreground transition-colors hover:text-foreground"
-                activeProps={{
-                  className:
-                    "rounded-lg px-3 py-1.5 font-medium bg-muted text-foreground",
-                }}
-              >
-                My tanks
-              </Link>
+            <nav aria-label="Primary" className="flex flex-wrap items-center gap-0.5 text-sm">
+              {[
+                { to: "/", label: "Builder", exact: true },
+                { to: "/quiz", label: "Quiz" },
+                { to: "/guides", label: "Guides" },
+                { to: "/shops", label: "Shops" },
+                { to: "/blog", label: "Blog" },
+                { to: "/saved", label: "My tanks" },
+              ].map((item) => (
+                <Link
+                  key={item.to}
+                  to={item.to}
+                  className="rounded-lg px-2.5 py-1.5 font-medium text-muted-foreground transition-colors hover:text-foreground"
+                  activeProps={{
+                    className:
+                      "rounded-lg px-2.5 py-1.5 font-medium bg-muted text-foreground",
+                  }}
+                  activeOptions={item.exact ? { exact: true } : undefined}
+                >
+                  {item.label}
+                </Link>
+              ))}
             </nav>
           </div>
         </header>
