@@ -100,10 +100,9 @@ export function FishGroup({ species, quantity, interior, selected, onSelect, cen
           instanceIndex={idx}
           basePosition={inst.offset}
           phase={inst.phase}
-          amp={inst.amp}
-          speed={inst.speed}
           colour={colour}
           profile={profile}
+          behaviour={behaviour}
           length={fishLen}
           selected={selected}
           reduced={reduced}
@@ -121,10 +120,9 @@ interface FishMeshProps {
   instanceIndex: number;
   basePosition: [number, number, number];
   phase: number;
-  amp: number;
-  speed: number;
   colour: string;
   profile: FishVisualProfile;
+  behaviour: FishBehaviourProfile;
   length: number;
   selected: boolean;
   reduced: boolean;
