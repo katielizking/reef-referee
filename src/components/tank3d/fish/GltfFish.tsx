@@ -173,9 +173,15 @@ export function GltfFish({
       }}
     >
       <primitive object={scene} />
+      {/* Invisible pointer hitbox sized to the model's local bbox so
+          translucent fins are not relied on for click/tap selection. */}
+      <mesh visible={false}>
+        <boxGeometry args={[localBbox[0] * 1.15, localBbox[1] * 1.4, localBbox[2] * 1.4]} />
+        <meshBasicMaterial transparent opacity={0} depthWrite={false} />
+      </mesh>
       {selected && (
-        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.4, 0]}>
-          <ringGeometry args={[0.48, 0.61, 36]} />
+        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -localBbox[1] * 0.6, 0]}>
+          <ringGeometry args={[localBbox[0] * 0.55, localBbox[0] * 0.7, 36]} />
           <meshBasicMaterial color="#B8E84A" transparent opacity={0.9} toneMapped={false} />
         </mesh>
       )}
