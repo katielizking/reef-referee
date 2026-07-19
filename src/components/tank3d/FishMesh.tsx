@@ -316,7 +316,7 @@ function Markings({ pattern, profile, speciesId, instanceIndex, colour }: Markin
   );
 }
 
-function FishMesh({
+export function ProceduralFish({
   speciesId,
   instanceIndex,
   basePosition,
