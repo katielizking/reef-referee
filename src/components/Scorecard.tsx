@@ -92,13 +92,23 @@ function ScoreRing({
       />
       <text
         x="50%"
-        y="50%"
+        y="46%"
         dominantBaseline="middle"
         textAnchor="middle"
         className="fill-foreground font-display font-semibold"
         fontSize={size * 0.3}
       >
         {score}
+      </text>
+      <text
+        x="50%"
+        y="68%"
+        dominantBaseline="middle"
+        textAnchor="middle"
+        className="fill-muted-foreground"
+        fontSize={size * 0.11}
+      >
+        / 100
       </text>
     </svg>
   );
