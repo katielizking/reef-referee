@@ -1,58 +1,63 @@
 
 ## Goal
 
-Give every fish its own page that explains its needs and how FishTankr scores it, reachable from the species list in the builder.
+Before the user saves a tank, surface the concrete risks the scorecard already knows about and ask them to acknowledge or fix each one. Experienced users can turn the check off.
 
-## Route
+## What "checklist" means here
 
-New file `src/routes/species.$id.tsx` at URL `/species/$id` (uses the species UUID — no schema change needed).
+Every item is derived from the existing `Scorecard` result — no new scoring logic. Items are bucketed by severity:
 
-- Loader uses `context.queryClient.ensureQueryData` to fetch the single species by id from Supabase.
-- `notFoundComponent` for unknown ids; `errorComponent` for fetch failures.
-- `head()` sets per-page title/description/og tags from the loaded species (common + scientific name, biotope, adult size).
+- **Must fix** (blocks silent save)
+  - Any species in `legality.illegalSpecies` → "Prohibited species in the tank"
+  - Any string in `compatibility.criticalConflicts` → predation warning per pair
+  - `bioload.loadPercent > 110` → "Overstocked — filter and water changes won't keep up"
 
-## Page content
+- **Worth another look** (shown but doesn't block)
+  - `bioload.loadPercent` between 90–110 → "Close to capacity"
+  - `state.maintenance_frequency === "monthly"` and load > 60% → "Monthly maintenance is thin for this stocking"
+  - Filter turnover-per-hour vs volume < 4× → "Filter is undersized for the tank"
+  - `space.score < 60` → surfaces `space.reasons[0]` (min-tank / swim-length shortfall)
+  - `biome.score < 50` → "Mixed biotope — species from different regions"
+  - Schooling species below minimum group size (derived from `state.species` + `min_group_size`)
 
-Four sections, using existing brand tokens and components — no new design system work.
+- **Info** (rendered as neutral notes, not gating)
+  - `legality.nativeNotes` — state-permit reminders
 
-1. **Header**
-   - Common name (H1, Sora) + scientific name (italic).
-   - Badges: biotope region, `legal_status` (Permitted / Australian native / Prohibited — coral for prohibited, lime for native, muted for permitted, always paired with label + icon).
+Each item has: title, one-line why, one-line fix hint, and an optional "Jump to setup" that scrolls to the relevant section anchor.
 
-2. **At a glance** (grid of stat cards)
-   - Adult size (`adult_size_cm`)
-   - Minimum tank (`min_tank_litres`)
-   - Swim zone (top / mid / bottom)
-   - Temperament
-   - Group size (if `is_schooling`, "Schools of X+"; else "Can be kept singly")
-   - Native pH range and temperature range
+## Guard preference
 
-3. **Welfare notes** — plain-English bullets derived from the row:
-   - Schooling requirement, if any.
-   - Fin-nipper / long-finned / predatory warnings.
-   - Native habitat description (`native_habitat_type`).
-   - `legal_note` when present (state-permit warning for natives, prohibition reason for restricted species).
+- New localStorage key `fishtankr:prestock-guard` (`"on" | "off"`, defaults to `"on"`).
+- Toggle rendered inside the checklist panel: "Skip this check — I know what I'm doing" (shadcn `Switch`, with helper text). Persists across sessions.
 
-4. **How the calculator uses this species** — one short paragraph per sub-score, explaining what the engine looks at (compatibility flags, bioload factor, min-tank + swim length, biotope match, legality). Written from the species' perspective ("Because this fish is a fin-nipper, it dings compatibility when kept with long-finned tank mates.") so the guide answers "why did my score change?"
+## Save flow
 
-5. Disclaimer footer: "This is a guide, not a guarantee. Individual fish vary." (matches the Scorecard voice.)
+Wrap `handleSave` in `src/routes/index.tsx`:
 
-## Linking from the builder
+- Guard **on**:
+  - No must-fix items → save immediately (current behaviour).
+  - Must-fix items present → open a shadcn `AlertDialog` listing them, with two actions: **Adjust tank** (closes dialog, does nothing else) and **Save anyway** (proceeds with save and toasts a warning). "Worth another look" items appear in the dialog as a secondary list, not as blockers.
+- Guard **off**: save immediately, no dialog. The inline panel still renders so the risks remain visible.
 
-Edit `src/components/TankSetupPanel.tsx` only:
-- In each species search result row, add a small "View guide" affordance (info icon `Link` from `lucide-react`) on the right side that navigates to `/species/$id` in a new tab. Clicking the row body still adds the fish — the icon has `stopPropagation` + `aria-label`.
-- In each added-species chip, add the same info-icon link next to the remove button.
+Share (`handleSave(true)`) uses the same gate.
 
-No changes to the scoring engine, database, saved-tanks, or shared-view routes.
+## Where it renders
+
+New component `PreStockChecklist` mounted in the right-hand scorecard column, directly above the existing `ScorecardPanel`. It's a card with:
+
+- Header: "Pre-stock check" + item count badges (e.g. "2 must fix · 1 look").
+- Collapsible body (shadcn `Collapsible`, expanded by default when there are must-fix items, otherwise collapsed).
+- Guard toggle at the bottom of the body.
+- When the tank has no species, panel shows a single neutral row: "Add fish to run the check."
 
 ## Files touched
 
-- `src/routes/species.$id.tsx` — new.
-- `src/components/TankSetupPanel.tsx` — add two info-icon links.
+- New `src/components/PreStockChecklist.tsx` — item derivation, inline panel, and the confirmation `AlertDialog`. Exports `PreStockChecklist` and a helper `useSaveGate({ scorecard, state })` that returns `{ mustFix, worthLook, guardOn, setGuardOn, confirmSave }` so the route can wire it into `handleSave`.
+- `src/routes/index.tsx` — render `<PreStockChecklist />` above `<ScorecardPanel />`, replace direct `handleSave` calls with the gated version from the hook.
 
-## Out of scope (say so up front)
+## Out of scope
 
-- No `/species` index page.
-- No new columns (uses only existing species fields).
-- No slug column — URL uses the UUID for now; can add a slug later without breaking anything.
-- No changes to how the Scorecard renders.
+- No scoring engine changes.
+- No new database columns or migrations.
+- No new checklist items beyond what the current scorecard can already tell us.
+- Guard toggle is device-local (localStorage) — not synced to the account.

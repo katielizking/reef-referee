@@ -7,6 +7,7 @@ import { TankSetupPanel } from "@/components/TankSetupPanel";
 import { TankVisual } from "@/components/TankVisual";
 import { ScorecardPanel } from "@/components/Scorecard";
 import { HeroTankIllustration } from "@/components/BrandLogo";
+import { PreStockChecklist, useSaveGate } from "@/components/PreStockChecklist";
 import { scoreTank } from "@/lib/scoring";
 import type { TankState } from "@/lib/types";
 import { useFilters, useHardscape, usePlants, useSpecies, saveTank } from "@/lib/data";
@@ -54,11 +55,12 @@ function Builder() {
   const filters = useFilters();
 
   const scorecard = useMemo(() => scoreTank(state), [state]);
+  const gate = useSaveGate(scorecard, state);
 
   const ready = species.data && plants.data && hardscape.data && filters.data;
   const showHero = state.species.length === 0;
 
-  async function handleSave(share = false) {
+  async function doSave(share: boolean) {
     try {
       setSaving(true);
       const row = await saveTank(state, savedId);
@@ -78,6 +80,10 @@ function Builder() {
     } finally {
       setSaving(false);
     }
+  }
+
+  function handleSave(share = false) {
+    gate.requestSave(share, doSave);
   }
 
   function scrollToBuilder() {
@@ -174,7 +180,14 @@ function Builder() {
               </p>
             </div>
           </div>
-          <div className="lg:sticky lg:top-20 lg:self-start">
+          <div className="space-y-4 lg:sticky lg:top-20 lg:self-start">
+            <PreStockChecklist
+              scorecard={scorecard}
+              state={state}
+              pendingSave={gate.pendingSave}
+              onCancelSave={gate.cancel}
+              onConfirmSave={() => gate.confirm(doSave)}
+            />
             <ScorecardPanel scorecard={scorecard} />
           </div>
         </div>
