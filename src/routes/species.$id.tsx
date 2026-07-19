@@ -214,6 +214,9 @@ function AddToTankButton({ species }: { species: Species }) {
       )}
     </div>
   );
+}
+
+
 
 function ScoreBlock({ title, body }: { title: string; body: string }) {
   return (
