@@ -14,7 +14,299 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      filters: {
+        Row: {
+          id: string
+          name: string
+          rated_litres: number
+          turnover_lph: number
+        }
+        Insert: {
+          id?: string
+          name: string
+          rated_litres: number
+          turnover_lph: number
+        }
+        Update: {
+          id?: string
+          name?: string
+          rated_litres?: number
+          turnover_lph?: number
+        }
+        Relationships: []
+      }
+      hardscape: {
+        Row: {
+          biotope_region: string
+          id: string
+          name: string
+          type: string
+        }
+        Insert: {
+          biotope_region: string
+          id?: string
+          name: string
+          type: string
+        }
+        Update: {
+          biotope_region?: string
+          id?: string
+          name?: string
+          type?: string
+        }
+        Relationships: []
+      }
+      plants: {
+        Row: {
+          biotope_region: string
+          common_name: string
+          id: string
+          light_need: string
+          scientific_name: string
+        }
+        Insert: {
+          biotope_region: string
+          common_name: string
+          id?: string
+          light_need: string
+          scientific_name: string
+        }
+        Update: {
+          biotope_region?: string
+          common_name?: string
+          id?: string
+          light_need?: string
+          scientific_name?: string
+        }
+        Relationships: []
+      }
+      species: {
+        Row: {
+          active: boolean
+          adult_size_cm: number
+          bioload_factor: number
+          biotope_region: string
+          common_name: string
+          fin_nipper: boolean
+          id: string
+          is_schooling: boolean
+          legal_in_australia: boolean
+          long_finned: boolean
+          min_group_size: number
+          min_tank_litres: number
+          native_habitat_type: string
+          native_ph_max: number
+          native_ph_min: number
+          native_temp_max_c: number
+          native_temp_min_c: number
+          predatory: boolean
+          scientific_name: string
+          swim_zone: string
+          temperament: string
+        }
+        Insert: {
+          active?: boolean
+          adult_size_cm: number
+          bioload_factor: number
+          biotope_region: string
+          common_name: string
+          fin_nipper?: boolean
+          id?: string
+          is_schooling?: boolean
+          legal_in_australia?: boolean
+          long_finned?: boolean
+          min_group_size?: number
+          min_tank_litres: number
+          native_habitat_type: string
+          native_ph_max: number
+          native_ph_min: number
+          native_temp_max_c: number
+          native_temp_min_c: number
+          predatory?: boolean
+          scientific_name: string
+          swim_zone: string
+          temperament: string
+        }
+        Update: {
+          active?: boolean
+          adult_size_cm?: number
+          bioload_factor?: number
+          biotope_region?: string
+          common_name?: string
+          fin_nipper?: boolean
+          id?: string
+          is_schooling?: boolean
+          legal_in_australia?: boolean
+          long_finned?: boolean
+          min_group_size?: number
+          min_tank_litres?: number
+          native_habitat_type?: string
+          native_ph_max?: number
+          native_ph_min?: number
+          native_temp_max_c?: number
+          native_temp_min_c?: number
+          predatory?: boolean
+          scientific_name?: string
+          swim_zone?: string
+          temperament?: string
+        }
+        Relationships: []
+      }
+      tank_hardscape: {
+        Row: {
+          hardscape_id: string
+          quantity: number
+          tank_id: string
+        }
+        Insert: {
+          hardscape_id: string
+          quantity?: number
+          tank_id: string
+        }
+        Update: {
+          hardscape_id?: string
+          quantity?: number
+          tank_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tank_hardscape_hardscape_id_fkey"
+            columns: ["hardscape_id"]
+            isOneToOne: false
+            referencedRelation: "hardscape"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tank_hardscape_tank_id_fkey"
+            columns: ["tank_id"]
+            isOneToOne: false
+            referencedRelation: "tanks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tank_plants: {
+        Row: {
+          plant_id: string
+          quantity: number
+          tank_id: string
+        }
+        Insert: {
+          plant_id: string
+          quantity?: number
+          tank_id: string
+        }
+        Update: {
+          plant_id?: string
+          quantity?: number
+          tank_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tank_plants_plant_id_fkey"
+            columns: ["plant_id"]
+            isOneToOne: false
+            referencedRelation: "plants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tank_plants_tank_id_fkey"
+            columns: ["tank_id"]
+            isOneToOne: false
+            referencedRelation: "tanks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tank_species: {
+        Row: {
+          quantity: number
+          species_id: string
+          tank_id: string
+        }
+        Insert: {
+          quantity: number
+          species_id: string
+          tank_id: string
+        }
+        Update: {
+          quantity?: number
+          species_id?: string
+          tank_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tank_species_species_id_fkey"
+            columns: ["species_id"]
+            isOneToOne: false
+            referencedRelation: "species"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tank_species_tank_id_fkey"
+            columns: ["tank_id"]
+            isOneToOne: false
+            referencedRelation: "tanks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tanks: {
+        Row: {
+          created_at: string
+          filter_id: string | null
+          height_cm: number
+          id: string
+          length_cm: number
+          maintenance_frequency: string
+          name: string
+          plant_density: string
+          session_id: string
+          share_slug: string
+          target_ph: number
+          target_temp_c: number
+          width_cm: number
+        }
+        Insert: {
+          created_at?: string
+          filter_id?: string | null
+          height_cm: number
+          id?: string
+          length_cm: number
+          maintenance_frequency?: string
+          name: string
+          plant_density?: string
+          session_id: string
+          share_slug?: string
+          target_ph?: number
+          target_temp_c?: number
+          width_cm: number
+        }
+        Update: {
+          created_at?: string
+          filter_id?: string | null
+          height_cm?: number
+          id?: string
+          length_cm?: number
+          maintenance_frequency?: string
+          name?: string
+          plant_density?: string
+          session_id?: string
+          share_slug?: string
+          target_ph?: number
+          target_temp_c?: number
+          width_cm?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tanks_filter_id_fkey"
+            columns: ["filter_id"]
+            isOneToOne: false
+            referencedRelation: "filters"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
