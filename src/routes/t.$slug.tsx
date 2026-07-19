@@ -119,7 +119,7 @@ function SharedTankBody() {
       </div>
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,340px)]">
         <div className="space-y-4">
-          <TankVisual state={state} />
+          <ClientOnlyTankScene state={state} interactive={false} />
           <ContentsList state={state} />
         </div>
         <div>
