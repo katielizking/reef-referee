@@ -246,7 +246,7 @@ function GuidePage() {
               On this page
             </p>
             <ul className="space-y-1.5 text-sm">
-              {guide.sections.map((s) => (
+              {guide.sections.map((s: { id: string; heading: string }) => (
                 <li key={s.id}>
                   <a href={`#${s.id}`} className="text-muted-foreground hover:text-foreground">
                     {s.heading}
@@ -269,7 +269,7 @@ function GuidePage() {
 
           <section id="faq">
             <h2>Frequently asked questions</h2>
-            {guide.faqs.map((f) => (
+            {guide.faqs.map((f: { q: string; a: string }) => (
               <div key={f.q} className="mb-4">
                 <h3 className="text-base font-semibold">{f.q}</h3>
                 <p>{f.a}</p>
