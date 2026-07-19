@@ -9,6 +9,7 @@ import {
   type FishTailStyle,
   type FishVisualProfile,
 } from "./fishVisuals";
+import { fishBehaviourProfile, type FishBehaviourProfile } from "./fishBehaviours";
 import { useReducedMotion } from "./useReducedMotion";
 
 interface FishGroupProps {
@@ -43,6 +44,7 @@ interface FishInstance {
 export function FishGroup({ species, quantity, interior, selected, onSelect, centerY }: FishGroupProps) {
   const colour = useMemo(() => speciesColour(species), [species]);
   const profile = useMemo(() => fishVisualProfile(species), [species]);
+  const behaviour = useMemo(() => fishBehaviourProfile(species), [species]);
   const reduced = useReducedMotion();
 
   // Models are normalised to approximately one scene unit from nose to tail.
@@ -98,10 +100,9 @@ export function FishGroup({ species, quantity, interior, selected, onSelect, cen
           instanceIndex={idx}
           basePosition={inst.offset}
           phase={inst.phase}
-          amp={inst.amp}
-          speed={inst.speed}
           colour={colour}
           profile={profile}
+          behaviour={behaviour}
           length={fishLen}
           selected={selected}
           reduced={reduced}
@@ -119,10 +120,9 @@ interface FishMeshProps {
   instanceIndex: number;
   basePosition: [number, number, number];
   phase: number;
-  amp: number;
-  speed: number;
   colour: string;
   profile: FishVisualProfile;
+  behaviour: FishBehaviourProfile;
   length: number;
   selected: boolean;
   reduced: boolean;
@@ -313,10 +313,9 @@ function FishMesh({
   instanceIndex,
   basePosition,
   phase,
-  amp,
-  speed,
   colour,
   profile,
+  behaviour,
   length,
   selected,
   reduced,
@@ -364,10 +363,60 @@ function FishMesh({
     }
 
     const t = clock.getElapsedTime();
-    const swimT = t * speed + phase;
-    const hx = Math.sin(swimT) * amp;
-    const hz = Math.cos(t * speed * 0.63 + phase) * amp * 0.5;
-    const hy = Math.sin(t * speed * 1.45 + phase) * 0.05;
+
+    // Group-level phase (shared across all instances of this species).
+    const groupPhase = hash01(speciesId, 999) * Math.PI * 2;
+    const cohesion = behaviour.schoolingCohesion;
+    const wander = behaviour.individualWander;
+
+    // Shared group orbit — larger, slower path used when cohesion is high.
+    const gT = t * behaviour.cruiseSpeed + groupPhase;
+    const gx = Math.sin(gT * 0.6) * behaviour.rangeX * bounds.x * 0.5;
+    const gz = Math.cos(gT * 0.42) * behaviour.rangeZ * bounds.z * 0.5;
+    const gy = Math.sin(gT * 0.3) * behaviour.verticalRange * bounds.y * 0.5;
+
+    // Per-instance wander overlaid on top.
+    const iT = t * behaviour.cruiseSpeed * (0.85 + (instanceIndex % 5) * 0.06) + phase;
+    const ix = Math.sin(iT * 1.15) * behaviour.rangeX * bounds.x * 0.38 * wander;
+    const iz = Math.cos(iT * 0.93) * behaviour.rangeZ * bounds.z * 0.38 * wander;
+    const iy = Math.sin(iT * 1.3) * behaviour.verticalRange * bounds.y * 0.42 * wander;
+
+    // Burst modulation — occasional darts for active/predatory species.
+    const burstCycle = Math.sin(t * 0.55 + phase * 2.7);
+    const burst = burstCycle > 0.72 ? (burstCycle - 0.72) / 0.28 : 0;
+    const speedMul = 1 + burst * behaviour.burstStrength * 1.5;
+
+    // Pause envelope — slows movement periodically for hoverers, grazers.
+    const pauseCycle = (Math.sin(t * 0.24 + phase * 1.7) + 1) * 0.5;
+    const pauseMul = 1 - pauseCycle * behaviour.pauseStrength * 0.85;
+
+    let dx = (gx * cohesion + ix) * speedMul * pauseMul;
+    let dz = (gz * cohesion + iz) * speedMul * pauseMul;
+    let dy = gy * cohesion + iy;
+
+    // Occasional rise toward the surface for labyrinth fish.
+    if (behaviour.surfaceVisit > 0) {
+      const surface = (Math.sin(t * 0.18 + phase * 0.9) + 1) * 0.5;
+      dy += surface * behaviour.surfaceVisit * bounds.y * 0.35;
+    }
+
+    // Extra lateral wiggle for slender bottom fish (kuhli, loach).
+    if (behaviour.bodyWiggle > 0) {
+      dz += Math.sin(t * behaviour.tailFrequency * 0.45 + phase) * behaviour.bodyWiggle * 0.35;
+      dx += Math.cos(t * behaviour.tailFrequency * 0.35 + phase) * behaviour.bodyWiggle * 0.2;
+    }
+
+    // Forage — nose down and pause periodically for bottom feeders/grazers.
+    let foragePitch = 0;
+    if (behaviour.forageStrength > 0) {
+      const f = Math.sin(t * 0.5 + phase * 1.3);
+      if (f > 0.6) {
+        const k = (f - 0.6) / 0.4;
+        foragePitch = -k * behaviour.forageStrength * behaviour.maxPitch * 1.8;
+        dx *= 1 - k * 0.6;
+        dz *= 1 - k * 0.6;
+      }
+    }
 
     const modelHalfLength = length * (profile.bodyHalfLength + profile.tailLength + 0.2);
     const horizontalMargin = Math.max(0.12, modelHalfLength);
@@ -375,17 +424,17 @@ function FishMesh({
     const verticalMargin = Math.max(0.1, length * (profile.bodyHeight + profile.dorsalHeight));
 
     const nx = THREE.MathUtils.clamp(
-      basePosition[0] + hx,
+      basePosition[0] + dx,
       -bounds.x / 2 + horizontalMargin,
       bounds.x / 2 - horizontalMargin,
     );
     const nz = THREE.MathUtils.clamp(
-      basePosition[2] + hz,
+      basePosition[2] + dz,
       -bounds.z / 2 + depthMargin,
       bounds.z / 2 - depthMargin,
     );
     const ny = THREE.MathUtils.clamp(
-      basePosition[1] + hy,
+      basePosition[1] + dy,
       bounds.substrateY + verticalMargin,
       bounds.y / 2 - verticalMargin,
     );
@@ -393,24 +442,33 @@ function FishMesh({
     target.set(nx, ny, nz);
     g.position.lerp(target, Math.min(delta * 2.25, 1));
 
-    const vx = Math.cos(swimT) * amp * speed;
-    const vz = -Math.sin(t * speed * 0.63 + phase) * amp * 0.5 * speed * 0.63;
+    // Heading — derivative of the path, combining group + individual.
+    const vx =
+      Math.cos(gT * 0.6) * 0.6 * behaviour.rangeX * bounds.x * 0.5 * cohesion +
+      Math.cos(iT * 1.15) * 1.15 * behaviour.rangeX * bounds.x * 0.38 * wander;
+    const vz =
+      -Math.sin(gT * 0.42) * 0.42 * behaviour.rangeZ * bounds.z * 0.5 * cohesion -
+      Math.sin(iT * 0.93) * 0.93 * behaviour.rangeZ * bounds.z * 0.38 * wander;
     const desiredHeading = Math.atan2(-vz, vx);
     const headingDelta = Math.atan2(
       Math.sin(desiredHeading - g.rotation.y),
       Math.cos(desiredHeading - g.rotation.y),
     );
-    g.rotation.y += headingDelta * Math.min(delta * 3.1, 1);
-    g.rotation.z = Math.sin(t * speed * 1.1 + phase) * 0.025;
+    g.rotation.y += headingDelta * Math.min(delta * behaviour.turnRate * 0.85, 1);
+    g.rotation.z = Math.sin(t * behaviour.tailFrequency * 0.14 + phase) * behaviour.bodyRoll;
+    g.rotation.x =
+      foragePitch + Math.sin(t * 0.42 + phase * 0.7) * behaviour.maxPitch * 0.15;
 
-    const tailBeat =
-      Math.sin(t * ((speciesId.length % 3) + 7.5) + phase) *
-      (profile.tailStyle === "flowing" ? 0.18 : 0.25);
+    // Tail beat scales with speed.
+    const tailFreq = behaviour.tailFrequency * (0.55 + speedMul * 0.55) * pauseMul + 0.6;
+    const tailBeat = Math.sin(t * tailFreq + phase) * behaviour.tailAmplitude;
     if (tailRef.current) tailRef.current.rotation.y = tailBeat;
     if (leftPectoralRef.current)
-      leftPectoralRef.current.rotation.x = -0.45 + Math.sin(t * 5.2 + phase) * 0.18;
+      leftPectoralRef.current.rotation.x =
+        -0.45 + Math.sin(t * behaviour.pectoralFrequency + phase) * 0.18;
     if (rightPectoralRef.current)
-      rightPectoralRef.current.rotation.x = 0.45 - Math.sin(t * 5.2 + phase) * 0.18;
+      rightPectoralRef.current.rotation.x =
+        0.45 - Math.sin(t * behaviour.pectoralFrequency + phase) * 0.18;
   });
 
   const bodyY = profile.bodyStyle === "bottom" ? -profile.bodyHeight * 0.12 : 0;
