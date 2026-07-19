@@ -17,6 +17,57 @@ const speciesByIdQuery = (id: string) =>
     staleTime: 5 * 60 * 1000,
   });
 
+const allSpeciesQuery = queryOptions({
+  queryKey: ["species", "all"],
+  queryFn: async () => {
+    const { data, error } = await supabase.from("species").select("*");
+    if (error) throw error;
+    return (data ?? []) as unknown as Species[];
+  },
+  staleTime: 5 * 60 * 1000,
+});
+
+function findRelated(target: Species, all: Species[]): Array<{ s: Species; reason: string }> {
+  const zoneLabel = { top: "top", mid: "mid-water", bottom: "bottom" } as const;
+  const scored = all
+    .filter((s) => s.id !== target.id)
+    .filter((s) => s.legal_status !== "prohibited")
+    .filter((s) => {
+      // temperament / behavioural compatibility
+      if (s.predatory || target.predatory) return false;
+      if (s.temperament === "aggressive" && target.temperament === "peaceful") return false;
+      if (target.temperament === "aggressive" && s.temperament === "peaceful") return false;
+      if (s.fin_nipper && target.long_finned) return false;
+      if (target.fin_nipper && s.long_finned) return false;
+      // water params overlap
+      if (s.native_ph_max < target.native_ph_min || s.native_ph_min > target.native_ph_max) return false;
+      if (s.native_temp_max_c < target.native_temp_min_c || s.native_temp_min_c > target.native_temp_max_c) return false;
+      // similar size (within 3x either way)
+      const ratio = s.adult_size_cm / target.adult_size_cm;
+      if (ratio > 3 || ratio < 1 / 3) return false;
+      return true;
+    })
+    .map((s) => {
+      let score = 0;
+      const reasons: string[] = [];
+      if (s.biotope_region === target.biotope_region) {
+        score += 3;
+        reasons.push("same biotope");
+      }
+      if (s.swim_zone !== target.swim_zone) {
+        score += 2;
+        reasons.push(`fills the ${zoneLabel[s.swim_zone]} zone`);
+      } else {
+        reasons.push(`shares the ${zoneLabel[s.swim_zone]} zone`);
+      }
+      if (s.temperament === target.temperament) score += 1;
+      return { s, score, reason: reasons.slice(0, 2).join(" · ") };
+    })
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 6);
+  return scored.map(({ s, reason }) => ({ s, reason }));
+}
+
 export const Route = createFileRoute("/species/$id")({
   loader: ({ context, params }) => context.queryClient.ensureQueryData(speciesByIdQuery(params.id)),
   head: ({ loaderData }) => {
