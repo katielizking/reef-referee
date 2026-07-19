@@ -1,0 +1,322 @@
+{
+  "version": 1,
+  "sdk_version": "0.23.0",
+  "path": "/mcp",
+  "auth": {
+    "type": "none"
+  },
+  "mcp": {
+    "server": {
+      "name": "fishtankr-mcp",
+      "version": "0.1.0",
+      "title": "FishTankr"
+    },
+    "tools": [
+      {
+        "name": "search_species",
+        "title": "Search freshwater species",
+        "description": "Search FishTankr's freshwater species catalog. Returns common name, scientific name, adult size, tank minimum, temperament, swim zone, biotope region and Australian legal status.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "query": {
+              "description": "Case-insensitive substring match on common or scientific name.",
+              "type": "string"
+            },
+            "biotope_region": {
+              "description": "Filter to one biotope region.",
+              "type": "string",
+              "enum": [
+                "amazon_blackwater",
+                "lake_malawi",
+                "se_asian_stream",
+                "australian_native",
+                "unmapped"
+              ]
+            },
+            "legal_status": {
+              "description": "Filter by Australian legal status.",
+              "type": "string",
+              "enum": [
+                "permitted",
+                "native",
+                "prohibited"
+              ]
+            },
+            "max_adult_size_cm": {
+              "description": "Only species whose adult size is <= this.",
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "limit": {
+              "description": "Max rows (default 20).",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "get_species",
+        "title": "Get species details",
+        "description": "Return the full care profile for a single species by id, scientific name, or common name.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "scientific_name": {
+              "type": "string"
+            },
+            "common_name": {
+              "type": "string"
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_plants",
+        "title": "List aquarium plants",
+        "description": "List freshwater aquarium plants in FishTankr's catalog, optionally filtered by biotope or light need.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "biotope_region": {
+              "type": "string",
+              "enum": [
+                "amazon_blackwater",
+                "lake_malawi",
+                "se_asian_stream",
+                "australian_native",
+                "unmapped"
+              ]
+            },
+            "light_need": {
+              "type": "string",
+              "enum": [
+                "low",
+                "med",
+                "high"
+              ]
+            },
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "recommend_filters",
+        "title": "Recommend filters for a tank size",
+        "description": "List filters from FishTankr's catalog, optionally sized for a given tank volume in litres. Rule of thumb: rated litres >= tank litres and turnover ~4-6x tank volume per hour.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "tank_litres": {
+              "description": "Tank volume in litres to size against.",
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_hardscape",
+        "title": "List hardscape items",
+        "description": "List hardscape items (rock, wood, substrate, leaf litter) available in FishTankr's catalog.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "rock",
+                "wood",
+                "substrate",
+                "leaf_litter"
+              ]
+            },
+            "biotope_region": {
+              "type": "string",
+              "enum": [
+                "amazon_blackwater",
+                "lake_malawi",
+                "se_asian_stream",
+                "australian_native",
+                "unmapped"
+              ]
+            },
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "find_aquarium_shops",
+        "title": "Find Australian aquarium shops",
+        "description": "Find aquarium/fishkeeping shops in FishTankr's Australian directory, filterable by state or suburb.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "state": {
+              "description": "Australian state code, e.g. NSW, VIC, QLD.",
+              "type": "string"
+            },
+            "suburb": {
+              "description": "Case-insensitive suburb match.",
+              "type": "string"
+            },
+            "specialty": {
+              "description": "Match a specialty tag (e.g. 'planted', 'marine').",
+              "type": "string"
+            },
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_blog_posts",
+        "title": "List FishTankr blog posts",
+        "description": "List published FishTankr blog posts with title, excerpt, tags, and slug. Use get_blog_post for full markdown.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "tag": {
+              "type": "string"
+            },
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "get_blog_post",
+        "title": "Get a FishTankr blog post",
+        "description": "Return the full markdown body of a published FishTankr blog post by slug.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "slug": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "slug"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "calculate_tank_litres",
+        "title": "Calculate tank volume in litres",
+        "description": "Compute litres for a rectangular freshwater aquarium given length, width, and height in centimetres.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "length_cm": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "width_cm": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "height_cm": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            }
+          },
+          "required": [
+            "length_cm",
+            "width_cm",
+            "height_cm"
+          ]
+        },
+        "outputSchema": null
+      }
+    ]
+  }
+}
