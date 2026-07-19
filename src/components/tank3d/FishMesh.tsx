@@ -94,8 +94,10 @@ export function FishGroup({ species, quantity, interior, selected, onSelect, cen
   return (
     <group>
       {instances.map((inst, idx) => (
-        <FishMesh
+        <FishRenderer
           key={idx}
+          species={species}
+          quantity={quantity}
           speciesId={species.id}
           instanceIndex={idx}
           basePosition={inst.offset}
@@ -114,6 +116,7 @@ export function FishGroup({ species, quantity, interior, selected, onSelect, cen
     </group>
   );
 }
+
 
 interface FishMeshProps {
   speciesId: string;
