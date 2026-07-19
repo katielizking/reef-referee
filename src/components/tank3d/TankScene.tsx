@@ -238,3 +238,30 @@ export default function TankScene({
     </div>
   );
 }
+
+function CameraRig({ defaultDistance }: { defaultDistance: number }) {
+  const { camera, controls } = useThree() as unknown as {
+    camera: THREE.PerspectiveCamera;
+    controls: OrbitControlsImpl | null;
+  };
+  const preset = useEditorStore((s) => s.cameraPreset);
+  const token = useEditorStore((s) => s.cameraToken);
+  const lastToken = useRef(0);
+
+  useEffect(() => {
+    if (!preset || token === lastToken.current) return;
+    lastToken.current = token;
+    const d = defaultDistance;
+    let pos: [number, number, number] = [d * 0.7, d * 0.35, d * 0.9];
+    if (preset === "front") pos = [0, 0, d * 1.1];
+    else if (preset === "iso") pos = [d * 0.7, d * 0.5, d * 0.9];
+    else if (preset === "top") pos = [0, d * 1.2, 0.001];
+    camera.position.set(...pos);
+    camera.lookAt(0, 0, 0);
+    controls?.target.set(0, 0, 0);
+    controls?.update();
+  }, [preset, token, defaultDistance, camera, controls]);
+
+  return null;
+}
+
