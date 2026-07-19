@@ -272,7 +272,7 @@ function SpeciesAdder({
                   <div className="text-sm font-medium">
                     {sp.common_name}
                     {!sp.legal_in_australia && (
-                      <span className="ml-2 rounded bg-red-100 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-red-700">
+                      <span className="ml-2 rounded bg-coral/20 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-foreground">
                         Not AU legal
                       </span>
                     )}
