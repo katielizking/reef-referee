@@ -11,6 +11,10 @@ import {
 } from "./fishVisuals";
 import { fishBehaviourProfile, type FishBehaviourProfile } from "./fishBehaviours";
 import { useReducedMotion } from "./useReducedMotion";
+import { FishRenderer } from "./fish/FishRenderer";
+
+export type { FishGroupProps, FishMeshProps };
+
 
 interface FishGroupProps {
   species: Species;
