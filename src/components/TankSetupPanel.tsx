@@ -264,26 +264,38 @@ function SpeciesAdder({
               <div className="p-3 text-sm text-muted-foreground">No species match.</div>
             )}
             {results.map((sp) => (
-              <button
+              <div
                 key={sp.id}
                 className="flex w-full items-start justify-between gap-2 border-b p-3 text-left last:border-b-0 hover:bg-muted"
-                onClick={() => add(sp)}
               >
-                <div>
-                  <div className="text-sm font-medium">
-                    {sp.common_name}
-                    {!sp.legal_in_australia && (
-                      <span className="ml-2 rounded bg-coral/20 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-foreground">
-                        Not AU legal
-                      </span>
-                    )}
+                <button className="flex flex-1 items-start gap-2 text-left" onClick={() => add(sp)}>
+                  <div className="flex-1">
+                    <div className="text-sm font-medium">
+                      {sp.common_name}
+                      {!sp.legal_in_australia && (
+                        <span className="ml-2 rounded bg-coral/20 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-foreground">
+                          Not AU legal
+                        </span>
+                      )}
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      {sp.scientific_name} · {BIOTOPE_LABEL[sp.biotope_region]}
+                    </div>
                   </div>
-                  <div className="text-xs text-muted-foreground">
-                    {sp.scientific_name} · {BIOTOPE_LABEL[sp.biotope_region]}
-                  </div>
-                </div>
-                <Plus className="h-4 w-4 shrink-0 text-primary" />
-              </button>
+                  <Plus className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                </button>
+                <Link
+                  to="/species/$id"
+                  params={{ id: sp.id }}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(e) => e.stopPropagation()}
+                  aria-label={`View guide for ${sp.common_name}`}
+                  className="rounded-lg p-1.5 text-muted-foreground hover:bg-background hover:text-foreground"
+                >
+                  <Info className="h-4 w-4" />
+                </Link>
+              </div>
             ))}
           </div>
         )}
