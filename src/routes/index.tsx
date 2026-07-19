@@ -6,11 +6,14 @@ import { toast } from "sonner";
 import { TankSetupPanel } from "@/components/TankSetupPanel";
 import { TankVisual } from "@/components/TankVisual";
 import { ScorecardPanel } from "@/components/Scorecard";
+import { MobileScoreBar } from "@/components/MobileScoreBar";
 import { HeroTankIllustration } from "@/components/BrandLogo";
 import { PreStockChecklist, useSaveGate } from "@/components/PreStockChecklist";
 import { scoreTank } from "@/lib/scoring";
+import { pickDefaultFilter } from "@/lib/defaults";
 import type { TankState } from "@/lib/types";
 import { useFilters, useHardscape, usePlants, useSpecies, saveTank } from "@/lib/data";
+
 
 export const Route = createFileRoute("/")({
   head: () => ({
