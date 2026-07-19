@@ -21,7 +21,7 @@ function mkSpecies(overrides: Partial<Species> & { id: string; common_name: stri
     native_temp_min_c: 24,
     native_temp_max_c: 28,
     native_habitat_type: "stream",
-    native_habitat_type: "stream",
+
     legal_in_australia: true,
     legal_status: "permitted",
     legal_note: null,
@@ -94,6 +94,9 @@ const illegal = mkSpecies({
   common_name: "Banned Cichlid",
   biotope_region: "amazon_blackwater",
   legal_in_australia: false,
+  legal_status: "prohibited",
+  legal_note: "Test prohibited species.",
+
   bioload_factor: 1,
   adult_size_cm: 8,
   min_tank_litres: 80,
