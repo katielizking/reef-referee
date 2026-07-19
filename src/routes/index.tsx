@@ -235,21 +235,50 @@ function Builder() {
             />
           </div>
           <div className="space-y-4">
-            <ClientOnlyTankScene
-              state={state}
-              onRemoveSpecies={(id) =>
-                setState((s) => ({ ...s, species: s.species.filter((x) => x.species.id !== id) }))
-              }
-            />
-
-            <div className="rounded-3xl border bg-card p-4 text-sm text-muted-foreground">
-              <p>
-                <span className="font-semibold text-foreground">Here's what's happening below the surface.</span>{" "}
-                Aim for a single biotope for a "True biotope" badge, keep bioload comfortably
-                under 100%, and give schooling species enough room to shoal.
-              </p>
+            <div className="relative">
+              <ClientOnlyTankScene
+                state={state}
+                setState={setState}
+                commit={history.commit}
+                onRemoveSpecies={(id) =>
+                  setState((s) => ({
+                    ...s,
+                    species: s.species.filter((x) => x.species.id !== id),
+                  }))
+                }
+              />
+              <SceneToolbar
+                canUndo={history.canUndo}
+                canRedo={history.canRedo}
+                onUndo={history.undo}
+                onRedo={history.redo}
+                onResetLayout={() => {
+                  setState((s) => ({ ...s, overrides: {} }));
+                  history.commit();
+                }}
+              />
             </div>
+
+            {selected ? (
+              <SelectedObjectPanel
+                state={state}
+                setState={setState}
+                interior={dims}
+                commit={history.commit}
+              />
+            ) : (
+              <div className="rounded-3xl border bg-card p-4 text-sm text-muted-foreground">
+                <p>
+                  <span className="font-semibold text-foreground">
+                    Tap any fish, plant or décor to edit it.
+                  </span>{" "}
+                  Drag to reposition, then rotate, resize, duplicate or remove
+                  from the panel that appears. Undo with ⌘Z.
+                </p>
+              </div>
+            )}
           </div>
+
           <div className="space-y-4 lg:sticky lg:top-20 lg:self-start">
             <PreStockChecklist
               scorecard={scorecard}
