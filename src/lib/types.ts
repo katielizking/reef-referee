@@ -31,7 +31,10 @@ export interface Species {
   biotope_region: BiotopeRegion;
   native_habitat_type: string;
   legal_in_australia: boolean;
+  legal_status: "permitted" | "native" | "prohibited";
+  legal_note: string | null;
 }
+
 
 export interface Plant {
   id: string;
