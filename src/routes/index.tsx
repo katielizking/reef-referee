@@ -336,6 +336,7 @@ function Builder() {
             <ScorecardPanel scorecard={scorecard} />
           </div>
         </div>
+        </>
       )}
       {ready && <MobileScoreBar scorecard={scorecard} />}
     </main>
