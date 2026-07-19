@@ -55,11 +55,12 @@ function Builder() {
   const filters = useFilters();
 
   const scorecard = useMemo(() => scoreTank(state), [state]);
+  const gate = useSaveGate(scorecard, state);
 
   const ready = species.data && plants.data && hardscape.data && filters.data;
   const showHero = state.species.length === 0;
 
-  async function handleSave(share = false) {
+  async function doSave(share: boolean) {
     try {
       setSaving(true);
       const row = await saveTank(state, savedId);
@@ -79,6 +80,10 @@ function Builder() {
     } finally {
       setSaving(false);
     }
+  }
+
+  function handleSave(share = false) {
+    gate.requestSave(share, doSave);
   }
 
   function scrollToBuilder() {
