@@ -170,7 +170,7 @@ function RootComponent() {
   );
 }
 
-const NAV_ITEMS = [
+const NAV_ITEMS: Array<{ to: string; label: string; exact?: boolean }> = [
   { to: "/", label: "Builder", exact: true },
   { to: "/quiz", label: "Quiz" },
   { to: "/species", label: "Species" },
@@ -178,7 +178,7 @@ const NAV_ITEMS = [
   { to: "/shops", label: "Shops" },
   { to: "/blog", label: "Blog" },
   { to: "/saved", label: "My tanks" },
-] as const;
+];
 
 function SiteHeader() {
   const [open, setOpen] = useState(false);
