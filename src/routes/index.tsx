@@ -16,6 +16,7 @@ import { HeroTankIllustration } from "@/components/BrandLogo";
 import { PreStockChecklist, useSaveGate } from "@/components/PreStockChecklist";
 import { scoreTank } from "@/lib/scoring";
 import { pickDefaultFilter } from "@/lib/defaults";
+import { PRESET_KEY, TANK_PRESETS } from "@/lib/presets";
 import type { TankState } from "@/lib/types";
 import { useFilters, useHardscape, usePlants, useSpecies, saveTank } from "@/lib/data";
 
