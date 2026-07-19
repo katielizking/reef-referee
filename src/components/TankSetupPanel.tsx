@@ -224,19 +224,6 @@ function SpeciesAdder({
   return (
     <section className="space-y-2">
       <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Fish</h3>
-      <div className="relative">
-        <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-        <input
-          className="w-full rounded-xl border bg-background py-2 pl-9 pr-3 text-sm outline-none focus:ring-2 focus:ring-ring"
-          placeholder="Search species…"
-          value={q}
-          onChange={(e) => {
-            setQ(e.target.value);
-            setShowResults(true);
-          }}
-          onFocus={() => setShowResults(true)}
-        />
-      </div>
       <div className="flex flex-wrap gap-1.5">
         {([
           ["all", "All"],
@@ -259,7 +246,17 @@ function SpeciesAdder({
         ))}
       </div>
       <div className="relative">
-
+        <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        <input
+          className="w-full rounded-xl border bg-background py-2 pl-9 pr-3 text-sm outline-none focus:ring-2 focus:ring-ring"
+          placeholder="Search species…"
+          value={q}
+          onChange={(e) => {
+            setQ(e.target.value);
+            setShowResults(true);
+          }}
+          onFocus={() => setShowResults(true)}
+        />
         {showResults && (
           <div className="absolute z-10 mt-1 max-h-72 w-full overflow-auto rounded-xl border bg-popover shadow-lg">
             {results.length === 0 && (
@@ -290,6 +287,7 @@ function SpeciesAdder({
           </div>
         )}
       </div>
+
 
       <ul className="space-y-2">
         {state.species.map((s) => (
