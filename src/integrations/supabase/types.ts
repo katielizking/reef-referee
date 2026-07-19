@@ -91,6 +91,8 @@ export type Database = {
           id: string
           is_schooling: boolean
           legal_in_australia: boolean
+          legal_note: string | null
+          legal_status: string
           long_finned: boolean
           min_group_size: number
           min_tank_litres: number
@@ -114,6 +116,8 @@ export type Database = {
           id?: string
           is_schooling?: boolean
           legal_in_australia?: boolean
+          legal_note?: string | null
+          legal_status?: string
           long_finned?: boolean
           min_group_size?: number
           min_tank_litres: number
@@ -137,6 +141,8 @@ export type Database = {
           id?: string
           is_schooling?: boolean
           legal_in_australia?: boolean
+          legal_note?: string | null
+          legal_status?: string
           long_finned?: boolean
           min_group_size?: number
           min_tank_litres?: number
