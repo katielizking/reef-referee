@@ -110,10 +110,14 @@ export function DragGroup({
     onCommit();
   }
 
+  // Fish handle their own vertical centre via FishGroup.centerY; the drag
+  // group itself sits at world Y=0. Everything else places at the anchor Y.
+  const positionY = placement.kind === "fish" ? 0 : placement.anchor[1];
+
   return (
     <group
       ref={groupRef}
-      position={placement.anchor}
+      position={[placement.anchor[0], positionY, placement.anchor[2]]}
       rotation={[0, placement.rotY, 0]}
       onPointerDown={interactive ? handlePointerDown : undefined}
       onPointerMove={interactive ? handlePointerMove : undefined}
@@ -121,10 +125,29 @@ export function DragGroup({
       onPointerCancel={interactive ? handlePointerUp : undefined}
     >
       {children}
-      {selected && <SelectionRing />}
+      {selected && <SelectionRing kind={placement.kind} interior={interior} />}
     </group>
   );
 }
+
+function SelectionRing({
+  kind,
+  interior,
+}: {
+  kind: PlacementKind;
+  interior: Interior;
+}) {
+  // Draw the selection halo where it reads best: on the substrate for
+  // grounded objects, or at the group's local origin otherwise.
+  const y = kind === "plant" || kind === "hardscape" ? 0.01 : 0;
+  return (
+    <mesh position={[0, y, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+      <ringGeometry args={[0.55, 0.68, 32]} />
+      <meshBasicMaterial color="#22d3ee" transparent opacity={0.9} toneMapped={false} />
+    </mesh>
+  );
+}
+
 
 function SelectionRing() {
   return (
