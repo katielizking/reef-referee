@@ -2,7 +2,9 @@ export type BiotopeRegion =
   | "amazon_blackwater"
   | "lake_malawi"
   | "se_asian_stream"
-  | "australian_native";
+  | "australian_native"
+  | "unmapped";
+
 
 export type SwimZone = "top" | "mid" | "bottom";
 export type Temperament = "peaceful" | "semi-aggressive" | "aggressive";
