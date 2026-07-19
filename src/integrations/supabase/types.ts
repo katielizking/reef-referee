@@ -426,7 +426,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_shared_tank: { Args: { p_slug: string }; Returns: Json }
     }
     Enums: {
       [_ in never]: never
