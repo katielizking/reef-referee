@@ -55,26 +55,29 @@ const RESULT: Record<
   },
 };
 
-function toneClass(score: number) {
-  if (score >= 75) return "text-foreground";
-  if (score >= 45) return "text-foreground";
-  return "text-foreground";
-}
-
-function ScoreRing({ score, color, size = 128 }: { score: number; color: string; size?: number }) {
+function ScoreRing({
+  score,
+  color,
+  size = 128,
+  label = "Overall",
+}: {
+  score: number;
+  color: string;
+  size?: number;
+  label?: string;
+}) {
   const r = size / 2 - 8;
   const c = 2 * Math.PI * r;
   const offset = c - (score / 100) * c;
   return (
-    <svg width={size} height={size} className="shrink-0" aria-hidden>
-      <circle
-        cx={size / 2}
-        cy={size / 2}
-        r={r}
-        stroke="var(--muted)"
-        strokeWidth="8"
-        fill="none"
-      />
+    <svg
+      width={size}
+      height={size}
+      className="shrink-0"
+      role="img"
+      aria-label={`${label} score ${score} out of 100`}
+    >
+      <circle cx={size / 2} cy={size / 2} r={r} stroke="var(--muted)" strokeWidth="8" fill="none" />
       <circle
         cx={size / 2}
         cy={size / 2}
@@ -100,6 +103,7 @@ function ScoreRing({ score, color, size = 128 }: { score: number; color: string;
     </svg>
   );
 }
+
 
 interface SubCardProps {
   title: string;
