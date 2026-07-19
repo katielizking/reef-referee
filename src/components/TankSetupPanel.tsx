@@ -527,7 +527,7 @@ function QtyStepper({
       </button>
       <button
         onClick={onRemove}
-        className="ml-1 rounded-lg p-1 text-muted-foreground hover:bg-red-50 hover:text-red-600"
+        className="ml-1 rounded-lg p-1 text-muted-foreground hover:bg-coral/15 hover:text-coral"
       >
         <X className="h-3.5 w-3.5" />
       </button>
