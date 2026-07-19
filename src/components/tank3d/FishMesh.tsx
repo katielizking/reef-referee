@@ -122,7 +122,7 @@ export function FishGroup({ species, quantity, interior, selected, onSelect, cen
 }
 
 
-interface FishMeshProps {
+export interface FishMeshProps {
   speciesId: string;
   instanceIndex: number;
   basePosition: [number, number, number];
@@ -137,6 +137,7 @@ interface FishMeshProps {
   showFineDetail: boolean;
   onSelect: () => void;
 }
+
 
 function makeTailShape(style: FishTailStyle, length: number, height: number): THREE.Shape {
   const shape = new THREE.Shape();
