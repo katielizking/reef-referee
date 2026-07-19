@@ -236,6 +236,30 @@ function SpeciesAdder({
           }}
           onFocus={() => setShowResults(true)}
         />
+      </div>
+      <div className="flex flex-wrap gap-1.5">
+        {([
+          ["all", "All"],
+          ["permitted", "Permitted"],
+          ["native", "Natives"],
+          ["prohibited", "Prohibited"],
+        ] as const).map(([key, label]) => (
+          <button
+            key={key}
+            type="button"
+            onClick={() => setLegalFilter(key)}
+            className={`rounded-full border px-2.5 py-0.5 text-xs transition ${
+              legalFilter === key
+                ? "border-primary bg-primary text-primary-foreground"
+                : "bg-background text-muted-foreground hover:bg-muted"
+            }`}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+      <div className="relative">
+
         {showResults && (
           <div className="absolute z-10 mt-1 max-h-72 w-full overflow-auto rounded-xl border bg-popover shadow-lg">
             {results.length === 0 && (
