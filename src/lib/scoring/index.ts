@@ -317,10 +317,14 @@ function scoreBiome(
 }
 
 // ============== 5. LEGALITY ==============
-function scoreLegality(state: TankState): SubScore & { illegalSpecies: string[] } {
-  const illegal = state.species
-    .map((s) => s.species)
-    .filter((s) => !s.legal_in_australia);
+function scoreLegality(state: TankState): SubScore & { illegalSpecies: string[]; nativeNotes: string[] } {
+  const speciesList = state.species.map((s) => s.species);
+  const illegal = speciesList.filter((s) => s.legal_status === "prohibited");
+  const nativeNotes = speciesList
+    .filter((s) => s.legal_status === "native" && s.legal_note)
+    .map((s) => s.legal_note as string);
+  // De-duplicate notes to avoid repeats when the same native species is added twice.
+  const uniqueNativeNotes = Array.from(new Set(nativeNotes));
 
   if (illegal.length === 0) {
     return {
@@ -328,6 +332,7 @@ function scoreLegality(state: TankState): SubScore & { illegalSpecies: string[] 
       reasons: ["All added species are legal to keep in Australia."],
       fixes: [],
       illegalSpecies: [],
+      nativeNotes: uniqueNativeNotes,
     };
   }
   const score = clamp(100 - 60 * illegal.length);
@@ -339,5 +344,7 @@ function scoreLegality(state: TankState): SubScore & { illegalSpecies: string[] 
     ],
     fixes: [`Remove ${names.join(" and ")}.`],
     illegalSpecies: names,
+    nativeNotes: uniqueNativeNotes,
   };
 }
+
