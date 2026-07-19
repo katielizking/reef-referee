@@ -17,7 +17,7 @@ export interface Scorecard {
   bioload: SubScore & { loadPercent: number };
   space: SubScore;
   biome: SubScore & { badge?: "true-biotope"; dominantRegion?: BiotopeRegion };
-  legality: SubScore & { illegalSpecies: string[] };
+  legality: SubScore & { illegalSpecies: string[]; nativeNotes: string[] };
 }
 
 export const WEIGHTS = {
