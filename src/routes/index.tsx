@@ -139,7 +139,7 @@ function Builder() {
   }
 
   return (
-    <main className="mx-auto max-w-7xl px-4 py-6">
+    <main className="mx-auto max-w-7xl px-4 py-6 pb-24 lg:pb-6">
       {showHero && (
         <section className="mb-8 grid gap-6 rounded-3xl border bg-card p-6 sm:p-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,380px)] lg:items-center">
           <div>
