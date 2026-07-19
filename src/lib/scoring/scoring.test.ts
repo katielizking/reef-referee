@@ -218,4 +218,30 @@ describe("scoreTank", () => {
     expect(typeof s.overall).toBe("number");
     expect(s.capReason).toBeNull();
   });
+
+  it("native species surfaces nativeNotes without penalising legality", () => {
+    const nativeFish = mkSpecies({
+      id: "native",
+      common_name: "Pacific Blue Eye",
+      biotope_region: "australian_native",
+      legal_status: "native",
+      legal_note: "Australian native - check state permit rules.",
+      native_ph_min: 6.5,
+      native_ph_max: 8.0,
+      native_temp_min_c: 20,
+      native_temp_max_c: 28,
+    });
+    const s = scoreTank(
+      baseState({
+        target_ph: 7.2,
+        target_temp_c: 24,
+        species: [{ species: nativeFish, quantity: 6 }],
+      }),
+    );
+    expect(s.legality.nativeNotes).toContain("Australian native - check state permit rules.");
+    expect(s.legality.score).toBe(100);
+    expect(s.legality.illegalSpecies).toEqual([]);
+    expect(s.capReason).toBeNull();
+  });
+
 });
