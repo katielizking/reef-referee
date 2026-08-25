@@ -105,65 +105,33 @@ export async function saveTank(
   state: import("./types").TankState,
   existingId?: string,
 ): Promise<TankRow> {
-  const payload = {
-    name: state.name || "Untitled tank",
-    length_cm: state.length_cm,
-    width_cm: state.width_cm,
-    height_cm: state.height_cm,
-    filter_id: state.filter?.id ?? null,
-    maintenance_frequency: state.maintenance_frequency,
-    target_ph: state.target_ph,
-    target_temp_c: state.target_temp_c,
-    plant_density: state.plant_density,
-  };
+  const { data, error } = await supabase.rpc("save_tank_atomic", {
+    p_existing_id: existingId ?? null,
+    p_tank: {
+      name: state.name || "Untitled tank",
+      length_cm: state.length_cm,
+      width_cm: state.width_cm,
+      height_cm: state.height_cm,
+      filter_id: state.filter?.id ?? null,
+      maintenance_frequency: state.maintenance_frequency,
+      target_ph: state.target_ph,
+      target_temp_c: state.target_temp_c,
+      plant_density: state.plant_density,
+    },
+    p_species: state.species.map((row) => ({
+      species_id: row.species.id,
+      quantity: row.quantity,
+    })),
+    p_plants: state.plants.map((row) => ({
+      plant_id: row.plant.id,
+      quantity: row.quantity,
+    })),
+    p_hardscape: state.hardscape.map((row) => ({
+      hardscape_id: row.hardscape.id,
+      quantity: row.quantity,
+    })),
+  });
 
-  let tank: TankRow;
-  if (existingId) {
-    const { data, error } = await supabase
-      .from("tanks")
-      .update(payload)
-      .eq("id", existingId)
-      .select("*")
-      .single();
-    if (error) throw error;
-    tank = data as unknown as TankRow;
-    await Promise.all([
-      supabase.from("tank_species").delete().eq("tank_id", tank.id),
-      supabase.from("tank_plants").delete().eq("tank_id", tank.id),
-      supabase.from("tank_hardscape").delete().eq("tank_id", tank.id),
-    ]);
-  } else {
-    const { data, error } = await supabase.from("tanks").insert(payload).select("*").single();
-    if (error) throw error;
-    tank = data as unknown as TankRow;
-  }
-
-  if (state.species.length > 0) {
-    await supabase.from("tank_species").insert(
-      state.species.map((s) => ({
-        tank_id: tank.id,
-        species_id: s.species.id,
-        quantity: s.quantity,
-      })),
-    );
-  }
-  if (state.plants.length > 0) {
-    await supabase.from("tank_plants").insert(
-      state.plants.map((s) => ({
-        tank_id: tank.id,
-        plant_id: s.plant.id,
-        quantity: s.quantity,
-      })),
-    );
-  }
-  if (state.hardscape.length > 0) {
-    await supabase.from("tank_hardscape").insert(
-      state.hardscape.map((s) => ({
-        tank_id: tank.id,
-        hardscape_id: s.hardscape.id,
-        quantity: s.quantity,
-      })),
-    );
-  }
-  return tank;
+  if (error) throw error;
+  return data as unknown as TankRow;
 }
