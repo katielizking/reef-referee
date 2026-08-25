@@ -18,13 +18,23 @@ import { scoreTank } from "@/lib/scoring";
 import { pickDefaultFilter } from "@/lib/defaults";
 import { PRESET_KEY, TANK_PRESETS } from "@/lib/presets";
 import type { TankState } from "@/lib/types";
-import { useFilters, useHardscape, usePlants, useSpecies, saveTank } from "@/lib/data";
+import {
+  loadTankBySlug,
+  saveTank,
+  useFilters,
+  useHardscape,
+  usePlants,
+  useSpecies,
+} from "@/lib/data";
 
 const HERO_DISMISS_KEY = "fishtankr:hero-dismissed";
 
 
 
 export const Route = createFileRoute("/")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    tank: typeof search.tank === "string" ? search.tank : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "FishTankr — Smarter tanks. Happier fish." },
@@ -56,9 +66,11 @@ const DEFAULT_STATE: TankState = {
 };
 
 function Builder() {
+  const { tank: tankSlug } = Route.useSearch();
   const [state, setState] = useState<TankState>(DEFAULT_STATE);
   const [saving, setSaving] = useState(false);
   const [savedId, setSavedId] = useState<string | undefined>(undefined);
+  const [loadingTank, setLoadingTank] = useState(Boolean(tankSlug));
   const [openSteps, setOpenSteps] = useState<StepId[]>(["tank"]);
   const [heroDismissed, setHeroDismissed] = useState(true); // start true to avoid SSR flash
   const navigate = useNavigate();
@@ -86,7 +98,55 @@ function Builder() {
   const selected = useEditorStore((s) => s.selected);
 
   const ready = species.data && plants.data && hardscape.data && filters.data;
-  const showHero = !heroDismissed && state.species.length === 0;
+  const showHero = !tankSlug && !heroDismissed && state.species.length === 0;
+
+  useEffect(() => {
+    if (!tankSlug) {
+      setLoadingTank(false);
+      return;
+    }
+
+    let cancelled = false;
+    setLoadingTank(true);
+
+    void loadTankBySlug(tankSlug)
+      .then((data) => {
+        if (cancelled) return;
+        if (!data) throw new Error("Tank not found");
+
+        setState({
+          name: data.tank.name,
+          length_cm: data.tank.length_cm,
+          width_cm: data.tank.width_cm,
+          height_cm: data.tank.height_cm,
+          filter: data.filter,
+          maintenance_frequency: data.tank.maintenance_frequency,
+          target_ph: data.tank.target_ph,
+          target_temp_c: data.tank.target_temp_c,
+          plant_density: data.tank.plant_density,
+          species: data.species,
+          plants: data.plants,
+          hardscape: data.hardscape,
+        });
+        setSavedId(data.tank.id);
+        setHeroDismissed(true);
+        toast.success(`Loaded ${data.tank.name}`);
+      })
+      .catch((error) => {
+        if (cancelled) return;
+        console.error(error);
+        toast.error("Couldn't open this tank", {
+          description: error instanceof Error ? error.message : "Try again in a moment.",
+        });
+      })
+      .finally(() => {
+        if (!cancelled) setLoadingTank(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [tankSlug]);
 
   function jumpToStep(id: StepId) {
     setOpenSteps((prev) => (prev.includes(id) ? prev : [...prev, id]));
@@ -108,7 +168,7 @@ function Builder() {
 
 
   useEffect(() => {
-    if (!species.data) return;
+    if (!species.data || tankSlug) return;
     const raw = sessionStorage.getItem("fishtankr:pending-add");
     if (!raw) return;
     sessionStorage.removeItem("fishtankr:pending-add");
@@ -141,11 +201,11 @@ function Builder() {
         ],
       };
     });
-  }, [species.data]);
+  }, [species.data, tankSlug]);
 
   // Load a preset (from /saved starter templates)
   useEffect(() => {
-    if (!species.data) return;
+    if (!species.data || tankSlug) return;
     const raw = sessionStorage.getItem(PRESET_KEY);
     if (!raw) return;
     sessionStorage.removeItem(PRESET_KEY);
@@ -163,7 +223,7 @@ function Builder() {
       })),
     }));
     toast.success(`Loaded ${preset.name}`);
-  }, [species.data]);
+  }, [species.data, tankSlug]);
 
   // Auto-suggest a filter once dimensions are known and none is chosen.
   useEffect(() => {
@@ -285,7 +345,7 @@ function Builder() {
         </div>
       </div>
 
-      {!ready ? (
+      {!ready || loadingTank ? (
         <div className="flex min-h-[40vh] items-center justify-center text-muted-foreground">
           <Loader2 className="h-6 w-6 animate-spin" />
         </div>
