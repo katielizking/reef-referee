@@ -427,6 +427,16 @@ export type Database = {
     }
     Functions: {
       get_shared_tank: { Args: { p_slug: string }; Returns: Json }
+      save_tank_atomic: {
+        Args: {
+          p_existing_id: string | null
+          p_hardscape: Json
+          p_plants: Json
+          p_species: Json
+          p_tank: Json
+        }
+        Returns: Database["public"]["Tables"]["tanks"]["Row"]
+      }
     }
     Enums: {
       [_ in never]: never
