@@ -1,5 +1,5 @@
 import { useMemo, useEffect, useRef } from "react";
-import { Canvas, useThree } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import * as THREE from "three";
@@ -11,6 +11,7 @@ import { EquipmentMesh } from "./EquipmentMesh";
 import { DragGroup } from "./DragGroup";
 import { substrateColour } from "./palette";
 import { useEditorStore } from "./editorStore";
+import { detectDeviceTier } from "@/lib/fish3d/quality";
 import {
   getPlacement,
   setPlacement,
@@ -53,6 +54,8 @@ export default function TankScene({
   const subColour = substrateColour(state);
 
   const hasFish = state.species.length > 0;
+  const quality = useMemo(() => detectDeviceTier(), []);
+  const richEffects = quality !== "low";
 
   // Clear selection when it points at a deleted row.
   useEffect(() => {
@@ -80,22 +83,45 @@ export default function TankScene({
   return (
     <div className="relative h-[480px] w-full overflow-hidden rounded-3xl border bg-gradient-to-b from-[#e8f4f6] to-[#c9e5eb]">
       <Canvas
-        shadows={false}
-        dpr={[1, 1.75]}
+        shadows={richEffects}
+        dpr={[1, quality === "high" ? 2 : 1.5]}
         camera={{ position: [camDistance * 0.7, camDistance * 0.35, camDistance * 0.9], fov: 40 }}
         frameloop={hasFish ? "always" : "demand"}
         onPointerMissed={() => select(null)}
       >
-        <color attach="background" args={["#dcefef"]} />
-        <ambientLight intensity={0.75} />
-        <directionalLight position={[5, 8, 4]} intensity={0.9} />
-        <directionalLight position={[-4, 3, -3]} intensity={0.35} color="#a7d8e2" />
+        <color attach="background" args={["#d7edf0"]} />
+        <fog attach="fog" args={["#b9dce2", largest * 2.2, largest * 5.5]} />
+        <hemisphereLight args={["#f7ffff", "#5d8790", 1.05]} />
+        <ambientLight intensity={0.48} />
+        <directionalLight
+          castShadow={richEffects}
+          position={[5, 9, 5]}
+          intensity={1.35}
+          color="#f5ffff"
+          shadow-mapSize-width={quality === "high" ? 2048 : 1024}
+          shadow-mapSize-height={quality === "high" ? 2048 : 1024}
+        />
+        <directionalLight position={[-4, 3, -3]} intensity={0.45} color="#69b7c9" />
+        <pointLight
+          position={[0, dims.y * 0.55, dims.z * 0.15]}
+          intensity={0.65}
+          color="#baf7ff"
+          distance={largest * 2.5}
+        />
 
-        {/* Water tint */}
+        {/* Clear water volume plus a reflective animated surface. */}
         <mesh>
           <boxGeometry args={[dims.x, dims.y, dims.z]} />
-          <meshStandardMaterial color="#8fcadb" transparent opacity={0.14} depthWrite={false} />
+          <meshPhysicalMaterial
+            color="#63b6c8"
+            transparent
+            opacity={0.075}
+            roughness={0.12}
+            transmission={0.2}
+            depthWrite={false}
+          />
         </mesh>
+        <WaterSurface dims={dims} reduced={!richEffects} />
 
         {/* Glass edges */}
         <lineSegments>
@@ -103,11 +129,23 @@ export default function TankScene({
           <lineBasicMaterial color="#4a7683" transparent opacity={0.8} />
         </lineSegments>
 
-        {/* Substrate slab */}
+        {/* Substrate slab with a lightweight granular surface. */}
         <mesh position={[0, -dims.y / 2 + substrateHeight / 2, 0]} receiveShadow>
           <boxGeometry args={[dims.x - 0.02, substrateHeight, dims.z - 0.02]} />
-          <meshStandardMaterial color={subColour} roughness={1} />
+          <meshStandardMaterial color={subColour} roughness={0.96} />
         </mesh>
+        <SubstrateGrains
+          dims={dims}
+          y={-dims.y / 2 + substrateHeight + 0.012}
+          colour={subColour}
+          count={quality === "high" ? 180 : quality === "medium" ? 90 : 40}
+        />
+        {richEffects && (
+          <BubbleColumn
+            dims={dims}
+            count={quality === "high" ? 28 : 14}
+          />
+        )}
 
         {/* Hardscape */}
         {state.hardscape.map(({ hardscape, quantity }) => {
@@ -230,6 +268,146 @@ export default function TankScene({
         </span>
       </div>
     </div>
+  );
+}
+
+function WaterSurface({
+  dims,
+  reduced,
+}: {
+  dims: { x: number; y: number; z: number };
+  reduced: boolean;
+}) {
+  const surface = useRef<THREE.Mesh>(null);
+
+  useFrame(({ clock }) => {
+    if (!surface.current || reduced) return;
+    const t = clock.getElapsedTime();
+    surface.current.position.y = dims.y / 2 - 0.035 + Math.sin(t * 0.65) * 0.012;
+    surface.current.rotation.z = Math.sin(t * 0.32) * 0.008;
+  });
+
+  return (
+    <mesh
+      ref={surface}
+      position={[0, dims.y / 2 - 0.035, 0]}
+      rotation={[-Math.PI / 2, 0, 0]}
+      renderOrder={3}
+    >
+      <planeGeometry args={[dims.x * 0.995, dims.z * 0.995, 1, 1]} />
+      <meshPhysicalMaterial
+        color="#bceef4"
+        transparent
+        opacity={0.32}
+        roughness={0.08}
+        metalness={0.05}
+        transmission={0.35}
+        clearcoat={1}
+        clearcoatRoughness={0.12}
+        side={THREE.DoubleSide}
+        depthWrite={false}
+      />
+    </mesh>
+  );
+}
+
+function SubstrateGrains({
+  dims,
+  y,
+  colour,
+  count,
+}: {
+  dims: { x: number; y: number; z: number };
+  y: number;
+  colour: string;
+  count: number;
+}) {
+  const geometry = useMemo(() => {
+    const positions = new Float32Array(count * 3);
+    for (let i = 0; i < count; i++) {
+      const seed = Math.sin((i + 1) * 91.173) * 43758.5453;
+      const seed2 = Math.sin((i + 1) * 47.731) * 12741.371;
+      positions[i * 3] = (seed - Math.floor(seed) - 0.5) * dims.x * 0.94;
+      positions[i * 3 + 1] = y + ((i % 5) / 5) * 0.025;
+      positions[i * 3 + 2] = (seed2 - Math.floor(seed2) - 0.5) * dims.z * 0.94;
+    }
+    const next = new THREE.BufferGeometry();
+    next.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+    return next;
+  }, [count, dims.x, dims.z, y]);
+
+  const grainColour = useMemo(
+    () => new THREE.Color(colour).offsetHSL(0, -0.08, 0.14),
+    [colour],
+  );
+
+  useEffect(() => () => geometry.dispose(), [geometry]);
+
+  return (
+    <points geometry={geometry}>
+      <pointsMaterial
+        color={grainColour}
+        size={0.045}
+        sizeAttenuation
+        transparent
+        opacity={0.7}
+      />
+    </points>
+  );
+}
+
+function BubbleColumn({
+  dims,
+  count,
+}: {
+  dims: { x: number; y: number; z: number };
+  count: number;
+}) {
+  const points = useRef<THREE.Points>(null);
+  const speeds = useMemo(
+    () => Float32Array.from({ length: count }, (_, i) => 0.16 + (i % 7) * 0.025),
+    [count],
+  );
+  const geometry = useMemo(() => {
+    const positions = new Float32Array(count * 3);
+    for (let i = 0; i < count; i++) {
+      const angle = i * 2.39996;
+      const radius = 0.08 + (i % 5) * 0.025;
+      positions[i * 3] = dims.x * 0.36 + Math.cos(angle) * radius;
+      positions[i * 3 + 1] = -dims.y * 0.42 + ((i * 0.618) % 1) * dims.y * 0.84;
+      positions[i * 3 + 2] = -dims.z * 0.35 + Math.sin(angle) * radius;
+    }
+    const next = new THREE.BufferGeometry();
+    next.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+    return next;
+  }, [count, dims.x, dims.y, dims.z]);
+
+  useEffect(() => () => geometry.dispose(), [geometry]);
+
+  useFrame((_, delta) => {
+    const attribute = points.current?.geometry.getAttribute("position");
+    if (!(attribute instanceof THREE.BufferAttribute)) return;
+    for (let i = 0; i < count; i++) {
+      const index = i * 3 + 1;
+      attribute.array[index] += speeds[i] * delta;
+      if (attribute.array[index] > dims.y * 0.46) {
+        attribute.array[index] = -dims.y * 0.44;
+      }
+    }
+    attribute.needsUpdate = true;
+  });
+
+  return (
+    <points ref={points} geometry={geometry}>
+      <pointsMaterial
+        color="#efffff"
+        size={0.075}
+        sizeAttenuation
+        transparent
+        opacity={0.72}
+        depthWrite={false}
+      />
+    </points>
   );
 }
 
