@@ -32,7 +32,7 @@ type Answers = {
   vibe: "peaceful" | "showpiece" | "biotope" | "oddballs";
   hardness: "soft" | "neutral" | "hard";
   maintenance: "low" | "medium" | "high";
-  legality: "permitted-only" | "natives-ok";
+  solo: "solo" | "either";
   style: "schooling" | "centrepiece" | "mixed";
 };
 
@@ -89,11 +89,11 @@ const questions: Array<{
     ],
   },
   {
-    key: "legality",
+    key: "solo",
     q: "Want a fish that can be kept alone?",
     options: [
-      { value: "permitted-only", label: "Skip natives — imported species only" },
-      { value: "natives-ok", label: "Natives welcome (I'll check state rules)" },
+      { value: "solo", label: "Yes — a fish with solo potential" },
+      { value: "either", label: "No preference" },
     ],
   },
   {
@@ -222,8 +222,8 @@ function QuizPage() {
   };
 
   return (
-    <main className="mx-auto max-w-2xl px-4 py-10">
-      <h1 className="font-display text-3xl font-bold text-foreground">
+    <main className="mx-auto max-w-2xl px-3 py-6 sm:px-4 sm:py-10">
+      <h1 className="font-display text-3xl font-bold tracking-[-.035em] sm:text-4xl text-foreground">
         What fish should I get?
       </h1>
       <p className="mt-2 text-muted-foreground">
@@ -238,7 +238,7 @@ function QuizPage() {
       </div>
 
       {!showResults && (
-        <div className="mt-8 rounded-2xl border bg-card p-6">
+        <div className="mt-6 rounded-[1.5rem] border bg-card p-4 sm:mt-8 sm:rounded-2xl sm:p-6">
           <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
             Question {step + 1} of {total}
           </p>
@@ -250,7 +250,7 @@ function QuizPage() {
               <button
                 key={o.value}
                 onClick={() => choose(o.value)}
-                className="rounded-xl border bg-background px-4 py-3 text-left text-sm font-medium text-foreground transition-colors hover:border-primary hover:bg-muted"
+                className="min-h-14 rounded-xl border bg-background px-4 py-3 text-left text-sm font-medium text-foreground transition-colors hover:border-primary hover:bg-muted"
               >
                 {o.label}
                 {o.hint && (
@@ -262,7 +262,7 @@ function QuizPage() {
           {step > 0 && (
             <button
               onClick={() => setStep(step - 1)}
-              className="mt-4 text-sm text-muted-foreground hover:text-foreground"
+              className="mt-4 inline-flex min-h-11 items-center text-sm text-muted-foreground hover:text-foreground"
             >
               ← Back
             </button>
@@ -284,7 +284,7 @@ function QuizPage() {
                 key={sp.id}
                 to="/species/$id"
                 params={{ id: sp.id }}
-                className="group flex items-start justify-between gap-4 rounded-2xl border bg-card p-5 transition-colors hover:border-primary/50"
+                className="group flex items-start justify-between gap-3 rounded-[1.25rem] border bg-card p-4 sm:rounded-2xl sm:p-5 transition-colors hover:border-primary/50"
               >
                 <div>
                   <p className="font-display text-lg font-semibold text-foreground group-hover:text-primary">
