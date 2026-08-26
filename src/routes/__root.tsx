@@ -262,7 +262,7 @@ function SiteFooter() {
           </div>
           <p className="mt-2 max-w-md text-xs leading-relaxed text-white/60">
             A guide, not a guarantee. Always check the needs of each species
-            and the rules in your state.
+            and the rules where you live.
           </p>
         </div>
         <nav aria-label="Footer" className="flex flex-wrap gap-x-4 gap-y-2 text-xs text-white/60">
