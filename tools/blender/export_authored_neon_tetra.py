@@ -161,7 +161,7 @@ def studio(root, mesh, armature, review_dir):
     scene.render.resolution_percentage = 100
     scene.render.image_settings.file_format = "PNG"
     scene.render.film_transparent = False
-    scene.view_settings.look = "AgX - Medium High Contrast"
+    scene.view_settings.look = "Medium High Contrast"
 
     views = {
         "side": (Vector((0, -.115, .012)), 70),
