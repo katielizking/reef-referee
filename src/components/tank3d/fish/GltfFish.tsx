@@ -82,11 +82,24 @@ export function GltfFish({
     root: scene,
     clips: gltf.animations ?? [],
     asset,
+    initialPhase: phase,
   });
 
   useEffect(() => {
+    scene.traverse((object) => {
+      if (!(object instanceof THREE.Mesh)) return;
+      object.castShadow = true;
+      object.receiveShadow = true;
+      const materials = Array.isArray(object.material) ? object.material : [object.material];
+      materials.forEach((material) => {
+        if (!(material instanceof THREE.MeshStandardMaterial)) return;
+        material.roughness = asset.materialProfile?.bodyRoughness ?? material.roughness;
+        material.envMapIntensity = 0.72;
+        material.needsUpdate = true;
+      });
+    });
     controller.setState("cruise");
-  }, [controller]);
+  }, [asset.materialProfile?.bodyRoughness, controller, scene]);
 
   useFrame(({ clock }, delta) => {
     const g = groupRef.current;
@@ -143,14 +156,25 @@ export function GltfFish({
     target.set(nx, ny, nz);
     g.position.lerp(target, Math.min(delta * 2.25, 1));
 
-    const vx = Math.cos(gT * 0.6) * behaviour.rangeX * bounds.x;
-    const vz = -Math.sin(gT * 0.42) * behaviour.rangeZ * bounds.z;
+    const vx =
+      Math.cos(gT * 0.6) * 0.6 * behaviour.rangeX * bounds.x * 0.5 * cohesion +
+      Math.cos(iT * 1.15) * 1.15 * behaviour.rangeX * bounds.x * 0.38 * wander;
+    const vz =
+      -Math.sin(gT * 0.42) * 0.42 * behaviour.rangeZ * bounds.z * 0.5 * cohesion -
+      Math.sin(iT * 0.93) * 0.93 * behaviour.rangeZ * bounds.z * 0.38 * wander;
     const desiredHeading = Math.atan2(-vz, vx) + rotationY;
     const headingDelta = Math.atan2(
       Math.sin(desiredHeading - g.rotation.y),
       Math.cos(desiredHeading - g.rotation.y),
     );
     g.rotation.y += headingDelta * Math.min(delta * behaviour.turnRate * 0.85, 1);
+    const bankTarget = THREE.MathUtils.clamp(-headingDelta * 0.42, -0.16, 0.16);
+    g.rotation.z = THREE.MathUtils.lerp(g.rotation.z, bankTarget, Math.min(delta * 3.2, 1));
+    const verticalVelocity =
+      Math.cos(gT * 0.3) * 0.3 * behaviour.verticalRange * bounds.y * 0.5 * cohesion +
+      Math.cos(iT * 1.3) * 1.3 * behaviour.verticalRange * bounds.y * 0.42 * wander;
+    const pitchTarget = THREE.MathUtils.clamp(verticalVelocity * 0.16, -0.08, 0.08);
+    g.rotation.x = THREE.MathUtils.lerp(g.rotation.x, pitchTarget, Math.min(delta * 2.4, 1));
 
     // State selection — coarse mapping; refined once real clips are authored.
     let state: FishAnimationState = "cruise";
