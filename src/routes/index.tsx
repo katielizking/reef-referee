@@ -279,7 +279,7 @@ function Builder() {
   return (
     <main className="mx-auto max-w-7xl px-4 py-6 pb-24 lg:pb-6">
       {showHero && (
-        <section className="relative mb-8 grid gap-6 rounded-3xl border bg-card p-6 sm:p-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,380px)] lg:items-center">
+        <section className="hero-grid fishtankr-panel relative mb-10 grid min-h-[430px] gap-8 overflow-hidden rounded-[2rem] p-6 sm:p-10 lg:grid-cols-[minmax(0,1.08fr)_minmax(360px,.92fr)] lg:items-center lg:p-12">
           <button
             type="button"
             onClick={dismissHero}
@@ -288,39 +288,39 @@ function Builder() {
           >
             <X className="h-4 w-4" aria-hidden />
           </button>
-          <div>
-            <span className="inline-flex items-center rounded-full bg-lime/30 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-foreground">
-              Know before you stock
+          <div className="relative z-10">
+            <span className="science-label text-primary">
+              Aquarium planning, decoded
             </span>
-            <h1 className="mt-3 font-display text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+            <h1 className="mt-5 max-w-2xl font-display text-4xl font-bold leading-[.98] tracking-[-.045em] text-ink sm:text-5xl lg:text-6xl">
               Smarter tanks. Happier fish.
             </h1>
-            <p className="mt-3 max-w-xl text-base text-muted-foreground">
+            <p className="mt-5 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
               Plan your setup, check your stocking and understand the biology behind a
               healthy aquarium with simple tools built around fish welfare.
             </p>
-            <div className="mt-5 flex flex-wrap gap-3">
+            <div className="mt-7 flex flex-wrap gap-3">
               <button
                 onClick={() => { dismissHero(); scrollToBuilder(); }}
-                className="inline-flex items-center justify-center rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm transition-all hover:brightness-95"
+                className="inline-flex items-center justify-center rounded-full bg-ink px-6 py-3 text-sm font-semibold text-white shadow-[0_8px_0_rgba(55,184,198,.28)] transition-all hover:-translate-y-0.5 hover:shadow-[0_10px_0_rgba(55,184,198,.34)]"
               >
                 Check my tank
               </button>
               <button
                 onClick={() => navigate({ to: "/saved" })}
-                className="inline-flex items-center justify-center rounded-xl border bg-card px-5 py-2.5 text-sm font-semibold text-foreground transition-colors hover:bg-muted"
+                className="inline-flex items-center justify-center rounded-full border border-ink/15 bg-white/70 px-6 py-3 text-sm font-semibold text-foreground transition-all hover:border-primary hover:bg-white"
               >
                 Explore the tools
               </button>
             </div>
           </div>
-          <HeroTankIllustration className="mx-auto w-full max-w-md" />
+          <div className="hero-float relative mx-auto w-full max-w-lg rounded-[2rem] border border-white/70 bg-white/55 p-3 shadow-[0_30px_80px_rgba(18,35,46,.15)] backdrop-blur-sm"><HeroTankIllustration className="w-full" /><div className="absolute -bottom-3 left-5 rounded-full bg-lime px-3 py-1.5 font-display text-[10px] font-bold uppercase tracking-[.14em] text-ink shadow-sm">Live welfare score</div></div>
         </section>
       )}
 
-      <div id="builder" className="mb-6 flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
+      <div id="builder" className="mb-6 flex flex-col justify-between gap-4 border-b border-ink/10 pb-5 sm:flex-row sm:items-end">
         <div>
-          <h2 className="font-display text-2xl font-semibold tracking-tight text-foreground">
+          <h2 className="font-display text-3xl font-bold tracking-[-.035em] text-foreground">
             Design your tank
           </h2>
           <p className="text-sm text-muted-foreground">
@@ -357,7 +357,7 @@ function Builder() {
         <>
           <BuilderSteps state={state} onJump={jumpToStep} />
           <div className="grid gap-6 lg:grid-cols-[minmax(0,320px)_minmax(0,1fr)_minmax(0,340px)]">
-            <div className="rounded-3xl border bg-card p-3 sm:p-4">
+            <div className="fishtankr-panel rounded-[1.75rem] p-3 sm:p-4">
               <TankSetupPanel
                 state={state}
                 setState={setState}
@@ -402,7 +402,7 @@ function Builder() {
                 commit={history.commit}
               />
             ) : (
-              <div className="rounded-3xl border bg-card p-4 text-sm text-muted-foreground">
+              <div className="fishtankr-panel rounded-[1.75rem] p-4 text-sm text-muted-foreground">
                 <p>
                   <span className="font-semibold text-foreground">
                     Tap any fish, plant or décor to edit it.
