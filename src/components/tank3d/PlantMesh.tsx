@@ -1,73 +1,55 @@
-import { useFrame } from "@react-three/fiber";
-import { useMemo, useRef } from "react";
+import { Html } from "@react-three/drei";
+import { useMemo } from "react";
 import type { Plant } from "@/lib/types";
-import * as THREE from "three";
 import { hashRange } from "./palette";
-import { useReducedMotion } from "./useReducedMotion";
 
 interface PlantClumpProps {
   plant: Plant;
   quantity: number;
   interior: { x: number; y: number; z: number; substrateY: number };
-  /** Override the Y at which the clump sits (defaults to interior.substrateY). */
   groundY?: number;
 }
 
+/**
+ * Honest placeholder for plants that do not yet have a verified,
+ * species-specific visual asset. It intentionally reads as a schematic,
+ * not as a botanical likeness.
+ */
 export function PlantClump({ plant, quantity, interior, groundY }: PlantClumpProps) {
-  const reduced = useReducedMotion();
   const y = groundY ?? interior.substrateY;
   const positions = useMemo(() => {
-    const out: Array<{ pos: [number, number, number]; scale: number; phase: number }> = [];
-    for (let i = 0; i < quantity; i++) {
-      const x = hashRange(plant.id, i * 5 + 1, -interior.x * 0.42, interior.x * 0.42);
-      const z = hashRange(plant.id, i * 5 + 2, -interior.z * 0.42, interior.z * 0.42);
-      const s = hashRange(plant.id, i * 5 + 3, 0.55, 0.85);
-      out.push({ pos: [x, y, z], scale: s, phase: hashRange(plant.id, i * 5 + 4, 0, Math.PI * 2) });
-    }
-    return out;
-  }, [plant.id, quantity, interior.x, interior.z, y]);
-
+    const count = Math.min(Math.max(quantity, 1), 8);
+    return Array.from({ length: count }, (_, index) => ({
+      x: hashRange(plant.id, index * 5 + 1, -interior.x * 0.3, interior.x * 0.3),
+      z: hashRange(plant.id, index * 5 + 2, -interior.z * 0.28, interior.z * 0.28),
+      height: hashRange(plant.id, index * 5 + 3, 0.42, 0.82),
+      lean: hashRange(plant.id, index * 5 + 4, -0.14, 0.14),
+    }));
+  }, [plant.id, quantity, interior.x, interior.z]);
 
   return (
-    <>
-      {positions.map((p, i) => (
-        <PlantMesh key={i} pos={p.pos} scale={p.scale} phase={p.phase} reduced={reduced} />
-      ))}
-    </>
-  );
-}
-
-function PlantMesh({ pos, scale, phase, reduced }: { pos: [number, number, number]; scale: number; phase: number; reduced: boolean }) {
-  const ref = useRef<THREE.Group>(null);
-  useFrame(({ clock }) => {
-    if (!ref.current || reduced) return;
-    ref.current.rotation.z = Math.sin(clock.getElapsedTime() * 0.7 + phase) * 0.04;
-  });
-  const height = 1.2 * scale;
-  const colours = useMemo(() => {
-    const variation = Math.sin(phase * 3.17) * 0.035;
-    const leaf = new THREE.Color("#4FA060").offsetHSL(variation, 0.04, variation);
-    const stem = new THREE.Color("#347A48").offsetHSL(variation, 0, -0.02);
-    return { leaf, stem };
-  }, [phase]);
-  return (
-    <group ref={ref} position={pos} scale={scale}>
-      {[0, 0.22, -0.22].map((x, i) => (
-        <group key={x} position={[x, 0, i === 1 ? 0.08 : 0]}>
-          <mesh position={[0, height / 2, 0]}>
-            <cylinderGeometry args={[0.035, 0.055, height, 8]} />
-            <meshStandardMaterial color={colours.stem} roughness={0.72} />
+    <group position={[0, y, 0]}>
+      {positions.map((position, index) => (
+        <group
+          key={index}
+          position={[position.x, 0, position.z]}
+          rotation={[0, 0, position.lean]}
+        >
+          <mesh position={[0, position.height / 2, 0]}>
+            <cylinderGeometry args={[0.012, 0.018, position.height, 6]} />
+            <meshBasicMaterial color="#7fcdb0" transparent opacity={0.3} wireframe />
           </mesh>
-          <mesh position={[0.14, height * 0.55, 0]} rotation={[0, 0, -0.75]} scale={[0.11, 0.32, 0.06]}>
-            <sphereGeometry args={[1, 12, 8]} />
-            <meshPhysicalMaterial color={colours.leaf} roughness={0.58} clearcoat={0.16} clearcoatRoughness={0.4} />
-          </mesh>
-          <mesh position={[-0.13, height * 0.78, 0]} rotation={[0, 0, 0.8]} scale={[0.11, 0.3, 0.06]}>
-            <sphereGeometry args={[1, 12, 8]} />
-            <meshPhysicalMaterial color={colours.leaf} roughness={0.58} clearcoat={0.16} clearcoatRoughness={0.4} />
+          <mesh position={[0.06, position.height * 0.72, 0]} rotation={[0, 0, -0.72]}>
+            <planeGeometry args={[0.18, 0.06]} />
+            <meshBasicMaterial color="#9edac1" transparent opacity={0.24} wireframe />
           </mesh>
         </group>
       ))}
+      <Html center position={[0, 0.92, 0]} distanceFactor={8} zIndexRange={[20, 0]}>
+        <div className="pointer-events-none whitespace-nowrap rounded-full border border-white/70 bg-ink/80 px-2 py-1 font-display text-[9px] font-semibold text-white shadow-sm backdrop-blur">
+          {plant.common_name} · model pending
+        </div>
+      </Html>
     </group>
   );
 }
