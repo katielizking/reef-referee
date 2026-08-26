@@ -40,8 +40,9 @@ export function useFishAnimationController(params: {
   root: THREE.Object3D | null;
   clips: THREE.AnimationClip[];
   asset: FishAssetDefinition;
+  initialPhase?: number;
 }) {
-  const { root, clips, asset } = params;
+  const { root, clips, asset, initialPhase = 0 } = params;
   const mixerRef = useRef<THREE.AnimationMixer | null>(null);
   const currentRef = useRef<{ state: FishAnimationState; action: THREE.AnimationAction } | null>(
     null,
@@ -99,6 +100,10 @@ export function useFishAnimationController(params: {
         return;
       }
       next.action.reset().fadeIn(CROSSFADE_SECONDS).play();
+      if (!cur) {
+        const duration = next.action.getClip().duration;
+        next.action.time = ((initialPhase / (Math.PI * 2)) % 1) * duration;
+      }
       if (cur) cur.action.fadeOut(CROSSFADE_SECONDS);
       currentRef.current = { state: next.state, action: next.action };
     },
