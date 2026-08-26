@@ -392,7 +392,7 @@ function AddToTankButton({ species }: { species: Species }) {
       </button>
       {prohibited && (
         <p className="mt-2 text-xs text-muted-foreground">
-          Heads up — this species is prohibited in Australia and will cap your tank's overall score.
+          Heads up — this species is flagged as prohibited or restricted and will cap your tank's overall score. Check the evidence and your local rules.
         </p>
       )}
     </div>
