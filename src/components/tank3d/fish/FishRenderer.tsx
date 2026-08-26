@@ -1,22 +1,64 @@
+import { Html } from "@react-three/drei";
 import { Suspense, lazy } from "react";
 import type { Species } from "@/lib/types";
-import { ProceduralFish, type FishMeshProps } from "../FishMesh";
+import type { FishMeshProps } from "../FishMesh";
 import { getFishAsset, hasGltfAsset, resolveModelUrl } from "@/lib/fish3d/registry";
 import { detectDeviceTier, resolveQuality, tierToLod } from "@/lib/fish3d/quality";
 import { FishAssetErrorBoundary } from "./FishAssetFallback";
 
-// Lazy import keeps the GLB code path out of the initial bundle for tanks
-// that only contain procedural species. The Suspense boundary below routes
-// to ProceduralFish while the chunk (and later the model itself) streams.
 const GltfFish = lazy(() =>
   import("./GltfFish").then((mod) => ({ default: mod.GltfFish })),
 );
 
 export interface FishRendererProps extends FishMeshProps {
-  /** Full species record — GLB path needs adult size and body family. */
   species: Species;
-  /** School size for this species entry (used by the quality manager). */
   quantity: number;
+}
+
+function UnverifiedFishMarker({
+  species,
+  basePosition,
+  length,
+  selected,
+  instanceIndex,
+  onSelect,
+}: Pick<
+  FishRendererProps,
+  "species" | "basePosition" | "length" | "selected" | "instanceIndex" | "onSelect"
+>) {
+  return (
+    <group
+      position={basePosition}
+      scale={Math.max(length, 0.24)}
+      onPointerDown={(event) => {
+        event.stopPropagation();
+        onSelect();
+      }}
+    >
+      <mesh scale={[0.42, 0.16, 0.09]}>
+        <sphereGeometry args={[1, 14, 9]} />
+        <meshPhysicalMaterial
+          color="#d9f4f5"
+          transparent
+          opacity={selected ? 0.34 : 0.16}
+          wireframe
+          roughness={0.35}
+          depthWrite={false}
+        />
+      </mesh>
+      <mesh position={[-0.48, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
+        <coneGeometry args={[0.18, 0.28, 3]} />
+        <meshBasicMaterial color="#8ecbd0" transparent opacity={0.25} wireframe />
+      </mesh>
+      {instanceIndex === 0 && (
+        <Html center position={[0, 0.3, 0]} distanceFactor={8} zIndexRange={[20, 0]}>
+          <div className="pointer-events-none whitespace-nowrap rounded-full border border-white/70 bg-ink/80 px-2 py-1 font-display text-[9px] font-semibold text-white shadow-sm backdrop-blur">
+            {species.common_name} · model pending
+          </div>
+        </Html>
+      )}
+    </group>
+  );
 }
 
 export function FishRenderer(props: FishRendererProps) {
@@ -33,39 +75,22 @@ export function FishRenderer(props: FishRendererProps) {
 
   const canUseGltf = tier !== "procedural" && asset !== null && hasGltfAsset(species.id);
   const modelUrl = canUseGltf && asset ? resolveModelUrl(asset, tierToLod(tier)) : null;
+  const marker = (
+    <UnverifiedFishMarker
+      species={species}
+      basePosition={rest.basePosition}
+      length={rest.length}
+      selected={selected}
+      instanceIndex={rest.instanceIndex}
+      onSelect={rest.onSelect}
+    />
+  );
 
-  if (!modelUrl || !asset) {
-    return (
-      <ProceduralFish
-        {...rest}
-        reduced={reduced}
-        selected={selected}
-        showFineDetail={showFineDetail}
-      />
-    );
-  }
+  if (!modelUrl || !asset) return marker;
 
   return (
-    <FishAssetErrorBoundary
-      fallback={
-        <ProceduralFish
-          {...rest}
-          reduced={reduced}
-          selected={selected}
-          showFineDetail={showFineDetail}
-        />
-      }
-    >
-      <Suspense
-        fallback={
-          <ProceduralFish
-            {...rest}
-            reduced={reduced}
-            selected={selected}
-            showFineDetail={showFineDetail}
-          />
-        }
-      >
+    <FishAssetErrorBoundary fallback={marker}>
+      <Suspense fallback={marker}>
         <GltfFish
           asset={asset}
           modelUrl={modelUrl}
