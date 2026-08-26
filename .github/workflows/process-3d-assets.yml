@@ -1,0 +1,103 @@
+name: Process 3D asset
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_path:
+        description: Source GLB, GLTF, FBX or OBJ under assets/3d/source
+        required: true
+        type: string
+      metadata_path:
+        description: Attribution sidecar JSON under assets/3d/source
+        required: true
+        type: string
+      output_name:
+        description: Output filename without folders
+        required: true
+        type: string
+      kind:
+        description: Asset type
+        required: true
+        default: fish
+        type: choice
+        options:
+          - fish
+          - plant
+      target_triangles:
+        description: Maximum web triangle count
+        required: true
+        default: "45000"
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  process:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Validate inputs
+        shell: bash
+        env:
+          SOURCE_PATH: ${{ inputs.source_path }}
+          METADATA_PATH: ${{ inputs.metadata_path }}
+          OUTPUT_NAME: ${{ inputs.output_name }}
+          TARGET_TRIANGLES: ${{ inputs.target_triangles }}
+        run: |
+          python3 - <<'PY'
+          import os
+          from pathlib import Path
+
+          root = Path.cwd().resolve()
+          source_root = (root / "assets/3d/source").resolve()
+          source = (root / os.environ["SOURCE_PATH"]).resolve()
+          metadata = (root / os.environ["METADATA_PATH"]).resolve()
+          name = os.environ["OUTPUT_NAME"]
+          triangles = int(os.environ["TARGET_TRIANGLES"])
+
+          if source_root not in source.parents or source_root not in metadata.parents:
+              raise SystemExit("Source and metadata must remain inside assets/3d/source")
+          if source.suffix.lower() not in {".glb", ".gltf", ".fbx", ".obj"}:
+              raise SystemExit("Unsupported source extension")
+          if metadata.suffix.lower() != ".json":
+              raise SystemExit("Metadata must be JSON")
+          if Path(name).name != name or not name.endswith(".glb"):
+              raise SystemExit("Output must be a plain .glb filename")
+          if not 1000 <= triangles <= 100000:
+              raise SystemExit("target_triangles must be between 1,000 and 100,000")
+          if not source.is_file() or not metadata.is_file():
+              raise SystemExit("Source or metadata file not found")
+          PY
+
+      - name: Install Blender
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes blender
+
+      - name: Process and export GLB
+        env:
+          SOURCE_PATH: ${{ inputs.source_path }}
+          METADATA_PATH: ${{ inputs.metadata_path }}
+          OUTPUT_NAME: ${{ inputs.output_name }}
+          ASSET_KIND: ${{ inputs.kind }}
+          TARGET_TRIANGLES: ${{ inputs.target_triangles }}
+        run: |
+          mkdir -p processed
+          blender --background --python tools/blender/process_asset.py -- \
+            --input "$SOURCE_PATH" \
+            --metadata "$METADATA_PATH" \
+            --output "processed/$OUTPUT_NAME" \
+            --kind "$ASSET_KIND" \
+            --target-triangles "$TARGET_TRIANGLES"
+
+      - name: Upload processed model for review
+        uses: actions/upload-artifact@v4
+        with:
+          name: fishtankr-${{ inputs.kind }}-${{ github.run_id }}
+          path: processed/*.glb
+          if-no-files-found: error
+          retention-days: 14
