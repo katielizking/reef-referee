@@ -81,16 +81,8 @@ export interface FullTank {
 }
 
 export async function loadTankBySlug(slug: string): Promise<FullTank | null> {
-  const { data, error } = await supabase.rpc("get_shared_tank", { p_slug: slug });
-  if (error) throw error;
-  if (!data) return null;
-  const payload = data as unknown as {
-    tank: TankRow;
-    filter: Filter | null;
-    species: Array<{ quantity: number; species: Species }>;
-    plants: Array<{ quantity: number; plant: Plant }>;
-    hardscape: Array<{ quantity: number; hardscape: Hardscape }>;
-  };
+  const payload = await getSharedTank({ data: { slug } });
+  if (!payload) return null;
   return {
     tank: payload.tank,
     filter: payload.filter ?? null,
@@ -105,35 +97,72 @@ export async function saveTank(
   state: import("./types").TankState,
   existingId?: string,
 ): Promise<TankRow> {
-  const { data, error } = await supabase.rpc("save_tank_atomic", {
-    p_existing_id: existingId ?? null,
-    p_tank: {
-      name: state.name || "Untitled tank",
-      length_cm: state.length_cm,
-      width_cm: state.width_cm,
-      height_cm: state.height_cm,
-      filter_id: state.filter?.id ?? null,
-      maintenance_frequency: state.maintenance_frequency,
-      target_ph: state.target_ph,
-      target_temp_c: state.target_temp_c,
-      plant_density: state.plant_density,
-    },
-    p_species: state.species.map((row) => ({
-      species_id: row.species.id,
-      quantity: row.quantity,
-    })),
-    p_plants: state.plants.map((row) => ({
-      plant_id: row.plant.id,
-      quantity: row.quantity,
-    })),
-    p_hardscape: state.hardscape.map((row) => ({
-      hardscape_id: row.hardscape.id,
-      quantity: row.quantity,
-    })),
-  });
+  const uid = await currentUserId();
+  if (!uid) throw new Error("You need an active session to save a tank.");
 
-  if (error) throw error;
-  return data as unknown as TankRow;
+  const tankFields = {
+    name: (state.name || "Untitled tank").slice(0, 120),
+    length_cm: state.length_cm,
+    width_cm: state.width_cm,
+    height_cm: state.height_cm,
+    filter_id: state.filter?.id ?? null,
+    maintenance_frequency: state.maintenance_frequency,
+    target_ph: state.target_ph,
+    target_temp_c: state.target_temp_c,
+    plant_density: state.plant_density,
+    user_id: uid,
+  };
+
+  let tank: TankRow;
+  if (existingId) {
+    const { data, error } = await supabase
+      .from("tanks")
+      .update(tankFields)
+      .eq("id", existingId)
+      .eq("user_id", uid)
+      .select("*")
+      .single();
+    if (error) throw error;
+    tank = data as unknown as TankRow;
+  } else {
+    const { data, error } = await supabase.from("tanks").insert(tankFields).select("*").single();
+    if (error) throw error;
+    tank = data as unknown as TankRow;
+  }
+
+  // Replace join rows (RLS scopes every statement to the owner's tanks).
+  await Promise.all([
+    supabase.from("tank_species").delete().eq("tank_id", tank.id),
+    supabase.from("tank_plants").delete().eq("tank_id", tank.id),
+    supabase.from("tank_hardscape").delete().eq("tank_id", tank.id),
+  ]);
+
+  const speciesRows = state.species.map((row) => ({
+    tank_id: tank.id,
+    species_id: row.species.id,
+    quantity: row.quantity,
+  }));
+  const plantRows = state.plants.map((row) => ({
+    tank_id: tank.id,
+    plant_id: row.plant.id,
+    quantity: row.quantity,
+  }));
+  const hardscapeRows = state.hardscape.map((row) => ({
+    tank_id: tank.id,
+    hardscape_id: row.hardscape.id,
+    quantity: row.quantity,
+  }));
+
+  const results = await Promise.all([
+    speciesRows.length ? supabase.from("tank_species").insert(speciesRows) : null,
+    plantRows.length ? supabase.from("tank_plants").insert(plantRows) : null,
+    hardscapeRows.length ? supabase.from("tank_hardscape").insert(hardscapeRows) : null,
+  ]);
+  for (const res of results) {
+    if (res?.error) throw res.error;
+  }
+
+  return tank;
 }
 
 
