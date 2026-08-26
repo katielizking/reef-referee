@@ -3,7 +3,7 @@ import { Suspense, lazy } from "react";
 import type { Species } from "@/lib/types";
 import { SpeciesPortrait } from "@/components/SpeciesPortrait";
 import type { FishMeshProps } from "../FishMesh";
-import { getFishAsset, hasGltfAsset, resolveModelUrl } from "@/lib/fish3d/registry";
+import { getFishAsset, resolveModelUrl } from "@/lib/fish3d/registry";
 import { detectDeviceTier, resolveQuality, tierToLod } from "@/lib/fish3d/quality";
 import { FishAssetErrorBoundary } from "./FishAssetFallback";
 
@@ -67,7 +67,7 @@ function UnverifiedFishMarker({
 
 export function FishRenderer(props: FishRendererProps) {
   const { species, quantity, reduced, selected, showFineDetail, ...rest } = props;
-  const asset = getFishAsset(species.id);
+  const asset = getFishAsset(species.id, species.scientific_name);
 
   const tier = resolveQuality({
     deviceTier: detectDeviceTier(),
@@ -77,7 +77,7 @@ export function FishRenderer(props: FishRendererProps) {
     selected,
   });
 
-  const canUseGltf = tier !== "procedural" && asset !== null && hasGltfAsset(species.id);
+  const canUseGltf = tier !== "procedural" && asset !== null;
   const modelUrl = canUseGltf && asset ? resolveModelUrl(asset, tierToLod(tier)) : null;
   const marker = (
     <UnverifiedFishMarker
