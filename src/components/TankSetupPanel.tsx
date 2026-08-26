@@ -48,8 +48,8 @@ export function TankSetupPanel({
       onValueChange={(v) => setOpenSteps(v as StepId[])}
       className="space-y-2"
     >
-      <AccordionItem value="tank" id="step-tank" className="rounded-2xl border bg-background/60 px-3">
-        <AccordionTrigger className="py-3 hover:no-underline">
+      <AccordionItem value="tank" id="step-tank" className="rounded-2xl border bg-background/60 px-3 scroll-mt-20">
+        <AccordionTrigger className="min-h-14 py-3 hover:no-underline">
           <StepHeader
             n={1}
             title="Tank & water"
@@ -60,7 +60,7 @@ export function TankSetupPanel({
           <label className="block text-sm">
             <span className="mb-1 block text-foreground/80">Name</span>
             <input
-              className="w-full rounded-xl border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
+              className="min-h-11 w-full rounded-xl border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
               value={state.name}
               onChange={(e) => setState((s) => ({ ...s, name: e.target.value }))}
               placeholder="Living room 60"
@@ -284,13 +284,13 @@ function Segmented<T extends string>({
   return (
     <div>
       <p className="mb-1 text-xs text-muted-foreground">{label}</p>
-      <div className="inline-flex flex-wrap gap-1 rounded-xl bg-muted p-1" role="group" aria-label={label}>
+      <div className="flex flex-wrap gap-1 rounded-xl bg-muted p-1" role="group" aria-label={label}>
         {options.map((o) => (
           <button
             key={o.value}
             type="button"
             aria-pressed={value === o.value}
-            className={`rounded-lg px-3 py-1.5 text-xs transition ${
+            className={`min-h-10 rounded-lg px-3 py-1.5 text-xs transition ${
               value === o.value
                 ? "bg-card text-foreground shadow-sm"
                 : "text-muted-foreground hover:text-foreground"
@@ -357,7 +357,7 @@ function SpeciesAdder({
       <div className="relative" ref={containerRef}>
         <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" aria-hidden />
         <input
-          className="w-full rounded-xl border bg-background py-2 pl-9 pr-3 text-sm outline-none focus:ring-2 focus:ring-ring"
+          className="min-h-11 w-full rounded-xl border bg-background py-2 pl-9 pr-3 text-sm outline-none focus:ring-2 focus:ring-ring"
           placeholder="Search species…"
           value={q}
           onChange={(e) => {
@@ -669,7 +669,7 @@ function QtyStepper({
         type="button"
         onClick={() => onChange(Math.max(0, value - 1))}
         aria-label={`Decrease quantity of ${itemLabel}`}
-        className="rounded-lg border p-1 text-muted-foreground hover:bg-muted"
+        className="flex h-9 w-9 items-center justify-center rounded-lg border p-1 text-muted-foreground hover:bg-muted"
       >
         <Minus className="h-3.5 w-3.5" aria-hidden />
       </button>
@@ -688,7 +688,7 @@ function QtyStepper({
         type="button"
         onClick={onRemove}
         aria-label={`Remove ${itemLabel}`}
-        className="ml-1 rounded-lg p-1 text-muted-foreground hover:bg-coral/15 hover:text-coral"
+        className="ml-1 flex h-9 w-9 items-center justify-center rounded-lg p-1 text-muted-foreground hover:bg-coral/15 hover:text-coral"
       >
         <X className="h-3.5 w-3.5" aria-hidden />
       </button>
