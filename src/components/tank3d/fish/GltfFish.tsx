@@ -78,6 +78,25 @@ export function GltfFish({
 
   const groupRef = useRef<THREE.Group>(null);
   const target = useMemo(() => new THREE.Vector3(), []);
+  const bettaRig = useMemo(() => {
+    if (asset.commonName.toLowerCase() !== "betta") return null;
+    const names = {
+      tail: ["Bone.003_Armature", "Bone.004_Armature", "Bone.005_Armature"],
+      leftPectoral: "Bone.046_Armature",
+      rightPectoral: "Bone.047_Armature",
+    };
+    const resolve = (name: string) => {
+      const bone = scene.getObjectByName(name);
+      return bone
+        ? { bone, rest: bone.quaternion.clone() }
+        : null;
+    };
+    return {
+      tail: names.tail.map(resolve).filter((entry): entry is NonNullable<typeof entry> => entry !== null),
+      leftPectoral: resolve(names.leftPectoral),
+      rightPectoral: resolve(names.rightPectoral),
+    };
+  }, [asset.commonName, scene]);
   const controller = useFishAnimationController({
     root: scene,
     clips: gltf.animations ?? [],
@@ -183,6 +202,29 @@ export function GltfFish({
     else if (pauseMul < 0.35) state = "hover";
     controller.setState(state);
     controller.tick(delta, speedMul * pauseMul);
+
+    // The BlueMesh Betta has a detailed skinned rig but only one general
+    // authored action. Layer an aquarium-scale propulsion cycle onto its
+    // real tail and pectoral bones so it visibly swims rather than gliding.
+    if (bettaRig) {
+      const swimRate = 3.6 + speedMul * 2.8;
+      const tailBeat = Math.sin(t * swimRate + phase);
+      bettaRig.tail.forEach(({ bone, rest }, index) => {
+        const amplitude = 0.12 + index * 0.095;
+        bone.quaternion.copy(rest);
+        bone.rotateZ(tailBeat * amplitude);
+      });
+
+      const pectoralBeat = Math.sin(t * (swimRate * 1.55) + phase + Math.PI * 0.5);
+      if (bettaRig.leftPectoral) {
+        bettaRig.leftPectoral.bone.quaternion.copy(bettaRig.leftPectoral.rest);
+        bettaRig.leftPectoral.bone.rotateX(pectoralBeat * 0.34);
+      }
+      if (bettaRig.rightPectoral) {
+        bettaRig.rightPectoral.bone.quaternion.copy(bettaRig.rightPectoral.rest);
+        bettaRig.rightPectoral.bone.rotateX(-pectoralBeat * 0.34);
+      }
+    }
   });
 
   return (
