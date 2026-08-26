@@ -22,17 +22,17 @@ type Shop = {
 export const Route = createFileRoute("/shops/")({
   head: () => ({
     meta: [
-      { title: "Australian aquarium shops directory | FishTankr" },
+      { title: "Aquarium shops directory | FishTankr" },
       {
         name: "description",
         content:
-          "A directory of freshwater and marine aquarium shops across Australia — Perth, Melbourne, Sydney, Brisbane, Adelaide and more.",
+          "A growing directory of freshwater and marine aquarium shops, with local specialties and contact details.",
       },
-      { property: "og:title", content: "Australian aquarium shops | FishTankr" },
+      { property: "og:title", content: "Aquarium shops directory | FishTankr" },
       {
         property: "og:description",
         content:
-          "Freshwater and marine aquarium shops across Australia, with specialties and locations.",
+          "Freshwater and marine aquarium shops, with specialties and location details.",
       },
       { property: "og:url", content: "/shops" },
     ],
@@ -73,13 +73,12 @@ function ShopsIndex() {
   }, [data, stateFilter, search]);
 
   return (
-    <main className="mx-auto max-w-5xl px-4 py-10">
+    <main className="mx-auto max-w-5xl px-3 py-6 sm:px-4 sm:py-10">
       <h1 className="font-display text-4xl font-bold text-foreground">
-        Aquarium shops in Australia
+        Aquarium shop directory
       </h1>
       <p className="mt-2 max-w-2xl text-muted-foreground">
-        A curated directory of local fish shops (LFS) worth visiting — freshwater,
-        planted, cichlid and native specialists across the country.
+        Find helpful local fish shops and specialist retailers. Coverage is currently expanding from Australia, with more regions to come.
       </p>
 
       <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
@@ -88,15 +87,15 @@ function ShopsIndex() {
           placeholder="Search by name, suburb or specialty…"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="flex-1 rounded-xl border bg-background px-4 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none"
+          className="min-h-11 flex-1 rounded-xl border bg-background px-4 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none"
         />
-        <div className="flex flex-wrap gap-1.5">
+        <div className="flex gap-1.5 overflow-x-auto overscroll-x-contain pb-1 [scrollbar-width:none] sm:flex-wrap sm:overflow-visible">
           {STATES.map((s) => (
             <button
               key={s}
               onClick={() => setStateFilter(s)}
               className={
-                "rounded-full px-3 py-1 text-xs font-medium transition-colors " +
+                "min-h-9 shrink-0 rounded-full px-3 py-1 text-xs font-medium transition-colors " +
                 (stateFilter === s
                   ? "bg-primary text-primary-foreground"
                   : "bg-muted text-muted-foreground hover:bg-muted/70")
@@ -114,7 +113,7 @@ function ShopsIndex() {
           <p className="text-sm text-muted-foreground">No shops match those filters.</p>
         )}
         {filtered.map((shop) => (
-          <div key={shop.id} className="rounded-2xl border bg-card p-5">
+          <div key={shop.id} className="rounded-[1.25rem] border bg-card p-4 sm:rounded-2xl sm:p-5">
             <div className="flex flex-wrap items-baseline justify-between gap-2">
               <Link
                 to="/shops/$slug"
