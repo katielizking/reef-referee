@@ -477,16 +477,24 @@ def stamp_metadata(profile, slug):
 
 def export(path):
     Path(path).parent.mkdir(parents=True, exist_ok=True)
-    bpy.ops.export_scene.gltf(
-        filepath=str(Path(path).resolve()),
-        export_format="GLB",
-        export_apply=True,
-        export_animations=True,
-        export_all_actions=True,
-        export_nla_strips=True,
-        export_materials="EXPORT",
-        export_yup=True,
-    )
+    requested = {
+        "filepath": str(Path(path).resolve()),
+        "export_format": "GLB",
+        "export_apply": True,
+        "export_animations": True,
+        "export_all_actions": True,
+        "export_nla_strips": True,
+        "export_materials": "EXPORT",
+        "export_yup": True,
+    }
+    # Blender's glTF operator options differ between packaged releases. Keep
+    # the stable options and use animation refinements only when available.
+    supported = {
+        prop.identifier for prop in bpy.ops.export_scene.gltf.get_rna_type().properties
+    }
+    bpy.ops.export_scene.gltf(**{
+        key: value for key, value in requested.items() if key in supported
+    })
 
 
 def main():
