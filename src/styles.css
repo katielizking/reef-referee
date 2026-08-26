@@ -178,3 +178,19 @@
   }
   .hero-float { animation: gentle-float 6s ease-in-out infinite; }
 }
+
+
+/* Mobile-first interaction guardrails */
+@layer base {
+  input, select, textarea { font-size: 16px; }
+  button, [role="button"], a { -webkit-tap-highlight-color: transparent; }
+}
+@media (max-width: 639px) {
+  html { -webkit-text-size-adjust: 100%; }
+  body { overscroll-behavior-y: none; }
+  .site-shell::before { opacity: .14; }
+  .fishtankr-panel { backdrop-filter: blur(12px); }
+}
+@media (min-width: 640px) {
+  input, select, textarea { font-size: inherit; }
+}
