@@ -54,7 +54,7 @@ jobs:
         if: steps.select.outputs.run == 'true'
         run: |
           sudo apt-get update
-          sudo apt-get install -y blender
+          sudo apt-get install -y blender python3-numpy
 
       - name: Generate reference-informed GLB
         if: steps.select.outputs.run == 'true'
@@ -63,6 +63,7 @@ jobs:
           blender --background --python tools/blender/generate_validation_species.py -- \
             --species "${{ matrix.species }}" \
             --output "generated/${{ matrix.species }}.glb"
+          test -s "generated/${{ matrix.species }}.glb"
 
       - name: Upload model for review
         if: steps.select.outputs.run == 'true'
