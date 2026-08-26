@@ -35,6 +35,20 @@ export interface Species {
   legal_in_australia: boolean;
   legal_status: "permitted" | "native" | "prohibited";
   legal_note: string | null;
+  legal_import_status:
+    | "permitted_with_conditions"
+    | "not_permitted"
+    | "not_applicable_native"
+    | "unknown";
+  legal_possession_status:
+    | "generally_permitted_check_state"
+    | "check_state_permits"
+    | "prohibited_or_restricted"
+    | "check_state_rules";
+  legal_source_label: string | null;
+  legal_source_url: string | null;
+  legal_reviewed_on: string | null;
+  legal_confidence: "verified" | "medium" | "incomplete";
 }
 
 
