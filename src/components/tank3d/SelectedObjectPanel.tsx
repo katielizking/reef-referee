@@ -9,6 +9,7 @@ import {
   type PlacementKind,
 } from "./placements";
 import { useSelected, useEditorStore } from "./editorStore";
+import { getFishAsset } from "@/lib/fish3d/registry";
 
 interface Props {
   state: TankState;
@@ -26,6 +27,7 @@ export function SelectedObjectPanel({ state, setState, interior, commit, onClose
   const { kind, refId } = selected;
   const label = placementLabel(state, kind, refId);
   const placement = getPlacement(state.overrides, kind, refId, interior);
+  const fishAttribution = kind === "fish" ? getFishAsset(refId)?.attribution : undefined;
 
   const rowExists = groupExists(state, kind, refId);
   if (!rowExists) {
@@ -143,6 +145,19 @@ export function SelectedObjectPanel({ state, setState, interior, commit, onClose
           />
         )}
       </div>
+
+      {fishAttribution && (
+        <p className="mt-4 rounded-xl border bg-muted/40 px-3 py-2 text-[11px] leading-relaxed text-muted-foreground">
+          3D model by{" "}
+          <a href={fishAttribution.sourceUrl} target="_blank" rel="noreferrer" className="font-semibold text-foreground underline underline-offset-2">
+            {fishAttribution.creator}
+          </a>{" "}
+          ·{" "}
+          <a href={fishAttribution.licenseUrl ?? fishAttribution.sourceUrl} target="_blank" rel="noreferrer" className="underline underline-offset-2">
+            {fishAttribution.licenseLabel}
+          </a>
+        </p>
+      )}
 
       <div className="mt-4 flex flex-wrap gap-2">
         {kind !== "equipment" && (
