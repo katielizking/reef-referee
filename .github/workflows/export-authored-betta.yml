@@ -21,7 +21,7 @@ jobs:
       - name: Install Blender
         run: |
           sudo apt-get update
-          sudo apt-get install -y blender
+          sudo apt-get install -y blender python3-numpy
       - name: Export production GLB
         run: |
           blender --background --python tools/blender/export_authored_betta.py -- \
