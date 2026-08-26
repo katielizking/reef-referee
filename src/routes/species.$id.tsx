@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useRouter, useNavigate, notFound } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
-import { ArrowLeft, Fish, Ruler, Droplet, Thermometer, Users, Waves, AlertTriangle, Info, Leaf, Plus } from "lucide-react";
+import { ArrowLeft, Fish, Ruler, Droplet, Thermometer, Users, Waves, AlertTriangle, ExternalLink, Info, Leaf, Plus, ShieldCheck } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import type { Species } from "@/lib/types";
 import { BIOTOPE_LABEL } from "@/lib/types";
@@ -128,7 +128,7 @@ function LegalBadge({ s }: { s: Species }) {
   if (s.legal_status === "prohibited") {
     return (
       <span className="inline-flex items-center gap-1 rounded-full bg-coral/20 px-2.5 py-1 text-xs font-semibold text-foreground">
-        <AlertTriangle className="h-3.5 w-3.5" /> Prohibited in Australia
+        <AlertTriangle className="h-3.5 w-3.5" /> Prohibited / restricted
       </span>
     );
   }
@@ -143,6 +143,97 @@ function LegalBadge({ s }: { s: Species }) {
     <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2.5 py-1 text-xs font-semibold text-muted-foreground">
       <Info className="h-3.5 w-3.5" /> Permitted in Australia
     </span>
+  );
+}
+
+function LegalityEvidence({ s }: { s: Species }) {
+  const importLabel = {
+    permitted_with_conditions: "Permitted for import with conditions",
+    not_permitted: "Not on the permitted import pathway",
+    not_applicable_native: "Not applicable — Australian native",
+    unknown: "Import status not yet verified",
+  }[s.legal_import_status ?? "unknown"];
+
+  const possessionLabel = {
+    generally_permitted_check_state: "Generally kept; check state and territory rules",
+    check_state_permits: "State or territory permits may apply",
+    prohibited_or_restricted: "Prohibited or restricted; check your jurisdiction",
+    check_state_rules: "Check state or territory rules",
+  }[s.legal_possession_status ?? "check_state_rules"];
+
+  const confidence = s.legal_confidence ?? "incomplete";
+  const confidenceLabel = {
+    verified: "Verified",
+    medium: "Government source, species detail needs review",
+    incomplete: "Incomplete — verify before relying on this",
+  }[confidence];
+
+  return (
+    <section className="mt-10 rounded-2xl border bg-card p-5">
+      <div className="flex items-start gap-3">
+        <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-primary" aria-hidden />
+        <div className="min-w-0 flex-1">
+          <h2 className="font-display text-xl font-semibold text-foreground">
+            Australian legality evidence
+          </h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Federal import eligibility and state possession rules are separate checks.
+          </p>
+        </div>
+      </div>
+
+      <dl className="mt-4 grid gap-3 sm:grid-cols-2">
+        <div className="rounded-xl bg-muted/50 p-3">
+          <dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            Federal import
+          </dt>
+          <dd className="mt-1 text-sm font-medium text-foreground">{importLabel}</dd>
+        </div>
+        <div className="rounded-xl bg-muted/50 p-3">
+          <dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            Keeping this species
+          </dt>
+          <dd className="mt-1 text-sm font-medium text-foreground">{possessionLabel}</dd>
+        </div>
+        <div className="rounded-xl bg-muted/50 p-3">
+          <dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            Evidence confidence
+          </dt>
+          <dd className="mt-1 text-sm font-medium text-foreground">{confidenceLabel}</dd>
+        </div>
+        <div className="rounded-xl bg-muted/50 p-3">
+          <dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            Last reviewed
+          </dt>
+          <dd className="mt-1 text-sm font-medium text-foreground">
+            {s.legal_reviewed_on
+              ? new Date(`${s.legal_reviewed_on}T00:00:00`).toLocaleDateString("en-AU")
+              : "Not recorded"}
+          </dd>
+        </div>
+      </dl>
+
+      {s.legal_source_url ? (
+        <a
+          href={s.legal_source_url}
+          target="_blank"
+          rel="noreferrer"
+          className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
+        >
+          {s.legal_source_label ?? "View government source"}
+          <ExternalLink className="h-3.5 w-3.5" aria-hidden />
+        </a>
+      ) : (
+        <p className="mt-4 text-sm text-muted-foreground">
+          {s.legal_source_label ?? "A jurisdiction-specific source still needs to be added."}
+        </p>
+      )}
+
+      <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
+        FishTankr provides screening guidance, not legal advice. Confirm current rules with
+        your state or territory fisheries authority before buying, moving or collecting fish.
+      </p>
+    </section>
   );
 }
 
@@ -227,6 +318,8 @@ function SpeciesGuide() {
           ))}
         </ul>
       </section>
+
+      <LegalityEvidence s={s} />
 
       <section className="mt-10">
         <h2 className="font-display text-xl font-semibold text-foreground">How the calculator uses this species</h2>
@@ -342,10 +435,10 @@ function biomeCopy(s: Species): string {
 
 function legalityCopy(s: Species): string {
   if (s.legal_status === "prohibited") {
-    return "Prohibited for private keeping in Australia. Adding this species caps the tank's overall score at 30 — swap for a legal alternative.";
+    return "Flagged as prohibited or restricted. Import and possession rules are separate, so check the linked federal source and your state or territory authority. Adding it caps the score at 30.";
   }
   if (s.legal_status === "native") {
     return "Australian native. Doesn't cost you legality points, but some states require permits to keep natives — check your state's fisheries rules before you buy.";
   }
-  return "Permitted for the aquarium trade in Australia. No legality issues.";
+  return "Listed as permitted for federal import with conditions. State or territory possession rules can still apply, so review the evidence before buying.";
 }
