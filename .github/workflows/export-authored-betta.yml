@@ -26,7 +26,17 @@ jobs:
         run: |
           blender --background --python tools/blender/export_authored_betta.py -- \
             assets/3d/source/betta-bluemesh/scene.gltf \
-            generated/betta/betta.glb
+            generated/betta/betta-source.glb
+          # The artwork remains exactly the same; shrink only the embedded
+          # textures for browser delivery. WebP is natively supported by
+          # current browsers and GLTFLoader's EXT_texture_webp support.
+          npx --yes @gltf-transform/cli resize \
+            generated/betta/betta-source.glb generated/betta/betta-1024.glb \
+            --width 1024 --height 1024
+          npx --yes @gltf-transform/cli webp \
+            generated/betta/betta-1024.glb generated/betta/betta.glb \
+            --slots "{baseColor,normalTexture,metallicRoughnessTexture}"
+          rm generated/betta/betta-source.glb generated/betta/betta-1024.glb
           test -s generated/betta/betta.glb
           test -s generated/betta/betta.json
       - name: Publish production model
