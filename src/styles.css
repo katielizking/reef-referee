@@ -119,7 +119,7 @@
 
 /* FishTankr visual foundation — editorial bright-science system */
 @layer base {
-  html { scroll-behavior: smooth; background: var(--foam); }
+  html { scroll-behavior: smooth; scroll-padding-top: 5.5rem; background: var(--foam); }
   body {
     min-width: 320px;
     min-height: 100vh;
@@ -183,7 +183,7 @@
 /* Mobile-first interaction guardrails */
 @layer base {
   input, select, textarea { font-size: 16px; }
-  button, [role="button"], a { -webkit-tap-highlight-color: transparent; }
+  button, [role="button"], a { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
 }
 @media (max-width: 639px) {
   html { -webkit-text-size-adjust: 100%; }
