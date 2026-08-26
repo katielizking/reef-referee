@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { getSharedTank } from "./tanks.functions";
 import type { Filter, Hardscape, Plant, Species, TankRow } from "./types";
 
 async function currentUserId(): Promise<string | null> {
