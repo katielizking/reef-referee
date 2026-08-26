@@ -36,9 +36,9 @@ export function buildChecklist(scorecard: Scorecard, state: TankState): Checklis
     items.push({
       id: `illegal:${name}`,
       severity: "must-fix",
-      title: `${name} is prohibited in Australia`,
-      why: "Restricted noxious species can't be legally kept in home aquariums.",
-      fix: "Remove this species and pick a permitted alternative from the same biotope.",
+      title: `${name} is flagged as prohibited or restricted`,
+      why: "Federal import and state possession rules may both restrict this species.",
+      fix: "Check the linked evidence and your jurisdiction, then remove it or choose a permitted alternative.",
     });
   }
 
