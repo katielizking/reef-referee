@@ -10,7 +10,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.5"
+    PostgrestVersion: "14.17"
   }
   public: {
     Tables: {
@@ -195,14 +195,8 @@ export type Database = {
           fin_nipper: boolean
           id: string
           is_schooling: boolean
-          legal_confidence: string
-          legal_import_status: string
           legal_in_australia: boolean
           legal_note: string | null
-          legal_possession_status: string
-          legal_reviewed_on: string | null
-          legal_source_label: string | null
-          legal_source_url: string | null
           legal_status: string
           long_finned: boolean
           min_group_size: number
@@ -226,14 +220,8 @@ export type Database = {
           fin_nipper?: boolean
           id?: string
           is_schooling?: boolean
-          legal_confidence?: string
-          legal_import_status?: string
           legal_in_australia?: boolean
           legal_note?: string | null
-          legal_possession_status?: string
-          legal_reviewed_on?: string | null
-          legal_source_label?: string | null
-          legal_source_url?: string | null
           legal_status?: string
           long_finned?: boolean
           min_group_size?: number
@@ -257,14 +245,8 @@ export type Database = {
           fin_nipper?: boolean
           id?: string
           is_schooling?: boolean
-          legal_confidence?: string
-          legal_import_status?: string
           legal_in_australia?: boolean
           legal_note?: string | null
-          legal_possession_status?: string
-          legal_reviewed_on?: string | null
-          legal_source_label?: string | null
-          legal_source_url?: string | null
           legal_status?: string
           long_finned?: boolean
           min_group_size?: number
@@ -445,16 +427,6 @@ export type Database = {
     }
     Functions: {
       get_shared_tank: { Args: { p_slug: string }; Returns: Json }
-      save_tank_atomic: {
-        Args: {
-          p_existing_id: string | null
-          p_hardscape: Json
-          p_plants: Json
-          p_species: Json
-          p_tank: Json
-        }
-        Returns: Database["public"]["Tables"]["tanks"]["Row"]
-      }
     }
     Enums: {
       [_ in never]: never
