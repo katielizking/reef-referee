@@ -4,10 +4,10 @@ import type { TankState } from "@/lib/types";
 export type StepId = "tank" | "filter" | "livestock" | "aquascape";
 
 const STEPS: Array<{ id: StepId; label: string; sub: string }> = [
-  { id: "tank", label: "Set tank", sub: "Size & water" },
-  { id: "filter", label: "Pick filter", sub: "Flow & care" },
-  { id: "livestock", label: "Add livestock", sub: "Choose fish" },
-  { id: "aquascape", label: "Aquascape", sub: "Plants & décor" },
+  { id: "tank", label: "Tank", sub: "Size & water" },
+  { id: "filter", label: "Filter", sub: "Flow & care" },
+  { id: "livestock", label: "Livestock", sub: "Fish community" },
+  { id: "aquascape", label: "Aquascape", sub: "Plants & habitat" },
 ];
 
 const MIN_DIM = 10;
@@ -31,47 +31,58 @@ interface Props {
 
 export function BuilderSteps({ state, onJump }: Props) {
   const status = stepStatus(state);
-  // The current step is the first incomplete one.
-  const currentIdx = STEPS.findIndex((s) => !status[s.id]);
+  const completed = STEPS.filter((step) => status[step.id]).length;
+  const currentIdx = STEPS.findIndex((step) => !status[step.id]);
+  const progress = Math.round((completed / STEPS.length) * 100);
 
   return (
-    <nav aria-label="Builder progress" className="mb-4">
-      <ol className="flex snap-x gap-2 overflow-x-auto rounded-2xl border bg-card p-2 sm:grid sm:grid-cols-4 sm:overflow-visible">
-        {STEPS.map((s, i) => {
-          const done = status[s.id];
-          const current = i === currentIdx;
+    <nav aria-label="Builder progress" className="mb-5 overflow-hidden rounded-[1.5rem] bg-ink text-white shadow-[0_16px_40px_rgba(18,35,46,.16)]">
+      <div className="flex items-center justify-between gap-4 border-b border-white/10 px-4 py-3 sm:px-5">
+        <div>
+          <p className="science-label text-blue">Tank build</p>
+          <p className="mt-1 text-xs text-white/55">{completed} of {STEPS.length} foundations set</p>
+        </div>
+        <div className="flex items-center gap-3">
+          <div className="hidden h-1.5 w-28 overflow-hidden rounded-full bg-white/10 sm:block">
+            <div className="h-full rounded-full bg-lime transition-all duration-500" style={{ width: `${progress}%` }} />
+          </div>
+          <span className="font-display text-sm font-bold text-lime">{progress}%</span>
+        </div>
+      </div>
+      <ol className="flex snap-x overflow-x-auto p-2 sm:grid sm:grid-cols-4 sm:overflow-visible">
+        {STEPS.map((step, index) => {
+          const done = status[step.id];
+          const current = index === currentIdx;
           return (
-            <li key={s.id} className="min-w-[10rem] flex-1 snap-start sm:min-w-0">
+            <li key={step.id} className="min-w-[10.5rem] flex-1 snap-start sm:min-w-0">
               <button
                 type="button"
-                onClick={() => onJump(s.id)}
+                onClick={() => onJump(step.id)}
                 aria-current={current ? "step" : undefined}
-                className={`flex w-full items-center gap-3 rounded-xl px-3 py-2 text-left transition ${
-                  done
-                    ? "bg-lime/20 text-foreground"
-                    : current
-                      ? "bg-primary/10 text-foreground ring-1 ring-primary/40"
-                      : "text-muted-foreground hover:bg-muted"
+                className={`group flex w-full items-center gap-3 rounded-2xl px-3 py-3 text-left transition-all ${
+                  current
+                    ? "bg-white text-ink shadow-sm"
+                    : done
+                      ? "text-white hover:bg-white/10"
+                      : "text-white/55 hover:bg-white/5 hover:text-white"
                 }`}
               >
                 <span
-                  className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold ${
+                  className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full border text-xs font-bold transition ${
                     done
-                      ? "bg-lime text-foreground"
+                      ? "border-lime bg-lime text-ink"
                       : current
-                        ? "bg-primary text-primary-foreground"
-                        : "bg-muted text-muted-foreground"
+                        ? "border-blue bg-blue text-white"
+                        : "border-white/20 text-white/50"
                   }`}
                   aria-hidden
                 >
-                  {done ? <Check className="h-3.5 w-3.5" /> : i + 1}
+                  {done ? <Check className="h-4 w-4" /> : index + 1}
                 </span>
                 <span className="min-w-0">
-                  <span className="block truncate text-sm font-semibold">
-                    {s.label}
-                  </span>
-                  <span className="block truncate text-xs text-muted-foreground">
-                    {s.sub}
+                  <span className="block truncate font-display text-sm font-semibold">{step.label}</span>
+                  <span className={`block truncate text-[11px] ${current ? "text-ink/55" : "text-white/45"}`}>
+                    {done ? "Ready" : step.sub}
                   </span>
                 </span>
               </button>
