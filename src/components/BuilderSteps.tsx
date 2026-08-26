@@ -36,8 +36,8 @@ export function BuilderSteps({ state, onJump }: Props) {
   const progress = Math.round((completed / STEPS.length) * 100);
 
   return (
-    <nav aria-label="Builder progress" className="mb-5 overflow-hidden rounded-[1.5rem] bg-ink text-white shadow-[0_16px_40px_rgba(18,35,46,.16)]">
-      <div className="flex items-center justify-between gap-4 border-b border-white/10 px-4 py-3 sm:px-5">
+    <nav aria-label="Builder progress" className="mb-4 overflow-hidden rounded-[1.25rem] sm:mb-5 sm:rounded-[1.5rem] bg-ink text-white shadow-[0_16px_40px_rgba(18,35,46,.16)]">
+      <div className="flex items-center justify-between gap-3 border-b border-white/10 px-4 py-3 sm:gap-4 sm:px-5">
         <div>
           <p className="science-label text-blue">Tank build</p>
           <p className="mt-1 text-xs text-white/55">{completed} of {STEPS.length} foundations set</p>
@@ -49,17 +49,17 @@ export function BuilderSteps({ state, onJump }: Props) {
           <span className="font-display text-sm font-bold text-lime">{progress}%</span>
         </div>
       </div>
-      <ol className="flex snap-x overflow-x-auto p-2 sm:grid sm:grid-cols-4 sm:overflow-visible">
+      <ol className="flex snap-x snap-mandatory overflow-x-auto overscroll-x-contain p-2 [scrollbar-width:none] sm:grid sm:grid-cols-4 sm:overflow-visible">
         {STEPS.map((step, index) => {
           const done = status[step.id];
           const current = index === currentIdx;
           return (
-            <li key={step.id} className="min-w-[10.5rem] flex-1 snap-start sm:min-w-0">
+            <li key={step.id} className="min-w-[9.25rem] flex-1 snap-start sm:min-w-0">
               <button
                 type="button"
                 onClick={() => onJump(step.id)}
                 aria-current={current ? "step" : undefined}
-                className={`group flex w-full items-center gap-3 rounded-2xl px-3 py-3 text-left transition-all ${
+                className={`group flex min-h-14 w-full items-center gap-3 rounded-2xl px-3 py-3 text-left transition-all ${
                   current
                     ? "bg-white text-ink shadow-sm"
                     : done
