@@ -121,6 +121,10 @@ def membrane(name, points, mat, thickness=.012):
 
 
 def ray(name, a, b, radius, mat):
+    if len(a) == 2:
+        a = (a[0], 0, a[1])
+    if len(b) == 2:
+        b = (b[0], 0, b[1])
     curve = bpy.data.curves.new(name, "CURVE")
     curve.dimensions = "3D"
     curve.bevel_depth, curve.bevel_resolution = radius, 2
