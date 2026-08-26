@@ -277,9 +277,9 @@ function Builder() {
   }
 
   return (
-    <main className="mx-auto max-w-[1500px] px-4 py-6 pb-24 lg:pb-6">
+    <main className="mx-auto max-w-[1500px] px-3 py-4 pb-28 sm:px-4 sm:py-6 lg:pb-6">
       {showHero && (
-        <section className="hero-grid fishtankr-panel relative mb-10 grid min-h-[430px] gap-8 overflow-hidden rounded-[2rem] p-6 sm:p-10 lg:grid-cols-[minmax(0,1.08fr)_minmax(360px,.92fr)] lg:items-center lg:p-12">
+        <section className="hero-grid fishtankr-panel relative mb-7 grid gap-7 overflow-hidden rounded-[1.5rem] p-5 sm:mb-10 sm:min-h-[430px] sm:rounded-[2rem] sm:p-10 lg:grid-cols-[minmax(0,1.08fr)_minmax(360px,.92fr)] lg:items-center lg:p-12">
           <button
             type="button"
             onClick={dismissHero}
@@ -299,16 +299,16 @@ function Builder() {
               Plan your setup, check your stocking and understand the biology behind a
               healthy aquarium with simple tools built around fish welfare.
             </p>
-            <div className="mt-7 flex flex-wrap gap-3">
+            <div className="mt-7 grid gap-3 sm:flex sm:flex-wrap">
               <button
                 onClick={() => { dismissHero(); scrollToBuilder(); }}
-                className="inline-flex items-center justify-center rounded-full bg-ink px-6 py-3 text-sm font-semibold text-white shadow-[0_8px_0_rgba(55,184,198,.28)] transition-all hover:-translate-y-0.5 hover:shadow-[0_10px_0_rgba(55,184,198,.34)]"
+                className="inline-flex min-h-12 w-full items-center justify-center rounded-full bg-ink px-6 py-3 sm:w-auto text-sm font-semibold text-white shadow-[0_8px_0_rgba(55,184,198,.28)] transition-all hover:-translate-y-0.5 hover:shadow-[0_10px_0_rgba(55,184,198,.34)]"
               >
                 Check my tank
               </button>
               <button
                 onClick={() => navigate({ to: "/saved" })}
-                className="inline-flex items-center justify-center rounded-full border border-ink/15 bg-white/70 px-6 py-3 text-sm font-semibold text-foreground transition-all hover:border-primary hover:bg-white"
+                className="inline-flex min-h-12 w-full items-center justify-center rounded-full border border-ink/15 bg-white/70 px-6 py-3 sm:w-auto text-sm font-semibold text-foreground transition-all hover:border-primary hover:bg-white"
               >
                 Explore the tools
               </button>
@@ -318,7 +318,7 @@ function Builder() {
         </section>
       )}
 
-      <div id="builder" className="mb-6 flex flex-col justify-between gap-4 border-b border-ink/10 pb-5 sm:flex-row sm:items-end">
+      <div id="builder" className="mb-5 flex flex-col justify-between gap-3 border-b border-ink/10 pb-4 sm:mb-6 sm:gap-4 sm:pb-5 sm:flex-row sm:items-end">
         <div>
           <h2 className="font-display text-3xl font-bold tracking-[-.035em] text-foreground">
             Design your tank
@@ -327,12 +327,12 @@ function Builder() {
             Add livestock, plants and hardscape. Your scorecard updates as you go.
           </p>
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
           <button
             onClick={() => handleSave(false)}
             disabled={saving || state.species.length === 0}
             title={state.species.length === 0 ? "Add fish to save" : undefined}
-            className="inline-flex items-center gap-1.5 rounded-xl border bg-card px-3 py-2 text-sm font-semibold text-foreground transition-colors hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed"
+            className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-xl border bg-card px-3 py-2 text-sm font-semibold text-foreground transition-colors hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
             Save
@@ -341,7 +341,7 @@ function Builder() {
             onClick={() => handleSave(true)}
             disabled={saving || state.species.length === 0}
             title={state.species.length === 0 ? "Add fish to share" : undefined}
-            className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:brightness-95 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-xl bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:brightness-95 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Share2 className="h-4 w-4" />
             Share
@@ -356,8 +356,8 @@ function Builder() {
       ) : (
         <>
           <BuilderSteps state={state} onJump={jumpToStep} />
-          <div className="grid items-start gap-5 xl:grid-cols-[minmax(280px,320px)_minmax(520px,1fr)_minmax(300px,340px)]">
-            <aside className="fishtankr-panel rounded-[1.75rem] p-3 sm:p-4 xl:sticky xl:top-24">
+          <div className="grid items-start gap-4 sm:gap-5 xl:grid-cols-[minmax(280px,320px)_minmax(520px,1fr)_minmax(300px,340px)]">
+            <aside className="order-2 fishtankr-panel rounded-[1.5rem] p-3 sm:rounded-[1.75rem] sm:p-4 xl:order-1 xl:sticky xl:top-24">
               <TankSetupPanel
                 state={state}
                 setState={setState}
@@ -369,15 +369,15 @@ function Builder() {
                 setOpenSteps={setOpenSteps}
               />
             </aside>
-          <div className="space-y-4">
-            <section className="overflow-hidden rounded-[2rem] border border-ink/15 bg-ink p-2 shadow-[0_28px_70px_rgba(18,35,46,.18)] sm:p-3">
-              <header className="flex flex-wrap items-center justify-between gap-3 px-2 pb-3 pt-1 text-white sm:px-3">
+          <div className="order-1 space-y-4 xl:order-2">
+            <section className="overflow-hidden rounded-[1.5rem] border border-ink/15 bg-ink p-2 sm:rounded-[2rem] shadow-[0_28px_70px_rgba(18,35,46,.18)] sm:p-3">
+              <header className="flex flex-col items-stretch gap-2 px-2 pb-3 pt-1 text-white sm:flex-row sm:items-center sm:justify-between sm:gap-3 sm:px-3">
                 <div>
                   <p className="science-label text-blue">Live aquarium</p>
                   <p className="mt-1 font-display text-sm font-semibold">{state.name}</p>
                 </div>
-                <div className="flex flex-wrap gap-1.5 text-[10px] font-semibold uppercase tracking-wide text-white/65">
-                  <span className="inline-flex items-center gap-1 rounded-full bg-white/10 px-2.5 py-1.5">
+                <div className="grid grid-cols-3 gap-1.5 text-[10px] sm:flex sm:flex-wrap font-semibold uppercase tracking-wide text-white/65">
+                  <span className="inline-flex min-w-0 items-center justify-center gap-1 rounded-full bg-white/10 px-2 py-1.5 text-center">
                     <Ruler className="h-3 w-3 text-blue" /> {state.length_cm} × {state.width_cm} × {state.height_cm} cm
                   </span>
                   <span className="inline-flex items-center gap-1 rounded-full bg-white/10 px-2.5 py-1.5">
@@ -433,7 +433,7 @@ function Builder() {
             )}
           </div>
 
-          <aside className="space-y-4 xl:sticky xl:top-24 xl:self-start">
+          <aside className="order-3 space-y-4 xl:sticky xl:top-24 xl:self-start">
             <PreStockChecklist
               scorecard={scorecard}
               state={state}
