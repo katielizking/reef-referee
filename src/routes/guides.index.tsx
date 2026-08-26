@@ -7,13 +7,13 @@ export const Route = createFileRoute("/guides/")({
       {
         name: "description",
         content:
-          "In-depth, Australian-friendly guides on cycling, filtration, planted tanks and stocking your first freshwater aquarium.",
+          "In-depth, internationally useful guides on cycling, filtration, planted tanks and stocking your first freshwater aquarium.",
       },
       { property: "og:title", content: "Freshwater aquarium guides | FishTankr" },
       {
         property: "og:description",
         content:
-          "In-depth, Australian-friendly guides on cycling, filtration, planted tanks and stocking your first freshwater aquarium.",
+          "In-depth, internationally useful guides on cycling, filtration, planted tanks and stocking your first freshwater aquarium.",
       },
       { property: "og:url", content: "/guides" },
     ],
@@ -53,7 +53,7 @@ function GuidesIndex() {
       <h1 className="font-display text-4xl font-bold text-foreground">Guides</h1>
       <p className="mt-2 max-w-2xl text-muted-foreground">
         Deep-dive articles on the biology and gear behind a healthy freshwater tank.
-        Everything is written with Australian keepers in mind.
+        Built to be useful wherever you keep fish; always check local water and wildlife rules when they apply.
       </p>
       <div className="mt-8 grid gap-4 sm:grid-cols-2">
         {guides.map((g) =>
