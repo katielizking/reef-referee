@@ -155,7 +155,7 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <div className="flex min-h-screen flex-col bg-background">
+      <div className="site-shell flex min-h-screen flex-col bg-background/80">
         <SiteHeader />
 
         <div className="flex-1">
@@ -183,20 +183,20 @@ const NAV_ITEMS: Array<{ to: string; label: string; exact?: boolean }> = [
 function SiteHeader() {
   const [open, setOpen] = useState(false);
   return (
-    <header className="sticky top-0 z-30 border-b border-border/70 bg-background/85 backdrop-blur">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3">
+    <header className="sticky top-0 z-30 border-b border-ink/10 bg-foam/88 shadow-[0_1px_0_rgba(255,255,255,.8)] backdrop-blur-xl">
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-5 px-4 py-3.5">
         <Link to="/" aria-label="FishTankr home" className="rounded-lg">
           <BrandLogo />
         </Link>
-        <nav aria-label="Primary" className="hidden md:flex items-center gap-1 text-sm">
+        <nav aria-label="Primary" className="hidden items-center gap-1 rounded-full border border-ink/10 bg-white/70 p-1 text-sm shadow-sm md:flex">
           {NAV_ITEMS.map((item) => (
             <Link
               key={item.to}
               to={item.to}
-              className="rounded-md px-2.5 py-1.5 font-medium text-muted-foreground transition-colors hover:text-foreground"
+              className="rounded-full px-3 py-1.5 font-medium text-muted-foreground transition-all hover:bg-foam hover:text-foreground"
               activeProps={{
                 className:
-                  "rounded-md px-2.5 py-1.5 font-medium text-foreground border-b-2 border-primary -mb-[2px]",
+                  "rounded-full bg-ink px-3 py-1.5 font-semibold text-white shadow-sm",
               }}
               activeOptions={item.exact ? { exact: true } : undefined}
             >
@@ -251,26 +251,26 @@ function SiteHeader() {
 
 function SiteFooter() {
   return (
-    <footer className="mt-16 border-t border-border/70 bg-card/50">
-      <div className="mx-auto grid max-w-7xl gap-6 px-4 py-8 sm:grid-cols-[1fr_auto] sm:items-start">
+    <footer className="relative mt-20 overflow-hidden border-t border-ink/10 bg-ink text-white">
+      <div className="mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:grid-cols-[1fr_auto] sm:items-start">
         <div>
           <div className="flex items-center gap-2">
             <BrandLogo size={22} showWordmark={false} />
-            <span className="font-display font-semibold text-foreground">
+            <span className="font-display font-semibold text-white">
               Smarter tanks. Happier fish.
             </span>
           </div>
-          <p className="mt-2 max-w-md text-xs text-muted-foreground">
+          <p className="mt-2 max-w-md text-xs leading-relaxed text-white/60">
             A guide, not a guarantee. Always check the needs of each species
             and the rules in your state.
           </p>
         </div>
-        <nav aria-label="Footer" className="flex flex-wrap gap-x-4 gap-y-2 text-xs text-muted-foreground">
-          <Link to="/species" className="hover:text-foreground">Species</Link>
-          <Link to="/guides" className="hover:text-foreground">Guides</Link>
-          <Link to="/blog" className="hover:text-foreground">Blog</Link>
-          <Link to="/shops" className="hover:text-foreground">Shops</Link>
-          <a href="/sitemap.xml" className="hover:text-foreground">Sitemap</a>
+        <nav aria-label="Footer" className="flex flex-wrap gap-x-4 gap-y-2 text-xs text-white/60">
+          <Link to="/species" className="transition-colors hover:text-white">Species</Link>
+          <Link to="/guides" className="transition-colors hover:text-white">Guides</Link>
+          <Link to="/blog" className="transition-colors hover:text-white">Blog</Link>
+          <Link to="/shops" className="transition-colors hover:text-white">Shops</Link>
+          <a href="/sitemap.xml" className="transition-colors hover:text-white">Sitemap</a>
         </nav>
       </div>
     </footer>
