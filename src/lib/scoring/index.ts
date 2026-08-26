@@ -147,10 +147,8 @@ export function scoreTank(state: TankState): Scorecard {
   let capReason: string | null = null;
   if (caps.length > 0) {
     const lowest = caps.reduce((a, b) => (a.cap <= b.cap ? a : b));
-    if (lowest.cap < weighted) {
-      overall = lowest.cap;
-      capReason = lowest.reason;
-    }
+    overall = Math.min(weighted, lowest.cap);
+    capReason = lowest.reason;
   }
 
   return {
