@@ -135,3 +135,44 @@ export async function saveTank(
   if (error) throw error;
   return data as unknown as TankRow;
 }
+
+
+export async function renameTank(id: string, name: string): Promise<TankRow> {
+  const trimmed = name.trim();
+  if (!trimmed) throw new Error("Tank name cannot be empty.");
+
+  const { data, error } = await supabase
+    .from("tanks")
+    .update({ name: trimmed })
+    .eq("id", id)
+    .select("*")
+    .single();
+
+  if (error) throw error;
+  return data as unknown as TankRow;
+}
+
+export async function deleteTank(id: string): Promise<void> {
+  const { error } = await supabase.from("tanks").delete().eq("id", id);
+  if (error) throw error;
+}
+
+export async function duplicateTank(slug: string): Promise<TankRow> {
+  const source = await loadTankBySlug(slug);
+  if (!source) throw new Error("Tank not found.");
+
+  return saveTank({
+    name: `${source.tank.name} copy`,
+    length_cm: source.tank.length_cm,
+    width_cm: source.tank.width_cm,
+    height_cm: source.tank.height_cm,
+    filter: source.filter,
+    maintenance_frequency: source.tank.maintenance_frequency,
+    target_ph: source.tank.target_ph,
+    target_temp_c: source.tank.target_temp_c,
+    plant_density: source.tank.plant_density,
+    species: source.species,
+    plants: source.plants,
+    hardscape: source.hardscape,
+  });
+}
