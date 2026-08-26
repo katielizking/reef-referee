@@ -54,7 +54,7 @@ export function MobileScoreBar({ scorecard }: { scorecard: Scorecard }) {
         <button
           type="button"
           aria-label={`Overall score ${scorecard.overall ?? "not yet available"}. Tap to view full scorecard.`}
-          className={`fixed inset-x-3 bottom-3 z-40 flex items-center justify-between gap-3 rounded-2xl border bg-card px-4 py-3 shadow-lg lg:hidden ${tone.bg}`}
+          className={`fixed inset-x-3 bottom-[calc(env(safe-area-inset-bottom)+0.75rem)] z-40 flex items-center justify-between gap-3 rounded-2xl border bg-card px-4 py-3 shadow-[0_12px_35px_rgba(18,35,46,.18)] shadow-lg lg:hidden ${tone.bg}`}
         >
           <div className="flex items-center gap-3">
             <div
@@ -74,7 +74,7 @@ export function MobileScoreBar({ scorecard }: { scorecard: Scorecard }) {
           <ChevronUp className="h-4 w-4 text-muted-foreground" aria-hidden />
         </button>
       </SheetTrigger>
-      <SheetContent side="bottom" className="h-[85dvh] overflow-y-auto">
+      <SheetContent side="bottom" className="h-[min(85dvh,44rem)] overflow-y-auto rounded-t-[1.5rem] pb-[env(safe-area-inset-bottom)]">
         <SheetHeader>
           <SheetTitle>Scorecard</SheetTitle>
         </SheetHeader>
