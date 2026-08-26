@@ -44,21 +44,27 @@ function PlantMesh({ pos, scale, phase, reduced }: { pos: [number, number, numbe
     ref.current.rotation.z = Math.sin(clock.getElapsedTime() * 0.7 + phase) * 0.04;
   });
   const height = 1.2 * scale;
+  const colours = useMemo(() => {
+    const variation = Math.sin(phase * 3.17) * 0.035;
+    const leaf = new THREE.Color("#4FA060").offsetHSL(variation, 0.04, variation);
+    const stem = new THREE.Color("#347A48").offsetHSL(variation, 0, -0.02);
+    return { leaf, stem };
+  }, [phase]);
   return (
     <group ref={ref} position={pos} scale={scale}>
       {[0, 0.22, -0.22].map((x, i) => (
         <group key={x} position={[x, 0, i === 1 ? 0.08 : 0]}>
           <mesh position={[0, height / 2, 0]}>
             <cylinderGeometry args={[0.035, 0.055, height, 8]} />
-            <meshStandardMaterial color="#347A48" />
+            <meshStandardMaterial color={colours.stem} roughness={0.72} />
           </mesh>
           <mesh position={[0.14, height * 0.55, 0]} rotation={[0, 0, -0.75]} scale={[0.11, 0.32, 0.06]}>
             <sphereGeometry args={[1, 12, 8]} />
-            <meshStandardMaterial color="#4FA060" />
+            <meshPhysicalMaterial color={colours.leaf} roughness={0.58} clearcoat={0.16} clearcoatRoughness={0.4} />
           </mesh>
           <mesh position={[-0.13, height * 0.78, 0]} rotation={[0, 0, 0.8]} scale={[0.11, 0.3, 0.06]}>
             <sphereGeometry args={[1, 12, 8]} />
-            <meshStandardMaterial color="#4FA060" />
+            <meshPhysicalMaterial color={colours.leaf} roughness={0.58} clearcoat={0.16} clearcoatRoughness={0.4} />
           </mesh>
         </group>
       ))}
