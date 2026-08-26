@@ -38,7 +38,6 @@ function UnverifiedFishMarker({
           event.stopPropagation();
           onSelect();
         }}
-        visible={false}
       >
         <boxGeometry args={[1, 1, 1]} />
         <meshBasicMaterial transparent opacity={0} depthWrite={false} />
