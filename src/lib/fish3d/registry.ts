@@ -38,7 +38,7 @@ const REGISTRY: Record<string, FishAssetDefinition> = {
       creator: "aeroplankton",
       sourceUrl: "https://blendswap.com/blend/32414",
       licenseLabel: "CC BY",
-      licenseUrl: "https://creativecommons.org/licenses/by/4.0/",
+      licenseUrl: "https://creativecommons.org/licenses/by/",
     },
     materialProfile: {
       bodyRoughness: 0.42,
