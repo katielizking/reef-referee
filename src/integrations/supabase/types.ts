@@ -195,8 +195,14 @@ export type Database = {
           fin_nipper: boolean
           id: string
           is_schooling: boolean
+          legal_confidence: string
+          legal_import_status: string
           legal_in_australia: boolean
           legal_note: string | null
+          legal_possession_status: string
+          legal_reviewed_on: string | null
+          legal_source_label: string | null
+          legal_source_url: string | null
           legal_status: string
           long_finned: boolean
           min_group_size: number
@@ -220,8 +226,14 @@ export type Database = {
           fin_nipper?: boolean
           id?: string
           is_schooling?: boolean
+          legal_confidence?: string
+          legal_import_status?: string
           legal_in_australia?: boolean
           legal_note?: string | null
+          legal_possession_status?: string
+          legal_reviewed_on?: string | null
+          legal_source_label?: string | null
+          legal_source_url?: string | null
           legal_status?: string
           long_finned?: boolean
           min_group_size?: number
@@ -245,8 +257,14 @@ export type Database = {
           fin_nipper?: boolean
           id?: string
           is_schooling?: boolean
+          legal_confidence?: string
+          legal_import_status?: string
           legal_in_australia?: boolean
           legal_note?: string | null
+          legal_possession_status?: string
+          legal_reviewed_on?: string | null
+          legal_source_label?: string | null
+          legal_source_url?: string | null
           legal_status?: string
           long_finned?: boolean
           min_group_size?: number
