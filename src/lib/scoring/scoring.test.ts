@@ -179,7 +179,7 @@ describe("scoreTank", () => {
     expect(s.capReason).toBeNull();
   });
 
-  it("illegal species caps overall at 30", () => {
+  it("regional catalogue notes never cap the welfare score", () => {
     const s = scoreTank(
       baseState({
         species: [
@@ -188,10 +188,10 @@ describe("scoreTank", () => {
         ],
       }),
     );
-    expect(s.legality.score).toBeLessThanOrEqual(40);
+    expect(s.legality.score).toBe(100);
+    expect(s.legality.illegalSpecies).toEqual([]);
     expect(s.overall).not.toBeNull();
-    expect(s.overall!).toBeLessThanOrEqual(30);
-    expect(s.capReason?.toLowerCase()).toMatch(/legal|illegal|australia/);
+    expect(s.capReason).toBeNull();
   });
 
   it("60 corys overstock the tank and cap at 45", () => {
@@ -219,7 +219,7 @@ describe("scoreTank", () => {
     expect(s.capReason).toBeNull();
   });
 
-  it("native species surfaces nativeNotes without penalising legality", () => {
+  it("native species does not receive a regional scoring penalty", () => {
     const nativeFish = mkSpecies({
       id: "native",
       common_name: "Pacific Blue Eye",
@@ -238,14 +238,14 @@ describe("scoreTank", () => {
         species: [{ species: nativeFish, quantity: 6 }],
       }),
     );
-    expect(s.legality.nativeNotes).toContain("Australian native - check state permit rules.");
+    expect(s.legality.nativeNotes).toEqual([]);
     expect(s.legality.score).toBe(100);
     expect(s.legality.illegalSpecies).toEqual([]);
     expect(s.capReason).toBeNull();
   });
 
 
-  it("prioritises prohibited livestock above every other problem", () => {
+  it("prioritises welfare risks over regional catalogue notes", () => {
     const s = scoreTank(
       baseState({
         species: [
@@ -256,8 +256,8 @@ describe("scoreTank", () => {
       }),
     );
     expect(s.priorityAction?.severity).toBe("critical");
-    expect(s.priorityAction?.category).toBe("legality");
-    expect(s.priorityAction?.action).toMatch(/Banned Cichlid/);
+    expect(s.priorityAction?.category).toBe("compatibility");
+    expect(s.priorityAction?.action).toMatch(/predator|separate/i);
   });
 
   it("prioritises predation when legality is clear", () => {
