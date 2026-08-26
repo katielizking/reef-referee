@@ -48,7 +48,7 @@ const REGISTRY: Record<string, FishAssetDefinition> = {
       finOpacity: 0.8,
       eyeClearcoat: 0.45,
     },
-  },,
+  },
   [BETTA_FALLBACK_KEY]: {
     speciesId: BETTA_FALLBACK_KEY,
     commonName: "Betta",
