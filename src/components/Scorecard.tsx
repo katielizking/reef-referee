@@ -121,10 +121,11 @@ interface SubCardProps {
   weightPct: number;
   reasons: string[];
   fixes: string[];
+  calculation: string;
   extra?: React.ReactNode;
 }
 
-function SubCard({ title, score, weightPct, reasons, fixes, extra }: SubCardProps) {
+function SubCard({ title, score, weightPct, reasons, fixes, calculation, extra }: SubCardProps) {
   const [open, setOpen] = useState(false);
   const hasFixes = fixes.length > 0;
   return (
@@ -169,6 +170,14 @@ function SubCard({ title, score, weightPct, reasons, fixes, extra }: SubCardProp
           ))}
         </ul>
       )}
+      <details className="mt-3 border-t border-border/70 pt-2">
+        <summary className="cursor-pointer text-xs font-medium text-muted-foreground">
+          How this is calculated
+        </summary>
+        <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
+          {calculation}
+        </p>
+      </details>
     </div>
   );
 }
@@ -242,6 +251,28 @@ export function ScorecardPanel({ scorecard }: { scorecard: Scorecard }) {
         )}
       </div>
 
+      {s.priorityAction && (
+        <div
+          className={`rounded-2xl border p-4 ${
+            s.priorityAction.severity === "critical"
+              ? "border-coral/40 bg-coral/10"
+              : s.priorityAction.severity === "high"
+                ? "border-warn/40 bg-warn/10"
+                : "border-primary/30 bg-primary/5"
+          }`}
+        >
+          <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+            Do this first · {s.priorityAction.category}
+          </p>
+          <p className="mt-1 font-display text-base font-semibold text-foreground">
+            {s.priorityAction.title}
+          </p>
+          <p className="mt-1 text-sm text-foreground/80">
+            {s.priorityAction.action}
+          </p>
+        </div>
+      )}
+
       {s.legality.illegalSpecies.length > 0 && (
         <div className="rounded-2xl border border-coral/40 bg-coral/10 p-4">
           <div className="flex items-start gap-2">
@@ -276,6 +307,7 @@ export function ScorecardPanel({ scorecard }: { scorecard: Scorecard }) {
         weightPct={25}
         reasons={s.compatibility.reasons}
         fixes={s.compatibility.fixes}
+        calculation="Checks schooling minimums and every species pair for temperament clashes, fin-nipping, predation, and overlapping pH and temperature ranges."
       />
       <SubCard
         title="Bioload"
@@ -283,6 +315,7 @@ export function ScorecardPanel({ scorecard }: { scorecard: Scorecard }) {
         weightPct={20}
         reasons={s.bioload.reasons}
         fixes={s.bioload.fixes}
+        calculation="Compares livestock waste load with usable capacity based on tank volume, filter turnover, planting and maintenance frequency. A 70–85% load keeps a healthy buffer."
         extra={
           <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
             {s.bioload.loadPercent}% load
@@ -295,6 +328,7 @@ export function ScorecardPanel({ scorecard }: { scorecard: Scorecard }) {
         weightPct={20}
         reasons={s.space.reasons}
         fixes={s.space.fixes}
+        calculation="Compares each species’ minimum tank volume and adult swimming-length requirement with this tank’s volume and length."
       />
       <SubCard
         title="Biome replication"
@@ -302,6 +336,7 @@ export function ScorecardPanel({ scorecard }: { scorecard: Scorecard }) {
         weightPct={25}
         reasons={s.biome.reasons}
         fixes={s.biome.fixes}
+        calculation="Combines species-region cohesion (45%), water authenticity (25%), matching hardscape (15%) and matching plants (15%)."
         extra={
           s.biome.dominantRegion ? (
             <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
@@ -316,6 +351,7 @@ export function ScorecardPanel({ scorecard }: { scorecard: Scorecard }) {
         weightPct={10}
         reasons={s.legality.reasons}
         fixes={s.legality.fixes}
+        calculation="Checks the catalogue’s Australian status for every selected species. A prohibited species sharply lowers and caps the overall score."
       />
     </div>
   );
