@@ -1,0 +1,40 @@
+name: Inspect authored betta
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - assets/3d/source/betta-bluemesh/**
+      - assets/3d/source/betta-bluemesh.asset.json
+      - tools/blender/inspect_authored_gltf.py
+      - .github/workflows/inspect-authored-betta.yml
+
+permissions:
+  contents: read
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Blender renderer
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y blender python3-numpy libegl1 libgl1-mesa-dri
+      - name: Inspect source and render previews
+        run: |
+          blender --background --python tools/blender/inspect_authored_gltf.py -- \
+            assets/3d/source/betta-bluemesh/scene.gltf generated/authored-betta-review
+          test -s generated/authored-betta-review/inspection.json
+          test -s generated/authored-betta-review/side.png
+          test -s generated/authored-betta-review/three-quarter.png
+          test -s generated/authored-betta-review/top.png
+      - name: Upload inspection package
+        uses: actions/upload-artifact@v4
+        with:
+          name: authored-betta-inspection
+          path: generated/authored-betta-review/
+          if-no-files-found: error
+          retention-days: 14
