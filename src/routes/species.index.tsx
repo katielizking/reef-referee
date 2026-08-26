@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { Loader2, Search } from "lucide-react";
 import { useSpecies } from "@/lib/data";
+import { SpeciesPortrait } from "@/components/SpeciesPortrait";
 import { BIOTOPE_LABEL, type BiotopeRegion, type Temperament } from "@/lib/types";
 
 export const Route = createFileRoute("/species/")({
@@ -50,15 +51,19 @@ function SpeciesIndex() {
   }, [data, q, region, legal, temperament, size]);
 
   return (
-    <main className="mx-auto max-w-6xl px-4 py-8">
-      <h1 className="font-display text-3xl font-bold text-foreground sm:text-4xl">
-        Freshwater fish species
-      </h1>
-      <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-        Browse care needs, biotope and Australian legality for {data?.length ?? 0} species. Tap a card for the full guide, or add it to your tank from there.
-      </p>
+    <main className="mx-auto max-w-7xl px-4 py-8 md:py-12">
+      <header className="hero-grid fishtankr-panel relative overflow-hidden rounded-[2rem] px-6 py-10 sm:px-10 sm:py-14">
+        <span className="science-label text-primary">Field guide · freshwater</span>
+        <h1 className="mt-5 max-w-3xl font-display text-4xl font-bold leading-[.98] tracking-[-.045em] text-ink sm:text-6xl">
+          Meet the fish,<br />before you bring them home.
+        </h1>
+        <p className="mt-5 max-w-2xl text-base leading-relaxed text-muted-foreground">
+          Explore {data?.length ?? 0} species through real, research-grade observations—then compare their care, behaviour, habitat and Australian legality.
+        </p>
+        <div className="absolute -bottom-16 -right-12 h-52 w-52 rounded-full border-[34px] border-blue/10" aria-hidden />
+      </header>
 
-      <div className="mt-6 space-y-3 rounded-2xl border bg-card p-3 sm:p-4">
+      <div className="fishtankr-panel sticky top-[72px] z-20 mt-6 space-y-3 rounded-[1.5rem] p-3 sm:p-4">
         <div className="relative">
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" aria-hidden />
           <input
@@ -106,14 +111,21 @@ function SpeciesIndex() {
           No species match those filters.
         </p>
       ) : (
-        <ul className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <ul className="mt-7 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {results.map((s) => (
             <li key={s.id}>
               <Link
                 to="/species/$id"
                 params={{ id: s.id }}
-                className="block h-full rounded-2xl border bg-card p-4 transition-colors hover:border-primary/50"
+                className="depth-card group block h-full overflow-hidden rounded-[1.5rem] border bg-card transition hover:border-primary/60"
               >
+                <SpeciesPortrait
+                  commonName={s.common_name}
+                  scientificName={s.scientific_name}
+                  compact
+                  className="aspect-[4/3] border-b border-ink/10"
+                />
+                <div className="p-4">
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0">
                     <p className="font-display font-semibold text-foreground">{s.common_name}</p>
@@ -127,9 +139,12 @@ function SpeciesIndex() {
                   )}
                 </div>
                 <p className="mt-2 text-xs text-muted-foreground">{BIOTOPE_LABEL[s.biotope_region]}</p>
-                <p className="mt-1 text-xs text-muted-foreground">
-                  {s.adult_size_cm} cm · {s.temperament} · {s.swim_zone} · min {s.min_tank_litres} L
+                <p className="mt-3 flex flex-wrap gap-1.5 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                  <span className="rounded-full bg-muted px-2 py-1">{s.adult_size_cm} cm</span>
+                  <span className="rounded-full bg-muted px-2 py-1">{s.temperament}</span>
+                  <span className="rounded-full bg-muted px-2 py-1">min {s.min_tank_litres} L</span>
                 </p>
+                </div>
               </Link>
             </li>
           ))}
