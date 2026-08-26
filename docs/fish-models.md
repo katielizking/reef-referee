@@ -1,91 +1,114 @@
-# Fish model pipeline
+# Verified 3D asset pipeline
 
-FishTankr renders every fish through `FishRenderer`, which dispatches to
-either the procedural body (`ProceduralFish`) or a rigged GLB
-(`GltfFish`). The procedural path is always the fallback — a species
-without a registry entry, an entry without a resolvable model URL, a
-Suspense load failure, a decoder error, or a mid-flight WebGL context loss
-all end up rendering the procedural fish.
+FishTankr only presents an animal or plant as a 3D likeness when the asset is
+verified for that exact taxon. Generic geometry, colour inference and
+lookalike substitution are not acceptable.
 
-This document is a checklist for adding a new photorealistic species. Do
-not commit an asset that does not tick every box below.
+## What Blender does
 
-## 1. Registry entry
+The repository includes `tools/blender/process_asset.py`. It:
 
-Add a `FishAssetDefinition` to `src/lib/fish3d/registry.ts` keyed by the
-species' Supabase `id`. Empty `models` is a valid staging state.
+- imports GLB, GLTF, FBX or OBJ;
+- rejects missing attribution or unsupported licences;
+- combines mesh parts into a web-ready body;
+- centres the asset and applies transforms;
+- scales fish from the recorded adult length;
+- reduces excessive triangle counts;
+- preserves textures, materials, skins and existing animations;
+- embeds source, creator, licence and scientific-name metadata;
+- exports a self-contained GLB.
 
-## 2. Asset requirements
+Blender does not create reliable species anatomy from a name. Every input mesh
+must already be an accurate likeness.
 
-- **Format**: `.glb` (binary glTF 2.0). No `.gltf` + external buffers.
-- **Orientation**: `+X` forward, `+Y` up, origin at centre of mass.
-- **Scale**: 1 model unit = 1 cm. Record the nose-to-caudal-tip length in
-  `modelReferenceLengthCm`.
-- **Rig**: single armature named `Armature`. Skinned mesh named `Body`.
-  Bones: `spine.001`–`spine.NNN`, `tail`, `pec.L`, `pec.R`, `dorsal`,
-  `anal` (as applicable to the species).
-- **Clips** (subset per species — mapping falls back down the chain):
-  - `Idle` (looping)
-  - `Cruise` (looping)
-  - `FastSwim` (looping)
-  - `Dart` (one-shot)
-  - `TurnL`, `TurnR` (one-shot)
-  - `Forage`, `Surface`, `Hover`, `Display` (optional)
-- **Materials**: PBR only. `KHR_materials_pbrSpecularGlossiness` is
-  disallowed. Split materials: `body`, `fins` (alpha blend), `eye`
-  (clearcoat). No embedded scripts.
-- **Textures**: 512² base colour + 512² normal, converted to KTX2/Basis
-  after optimisation. Fins use an alpha mask.
-- **Licence**: CC0, CC-BY (with attribution recorded here), or original
-  commissioned work. No scraped assets.
-- **Validation**: passes `gltf-validator`. Medium-LOD target < 250 KB.
+## Accepted licences
 
-## 3. Naming
+- CC0 1.0
+- CC BY 4.0
+- CC BY-SA 4.0
+- original work owned by the project
 
-- Folder: `public/models/fish/<species-id>/`
-- Files: `<species-id>.<lod>.glb` where `<lod> ∈ high | medium | low`
-- External textures (if any): `<species-id>_<map>.ktx2`
-- Clip names: PascalCase (`Idle`, `Cruise`, `FastSwim`, `Dart`, `TurnL`,
-  `TurnR`, `Forage`, `Surface`, `Hover`, `Display`).
-- Mesh nodes: `Body`, `Fin_Dorsal`, `Fin_Anal`, `Fin_Pec_L`, `Fin_Pec_R`,
-  `Fin_Caudal`.
-- Bones: `spine.NNN`, `tail`, `pec.L/R`, etc.
+Do not use marketplace assets merely labelled “free”. The source page must
+state the licence and creator.
 
-## 4. Optimisation pipeline
+## Preparing a source asset
 
-Run per asset, locally, before committing:
+1. Put the source file under `assets/3d/source/`.
+2. Copy `assets/3d/source/example.asset.json` beside it.
+3. Record the accepted scientific name, source page, creator and licence.
+4. For fish, record adult total length in centimetres.
+5. Author fish facing `+X`, with the dorsal side up.
+6. Confirm the likeness against at least two reliable reference images.
 
-```text
-Blender (author, decimate, bake) → export GLB
-  → gltf-transform prune --keep-attributes false
-  → gltf-transform dedup
-  → gltf-transform weld
-  → gltf-transform meshopt --level medium
-  → gltf-transform resize --width 512 --height 512
-  → gltf-transform ktx2 --mode etc1s
-  → gltf-transform inspect
-  → gltf-validator
+Example:
+
+```json
+{
+  "asset_id": "betta-splendens",
+  "common_name": "Betta",
+  "scientific_name": "Betta splendens",
+  "adult_length_cm": 6,
+  "source_url": "https://example.com/source-model",
+  "creator": "Creator name",
+  "license": "CC-BY-4.0",
+  "notes": "Validated against adult male veil-tail references."
+}
 ```
 
-Meshopt is preferred for skinned fish; Draco is fine for static hardscape.
+## Running through GitHub
 
-## 5. Hosting
+Open **Actions → Process 3D asset → Run workflow** and provide:
 
-- Files ≤ 200 KB → commit under `public/models/fish/<species-id>/`.
-- Files > 200 KB → upload via `lovable-assets` and reference the `.asset.json`
-  URL from the registry entry.
+- the source path;
+- the metadata sidecar path;
+- a plain `.glb` output filename;
+- fish or plant;
+- a triangle target (45,000 is the default).
 
-## 6. Licence log
+The job is deliberately read-only. It uploads the processed GLB as a GitHub
+Actions artifact for review and retains it for 14 days. Approved assets can
+then be committed under:
 
-| Species | Source | Author | Licence | Notes |
-| --- | --- | --- | --- | --- |
-| _none yet_ | | | | |
+- `public/models/fish/<species-id>/`
+- `public/models/plants/<species-id>/`
 
-## 7. Anti-checklist
+This avoids an unreviewed model or licence error automatically reaching
+Lovable.
 
-- Never remove the procedural renderer.
-- Never mix total-length and standard-length measurements in one entry.
-- Never bake root translation into a clip (breaks movement math).
-- Never hard-code species assets outside `src/lib/fish3d/registry.ts`.
-- Never publish an entry with `renderMode: 'gltf'` and a live model URL
-  before the file has passed `gltf-validator` and the licence log is updated.
+## Runtime requirements
+
+Fish models:
+
+- exact species, morph/sex identified where visually important;
+- `+X` forward;
+- measured nose-to-caudal total length;
+- PBR materials;
+- translucent fins where appropriate;
+- preferably a single armature;
+- animation clips named `Idle`, `Cruise`, `FastSwim`, `Dart`,
+  `TurnL`, `TurnR`, plus optional behaviour clips.
+
+Plant models:
+
+- exact species or clearly identified cultivar;
+- roots/rhizome represented correctly;
+- leaves match real arrangement, width and growth habit;
+- pivot at attachment/substrate point;
+- optional subtle sway animation.
+
+## Validation gate
+
+Before registration, confirm:
+
+- scientific identity;
+- licence and attribution;
+- silhouette and markings;
+- adult scale;
+- correct orientation and pivot;
+- acceptable textures and alpha;
+- animation has no root translation;
+- mobile performance;
+- GLB opens without external dependencies.
+
+Only after those checks should the asset be added to
+`src/lib/fish3d/registry.ts`.
