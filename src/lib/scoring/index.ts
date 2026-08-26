@@ -78,7 +78,7 @@ export function scoreTank(state: TankState): Scorecard {
   if (legality.illegalSpecies.length > 0) {
     caps.push({
       cap: 30,
-      reason: "Score capped: the catalogue flags a prohibited or restricted species.",
+      reason: "Score capped: the catalogue flags an Australian legality concern.",
     });
   }
   if (bioload.loadPercent > 110) {
