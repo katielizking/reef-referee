@@ -12,10 +12,10 @@ export const Route = createFileRoute("/species/")({
       {
         name: "description",
         content:
-          "Browse freshwater aquarium species with care parameters, biotope and Australian legality. Filter by region, temperament and adult size.",
+          "Browse freshwater aquarium species with care parameters, biotope and regional availability notes. Filter by region, temperament and adult size.",
       },
       { property: "og:title", content: "Freshwater fish species — FishTankr" },
-      { property: "og:description", content: "Care parameters, biotope and Australian legality for popular freshwater aquarium species." },
+      { property: "og:description", content: "Care parameters, biotope and regional availability notes for popular freshwater aquarium species." },
       { property: "og:url", content: "/species" },
     ],
     links: [{ rel: "canonical", href: "/species" }],
@@ -58,7 +58,7 @@ function SpeciesIndex() {
           Meet the fish,<br />before you bring them home.
         </h1>
         <p className="mt-5 max-w-2xl text-base leading-relaxed text-muted-foreground">
-          Explore {data?.length ?? 0} species through real, research-grade observations—then compare their care, behaviour, habitat and Australian legality.
+          Explore {data?.length ?? 0} species through real, research-grade observations—then compare their care, behaviour, habitat and regional care notes.
         </p>
         <div className="absolute -bottom-16 -right-12 h-52 w-52 rounded-full border-[34px] border-blue/10" aria-hidden />
       </header>
@@ -82,11 +82,11 @@ function SpeciesIndex() {
           ["australian_native", BIOTOPE_LABEL.australian_native],
           ["unmapped", BIOTOPE_LABEL.unmapped],
         ]} />
-        <Filter label="Legality" value={legal} onChange={setLegal} options={[
+        <Filter label="Australia reference" value={legal} onChange={setLegal} options={[
           ["all", "All"],
-          ["permitted", "Permitted"],
+          ["permitted", "Listed"],
           ["native", "Native"],
-          ["prohibited", "Prohibited"],
+          ["prohibited", "Restricted"],
         ]} />
         <Filter label="Temperament" value={temperament} onChange={setTemperament} options={[
           ["all", "All"],
