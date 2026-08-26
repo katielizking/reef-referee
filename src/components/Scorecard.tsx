@@ -278,9 +278,9 @@ export function ScorecardPanel({ scorecard }: { scorecard: Scorecard }) {
           <div className="flex items-start gap-2">
             <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-coral" aria-hidden />
             <div>
-              <p className="text-sm font-semibold text-foreground">Not legal in Australia</p>
+              <p className="text-sm font-semibold text-foreground">Prohibited or restricted</p>
               <p className="mt-1 text-sm text-foreground/80">
-                {s.legality.illegalSpecies.join(", ")} cannot be legally imported or kept.
+                {s.legality.illegalSpecies.join(", ")} are flagged in the catalogue. Check the species evidence and your state or territory rules.
               </p>
             </div>
           </div>
