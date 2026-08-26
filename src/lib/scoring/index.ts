@@ -29,11 +29,12 @@ export interface Scorecard {
 }
 
 export const WEIGHTS = {
-  compatibility: 0.25,
-  bioload: 0.2,
-  space: 0.2,
-  biome: 0.25,
-  legality: 0.1,
+  compatibility: 0.28,
+  bioload: 0.22,
+  space: 0.22,
+  biome: 0.28,
+  // Local rules are informational: there is no single global legal status.
+  legality: 0,
 } as const;
 
 export function litresOf(state: Pick<TankState, "length_cm" | "width_cm" | "height_cm">) {
@@ -75,12 +76,6 @@ export function scoreTank(state: TankState): Scorecard {
   );
 
   const caps: Array<{ cap: number; reason: string }> = [];
-  if (legality.illegalSpecies.length > 0) {
-    caps.push({
-      cap: 30,
-      reason: "Score capped: the catalogue flags an Australian legality concern.",
-    });
-  }
   if (bioload.loadPercent > 110) {
     caps.push({
       cap: 45,
@@ -133,16 +128,6 @@ function choosePriorityAction(
     "compatibility" | "bioload" | "space" | "biome" | "legality"
   >,
 ): PriorityAction | null {
-  if (scores.legality.illegalSpecies.length > 0) {
-    const names = scores.legality.illegalSpecies.join(", ");
-    return {
-      severity: "critical",
-      category: "legality",
-      title: "Resolve the legality flag first",
-      action: `Remove ${names} and choose a permitted alternative, or verify the current rule with your jurisdiction before stocking.`,
-    };
-  }
-
   if (scores.compatibility.criticalConflicts.length > 0) {
     return {
       severity: "critical",
