@@ -81,7 +81,7 @@ export default function TankScene({
   }
 
   return (
-    <div className="relative h-[480px] w-full overflow-hidden rounded-3xl border bg-gradient-to-b from-[#e8f4f6] to-[#c9e5eb]">
+    <div className="relative h-[430px] w-full overflow-hidden rounded-[1.45rem] border border-white/20 bg-gradient-to-b from-[#e8f4f6] to-[#c9e5eb] sm:h-[540px] xl:h-[620px]">
       <Canvas
         shadows={richEffects}
         dpr={[1, quality === "high" ? 2 : 1.5]}
