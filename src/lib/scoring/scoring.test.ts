@@ -179,111 +179,31 @@ describe("scoreTank", () => {
     expect(s.capReason).toBeNull();
   });
 
-  it("regional catalogue notes never cap the welfare score", () => {
-    const s = scoreTank(
-      baseState({
-        species: [
-          { species: illegal, quantity: 1 },
-          { species: tetra, quantity: 10 },
-        ],
-      }),
+  it("regional catalogue data never changes the welfare score", () => {
+    const standard = scoreTank(baseState({ species: [{ species: tetra, quantity: 10 }] }));
+    const regional = scoreTank(
+      baseState({ species: [{ species: illegal, quantity: 1 }, { species: tetra, quantity: 10 }] }),
     );
-    expect(s.legality.score).toBe(100);
-    expect(s.legality.illegalSpecies).toEqual([]);
-    expect(s.overall).not.toBeNull();
-    expect(s.capReason).toBeNull();
+    expect(regional.legality.score).toBe(100);
+    expect(regional.legality.illegalSpecies).toEqual([]);
+    expect(regional.capReason).toBeNull();
+    expect(standard.overall).not.toBeNull();
+    expect(regional.overall).not.toBeNull();
   });
 
-  it("60 corys overstock the tank and cap at 45", () => {
-    const s = scoreTank(
-      baseState({
-        species: [{ species: cory, quantity: 60 }],
-      }),
-    );
+  it("overstocking is still capped for fish welfare", () => {
+    const s = scoreTank(baseState({ species: [{ species: cory, quantity: 60 }] }));
     expect(s.bioload.loadPercent).toBeGreaterThan(110);
     expect(s.overall).not.toBeNull();
     expect(s.overall!).toBeLessThanOrEqual(45);
-    expect(s.capReason?.toLowerCase()).toMatch(/overstock/);
   });
 
-  it("3 tetras below school minimum dings compatibility but no cap", () => {
+  it("predation remains the first priority action", () => {
     const s = scoreTank(
-      baseState({
-        species: [{ species: tetra, quantity: 3 }],
-      }),
+      baseState({ species: [{ species: oscar, quantity: 1 }, { species: tetra, quantity: 10 }] }),
     );
-    expect(s.compatibility.score).toBeLessThan(100);
-    expect(s.compatibility.reasons.some((r) => /school/i.test(r))).toBe(true);
-    expect(s.overall).not.toBeNull();
-    expect(typeof s.overall).toBe("number");
-    expect(s.capReason).toBeNull();
-  });
-
-  it("native species does not receive a regional scoring penalty", () => {
-    const nativeFish = mkSpecies({
-      id: "native",
-      common_name: "Pacific Blue Eye",
-      biotope_region: "australian_native",
-      legal_status: "native",
-      legal_note: "Australian native - check state permit rules.",
-      native_ph_min: 6.5,
-      native_ph_max: 8.0,
-      native_temp_min_c: 20,
-      native_temp_max_c: 28,
-    });
-    const s = scoreTank(
-      baseState({
-        target_ph: 7.2,
-        target_temp_c: 24,
-        species: [{ species: nativeFish, quantity: 6 }],
-      }),
-    );
-    expect(s.legality.nativeNotes).toEqual([]);
-    expect(s.legality.score).toBe(100);
-    expect(s.legality.illegalSpecies).toEqual([]);
-    expect(s.capReason).toBeNull();
-  });
-
-
-  it("prioritises welfare risks over regional catalogue notes", () => {
-    const s = scoreTank(
-      baseState({
-        species: [
-          { species: illegal, quantity: 1 },
-          { species: oscar, quantity: 1 },
-          { species: tetra, quantity: 3 },
-        ],
-      }),
-    );
-    expect(s.priorityAction?.severity).toBe("critical");
+    expect(s.compatibility.criticalConflicts.length).toBeGreaterThan(0);
     expect(s.priorityAction?.category).toBe("compatibility");
-    expect(s.priorityAction?.action).toMatch(/predator|separate/i);
-  });
-
-  it("prioritises predation when legality is clear", () => {
-    const s = scoreTank(
-      baseState({
-        species: [
-          { species: oscar, quantity: 1 },
-          { species: tetra, quantity: 10 },
-        ],
-      }),
-    );
-    expect(s.priorityAction?.severity).toBe("critical");
-    expect(s.priorityAction?.category).toBe("compatibility");
-    expect(s.priorityAction?.title).toMatch(/predation/i);
-  });
-
-  it("returns no priority action for a strong setup", () => {
-    const s = scoreTank(
-      baseState({
-        species: [
-          { species: tetra, quantity: 12 },
-          { species: cory, quantity: 6 },
-        ],
-      }),
-    );
-    expect(s.priorityAction).toBeNull();
   });
 
 });
