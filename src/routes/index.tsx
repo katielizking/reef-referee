@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { Loader2, Save, Share2, X } from "lucide-react";
+import { Fish, Loader2, Ruler, Save, Share2, Waves, X } from "lucide-react";
 import { toast } from "sonner";
 
 import { TankSetupPanel } from "@/components/TankSetupPanel";
@@ -277,7 +277,7 @@ function Builder() {
   }
 
   return (
-    <main className="mx-auto max-w-7xl px-4 py-6 pb-24 lg:pb-6">
+    <main className="mx-auto max-w-[1500px] px-4 py-6 pb-24 lg:pb-6">
       {showHero && (
         <section className="hero-grid fishtankr-panel relative mb-10 grid min-h-[430px] gap-8 overflow-hidden rounded-[2rem] p-6 sm:p-10 lg:grid-cols-[minmax(0,1.08fr)_minmax(360px,.92fr)] lg:items-center lg:p-12">
           <button
@@ -356,8 +356,8 @@ function Builder() {
       ) : (
         <>
           <BuilderSteps state={state} onJump={jumpToStep} />
-          <div className="grid gap-6 lg:grid-cols-[minmax(0,320px)_minmax(0,1fr)_minmax(0,340px)]">
-            <div className="fishtankr-panel rounded-[1.75rem] p-3 sm:p-4">
+          <div className="grid items-start gap-5 xl:grid-cols-[minmax(280px,320px)_minmax(520px,1fr)_minmax(300px,340px)]">
+            <aside className="fishtankr-panel rounded-[1.75rem] p-3 sm:p-4 xl:sticky xl:top-24">
               <TankSetupPanel
                 state={state}
                 setState={setState}
@@ -368,9 +368,27 @@ function Builder() {
                 openSteps={openSteps}
                 setOpenSteps={setOpenSteps}
               />
-            </div>
+            </aside>
           <div className="space-y-4">
-            <div className="relative">
+            <section className="overflow-hidden rounded-[2rem] border border-ink/15 bg-ink p-2 shadow-[0_28px_70px_rgba(18,35,46,.18)] sm:p-3">
+              <header className="flex flex-wrap items-center justify-between gap-3 px-2 pb-3 pt-1 text-white sm:px-3">
+                <div>
+                  <p className="science-label text-blue">Live aquarium</p>
+                  <p className="mt-1 font-display text-sm font-semibold">{state.name}</p>
+                </div>
+                <div className="flex flex-wrap gap-1.5 text-[10px] font-semibold uppercase tracking-wide text-white/65">
+                  <span className="inline-flex items-center gap-1 rounded-full bg-white/10 px-2.5 py-1.5">
+                    <Ruler className="h-3 w-3 text-blue" /> {state.length_cm} × {state.width_cm} × {state.height_cm} cm
+                  </span>
+                  <span className="inline-flex items-center gap-1 rounded-full bg-white/10 px-2.5 py-1.5">
+                    <Waves className="h-3 w-3 text-blue" /> {Math.round((state.length_cm * state.width_cm * state.height_cm) / 1000)} L
+                  </span>
+                  <span className="inline-flex items-center gap-1 rounded-full bg-white/10 px-2.5 py-1.5">
+                    <Fish className="h-3 w-3 text-lime" /> {state.species.reduce((total, row) => total + row.quantity, 0)} fish
+                  </span>
+                </div>
+              </header>
+              <div className="relative">
               <ClientOnlyTankScene
                 state={state}
                 setState={setState}
@@ -392,7 +410,8 @@ function Builder() {
                   history.commit();
                 }}
               />
-            </div>
+              </div>
+            </section>
 
             {selected ? (
               <SelectedObjectPanel
@@ -414,7 +433,7 @@ function Builder() {
             )}
           </div>
 
-          <div className="space-y-4 lg:sticky lg:top-20 lg:self-start">
+          <aside className="space-y-4 xl:sticky xl:top-24 xl:self-start">
             <PreStockChecklist
               scorecard={scorecard}
               state={state}
@@ -423,7 +442,7 @@ function Builder() {
               onConfirmSave={() => gate.confirm(doSave)}
             />
             <ScorecardPanel scorecard={scorecard} />
-          </div>
+          </aside>
         </div>
         </>
       )}
