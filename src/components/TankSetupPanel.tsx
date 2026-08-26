@@ -1,5 +1,5 @@
 import { useMemo, useRef, useState } from "react";
-import { Search, Plus, Minus, X, Info, AlertTriangle, Fish, Sprout } from "lucide-react";
+import { Search, Plus, Minus, X, Info, Fish, Sprout } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import type { Filter, Hardscape, MaintenanceFrequency, Plant, PlantDensity, Species, TankState } from "@/lib/types";
 import { BIOTOPE_LABEL } from "@/lib/types";
@@ -316,25 +316,22 @@ function SpeciesAdder({
 }) {
   const [q, setQ] = useState("");
   const [showResults, setShowResults] = useState(false);
-  const [legalFilter, setLegalFilter] = useState<"all" | "permitted" | "native" | "prohibited">("all");
   const containerRef = useRef<HTMLDivElement>(null);
   useOutsideClick(containerRef, () => setShowResults(false), showResults);
 
   const results = useMemo(() => {
     const term = q.trim().toLowerCase();
-    const base = legalFilter === "all" ? species : species.filter((s) => s.legal_status === legalFilter);
-    if (!term) return base.slice(0, 8);
-    return base
+    if (!term) return species.slice(0, 8);
+    return species
       .filter(
         (s) =>
           s.common_name.toLowerCase().includes(term) ||
           s.scientific_name.toLowerCase().includes(term),
       )
       .slice(0, 12);
-  }, [q, species, legalFilter]);
+  }, [q, species]);
 
   function add(sp: Species) {
-    if (sp.legal_status === "prohibited") return;
     setState((s) => {
       const existing = s.species.find((x) => x.species.id === sp.id);
       if (existing) {
@@ -357,34 +354,6 @@ function SpeciesAdder({
   return (
     <section className="space-y-2">
       <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Fish</h3>
-      <div className="flex flex-wrap gap-1.5">
-        {([
-          ["all", "All"],
-          ["permitted", "Permitted"],
-          ["native", "Natives"],
-          ["prohibited", "Prohibited"],
-        ] as const).map(([key, label]) => (
-          <button
-            key={key}
-            type="button"
-            aria-pressed={legalFilter === key}
-            onClick={() => setLegalFilter(key)}
-            className={`rounded-full border px-2.5 py-0.5 text-xs transition ${
-              legalFilter === key
-                ? "border-primary bg-primary text-primary-foreground"
-                : "bg-background text-muted-foreground hover:bg-muted"
-            }`}
-          >
-            {label}
-          </button>
-        ))}
-      </div>
-      {legalFilter === "prohibited" && (
-        <p className="flex items-start gap-1.5 rounded-lg bg-coral/10 px-2.5 py-1.5 text-xs font-medium text-foreground">
-          <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-coral" aria-hidden />
-          <span>These species can't legally be kept in Australia. Browse for reference only.</span>
-        </p>
-      )}
       <div className="relative" ref={containerRef}>
         <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" aria-hidden />
         <input
@@ -403,71 +372,38 @@ function SpeciesAdder({
             {results.length === 0 && (
               <div className="p-3 text-sm text-muted-foreground">No species match.</div>
             )}
-            {results.map((sp) => {
-              const prohibited = sp.legal_status === "prohibited";
-              return (
-                <div
-                  key={sp.id}
-                  className="flex w-full items-start justify-between gap-2 border-b p-3 text-left last:border-b-0 hover:bg-muted"
+            {results.map((sp) => (
+              <div
+                key={sp.id}
+                className="flex w-full items-start justify-between gap-2 border-b p-3 text-left last:border-b-0 hover:bg-muted"
+              >
+                <button
+                  type="button"
+                  className="flex flex-1 items-start gap-2 text-left"
+                  onClick={() => add(sp)}
+                  aria-label={`Add ${sp.common_name} to tank`}
                 >
-                  {prohibited ? (
-                    <Link
-                      to="/species/$id"
-                      params={{ id: sp.id }}
-                      onClick={() => setShowResults(false)}
-                      className="flex flex-1 items-start gap-2 text-left"
-                    >
-                      <div className="flex-1">
-                        <div className="text-sm font-medium">
-                          {sp.common_name}
-                          <span className="ml-2 rounded bg-coral/20 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-foreground">
-                            Prohibited
-                          </span>
-                        </div>
-                        <div className="text-xs text-muted-foreground">
-                          {sp.scientific_name} · view guide
-                        </div>
-                      </div>
-                      <Info className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" aria-hidden />
-                    </Link>
-                  ) : (
-                    <button
-                      type="button"
-                      className="flex flex-1 items-start gap-2 text-left"
-                      onClick={() => add(sp)}
-                      aria-label={`Add ${sp.common_name} to tank`}
-                    >
-                      <div className="flex-1">
-                        <div className="text-sm font-medium">
-                          {sp.common_name}
-                          {!sp.legal_in_australia && (
-                            <span className="ml-2 rounded bg-coral/20 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-foreground">
-                              Not AU legal
-                            </span>
-                          )}
-                        </div>
-                        <div className="text-xs text-muted-foreground">
-                          {sp.scientific_name} · {BIOTOPE_LABEL[sp.biotope_region]}
-                        </div>
-                      </div>
-                      <Plus className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden />
-                    </button>
-                  )}
-                  <Link
-                    to="/species/$id"
-                    params={{ id: sp.id }}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={(e) => e.stopPropagation()}
-                    aria-label={`View guide for ${sp.common_name}`}
-                    className="rounded-lg p-1.5 text-muted-foreground hover:bg-background hover:text-foreground"
-                  >
-                    <Info className="h-4 w-4" aria-hidden />
-                  </Link>
-                </div>
-              );
-            })}
-          </div>
+                  <div className="flex-1">
+                    <div className="text-sm font-medium">{sp.common_name}</div>
+                    <div className="text-xs text-muted-foreground">
+                      {sp.scientific_name} · {BIOTOPE_LABEL[sp.biotope_region]}
+                    </div>
+                  </div>
+                  <Plus className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden />
+                </button>
+                <Link
+                  to="/species/$id"
+                  params={{ id: sp.id }}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(e) => e.stopPropagation()}
+                  aria-label={`View guide for ${sp.common_name}`}
+                  className="rounded-lg p-1.5 text-muted-foreground hover:bg-background hover:text-foreground"
+                >
+                  <Info className="h-4 w-4" aria-hidden />
+                </Link>
+              </div>
+            ))}          </div>
         )}
       </div>
 
