@@ -1,7 +1,8 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
 import { Suspense } from "react";
-import { Loader2 } from "lucide-react";
+import { Copy, Loader2, Share2, WandSparkles } from "lucide-react";
+import { toast } from "sonner";
 
 import { loadTankBySlug } from "@/lib/data";
 import { scoreTank, litresOf } from "@/lib/scoring";
@@ -103,6 +104,29 @@ function SharedTankBody() {
   const scorecard = scoreTank(state);
   const litres = Math.round(litresOf(state));
 
+  async function copyLink() {
+    const url = window.location.href;
+    await navigator.clipboard.writeText(url);
+    toast.success("Tank link copied");
+  }
+
+  async function shareTank() {
+    const url = window.location.href;
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: `${state.name} — FishTankr`,
+          text: `Check out ${state.name}, a ${litres} L aquarium planned in FishTankr.`,
+          url,
+        });
+        return;
+      } catch (error) {
+        if (error instanceof DOMException && error.name === "AbortError") return;
+      }
+    }
+    await copyLink();
+  }
+
   return (
     <main className="mx-auto max-w-6xl px-4 py-6">
       <div className="mb-6">
@@ -116,6 +140,32 @@ function SharedTankBody() {
           {state.length_cm}×{state.width_cm}×{state.height_cm} cm · {litres} L ·{" "}
           {state.filter ? state.filter.name : "no filter set"}
         </p>
+        <div className="mt-4 flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={() => void shareTank()}
+            className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:brightness-95"
+          >
+            <Share2 className="h-4 w-4" aria-hidden />
+            Share tank
+          </button>
+          <button
+            type="button"
+            onClick={() => void copyLink()}
+            className="inline-flex items-center gap-1.5 rounded-xl border bg-card px-4 py-2 text-sm font-semibold text-foreground hover:bg-muted"
+          >
+            <Copy className="h-4 w-4" aria-hidden />
+            Copy link
+          </button>
+          <Link
+            to="/"
+            search={{ remix: slug }}
+            className="inline-flex items-center gap-1.5 rounded-xl border bg-card px-4 py-2 text-sm font-semibold text-foreground hover:bg-muted"
+          >
+            <WandSparkles className="h-4 w-4" aria-hidden />
+            Remix this tank
+          </Link>
+        </div>
       </div>
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,340px)]">
         <div className="space-y-4">
@@ -128,9 +178,9 @@ function SharedTankBody() {
           <div className="mt-4">
             <Link
               to="/"
-              className="inline-flex rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:brightness-95"
+              className="inline-flex rounded-xl border bg-card px-4 py-2 text-sm font-semibold text-foreground hover:bg-muted"
             >
-              Design your own
+              Start a blank tank
             </Link>
           </div>
         </div>
