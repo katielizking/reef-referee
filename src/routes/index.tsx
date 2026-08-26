@@ -32,7 +32,7 @@ const HERO_DISMISS_KEY = "fishtankr:hero-dismissed";
 
 
 export const Route = createFileRoute("/")({
-  validateSearch: (search: Record<string, unknown>) => ({
+  validateSearch: (search: Record<string, unknown>): { tank?: string; remix?: string } => ({
     tank: typeof search.tank === "string" ? search.tank : undefined,
     remix: typeof search.remix === "string" ? search.remix : undefined,
   }),
