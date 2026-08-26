@@ -118,7 +118,7 @@ function ScoreRing({
 interface SubCardProps {
   title: string;
   score: number;
-  weightPct: number;
+  weightPct?: number;
   reasons: string[];
   fixes: string[];
   calculation: string;
@@ -136,9 +136,11 @@ function SubCard({ title, score, weightPct, reasons, fixes, calculation, extra }
             <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
               {title}
             </p>
-            <span className="rounded-full bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground" title={`Contributes ${weightPct}% to overall`}>
-              {weightPct}% weight
-            </span>
+            {typeof weightPct === "number" && (
+              <span className="rounded-full bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground" title={`Contributes ${weightPct}% to overall`}>
+                {weightPct}% weight
+              </span>
+            )}
           </div>
           <div className="mt-1 flex items-baseline gap-1">
             <span className="font-display text-2xl font-bold tracking-tight text-foreground">{score}</span>
@@ -278,49 +280,21 @@ export function ScorecardPanel({ scorecard }: { scorecard: Scorecard }) {
         </div>
       )}
 
-      {s.legality.illegalSpecies.length > 0 && (
-        <div className="rounded-2xl border border-coral/40 bg-coral/10 p-4">
-          <div className="flex items-start gap-2">
-            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-coral" aria-hidden />
-            <div>
-              <p className="text-sm font-semibold text-foreground">Regional rules & availability</p>
-              <p className="mt-1 text-sm text-foreground/80">
-                {s.legality.illegalSpecies.join(", ")} have regional research notes. Check current rules where you live before buying.
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {s.legality.nativeNotes.length > 0 && (
-        <div className="rounded-2xl border bg-muted/40 p-4">
-          <p className="flex items-center gap-1.5 text-sm font-semibold text-foreground">
-            <Info className="h-4 w-4" aria-hidden />
-            Native collection rules can vary
-          </p>
-          <ul className="mt-2 space-y-1 text-sm text-foreground/80">
-            {s.legality.nativeNotes.map((n, i) => (
-              <li key={i}>· {n}</li>
-            ))}
-          </ul>
-        </div>
-      )}
-
       <SubCard
         title="Species compatibility"
         score={s.compatibility.score}
-        weightPct={25}
+        weightPct={35}
         reasons={s.compatibility.reasons}
         fixes={s.compatibility.fixes}
-        calculation="Checks schooling minimums and every species pair for temperament clashes, fin-nipping, predation, and overlapping pH and temperature ranges."
+        calculation="Checks same-species group needs, aggression and territorial behaviour, then checks every species pair for temperament clashes, fin-nipping, predation and overlapping water ranges."
       />
       <SubCard
         title="Bioload"
         score={s.bioload.score}
-        weightPct={20}
-        reasons={s.bioload.reasons}
+        weightPct={25}
+        reasons={s.bioload.headroom ? [...s.bioload.reasons, s.bioload.headroom] : s.bioload.reasons}
         fixes={s.bioload.fixes}
-        calculation="Compares livestock waste load with usable capacity based on tank volume, filter turnover, planting and maintenance frequency. A 70–85% load keeps a healthy buffer."
+        calculation="Compares livestock waste load with usable capacity based on tank volume, filter turnover, planting and maintenance. Light stocking is never penalised; the score only falls above the healthy 85% plateau."
         extra={
           <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
             {s.bioload.loadPercent}% load
@@ -330,18 +304,32 @@ export function ScorecardPanel({ scorecard }: { scorecard: Scorecard }) {
       <SubCard
         title="Space to swim"
         score={s.space.score}
-        weightPct={20}
+        weightPct={25}
         reasons={s.space.reasons}
         fixes={s.space.fixes}
         calculation="Compares each species’ minimum tank volume and adult swimming-length requirement with this tank’s volume and length."
       />
       <SubCard
+        title="Water suitability"
+        score={s.water.score}
+        weightPct={15}
+        reasons={s.water.reasons}
+        fixes={s.water.fixes}
+        calculation="Checks the tank’s selected pH and temperature against every fish’s care range. It is separate from pairwise compatibility, so a single fish in unsuitable water is still flagged."
+        extra={
+          s.water.misfits.length > 0 ? (
+            <span className="rounded-full bg-warn/20 px-2 py-0.5 text-xs font-medium text-foreground">
+              {s.water.misfits.length} affected
+            </span>
+          ) : null
+        }
+      />
+      <SubCard
         title="Biome replication"
         score={s.biome.score}
-        weightPct={25}
         reasons={s.biome.reasons}
         fixes={s.biome.fixes}
-        calculation="Combines species-region cohesion (45%), water authenticity (25%), matching hardscape (15%) and matching plants (15%)."
+        calculation="An optional habitat-authenticity measure combining species-region cohesion, water, hardscape and plants. It is shown for inspiration and never changes the welfare score."
         extra={
           s.biome.dominantRegion ? (
             <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
@@ -349,14 +337,6 @@ export function ScorecardPanel({ scorecard }: { scorecard: Scorecard }) {
             </span>
           ) : null
         }
-      />
-      <SubCard
-        title="Local rules & availability"
-        score={s.legality.score}
-        weightPct={10}
-        reasons={s.legality.reasons}
-        fixes={s.legality.fixes}
-        calculation="Local rules and availability vary by country and region, so they never alter your FishTankr welfare score."
       />
     </div>
   );
