@@ -48,11 +48,54 @@ const REGISTRY: Record<string, FishAssetDefinition> = {
       finOpacity: 0.8,
       eyeClearcoat: 0.45,
     },
+  },,
+  [BETTA_FALLBACK_KEY]: {
+    speciesId: BETTA_FALLBACK_KEY,
+    commonName: "Betta",
+    renderMode: "gltf",
+    bodyFamily: "labyrinth",
+    models: { medium: BETTA_MODEL },
+    adultLengthCm: 6,
+    modelReferenceLengthCm: 6,
+    lengthMeasurement: "total",
+    orientation: { forwardAxis: "+x", verticalOffset: 0 },
+    animations: {
+      idle: "Take 01_Armature",
+      hover: "Take 01_Armature",
+      cruise: "Take 01_Armature",
+      fast: "Take 01_Armature",
+      dart: "Take 01_Armature",
+      turnLeft: "Take 01_Armature",
+      turnRight: "Take 01_Armature",
+    },
+    attribution: {
+      creator: "BlueMesh",
+      sourceUrl: "https://sketchfab.com/3d-models/betta-splendens-f4eeb7f50ad24873842bd954ad27d23b",
+      licenseLabel: "CC BY 4.0",
+      licenseUrl: "https://creativecommons.org/licenses/by/4.0/",
+    },
+    materialProfile: {
+      bodyRoughness: 0.38,
+      iridescence: 0.42,
+      finOpacity: 0.78,
+      finTransmission: 0.25,
+      eyeClearcoat: 0.4,
+    },
   },
 };
 
-export function getFishAsset(speciesId: string): FishAssetDefinition | null {
-  return REGISTRY[speciesId] ?? null;
+const SCIENTIFIC_NAME_FALLBACKS: Record<string, string> = {
+  "betta splendens": BETTA_FALLBACK_KEY,
+};
+
+export function getFishAsset(
+  speciesId: string,
+  scientificName?: string | null,
+): FishAssetDefinition | null {
+  const direct = REGISTRY[speciesId];
+  if (direct) return direct;
+  const fallbackKey = scientificName?.trim().toLowerCase();
+  return fallbackKey ? REGISTRY[SCIENTIFIC_NAME_FALLBACKS[fallbackKey]] ?? null : null;
 }
 
 /** Returns true only when a GLB URL is actually resolvable — otherwise use the placeholder. */
