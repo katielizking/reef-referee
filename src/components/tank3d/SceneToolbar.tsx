@@ -13,7 +13,7 @@ export function SceneToolbar({ canUndo, canRedo, onUndo, onRedo, onResetLayout }
   const setCameraPreset = useEditorStore((s) => s.setCameraPreset);
   return (
     <>
-      <div className="pointer-events-none absolute right-3 top-3 z-10 flex gap-1.5">
+      <div className="pointer-events-none absolute right-2 top-2 z-10 flex gap-1.5 sm:right-3 sm:top-3">
         <ToolbarButton onClick={onUndo} disabled={!canUndo} label="Undo (⌘Z)">
           <Undo2 className="h-4 w-4" />
         </ToolbarButton>
@@ -24,7 +24,7 @@ export function SceneToolbar({ canUndo, canRedo, onUndo, onRedo, onResetLayout }
           <RotateCw className="h-4 w-4" />
         </ToolbarButton>
       </div>
-      <div className="pointer-events-none absolute left-3 top-3 z-10 flex gap-1.5">
+      <div className="pointer-events-none absolute left-2 top-2 z-10 flex gap-1.5 sm:left-3 sm:top-3">
         <CamButton preset="front" label="Front view" onPick={setCameraPreset}>
           <SquareStack className="h-4 w-4" />
         </CamButton>
@@ -75,7 +75,7 @@ function ToolbarButton({
       disabled={disabled}
       aria-label={label}
       title={label}
-      className="pointer-events-auto rounded-lg border bg-card/90 p-1.5 text-foreground shadow-sm backdrop-blur transition-colors hover:bg-muted disabled:cursor-not-allowed disabled:opacity-40"
+      className="pointer-events-auto flex h-10 w-10 items-center justify-center rounded-xl border bg-card/90 p-2 sm:h-auto sm:w-auto sm:rounded-lg sm:p-1.5 text-foreground shadow-sm backdrop-blur transition-colors hover:bg-muted disabled:cursor-not-allowed disabled:opacity-40"
     >
       {children}
     </button>
