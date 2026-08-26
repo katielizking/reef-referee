@@ -21,6 +21,40 @@ The repository includes `tools/blender/process_asset.py`. It:
 Blender does not create reliable species anatomy from a name. Every input mesh
 must already be an accurate likeness.
 
+## Reference-informed validation generator
+
+`tools/blender/generate_validation_species.py` creates a first validation
+batch with distinct morphology for:
+
+- neon tetra (`Paracheirodon innesi`);
+- betta (`Betta splendens`);
+- bronze corydoras (`Osteogaster aenea`, commonly sold as
+  `Corydoras aeneus`);
+- Java fern (`Leptochilus pteropus`, commonly listed as
+  `Microsorum pteropus`);
+- Amazon sword (`Aquarius grisebachii`, commonly listed as
+  `Echinodorus grisebachii`).
+
+These are procedural, reference-informed candidates—not automatically approved
+biological reconstructions. Each GLB embeds its scientific name, reference
+URLs, modelling assumptions and a validation warning.
+
+Open **Actions → Generate validation species models → Run workflow**. Choose one
+species or `all`. The read-only job generates downloadable GLBs retained for
+14 days. It never publishes models into the application.
+
+Local example:
+
+```bash
+blender --background --python tools/blender/generate_validation_species.py -- \
+  --species neon-tetra \
+  --output generated/neon-tetra.glb
+```
+
+Fish candidates include separate fins and markings plus `Idle`, `Cruise`,
+`FastSwim` and `Dart` tail actions. Plant candidates include rhizome or
+rosette growth, lanceolate leaves, midribs and a `WaterSway` action.
+
 ## Accepted licences
 
 - CC0 1.0
