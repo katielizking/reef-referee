@@ -89,8 +89,8 @@ export default function TankScene({
         frameloop={hasFish ? "always" : "demand"}
         onPointerMissed={() => select(null)}
       >
-        <color attach="background" args={["#d7edf0"]} />
-        <fog attach="fog" args={["#b9dce2", largest * 2.2, largest * 5.5]} />
+        <color attach="background" args={["#b7dce2"]} />
+        <fog attach="fog" args={["#8fc3cd", largest * 1.8, largest * 5.2]} />
         <hemisphereLight args={["#f7ffff", "#5d8790", 1.05]} />
         <ambientLight intensity={0.48} />
         <directionalLight
@@ -108,6 +108,11 @@ export default function TankScene({
           color="#baf7ff"
           distance={largest * 2.5}
         />
+        <CausticLight dims={dims} reduced={!richEffects} />
+        <mesh position={[0, -dims.y / 2 - 0.13, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
+          <planeGeometry args={[dims.x * 1.18, dims.z * 1.25]} />
+          <shadowMaterial transparent opacity={0.24} />
+        </mesh>
 
         {/* Clear water volume plus a reflective animated surface. */}
         <mesh>
@@ -122,11 +127,13 @@ export default function TankScene({
           />
         </mesh>
         <WaterSurface dims={dims} reduced={!richEffects} />
+        <GlassShell dims={dims} />
+        {richEffects && <SuspendedParticles dims={dims} count={quality === "high" ? 150 : 75} />}
 
-        {/* Glass edges */}
+        {/* Reinforced glass edges */}
         <lineSegments>
           <edgesGeometry args={[new THREE.BoxGeometry(dims.x, dims.y, dims.z)]} />
-          <lineBasicMaterial color="#4a7683" transparent opacity={0.8} />
+          <lineBasicMaterial color="#335f6b" transparent opacity={0.72} />
         </lineSegments>
 
         {/* Substrate slab with a lightweight granular surface. */}
@@ -409,6 +416,137 @@ function BubbleColumn({
       />
     </points>
   );
+}
+
+function GlassShell({ dims }: { dims: { x: number; y: number; z: number } }) {
+  return (
+    <mesh renderOrder={5}>
+      <boxGeometry args={[dims.x + 0.025, dims.y + 0.025, dims.z + 0.025]} />
+      <meshPhysicalMaterial
+        color="#dffbff"
+        transparent
+        opacity={0.065}
+        roughness={0.04}
+        metalness={0.02}
+        transmission={0.28}
+        thickness={0.08}
+        clearcoat={1}
+        clearcoatRoughness={0.05}
+        side={THREE.DoubleSide}
+        depthWrite={false}
+      />
+    </mesh>
+  );
+}
+
+function CausticLight({
+  dims,
+  reduced,
+}: {
+  dims: { x: number; y: number; z: number };
+  reduced: boolean;
+}) {
+  const group = useRef<THREE.Group>(null);
+  const pools = useMemo(
+    () =>
+      Array.from({ length: 18 }, (_, index) => ({
+        x: (hashNoise(index * 2 + 1) - 0.5) * dims.x * 0.82,
+        z: (hashNoise(index * 2 + 2) - 0.5) * dims.z * 0.82,
+        radius: 0.08 + hashNoise(index * 3 + 4) * 0.2,
+        stretch: 1.3 + hashNoise(index * 5 + 3) * 2.4,
+      })),
+    [dims.x, dims.z],
+  );
+
+  useFrame(({ clock }) => {
+    if (!group.current || reduced) return;
+    const t = clock.getElapsedTime();
+    group.current.rotation.y = Math.sin(t * 0.12) * 0.12;
+    group.current.position.x = Math.sin(t * 0.2) * 0.05;
+    group.current.position.z = Math.cos(t * 0.16) * 0.04;
+  });
+
+  return (
+    <>
+      <spotLight
+        position={[0, dims.y * 1.25, dims.z * 0.25]}
+        angle={0.72}
+        penumbra={0.9}
+        intensity={0.9}
+        color="#d9ffff"
+        distance={dims.y * 3.2}
+      />
+      <group ref={group} position={[0, -dims.y / 2 + 0.018, 0]}>
+        {pools.map((pool, index) => (
+          <mesh
+            key={index}
+            position={[pool.x, 0, pool.z]}
+            rotation={[-Math.PI / 2, 0, index * 0.71]}
+            scale={[pool.stretch, 1, 1]}
+          >
+            <ringGeometry args={[pool.radius * 0.64, pool.radius, 18]} />
+            <meshBasicMaterial
+              color="#dfffff"
+              transparent
+              opacity={0.09}
+              blending={THREE.AdditiveBlending}
+              depthWrite={false}
+              toneMapped={false}
+            />
+          </mesh>
+        ))}
+      </group>
+    </>
+  );
+}
+
+function SuspendedParticles({
+  dims,
+  count,
+}: {
+  dims: { x: number; y: number; z: number };
+  count: number;
+}) {
+  const points = useRef<THREE.Points>(null);
+  const geometry = useMemo(() => {
+    const positions = new Float32Array(count * 3);
+    for (let index = 0; index < count; index++) {
+      positions[index * 3] = (hashNoise(index * 7 + 1) - 0.5) * dims.x * 0.94;
+      positions[index * 3 + 1] = (hashNoise(index * 7 + 2) - 0.5) * dims.y * 0.9;
+      positions[index * 3 + 2] = (hashNoise(index * 7 + 3) - 0.5) * dims.z * 0.9;
+    }
+    const next = new THREE.BufferGeometry();
+    next.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+    return next;
+  }, [count, dims.x, dims.y, dims.z]);
+
+  useEffect(() => () => geometry.dispose(), [geometry]);
+
+  useFrame(({ clock }) => {
+    if (!points.current) return;
+    const t = clock.getElapsedTime();
+    points.current.rotation.y = Math.sin(t * 0.035) * 0.08;
+    points.current.position.y = Math.sin(t * 0.11) * 0.025;
+  });
+
+  return (
+    <points ref={points} geometry={geometry}>
+      <pointsMaterial
+        color="#ecffff"
+        size={0.018}
+        sizeAttenuation
+        transparent
+        opacity={0.32}
+        blending={THREE.AdditiveBlending}
+        depthWrite={false}
+      />
+    </points>
+  );
+}
+
+function hashNoise(value: number): number {
+  const n = Math.sin(value * 12.9898) * 43758.5453;
+  return n - Math.floor(n);
 }
 
 function CameraRig({ defaultDistance }: { defaultDistance: number }) {
