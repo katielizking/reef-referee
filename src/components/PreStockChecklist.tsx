@@ -37,7 +37,7 @@ export function buildChecklist(scorecard: Scorecard, state: TankState): Checklis
       id: `illegal:${name}`,
       severity: "must-fix",
       title: `${name} is flagged as prohibited or restricted`,
-      why: "Federal import and state possession rules may both restrict this species.",
+      why: "Availability, import and keeping rules can vary by country and region.",
       fix: "Check the linked evidence and your jurisdiction, then remove it or choose a permitted alternative.",
     });
   }
@@ -146,7 +146,7 @@ export function buildChecklist(scorecard: Scorecard, state: TankState): Checklis
     items.push({
       id: `native:${note}`,
       severity: "info",
-      title: "Australian native — check your state's rules",
+      title: "Native collection rules may vary",
       why: note,
       fix: "Confirm your state's fisheries permit requirements before you buy.",
     });
