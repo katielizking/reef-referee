@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Switch } from "@/components/ui/switch";
-import type { Scorecard } from "@/lib/scoring";
+import type { Issue, Scorecard } from "@/lib/scoring";
 import { litresOf } from "@/lib/scoring";
 import type { TankState } from "@/lib/types";
 
@@ -28,62 +28,84 @@ export interface ChecklistItem {
   fix: string;
 }
 
+function issueTitle(issue: Issue): string {
+  const titles: Partial<Record<Issue["code"], string>> = {
+    "shoal-shortfall": "Group is too small",
+    "conspecific-partial-group": "Unsafe partial group",
+    "conspecific-aggression": "Same-species aggression",
+    "conspecific-territorial": "Territorial group risk",
+    "aggression-standing": "Aggression needs active management",
+    "both-aggressive": "Two aggressive species",
+    "temperament-clash": "Temperament mismatch",
+    "both-territorial": "Competing territories",
+    "fin-nipping": "Fin-nipping risk",
+    "fin-nipping-understocked": "Fin-nipping risk is elevated",
+    predation: "Predation risk",
+    "ph-no-overlap": "No shared pH range",
+    "ph-marginal": "Very narrow shared pH range",
+    "temp-no-overlap": "No shared temperature range",
+    "temp-marginal": "Very narrow shared temperature range",
+    "tank-too-small": "Tank volume is too small",
+    "tank-too-short": "Tank is too short",
+    "footprint-crowded": "Tank footprint is crowded",
+    "ph-unsuitable": "Target pH is unsuitable",
+    "temp-unsuitable": "Target temperature is unsuitable",
+  };
+  return titles[issue.code] ?? "Care issue";
+}
+
+function checklistSeverity(issue: Issue): ChecklistSeverity {
+  if (issue.severity === "critical") return "must-fix";
+  if (issue.severity === "high" || issue.severity === "medium") return "worth-look";
+  return "info";
+}
+
 export function buildChecklist(scorecard: Scorecard, state: TankState): ChecklistItem[] {
   const items: ChecklistItem[] = [];
+  const scoredIssues: Issue[] = [
+    ...scorecard.compatibility.issues,
+    ...(scorecard.space.issues ?? []),
+    ...(scorecard.water.issues ?? []),
+  ];
 
-  // Must-fix — prohibited species
-  for (const name of scorecard.legality.illegalSpecies) {
+  scoredIssues.forEach((issue, index) => {
     items.push({
-      id: `illegal:${name}`,
-      severity: "must-fix",
-      title: `${name} is flagged as prohibited or restricted`,
-      why: "Availability, import and keeping rules can vary by country and region.",
-      fix: "Check the linked evidence and your jurisdiction, then remove it or choose a permitted alternative.",
+      id: `${issue.category}:${issue.code}:${index}`,
+      severity: checklistSeverity(issue),
+      title: issueTitle(issue),
+      why: issue.reason,
+      fix: issue.fix,
     });
-  }
+  });
 
-  // Must-fix — predation
-  for (const conflict of scorecard.compatibility.criticalConflicts) {
-    items.push({
-      id: `predation:${conflict}`,
-      severity: "must-fix",
-      title: "Predation risk",
-      why: conflict,
-      fix: "Rehome the predator, or replace its tank mates with fish it can't fit in its mouth.",
-    });
-  }
-
-  // Must-fix — overstocked
   if (scorecard.bioload.loadPercent > 110) {
     items.push({
       id: "overstocked",
       severity: "must-fix",
       title: `Overstocked at ${Math.round(scorecard.bioload.loadPercent)}%`,
-      why: "Filtration and water changes won't keep pace with the waste this stocking produces.",
-      fix: "Reduce fish counts, upgrade the filter, or move to a larger tank before adding more.",
+      why: "Filtration and water changes will not keep pace with this stocking load.",
+      fix: scorecard.bioload.fixes[0] ?? "Reduce fish counts, improve filtration or move to a larger tank.",
     });
-  } else if (scorecard.bioload.loadPercent > 90) {
+  } else if (scorecard.bioload.loadPercent > 85) {
     items.push({
       id: "near-capacity",
       severity: "worth-look",
-      title: `Close to capacity (${Math.round(scorecard.bioload.loadPercent)}%)`,
-      why: "You're near the limit for this filter and maintenance schedule.",
-      fix: "Hold off on adding more fish, or step up to weekly water changes.",
+      title: `Very little biological headroom (${Math.round(scorecard.bioload.loadPercent)}%)`,
+      why: "The tank is above FishTankr’s comfortable 85% capacity plateau.",
+      fix: scorecard.bioload.fixes[0] ?? "Treat the tank as full and keep maintenance weekly.",
     });
   }
 
-  // Worth-look — maintenance thin for stocking
   if (state.maintenance_frequency === "monthly" && scorecard.bioload.loadPercent > 60) {
     items.push({
       id: "maint-thin",
       severity: "worth-look",
       title: "Monthly maintenance is thin for this stocking",
-      why: "Nitrate and organics build up faster than monthly water changes can clear them.",
+      why: "Nitrate and dissolved waste may build up faster than monthly water changes can remove them.",
       fix: "Switch to fortnightly or weekly water changes.",
     });
   }
 
-  // Worth-look — filter turnover
   const litres = litresOf(state);
   if (state.filter && litres > 0) {
     const turnover = state.filter.turnover_lph / litres;
@@ -92,8 +114,8 @@ export function buildChecklist(scorecard: Scorecard, state: TankState): Checklis
         id: "filter-undersized",
         severity: "worth-look",
         title: `Filter turnover is only ${turnover.toFixed(1)}× per hour`,
-        why: "Most freshwater tanks want 4–6× tank volume per hour of filter flow.",
-        fix: "Pick a filter rated for a larger tank, or add a second filter.",
+        why: "Most freshwater community tanks need roughly 4–6× tank volume per hour of filter flow.",
+        fix: "Choose a higher-flow filter or add a second filter while keeping species-specific flow needs in mind.",
       });
     }
   } else if (!state.filter && state.species.length > 0) {
@@ -101,54 +123,18 @@ export function buildChecklist(scorecard: Scorecard, state: TankState): Checklis
       id: "no-filter",
       severity: "must-fix",
       title: "No filter selected",
-      why: "A tank with fish needs biological filtration — the bacteria in the filter keep the water safe.",
-      fix: "Pick a filter rated for your tank volume.",
+      why: "A stocked tank needs established biological filtration to process toxic waste.",
+      fix: "Choose a filter rated for at least this tank’s volume and cycle it before adding fish.",
     });
   }
 
-  // Worth-look — space
-  if (scorecard.space.score < 60 && scorecard.space.reasons.length > 0) {
-    items.push({
-      id: "space",
-      severity: "worth-look",
-      title: "Not enough space",
-      why: scorecard.space.reasons[0],
-      fix: scorecard.space.fixes[0] ?? "Reduce active swimmers or move to a longer tank.",
-    });
-  }
-
-  // Worth-look — biome mixing
   if (scorecard.biome.score < 50 && state.species.length > 1) {
     items.push({
-      id: "mixed-biome",
-      severity: "worth-look",
-      title: "Mixed biotope",
-      why: "Species from different regions want different water and won't all thrive together.",
-      fix: "Pick a single region and stock around it for a stronger biome score.",
-    });
-  }
-
-  // Worth-look — schooling shortfalls
-  for (const { species, quantity } of state.species) {
-    if (species.is_schooling && quantity < species.min_group_size) {
-      items.push({
-        id: `school:${species.id}`,
-        severity: "worth-look",
-        title: `${species.common_name} needs a bigger group`,
-        why: `Schooling species; keeping ${quantity} causes chronic stress.`,
-        fix: `Add at least ${species.min_group_size - quantity} more to reach ${species.min_group_size}.`,
-      });
-    }
-  }
-
-  // Info — native permit notes
-  for (const note of scorecard.legality.nativeNotes) {
-    items.push({
-      id: `native:${note}`,
+      id: "mixed-biotope",
       severity: "info",
-      title: "Native collection rules may vary",
-      why: note,
-      fix: "Confirm your state's fisheries permit requirements before you buy.",
+      title: "Mixed-region community",
+      why: "This is not a strict biotope, which is a style choice rather than a welfare failure.",
+      fix: "Leave it mixed, or choose one region if you want a more authentic biotope display.",
     });
   }
 
