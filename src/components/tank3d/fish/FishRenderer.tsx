@@ -2,7 +2,7 @@ import { Html } from "@react-three/drei";
 import { Suspense, lazy } from "react";
 import type { Species } from "@/lib/types";
 import { SpeciesPortrait } from "@/components/SpeciesPortrait";
-import type { FishMeshProps } from "../FishMesh";
+import { ProceduralFish, type FishMeshProps } from "../FishMesh";
 import { getFishAsset, resolveModelUrl } from "@/lib/fish3d/registry";
 import { detectDeviceTier, resolveQuality, tierToLod } from "@/lib/fish3d/quality";
 import { FishAssetErrorBoundary } from "./FishAssetFallback";
@@ -91,11 +91,23 @@ export function FishRenderer(props: FishRendererProps) {
     />
   );
 
+  // A verified model may take a moment to download/decode on its first use.
+  // Keep a living fish in the tank during that interval; only species without
+  // an approved exact model use the clearly labelled photo marker.
+  const loadingFallback = (
+    <ProceduralFish
+      {...rest}
+      reduced={reduced}
+      selected={selected}
+      showFineDetail={showFineDetail}
+    />
+  );
+
   if (!modelUrl || !asset) return marker;
 
   return (
-    <FishAssetErrorBoundary fallback={marker}>
-      <Suspense fallback={marker}>
+    <FishAssetErrorBoundary fallback={loadingFallback}>
+      <Suspense fallback={loadingFallback}>
         <GltfFish
           asset={asset}
           modelUrl={modelUrl}
