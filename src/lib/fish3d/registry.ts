@@ -11,6 +11,8 @@ import type { FishAssetDefinition } from "./types";
 // Model by aeroplankton, CC-BY: https://blendswap.com/blend/32414
 const NEON_TETRA_ID = "19a5e713-7fa1-4abb-b6fc-ac564b6be103";
 const NEON_TETRA_MODEL = "/models/fish/neon-tetra/neon-tetra.glb";
+const BETTA_MODEL = "/models/fish/betta/betta.glb";
+const BETTA_FALLBACK_KEY = "betta-splendens";
 
 const REGISTRY: Record<string, FishAssetDefinition> = {
   [NEON_TETRA_ID]: {
