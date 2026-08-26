@@ -1,0 +1,69 @@
+name: Generate validation species models
+
+on:
+  workflow_dispatch:
+    inputs:
+      species:
+        description: Species to generate
+        required: true
+        default: all
+        type: choice
+        options:
+          - all
+          - neon-tetra
+          - betta
+          - bronze-corydoras
+          - java-fern
+          - amazon-sword
+
+permissions:
+  contents: read
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        species:
+          - neon-tetra
+          - betta
+          - bronze-corydoras
+          - java-fern
+          - amazon-sword
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select species
+        id: select
+        shell: bash
+        run: |
+          if [[ "${{ inputs.species }}" == "all" || "${{ inputs.species }}" == "${{ matrix.species }}" ]]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Install Blender
+        if: steps.select.outputs.run == 'true'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y blender
+
+      - name: Generate reference-informed GLB
+        if: steps.select.outputs.run == 'true'
+        run: |
+          mkdir -p generated
+          blender --background --python tools/blender/generate_validation_species.py -- \
+            --species "${{ matrix.species }}" \
+            --output "generated/${{ matrix.species }}.glb"
+
+      - name: Upload model for review
+        if: steps.select.outputs.run == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: validation-model-${{ matrix.species }}
+          path: generated/${{ matrix.species }}.glb
+          if-no-files-found: error
+          retention-days: 14
