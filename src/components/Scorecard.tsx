@@ -283,9 +283,9 @@ export function ScorecardPanel({ scorecard }: { scorecard: Scorecard }) {
           <div className="flex items-start gap-2">
             <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-coral" aria-hidden />
             <div>
-              <p className="text-sm font-semibold text-foreground">Prohibited or restricted</p>
+              <p className="text-sm font-semibold text-foreground">Regional rules & availability</p>
               <p className="mt-1 text-sm text-foreground/80">
-                {s.legality.illegalSpecies.join(", ")} are flagged in the catalogue. Check the species evidence and your state or territory rules.
+                {s.legality.illegalSpecies.join(", ")} have regional research notes. Check current rules where you live before buying.
               </p>
             </div>
           </div>
@@ -296,7 +296,7 @@ export function ScorecardPanel({ scorecard }: { scorecard: Scorecard }) {
         <div className="rounded-2xl border bg-muted/40 p-4">
           <p className="flex items-center gap-1.5 text-sm font-semibold text-foreground">
             <Info className="h-4 w-4" aria-hidden />
-            Australian natives — check your state's rules
+            Native collection rules can vary
           </p>
           <ul className="mt-2 space-y-1 text-sm text-foreground/80">
             {s.legality.nativeNotes.map((n, i) => (
@@ -351,12 +351,12 @@ export function ScorecardPanel({ scorecard }: { scorecard: Scorecard }) {
         }
       />
       <SubCard
-        title="Australian legality"
+        title="Local rules & availability"
         score={s.legality.score}
         weightPct={10}
         reasons={s.legality.reasons}
         fixes={s.legality.fixes}
-        calculation="Checks the catalogue’s Australian status for every selected species. A prohibited species sharply lowers and caps the overall score."
+        calculation="Local rules and availability vary by country and region, so they never alter your FishTankr welfare score."
       />
     </div>
   );
