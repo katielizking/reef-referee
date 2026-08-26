@@ -1,6 +1,7 @@
 import { Html } from "@react-three/drei";
 import { Suspense, lazy } from "react";
 import type { Species } from "@/lib/types";
+import { SpeciesPortrait } from "@/components/SpeciesPortrait";
 import type { FishMeshProps } from "../FishMesh";
 import { getFishAsset, hasGltfAsset, resolveModelUrl } from "@/lib/fish3d/registry";
 import { detectDeviceTier, resolveQuality, tierToLod } from "@/lib/fish3d/quality";
@@ -21,42 +22,46 @@ function UnverifiedFishMarker({
   length,
   selected,
   instanceIndex,
+  quantity,
   onSelect,
 }: Pick<
   FishRendererProps,
-  "species" | "basePosition" | "length" | "selected" | "instanceIndex" | "onSelect"
+  "species" | "basePosition" | "length" | "selected" | "instanceIndex" | "quantity" | "onSelect"
 >) {
+  if (instanceIndex > 0) return null;
+
   return (
-    <group
-      position={basePosition}
-      scale={Math.max(length, 0.24)}
-      onPointerDown={(event) => {
-        event.stopPropagation();
-        onSelect();
-      }}
-    >
-      <mesh scale={[0.42, 0.16, 0.09]}>
-        <sphereGeometry args={[1, 14, 9]} />
-        <meshPhysicalMaterial
-          color="#d9f4f5"
-          transparent
-          opacity={selected ? 0.34 : 0.16}
-          wireframe
-          roughness={0.35}
-          depthWrite={false}
-        />
+    <group position={basePosition}>
+      <mesh
+        scale={[Math.max(length * 0.55, 0.18), Math.max(length * 0.24, 0.09), 0.08]}
+        onPointerDown={(event) => {
+          event.stopPropagation();
+          onSelect();
+        }}
+        visible={false}
+      >
+        <boxGeometry args={[1, 1, 1]} />
+        <meshBasicMaterial transparent opacity={0} depthWrite={false} />
       </mesh>
-      <mesh position={[-0.48, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
-        <coneGeometry args={[0.18, 0.28, 3]} />
-        <meshBasicMaterial color="#8ecbd0" transparent opacity={0.25} wireframe />
-      </mesh>
-      {instanceIndex === 0 && (
-        <Html center position={[0, 0.3, 0]} distanceFactor={8} zIndexRange={[20, 0]}>
-          <div className="pointer-events-none whitespace-nowrap rounded-full border border-white/70 bg-ink/80 px-2 py-1 font-display text-[9px] font-semibold text-white shadow-sm backdrop-blur">
-            {species.common_name} · model pending
+      <Html center sprite distanceFactor={6} zIndexRange={[20, 0]}>
+        <div className={`pointer-events-none relative w-28 overflow-hidden rounded-[1.25rem] border-2 bg-white shadow-[0_8px_24px_rgba(18,35,46,.2)] ${
+          selected ? "border-lime" : "border-white/80"
+        }`}>
+          <SpeciesPortrait
+            commonName={species.common_name}
+            scientificName={species.scientific_name}
+            compact
+            className="aspect-[4/3] w-full"
+          />
+          <div className="bg-ink px-2 py-1.5 text-center text-[8px] font-semibold leading-tight text-white">
+            {species.common_name}
+            {quantity > 1 ? <span className="ml-1 text-lime">×{quantity}</span> : null}
+            <span className="mt-0.5 block font-normal italic text-white/55">
+              photographic reference
+            </span>
           </div>
-        </Html>
-      )}
+        </div>
+      </Html>
     </group>
   );
 }
@@ -82,6 +87,7 @@ export function FishRenderer(props: FishRendererProps) {
       length={rest.length}
       selected={selected}
       instanceIndex={rest.instanceIndex}
+      quantity={quantity}
       onSelect={rest.onSelect}
     />
   );
