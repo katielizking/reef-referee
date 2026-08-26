@@ -1,0 +1,38 @@
+name: Export authored betta
+
+on:
+  push:
+    paths:
+      - "assets/3d/source/betta-bluemesh/**"
+      - "assets/3d/source/betta-bluemesh.asset.json"
+      - "tools/blender/export_authored_betta.py"
+      - ".github/workflows/export-authored-betta.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Blender
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y blender
+      - name: Export production GLB
+        run: |
+          blender --background --python tools/blender/export_authored_betta.py -- \
+            assets/3d/source/betta-bluemesh/scene.gltf \
+            generated/betta/betta.glb
+          test -s generated/betta/betta.glb
+          test -s generated/betta/betta.json
+      - name: Upload production package
+        uses: actions/upload-artifact@v4
+        with:
+          name: authored-betta-production
+          path: generated/betta/
+          if-no-files-found: error
+          retention-days: 14
