@@ -1,0 +1,40 @@
+name: Generate neon tetra hero model
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - tools/blender/generate_neon_tetra_hero.py
+      - .github/workflows/generate-neon-tetra-hero.yml
+
+permissions:
+  contents: read
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Blender
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y blender python3-numpy
+      - name: Build hero model and studio render
+        run: |
+          mkdir -p generated
+          blender --background --python tools/blender/generate_neon_tetra_hero.py -- \
+            --output generated/neon-tetra-hero.glb \
+            --preview generated/neon-tetra-hero.png
+          test -s generated/neon-tetra-hero.glb
+          test -s generated/neon-tetra-hero.png
+      - name: Upload review package
+        uses: actions/upload-artifact@v4
+        with:
+          name: neon-tetra-hero-review
+          path: |
+            generated/neon-tetra-hero.glb
+            generated/neon-tetra-hero.png
+          if-no-files-found: error
+          retention-days: 14
