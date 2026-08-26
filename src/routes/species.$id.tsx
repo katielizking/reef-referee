@@ -32,7 +32,7 @@ function findRelated(target: Species, all: Species[]): Array<{ s: Species; reaso
   const zoneLabel = { top: "top", mid: "mid-water", bottom: "bottom" } as const;
   const scored = all
     .filter((s) => s.id !== target.id)
-    .filter((s) => s.legal_status !== "prohibited")
+    
     .filter((s) => {
       // temperament / behavioural compatibility
       if (s.predatory || target.predatory) return false;
@@ -129,20 +129,20 @@ function LegalBadge({ s }: { s: Species }) {
   if (s.legal_status === "prohibited") {
     return (
       <span className="inline-flex items-center gap-1 rounded-full bg-coral/20 px-2.5 py-1 text-xs font-semibold text-foreground">
-        <AlertTriangle className="h-3.5 w-3.5" /> Prohibited / restricted
+        <AlertTriangle className="h-3.5 w-3.5" /> Australia: restricted
       </span>
     );
   }
   if (s.legal_status === "native") {
     return (
       <span className="inline-flex items-center gap-1 rounded-full bg-lime/30 px-2.5 py-1 text-xs font-semibold text-foreground">
-        <Leaf className="h-3.5 w-3.5" /> Australian native
+        <Leaf className="h-3.5 w-3.5" /> Australia: native
       </span>
     );
   }
   return (
     <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2.5 py-1 text-xs font-semibold text-muted-foreground">
-      <Info className="h-3.5 w-3.5" /> Permitted in Australia
+      <Info className="h-3.5 w-3.5" /> Australia: listed
     </span>
   );
 }
@@ -175,7 +175,7 @@ function LegalityEvidence({ s }: { s: Species }) {
         <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-primary" aria-hidden />
         <div className="min-w-0 flex-1">
           <h2 className="font-display text-xl font-semibold text-foreground">
-            Australian legality evidence
+            Australia reference notes
           </h2>
           <p className="mt-1 text-sm text-muted-foreground">
             Federal import eligibility and state possession rules are separate checks.
@@ -208,7 +208,7 @@ function LegalityEvidence({ s }: { s: Species }) {
           </dt>
           <dd className="mt-1 text-sm font-medium text-foreground">
             {s.legal_reviewed_on
-              ? new Date(`${s.legal_reviewed_on}T00:00:00`).toLocaleDateString("en-AU")
+              ? new Date(`${s.legal_reviewed_on}T00:00:00`).toLocaleDateString()
               : "Not recorded"}
           </dd>
         </div>
@@ -231,7 +231,7 @@ function LegalityEvidence({ s }: { s: Species }) {
       )}
 
       <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
-        FishTankr provides screening guidance, not legal advice. Confirm current rules with
+        FishTankr’s catalogue includes Australia-specific reference research; it is not a global availability verdict. Confirm current rules with
         your state or territory fisheries authority before buying, moving or collecting fish.
       </p>
     </section>
@@ -346,7 +346,7 @@ function SpeciesGuide() {
           <ScoreBlock title="Bioload" body={bioloadCopy(s)} />
           <ScoreBlock title="Space to swim" body={spaceCopy(s)} />
           <ScoreBlock title="Biome replication" body={biomeCopy(s)} />
-          <ScoreBlock title="Australian legality" body={legalityCopy(s)} />
+          <ScoreBlock title="Local rules & availability" body={legalityCopy(s)} />
         </div>
       </section>
 
@@ -407,7 +407,7 @@ function AddToTankButton({ species }: { species: Species }) {
       </button>
       {prohibited && (
         <p className="mt-2 text-xs text-muted-foreground">
-          Heads up — this species is flagged as prohibited or restricted and will cap your tank's overall score. Check the evidence and your local rules.
+          Heads up — this species is flagged as prohibited or restricted and does not affect your welfare score. Check current rules where you live before buying.
         </p>
       )}
     </div>
@@ -450,10 +450,10 @@ function biomeCopy(s: Species): string {
 
 function legalityCopy(s: Species): string {
   if (s.legal_status === "prohibited") {
-    return "Flagged as prohibited or restricted. Import and possession rules are separate, so check the linked federal source and your state or territory authority. Adding it caps the score at 30.";
+    return "Flagged as prohibited or restricted. This Australia-specific reference may not apply where you live. Check local import and keeping rules before buying.";
   }
   if (s.legal_status === "native") {
-    return "Australian native. Doesn't cost you legality points, but some states require permits to keep natives — check your state's fisheries rules before you buy.";
+    return "This species is native to Australia. Collection, import and keeping rules vary by region; check local guidance before buying.";
   }
   return "Listed as permitted for federal import with conditions. State or territory possession rules can still apply, so review the evidence before buying.";
 }
