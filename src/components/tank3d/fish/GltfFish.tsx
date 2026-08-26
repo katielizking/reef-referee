@@ -82,8 +82,8 @@ export function GltfFish({
     if (asset.commonName.toLowerCase() !== "betta") return null;
     const names = {
       tail: ["Bone.003_Armature", "Bone.004_Armature", "Bone.005_Armature"],
-      leftPectoral: "Bone.046_Armature",
-      rightPectoral: "Bone.047_Armature",
+      leftPectoral: ["Bone.046_Armature", "Bone.048_Armature", "Bone.050_Armature"],
+      rightPectoral: ["Bone.047_Armature", "Bone.049_Armature", "Bone.051_Armature"],
     };
     const resolve = (name: string) => {
       const bone = scene.getObjectByName(name);
@@ -93,8 +93,8 @@ export function GltfFish({
     };
     return {
       tail: names.tail.map(resolve).filter((entry): entry is NonNullable<typeof entry> => entry !== null),
-      leftPectoral: resolve(names.leftPectoral),
-      rightPectoral: resolve(names.rightPectoral),
+      leftPectoral: names.leftPectoral.map(resolve).filter((entry): entry is NonNullable<typeof entry> => entry !== null),
+      rightPectoral: names.rightPectoral.map(resolve).filter((entry): entry is NonNullable<typeof entry> => entry !== null),
     };
   }, [asset.commonName, scene]);
   const controller = useFishAnimationController({
@@ -216,14 +216,18 @@ export function GltfFish({
       });
 
       const pectoralBeat = Math.sin(t * (swimRate * 1.55) + phase + Math.PI * 0.5);
-      if (bettaRig.leftPectoral) {
-        bettaRig.leftPectoral.bone.quaternion.copy(bettaRig.leftPectoral.rest);
-        bettaRig.leftPectoral.bone.rotateX(pectoralBeat * 0.34);
-      }
-      if (bettaRig.rightPectoral) {
-        bettaRig.rightPectoral.bone.quaternion.copy(bettaRig.rightPectoral.rest);
-        bettaRig.rightPectoral.bone.rotateX(-pectoralBeat * 0.34);
-      }
+      // The paired fin chains are Bone.046 → .048 → .050 and
+      // Bone.047 → .049 → .051 in the published BlueMesh armature.
+      // Drive each joint with a small phase lag: this creates a recognisable
+      // fin fan, rather than merely rotating the fin at its body attachment.
+      bettaRig.leftPectoral.forEach(({ bone, rest }, index) => {
+        bone.quaternion.copy(rest);
+        bone.rotateZ(pectoralBeat * (0.48 - index * 0.1));
+      });
+      bettaRig.rightPectoral.forEach(({ bone, rest }, index) => {
+        bone.quaternion.copy(rest);
+        bone.rotateZ(-pectoralBeat * (0.48 - index * 0.1));
+      });
     }
   });
 
