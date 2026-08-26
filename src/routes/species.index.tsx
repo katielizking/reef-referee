@@ -24,14 +24,12 @@ export const Route = createFileRoute("/species/")({
 });
 
 type Region = BiotopeRegion | "all";
-type Legal = "all" | "permitted" | "native" | "prohibited";
 type SizeBand = "all" | "small" | "medium" | "large";
 
 function SpeciesIndex() {
   const { data, isLoading } = useSpecies();
   const [q, setQ] = useState("");
   const [region, setRegion] = useState<Region>("all");
-  const [legal, setLegal] = useState<Legal>("all");
   const [temperament, setTemperament] = useState<Temperament | "all">("all");
   const [size, setSize] = useState<SizeBand>("all");
 
@@ -40,7 +38,6 @@ function SpeciesIndex() {
     const term = q.trim().toLowerCase();
     return data.filter((s) => {
       if (region !== "all" && s.biotope_region !== region) return false;
-      if (legal !== "all" && s.legal_status !== legal) return false;
       if (temperament !== "all" && s.temperament !== temperament) return false;
       if (size === "small" && s.adult_size_cm >= 6) return false;
       if (size === "medium" && (s.adult_size_cm < 6 || s.adult_size_cm > 15)) return false;
@@ -48,13 +45,13 @@ function SpeciesIndex() {
       if (term && !s.common_name.toLowerCase().includes(term) && !s.scientific_name.toLowerCase().includes(term)) return false;
       return true;
     });
-  }, [data, q, region, legal, temperament, size]);
+  }, [data, q, region, temperament, size]);
 
   return (
-    <main className="mx-auto max-w-7xl px-4 py-8 md:py-12">
-      <header className="hero-grid fishtankr-panel relative overflow-hidden rounded-[2rem] px-6 py-10 sm:px-10 sm:py-14">
+    <main className="mx-auto max-w-7xl px-3 py-5 sm:px-4 sm:py-8 md:py-12">
+      <header className="hero-grid fishtankr-panel relative overflow-hidden rounded-[1.5rem] px-5 py-8 sm:rounded-[2rem] sm:px-6 sm:py-10 sm:px-10 sm:py-14">
         <span className="science-label text-primary">Field guide · freshwater</span>
-        <h1 className="mt-5 max-w-3xl font-display text-4xl font-bold leading-[.98] tracking-[-.045em] text-ink sm:text-6xl">
+        <h1 className="mt-5 max-w-3xl font-display text-3xl font-bold sm:text-4xl leading-[.98] tracking-[-.045em] text-ink sm:text-6xl">
           Meet the fish,<br />before you bring them home.
         </h1>
         <p className="mt-5 max-w-2xl text-base leading-relaxed text-muted-foreground">
@@ -63,11 +60,11 @@ function SpeciesIndex() {
         <div className="absolute -bottom-16 -right-12 h-52 w-52 rounded-full border-[34px] border-blue/10" aria-hidden />
       </header>
 
-      <div className="fishtankr-panel sticky top-[72px] z-20 mt-6 space-y-3 rounded-[1.5rem] p-3 sm:p-4">
+      <div className="fishtankr-panel mt-5 space-y-3 rounded-[1.25rem] p-3 sm:mt-6 sm:rounded-[1.5rem] sm:p-4 md:sticky md:top-[72px] md:z-20">
         <div className="relative">
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" aria-hidden />
           <input
-            className="w-full rounded-xl border bg-background py-2 pl-9 pr-3 text-sm outline-none focus:ring-2 focus:ring-ring"
+            className="min-h-11 w-full rounded-xl border bg-background py-2 pl-9 pr-3 text-sm outline-none focus:ring-2 focus:ring-ring"
             placeholder="Search common or scientific name…"
             value={q}
             onChange={(e) => setQ(e.target.value)}
@@ -111,13 +108,13 @@ function SpeciesIndex() {
           No species match those filters.
         </p>
       ) : (
-        <ul className="mt-7 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <ul className="mt-5 grid gap-3 sm:mt-7 sm:gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {results.map((s) => (
             <li key={s.id}>
               <Link
                 to="/species/$id"
                 params={{ id: s.id }}
-                className="depth-card group block h-full overflow-hidden rounded-[1.5rem] border bg-card transition hover:border-primary/60"
+                className="depth-card group block h-full overflow-hidden rounded-[1.25rem] sm:rounded-[1.5rem] border bg-card transition hover:border-primary/60"
               >
                 <SpeciesPortrait
                   commonName={s.common_name}
@@ -168,14 +165,14 @@ function Filter<T extends string>({
   return (
     <div>
       <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">{label}</p>
-      <div className="flex flex-wrap gap-1.5">
+      <div className="flex snap-x gap-1.5 overflow-x-auto overscroll-x-contain pb-1 [scrollbar-width:none] sm:flex-wrap sm:overflow-visible">
         {options.map(([key, lbl]) => (
           <button
             key={key}
             type="button"
             aria-pressed={value === key}
             onClick={() => onChange(key)}
-            className={`rounded-full border px-2.5 py-0.5 text-xs transition ${
+            className={`min-h-9 shrink-0 snap-start rounded-full border px-3 py-1 text-xs transition ${
               value === key
                 ? "border-primary bg-primary text-primary-foreground"
                 : "bg-background text-muted-foreground hover:bg-muted"
