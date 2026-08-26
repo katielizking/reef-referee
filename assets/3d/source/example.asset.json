@@ -1,0 +1,10 @@
+{
+  "asset_id": "replace-with-stable-species-slug",
+  "common_name": "Replace with common name",
+  "scientific_name": "Replace with accepted scientific name",
+  "adult_length_cm": 4,
+  "source_url": "https://source.example/model-page",
+  "creator": "Creator name",
+  "license": "CC-BY-4.0",
+  "notes": "Confirm morphology against at least two reliable reference images before processing."
+}
