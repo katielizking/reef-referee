@@ -11,13 +11,13 @@ export const Route = createFileRoute("/quiz")({
       {
         name: "description",
         content:
-          "Answer 7 quick questions and get 3–5 freshwater fish species matched to your tank size, experience and preferences. Australian legality built in.",
+          "Answer 7 quick questions and get 3–5 freshwater fish species matched to your tank size, experience and preferences. care needs and compatibility in mind.",
       },
       { property: "og:title", content: "What fish should I get? | FishTankr" },
       {
         property: "og:description",
         content:
-          "A 7-question quiz that recommends freshwater fish species for your tank. Australian legality aware.",
+          "A 7-question quiz that recommends freshwater fish species for your tank. care and compatibility focused.",
       },
       { property: "og:url", content: "/quiz" },
     ],
@@ -75,7 +75,7 @@ const questions: Array<{
     q: "What's your tap water like? (or what would you like to match)",
     options: [
       { value: "soft", label: "Soft & slightly acidic (rainwater / tank water)" },
-      { value: "neutral", label: "Neutral (most Australian mains)" },
+      { value: "neutral", label: "Neutral" },
       { value: "hard", label: "Hard & alkaline (bore / limestone areas)" },
     ],
   },
@@ -90,7 +90,7 @@ const questions: Array<{
   },
   {
     key: "legality",
-    q: "Australian-native species?",
+    q: "Want a fish that can be kept alone?",
     options: [
       { value: "permitted-only", label: "Skip natives — imported species only" },
       { value: "natives-ok", label: "Natives welcome (I'll check state rules)" },
@@ -121,10 +121,6 @@ function scoreSpecies(sp: Species, a: Answers): number {
   const headroom = a.litres - Number(sp.min_tank_litres);
   score += Math.min(20, headroom / 5);
 
-  // Legality
-  if (sp.legal_status === "prohibited") return -1;
-  if (sp.legal_status === "native" && a.legality === "permitted-only") return -1;
-  if (sp.legal_status === "native" && a.legality === "natives-ok") score += 8;
 
   // Experience — small, peaceful, hardy → beginner-friendly
   const beginnerFriendly =
@@ -297,7 +293,7 @@ function QuizPage() {
                   <p className="text-sm italic text-muted-foreground">{sp.scientific_name}</p>
                   <p className="mt-2 text-xs text-muted-foreground">
                     {sp.biotope_region} · {sp.temperament} · min {sp.min_tank_litres}L
-                    {sp.legal_status === "native" && " · Australian native"}
+                    
                   </p>
                 </div>
                 <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
