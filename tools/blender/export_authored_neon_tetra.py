@@ -135,9 +135,9 @@ def studio(root, mesh, armature, review_dir):
     world.node_tree.nodes["Background"].inputs["Strength"].default_value = .22
 
     for name, location, energy, size, colour in [
-        ("Key", (.02, -.09, .055), 700, .08, (.72, .88, 1)),
-        ("Rim", (-.05, .06, .045), 850, .065, (.08, .45, 1)),
-        ("Warm Fill", (.06, -.03, -.01), 420, .06, (1, .28, .13)),
+        ("Key", (.02, -.09, .055), 4.0, .08, (.72, .88, 1)),
+        ("Rim", (-.05, .06, .045), 5.0, .065, (.08, .45, 1)),
+        ("Warm Fill", (.06, -.03, -.01), 2.0, .06, (1, .28, .13)),
     ]:
         data = bpy.data.lights.new(f"FishTankr_{name}", "AREA")
         data.energy, data.shape, data.size, data.color = energy, "DISK", size, colour
@@ -161,6 +161,7 @@ def studio(root, mesh, armature, review_dir):
     scene.render.resolution_percentage = 100
     scene.render.image_settings.file_format = "PNG"
     scene.render.film_transparent = False
+    scene.view_settings.look = "AgX - Medium High Contrast"
 
     views = {
         "side": (Vector((0, -.115, .012)), 70),
