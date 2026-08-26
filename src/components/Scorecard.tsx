@@ -129,7 +129,7 @@ function SubCard({ title, score, weightPct, reasons, fixes, calculation, extra }
   const [open, setOpen] = useState(false);
   const hasFixes = fixes.length > 0;
   return (
-    <div className="rounded-2xl border bg-card p-4">
+    <div className="depth-card rounded-[1.5rem] border bg-card p-4">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
@@ -141,8 +141,17 @@ function SubCard({ title, score, weightPct, reasons, fixes, calculation, extra }
             </span>
           </div>
           <div className="mt-1 flex items-baseline gap-1">
-            <span className="font-display text-2xl font-semibold text-foreground">{score}</span>
+            <span className="font-display text-2xl font-bold tracking-tight text-foreground">{score}</span>
             <span className="text-xs text-muted-foreground">/ 100</span>
+          </div>
+          <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-muted">
+            <div
+              className={`h-full rounded-full transition-all duration-500 ${
+                score >= 75 ? "bg-lime" : score >= 45 ? "bg-warn" : "bg-coral"
+              }`}
+              style={{ width: `${score}%` }}
+              aria-hidden
+            />
           </div>
         </div>
         {extra}
@@ -190,7 +199,7 @@ export function ScorecardPanel({ scorecard }: { scorecard: Scorecard }) {
 
   return (
     <div className="space-y-4">
-      <div className="rounded-3xl border bg-card p-5">
+      <div className="fishtankr-panel overflow-hidden rounded-[1.75rem] p-5">
         <div className="flex items-start gap-4">
           {s.overall === null ? (
             <div
@@ -203,9 +212,7 @@ export function ScorecardPanel({ scorecard }: { scorecard: Scorecard }) {
             <ScoreRing score={s.overall} color={meta!.ringVar} />
           )}
           <div className="min-w-0">
-            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-              Overall
-            </p>
+            <p className="science-label text-primary">Live referee</p>
             {s.overall === null ? (
               <>
                 <p className="mt-1 font-display text-lg font-semibold text-foreground">
@@ -253,7 +260,7 @@ export function ScorecardPanel({ scorecard }: { scorecard: Scorecard }) {
 
       {s.priorityAction && (
         <div
-          className={`rounded-2xl border p-4 ${
+          className={`depth-card rounded-[1.5rem] border p-4 ${
             s.priorityAction.severity === "critical"
               ? "border-coral/40 bg-coral/10"
               : s.priorityAction.severity === "high"
@@ -261,10 +268,8 @@ export function ScorecardPanel({ scorecard }: { scorecard: Scorecard }) {
                 : "border-primary/30 bg-primary/5"
           }`}
         >
-          <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-            Do this first · {s.priorityAction.category}
-          </p>
-          <p className="mt-1 font-display text-base font-semibold text-foreground">
+          <p className="science-label text-foreground/60">Do this first · {s.priorityAction.category}</p>
+          <p className="mt-3 font-display text-lg font-bold tracking-tight text-foreground">
             {s.priorityAction.title}
           </p>
           <p className="mt-1 text-sm text-foreground/80">
