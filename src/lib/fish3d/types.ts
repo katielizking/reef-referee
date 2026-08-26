@@ -52,6 +52,13 @@ export interface FishMaterialProfile {
   eyeClearcoat?: number;
 }
 
+export interface FishAssetAttribution {
+  creator: string;
+  sourceUrl: string;
+  licenseLabel: string;
+  licenseUrl?: string;
+}
+
 export interface FishAssetDefinition {
   /** Must match a `species.id` from the Supabase catalog. */
   speciesId: string;
@@ -75,6 +82,7 @@ export interface FishAssetDefinition {
   animations?: Partial<Record<FishAnimationState, string>>;
 
   materialProfile?: FishMaterialProfile;
+  attribution?: FishAssetAttribution;
 }
 
 export const DEFAULT_ORIENTATION: FishModelOrientation = {
