@@ -69,7 +69,6 @@ bpy.ops.export_scene.gltf(
     export_format="GLB",
     use_selection=False,
     export_animations=True,
-    export_all_actions=True,
     export_skins=True,
     export_morph=True,
     export_materials="EXPORT",
