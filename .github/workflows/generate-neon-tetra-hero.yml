@@ -20,7 +20,7 @@ jobs:
       - name: Install Blender
         run: |
           sudo apt-get update
-          sudo apt-get install -y blender python3-numpy
+          sudo apt-get install -y blender python3-numpy libegl1 libgl1-mesa-dri
       - name: Build hero model and studio render
         run: |
           mkdir -p generated
