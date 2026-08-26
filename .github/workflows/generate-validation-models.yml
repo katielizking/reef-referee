@@ -15,6 +15,11 @@ on:
           - bronze-corydoras
           - java-fern
           - amazon-sword
+  push:
+    branches: [main]
+    paths:
+      - tools/blender/generate_validation_species.py
+      - .github/workflows/generate-validation-models.yml
 
 permissions:
   contents: read
@@ -39,7 +44,7 @@ jobs:
         id: select
         shell: bash
         run: |
-          if [[ "${{ inputs.species }}" == "all" || "${{ inputs.species }}" == "${{ matrix.species }}" ]]; then
+          if [[ "${{ github.event_name }}" == "push" || "${{ inputs.species }}" == "all" || "${{ inputs.species }}" == "${{ matrix.species }}" ]]; then
             echo "run=true" >> "$GITHUB_OUTPUT"
           else
             echo "run=false" >> "$GITHUB_OUTPUT"
