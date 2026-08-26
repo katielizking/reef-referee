@@ -244,4 +244,46 @@ describe("scoreTank", () => {
     expect(s.capReason).toBeNull();
   });
 
+
+  it("prioritises prohibited livestock above every other problem", () => {
+    const s = scoreTank(
+      baseState({
+        species: [
+          { species: illegal, quantity: 1 },
+          { species: oscar, quantity: 1 },
+          { species: tetra, quantity: 3 },
+        ],
+      }),
+    );
+    expect(s.priorityAction?.severity).toBe("critical");
+    expect(s.priorityAction?.category).toBe("legality");
+    expect(s.priorityAction?.action).toMatch(/Banned Cichlid/);
+  });
+
+  it("prioritises predation when legality is clear", () => {
+    const s = scoreTank(
+      baseState({
+        species: [
+          { species: oscar, quantity: 1 },
+          { species: tetra, quantity: 10 },
+        ],
+      }),
+    );
+    expect(s.priorityAction?.severity).toBe("critical");
+    expect(s.priorityAction?.category).toBe("compatibility");
+    expect(s.priorityAction?.title).toMatch(/predation/i);
+  });
+
+  it("returns no priority action for a strong setup", () => {
+    const s = scoreTank(
+      baseState({
+        species: [
+          { species: tetra, quantity: 12 },
+          { species: cory, quantity: 6 },
+        ],
+      }),
+    );
+    expect(s.priorityAction).toBeNull();
+  });
+
 });
