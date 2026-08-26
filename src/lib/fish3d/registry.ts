@@ -34,6 +34,12 @@ const REGISTRY: Record<string, FishAssetDefinition> = {
       turnLeft: "ArmatureAction",
       turnRight: "ArmatureAction",
     },
+    attribution: {
+      creator: "aeroplankton",
+      sourceUrl: "https://blendswap.com/blend/32414",
+      licenseLabel: "CC BY",
+      licenseUrl: "https://creativecommons.org/licenses/by/4.0/",
+    },
     materialProfile: {
       bodyRoughness: 0.42,
       iridescence: 0.45,
