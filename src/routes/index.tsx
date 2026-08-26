@@ -34,6 +34,7 @@ const HERO_DISMISS_KEY = "fishtankr:hero-dismissed";
 export const Route = createFileRoute("/")({
   validateSearch: (search: Record<string, unknown>) => ({
     tank: typeof search.tank === "string" ? search.tank : undefined,
+    remix: typeof search.remix === "string" ? search.remix : undefined,
   }),
   head: () => ({
     meta: [
@@ -66,11 +67,12 @@ const DEFAULT_STATE: TankState = {
 };
 
 function Builder() {
-  const { tank: tankSlug } = Route.useSearch();
+  const { tank: tankSlug, remix: remixSlug } = Route.useSearch();
+  const sourceSlug = tankSlug ?? remixSlug;
   const [state, setState] = useState<TankState>(DEFAULT_STATE);
   const [saving, setSaving] = useState(false);
   const [savedId, setSavedId] = useState<string | undefined>(undefined);
-  const [loadingTank, setLoadingTank] = useState(Boolean(tankSlug));
+  const [loadingTank, setLoadingTank] = useState(Boolean(sourceSlug));
   const [openSteps, setOpenSteps] = useState<StepId[]>(["tank"]);
   const [heroDismissed, setHeroDismissed] = useState(true); // start true to avoid SSR flash
   const navigate = useNavigate();
@@ -98,10 +100,10 @@ function Builder() {
   const selected = useEditorStore((s) => s.selected);
 
   const ready = species.data && plants.data && hardscape.data && filters.data;
-  const showHero = !tankSlug && !heroDismissed && state.species.length === 0;
+  const showHero = !sourceSlug && !heroDismissed && state.species.length === 0;
 
   useEffect(() => {
-    if (!tankSlug) {
+    if (!sourceSlug) {
       setLoadingTank(false);
       return;
     }
@@ -109,13 +111,13 @@ function Builder() {
     let cancelled = false;
     setLoadingTank(true);
 
-    void loadTankBySlug(tankSlug)
+    void loadTankBySlug(sourceSlug)
       .then((data) => {
         if (cancelled) return;
         if (!data) throw new Error("Tank not found");
 
         setState({
-          name: data.tank.name,
+          name: remixSlug ? `${data.tank.name} remix` : data.tank.name,
           length_cm: data.tank.length_cm,
           width_cm: data.tank.width_cm,
           height_cm: data.tank.height_cm,
@@ -128,9 +130,11 @@ function Builder() {
           plants: data.plants,
           hardscape: data.hardscape,
         });
-        setSavedId(data.tank.id);
+        setSavedId(remixSlug ? undefined : data.tank.id);
         setHeroDismissed(true);
-        toast.success(`Loaded ${data.tank.name}`);
+        toast.success(
+          remixSlug ? `Ready to remix ${data.tank.name}` : `Loaded ${data.tank.name}`,
+        );
       })
       .catch((error) => {
         if (cancelled) return;
@@ -146,7 +150,7 @@ function Builder() {
     return () => {
       cancelled = true;
     };
-  }, [tankSlug]);
+  }, [sourceSlug, remixSlug]);
 
   function jumpToStep(id: StepId) {
     setOpenSteps((prev) => (prev.includes(id) ? prev : [...prev, id]));
@@ -168,7 +172,7 @@ function Builder() {
 
 
   useEffect(() => {
-    if (!species.data || tankSlug) return;
+    if (!species.data || sourceSlug) return;
     const raw = sessionStorage.getItem("fishtankr:pending-add");
     if (!raw) return;
     sessionStorage.removeItem("fishtankr:pending-add");
@@ -201,11 +205,11 @@ function Builder() {
         ],
       };
     });
-  }, [species.data, tankSlug]);
+  }, [species.data, sourceSlug]);
 
   // Load a preset (from /saved starter templates)
   useEffect(() => {
-    if (!species.data || tankSlug) return;
+    if (!species.data || sourceSlug) return;
     const raw = sessionStorage.getItem(PRESET_KEY);
     if (!raw) return;
     sessionStorage.removeItem(PRESET_KEY);
@@ -223,7 +227,7 @@ function Builder() {
       })),
     }));
     toast.success(`Loaded ${preset.name}`);
-  }, [species.data, tankSlug]);
+  }, [species.data, sourceSlug]);
 
   // Auto-suggest a filter once dimensions are known and none is chosen.
   useEffect(() => {
