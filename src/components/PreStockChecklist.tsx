@@ -31,27 +31,19 @@ export interface ChecklistItem {
 export function buildChecklist(scorecard: Scorecard, state: TankState): ChecklistItem[] {
   const items: ChecklistItem[] = [];
 
-  // Must-fix — prohibited species
-  for (const name of scorecard.legality.illegalSpecies) {
+  // Must-fix: anything the engine rates critical. Predation, two aggressive
+  // species, and two of the same aggressive fish all land here.
+  for (const issue of scorecard.compatibility.issues) {
+    if (issue.severity !== "critical") continue;
     items.push({
-      id: `illegal:${name}`,
+      id: `critical:${issue.code}:${issue.reason}`,
       severity: "must-fix",
-      title: `${name} is flagged as prohibited or restricted`,
-      why: "Availability, import and keeping rules can vary by country and region.",
-      fix: "Check the linked evidence and your jurisdiction, then remove it or choose a permitted alternative.",
+      title: "Serious compatibility problem",
+      why: issue.reason,
+      fix: issue.fix,
     });
   }
 
-  // Must-fix — predation
-  for (const conflict of scorecard.compatibility.criticalConflicts) {
-    items.push({
-      id: `predation:${conflict}`,
-      severity: "must-fix",
-      title: "Predation risk",
-      why: conflict,
-      fix: "Rehome the predator, or replace its tank mates with fish it can't fit in its mouth.",
-    });
-  }
 
   // Must-fix — overstocked
   if (scorecard.bioload.loadPercent > 110) {
@@ -118,13 +110,18 @@ export function buildChecklist(scorecard: Scorecard, state: TankState): Checklis
   }
 
   // Worth-look — biome mixing
-  if (scorecard.biome.score < 50 && state.species.length > 1) {
+  if (
+    scorecard.biome.dominantRegion &&
+    scorecard.biome.dominantRegion !== "unmapped" &&
+    scorecard.biome.score < 50 &&
+    state.species.length > 1
+  ) {
     items.push({
       id: "mixed-biome",
       severity: "worth-look",
-      title: "Mixed biotope",
-      why: "Species from different regions want different water and won't all thrive together.",
-      fix: "Pick a single region and stock around it for a stronger biome score.",
+      title: "Biotope is only partly matched",
+      why: "You are close to a single-region tank, but some stock is from elsewhere. This is a style goal, not a welfare problem.",
+      fix: "Swap the outliers for species from the same region, or keep it as a mixed community.",
     });
   }
 
@@ -141,14 +138,14 @@ export function buildChecklist(scorecard: Scorecard, state: TankState): Checklis
     }
   }
 
-  // Info — native permit notes
-  for (const note of scorecard.legality.nativeNotes) {
+  // Worth-look: the tank's own water settings do not suit some of the stock.
+  for (const issue of scorecard.water.issues ?? []) {
     items.push({
-      id: `native:${note}`,
-      severity: "info",
-      title: "Native collection rules may vary",
-      why: note,
-      fix: "Confirm your state's fisheries permit requirements before you buy.",
+      id: `water:${issue.code}:${issue.reason}`,
+      severity: issue.severity === "high" ? "worth-look" : "info",
+      title: "Water settings do not suit every species",
+      why: issue.reason,
+      fix: issue.fix,
     });
   }
 
