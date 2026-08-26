@@ -10,9 +10,17 @@ export interface CompatibilitySubScore extends SubScore {
   criticalConflicts: string[];
 }
 
+export interface PriorityAction {
+  severity: "critical" | "high" | "medium";
+  category: "legality" | "compatibility" | "bioload" | "space" | "biome";
+  title: string;
+  action: string;
+}
+
 export interface Scorecard {
   overall: number | null;
   capReason: string | null;
+  priorityAction: PriorityAction | null;
   compatibility: CompatibilitySubScore;
   bioload: SubScore & { loadPercent: number };
   space: SubScore;
@@ -46,7 +54,16 @@ export function scoreTank(state: TankState): Scorecard {
   const legality = scoreLegality(state);
 
   if (state.species.length === 0) {
-    return { overall: null, capReason: null, compatibility, bioload, space, biome, legality };
+    return {
+      overall: null,
+      capReason: null,
+      priorityAction: null,
+      compatibility,
+      bioload,
+      space,
+      biome,
+      legality,
+    };
   }
 
   const weighted = Math.round(
@@ -90,7 +107,101 @@ export function scoreTank(state: TankState): Scorecard {
     }
   }
 
-  return { overall, capReason, compatibility, bioload, space, biome, legality };
+  const priorityAction = choosePriorityAction({
+    compatibility,
+    bioload,
+    space,
+    biome,
+    legality,
+  });
+
+  return {
+    overall,
+    capReason,
+    priorityAction,
+    compatibility,
+    bioload,
+    space,
+    biome,
+    legality,
+  };
+}
+
+function choosePriorityAction(
+  scores: Pick<
+    Scorecard,
+    "compatibility" | "bioload" | "space" | "biome" | "legality"
+  >,
+): PriorityAction | null {
+  if (scores.legality.illegalSpecies.length > 0) {
+    const names = scores.legality.illegalSpecies.join(", ");
+    return {
+      severity: "critical",
+      category: "legality",
+      title: "Remove prohibited livestock first",
+      action: `Remove ${names} and choose a permitted alternative before stocking.`,
+    };
+  }
+
+  if (scores.compatibility.criticalConflicts.length > 0) {
+    return {
+      severity: "critical",
+      category: "compatibility",
+      title: "Resolve the predation risk first",
+      action:
+        scores.compatibility.fixes[0] ??
+        "Separate the predator from fish small enough to be eaten.",
+    };
+  }
+
+  if (scores.bioload.loadPercent > 110) {
+    return {
+      severity: "critical",
+      category: "bioload",
+      title: "Reduce the stocking load first",
+      action:
+        scores.bioload.fixes[0] ??
+        "Reduce fish numbers, increase tank volume or improve filtration.",
+    };
+  }
+
+  if (scores.space.score < 60 && scores.space.fixes.length > 0) {
+    return {
+      severity: "high",
+      category: "space",
+      title: "Fix the swimming-space problem first",
+      action: scores.space.fixes[0],
+    };
+  }
+
+  if (scores.compatibility.score < 75 && scores.compatibility.fixes.length > 0) {
+    return {
+      severity: "high",
+      category: "compatibility",
+      title: "Improve compatibility first",
+      action: scores.compatibility.fixes[0],
+    };
+  }
+
+  if (scores.bioload.loadPercent > 90 && scores.bioload.fixes.length > 0) {
+    return {
+      severity: "high",
+      category: "bioload",
+      title: "Create more biological headroom",
+      action: scores.bioload.fixes[0],
+    };
+  }
+
+  if (scores.biome.score < 60 && scores.biome.fixes.length > 0) {
+    return {
+      severity: "medium",
+      category: "biome",
+      title: "Make the habitat more cohesive",
+      action: scores.biome.fixes[0],
+    };
+  }
+
+  return null;
 }
 
 // ============== 1. COMPATIBILITY ==============
