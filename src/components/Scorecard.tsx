@@ -1,5 +1,5 @@
 import { BIOTOPE_LABEL } from "@/lib/types";
-import type { Scorecard } from "@/lib/scoring";
+import type { Issue, Scorecard } from "@/lib/scoring";
 import {
   AlertCircle,
   AlertTriangle,
@@ -114,34 +114,100 @@ function ScoreRing({
   );
 }
 
+const SEVERITY_ORDER: Record<Issue["severity"], number> = {
+  critical: 0,
+  high: 1,
+  medium: 2,
+  low: 3,
+};
+
+const SEVERITY_STYLE: Record<Issue["severity"], { dot: string; label: string | null }> = {
+  critical: { dot: "bg-coral", label: "Critical" },
+  high: { dot: "bg-warn", label: "Important" },
+  medium: { dot: "bg-muted-foreground/50", label: null },
+  low: { dot: "bg-muted-foreground/30", label: null },
+};
+
+/** Criticals first, so the thing that kills fish is never buried under a pH note. */
+function IssueList({ issues }: { issues: Issue[] }) {
+  const ordered = [...issues].sort(
+    (a, b) => SEVERITY_ORDER[a.severity] - SEVERITY_ORDER[b.severity],
+  );
+  return (
+    <ul className="mt-2 space-y-1.5 text-sm text-foreground/80">
+      {ordered.map((issue, i) => (
+        <li key={`${issue.code}-${i}`} className="flex items-start gap-2">
+          <span
+            className={`mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full ${SEVERITY_STYLE[issue.severity].dot}`}
+            aria-hidden
+          />
+          <span>
+            {SEVERITY_STYLE[issue.severity].label && (
+              <span className="mr-1 font-semibold text-foreground">
+                {SEVERITY_STYLE[issue.severity].label}.
+              </span>
+            )}
+            {issue.reason}
+          </span>
+        </li>
+      ))}
+    </ul>
+  );
+}
 
 interface SubCardProps {
   title: string;
   score: number;
-  weightPct: number;
+  /** Omitted for factors that sit beside the score rather than inside it. */
+  weightPct?: number;
+  note?: string;
   reasons: string[];
   fixes: string[];
+  issues?: Issue[];
   calculation: string;
   extra?: React.ReactNode;
+  footer?: React.ReactNode;
 }
 
-function SubCard({ title, score, weightPct, reasons, fixes, calculation, extra }: SubCardProps) {
+function SubCard({
+  title,
+  score,
+  weightPct,
+  note,
+  reasons,
+  fixes,
+  issues,
+  calculation,
+  extra,
+  footer,
+}: SubCardProps) {
   const [open, setOpen] = useState(false);
   const hasFixes = fixes.length > 0;
   return (
     <div className="depth-card rounded-[1.5rem] border bg-card p-4">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
               {title}
             </p>
-            <span className="rounded-full bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground" title={`Contributes ${weightPct}% to overall`}>
-              {weightPct}% weight
-            </span>
+            {typeof weightPct === "number" ? (
+              <span
+                className="rounded-full bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground"
+                title={`Contributes ${weightPct}% to overall`}
+              >
+                {weightPct}% weight
+              </span>
+            ) : note ? (
+              <span className="rounded-full bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">
+                {note}
+              </span>
+            ) : null}
           </div>
           <div className="mt-1 flex items-baseline gap-1">
-            <span className="font-display text-2xl font-bold tracking-tight text-foreground">{score}</span>
+            <span className="font-display text-2xl font-bold tracking-tight text-foreground">
+              {score}
+            </span>
             <span className="text-xs text-muted-foreground">/ 100</span>
           </div>
           <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-muted">
@@ -156,13 +222,16 @@ function SubCard({ title, score, weightPct, reasons, fixes, calculation, extra }
         </div>
         {extra}
       </div>
-      {reasons.length > 0 && (
+      {issues && issues.length > 0 ? (
+        <IssueList issues={issues} />
+      ) : reasons.length > 0 ? (
         <ul className="mt-2 space-y-1 text-sm text-foreground/80">
           {reasons.map((r, i) => (
             <li key={i}>{r}</li>
           ))}
         </ul>
-      )}
+      ) : null}
+      {footer}
       {hasFixes && (
         <button
           className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-primary hover:underline"
@@ -183,9 +252,7 @@ function SubCard({ title, score, weightPct, reasons, fixes, calculation, extra }
         <summary className="cursor-pointer text-xs font-medium text-muted-foreground">
           How this is calculated
         </summary>
-        <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
-          {calculation}
-        </p>
+        <p className="mt-2 text-xs leading-relaxed text-muted-foreground">{calculation}</p>
       </details>
     </div>
   );
@@ -251,8 +318,8 @@ export function ScorecardPanel({ scorecard }: { scorecard: Scorecard }) {
           <p className="mt-4 flex items-start gap-1.5 border-t border-border/70 pt-3 text-xs text-muted-foreground">
             <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden />
             <span>
-              This is a guide, not a guarantee. Individual species have different space and
-              care needs — always check before you stock.
+              This is a guide, not a guarantee. Individual species have different space and care
+              needs — always check before you stock.
             </span>
           </p>
         )}
@@ -268,80 +335,75 @@ export function ScorecardPanel({ scorecard }: { scorecard: Scorecard }) {
                 : "border-primary/30 bg-primary/5"
           }`}
         >
-          <p className="science-label text-foreground/60">Do this first · {s.priorityAction.category}</p>
+          <p className="science-label text-foreground/60">
+            Do this first · {s.priorityAction.category}
+          </p>
           <p className="mt-3 font-display text-lg font-bold tracking-tight text-foreground">
             {s.priorityAction.title}
           </p>
-          <p className="mt-1 text-sm text-foreground/80">
-            {s.priorityAction.action}
-          </p>
-        </div>
-      )}
-
-      {s.legality.illegalSpecies.length > 0 && (
-        <div className="rounded-2xl border border-coral/40 bg-coral/10 p-4">
-          <div className="flex items-start gap-2">
-            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-coral" aria-hidden />
-            <div>
-              <p className="text-sm font-semibold text-foreground">Regional rules & availability</p>
-              <p className="mt-1 text-sm text-foreground/80">
-                {s.legality.illegalSpecies.join(", ")} have regional research notes. Check current rules where you live before buying.
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {s.legality.nativeNotes.length > 0 && (
-        <div className="rounded-2xl border bg-muted/40 p-4">
-          <p className="flex items-center gap-1.5 text-sm font-semibold text-foreground">
-            <Info className="h-4 w-4" aria-hidden />
-            Native collection rules can vary
-          </p>
-          <ul className="mt-2 space-y-1 text-sm text-foreground/80">
-            {s.legality.nativeNotes.map((n, i) => (
-              <li key={i}>· {n}</li>
-            ))}
-          </ul>
+          <p className="mt-1 text-sm text-foreground/80">{s.priorityAction.action}</p>
         </div>
       )}
 
       <SubCard
         title="Species compatibility"
         score={s.compatibility.score}
-        weightPct={25}
+        weightPct={35}
         reasons={s.compatibility.reasons}
         fixes={s.compatibility.fixes}
-        calculation="Checks schooling minimums and every species pair for temperament clashes, fin-nipping, predation, and overlapping pH and temperature ranges."
+        issues={s.compatibility.issues}
+        calculation="Checks group sizes, aggression towards a species' own kind, and every species pair for temperament clashes, fin-nipping, predation, and overlapping pH and temperature ranges. The worst problem counts most, so a big tank is not punished for having many pairs to check."
       />
       <SubCard
         title="Bioload"
         score={s.bioload.score}
-        weightPct={20}
+        weightPct={25}
         reasons={s.bioload.reasons}
         fixes={s.bioload.fixes}
-        calculation="Compares livestock waste load with usable capacity based on tank volume, filter turnover, planting and maintenance frequency. A 70–85% load keeps a healthy buffer."
+        calculation="Compares livestock waste load with usable capacity based on tank volume, filter turnover, planting and maintenance frequency. A lightly stocked tank is never marked down: spare capacity is headroom, not a fault."
         extra={
           <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
             {s.bioload.loadPercent}% load
           </span>
         }
+        footer={
+          s.bioload.headroom ? (
+            <p className="mt-2 text-sm text-muted-foreground">{s.bioload.headroom}</p>
+          ) : null
+        }
       />
       <SubCard
         title="Space to swim"
         score={s.space.score}
-        weightPct={20}
+        weightPct={25}
         reasons={s.space.reasons}
         fixes={s.space.fixes}
+        issues={s.space.issues}
         calculation="Compares each species’ minimum tank volume and adult swimming-length requirement with this tank’s volume and length."
       />
       <SubCard
-        title="Biome replication"
+        title="Water settings"
+        score={s.water.score}
+        weightPct={15}
+        reasons={s.water.reasons}
+        fixes={s.water.fixes}
+        issues={s.water.issues}
+        calculation="Checks the pH and temperature you have set for this tank against the range each species actually needs."
+        extra={
+          s.water.misfits.length > 0 ? (
+            <span className="rounded-full bg-warn/20 px-2 py-0.5 text-xs font-medium text-foreground">
+              {s.water.misfits.length} not suited
+            </span>
+          ) : null
+        }
+      />
+      <SubCard
+        title="Biotope replication"
         score={s.biome.score}
-        weightPct={25}
+        note="Style goal, not part of the score"
         reasons={s.biome.reasons}
         fixes={s.biome.fixes}
-        calculation="Combines species-region cohesion (45%), water authenticity (25%), matching hardscape (15%) and matching plants (15%)."
+        calculation="How faithfully the tank recreates one real habitat: species-region cohesion, water authenticity, matching hardscape and matching plants. A mixed community is a perfectly good tank, so this sits beside your welfare score rather than inside it."
         extra={
           s.biome.dominantRegion ? (
             <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
@@ -349,14 +411,6 @@ export function ScorecardPanel({ scorecard }: { scorecard: Scorecard }) {
             </span>
           ) : null
         }
-      />
-      <SubCard
-        title="Local rules & availability"
-        score={s.legality.score}
-        weightPct={10}
-        reasons={s.legality.reasons}
-        fixes={s.legality.fixes}
-        calculation="Local rules and availability vary by country and region, so they never alter your FishTankr welfare score."
       />
     </div>
   );
