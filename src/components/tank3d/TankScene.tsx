@@ -81,7 +81,7 @@ export default function TankScene({
   }
 
   return (
-    <div className="relative h-[430px] w-full overflow-hidden rounded-[1.45rem] border border-white/20 bg-gradient-to-b from-[#e8f4f6] to-[#c9e5eb] sm:h-[540px] xl:h-[620px]">
+    <div className="relative h-[56svh] min-h-[360px] max-h-[520px] w-full touch-none overflow-hidden rounded-[1.15rem] border border-white/20 bg-gradient-to-b from-[#e8f4f6] to-[#c9e5eb] sm:h-[540px] sm:max-h-none sm:rounded-[1.45rem] xl:h-[620px]">
       <Canvas
         shadows={richEffects}
         dpr={[1, quality === "high" ? 2 : 1.5]}
@@ -270,8 +270,8 @@ export default function TankScene({
       <div className="pointer-events-none absolute inset-x-0 bottom-3 flex justify-center">
         <span className="rounded-full bg-card/85 px-3 py-1 text-[11px] text-muted-foreground shadow-sm backdrop-blur">
           {hasFish
-            ? "Tap fish · plants · hardscape to edit"
-            : "Drag to rotate · scroll to zoom · click objects to edit"}
+            ? "Tap an item to edit · drag to explore"
+            : "Drag to explore · tap an item to edit"}
         </span>
       </div>
     </div>
