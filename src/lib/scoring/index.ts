@@ -78,7 +78,7 @@ export function scoreTank(state: TankState): Scorecard {
   if (legality.illegalSpecies.length > 0) {
     caps.push({
       cap: 30,
-      reason: "Score capped: contains species that are illegal to keep in Australia.",
+      reason: "Score capped: the catalogue flags a prohibited or restricted species.",
     });
   }
   if (bioload.loadPercent > 110) {
@@ -138,8 +138,8 @@ function choosePriorityAction(
     return {
       severity: "critical",
       category: "legality",
-      title: "Remove prohibited livestock first",
-      action: `Remove ${names} and choose a permitted alternative before stocking.`,
+      title: "Resolve the legality flag first",
+      action: `Remove ${names} and choose a permitted alternative, or verify the current rule with your jurisdiction before stocking.`,
     };
   }
 
@@ -451,7 +451,7 @@ function scoreLegality(state: TankState): SubScore & { illegalSpecies: string[];
   return {
     score,
     reasons: [
-      `${names.join(", ")} ${illegal.length === 1 ? "is" : "are"} restricted and cannot be legally imported or kept in Australia.`,
+      `${names.join(", ")} ${illegal.length === 1 ? "is" : "are"} flagged as prohibited or restricted. Import and possession rules may differ by jurisdiction.`,
     ],
     fixes: [`Remove ${names.join(" and ")}.`],
     illegalSpecies: names,
