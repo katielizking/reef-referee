@@ -506,8 +506,35 @@ export function ProceduralFish({
           color={colours.base}
           roughness={0.34}
           metalness={0.03}
-          clearcoat={0.28}
-          clearcoatRoughness={0.3}
+          clearcoat={0.42}
+          clearcoatRoughness={0.22}
+          iridescence={0.32}
+          iridescenceIOR={1.3}
+          iridescenceThicknessRange={[100, 360]}
+        />
+      </mesh>
+
+      {/* A translucent belly layer catches the aquarium light like real scales. */}
+      <mesh
+        position={[-profile.bodyHalfLength * 0.02, bodyY - profile.bodyHeight * 0.24, 0]}
+        scale={[
+          profile.bodyHalfLength * 0.91,
+          profile.bodyHeight * 0.72,
+          profile.bodyDepth * 1.015,
+        ]}
+      >
+        <sphereGeometry args={[1, 18, 12]} />
+        <meshPhysicalMaterial
+          color="#eef4df"
+          transparent
+          opacity={0.13}
+          roughness={0.22}
+          metalness={0.08}
+          clearcoat={0.5}
+          clearcoatRoughness={0.16}
+          iridescence={0.45}
+          iridescenceIOR={1.28}
+          depthWrite={false}
         />
       </mesh>
 
@@ -521,8 +548,11 @@ export function ProceduralFish({
           color={colours.secondary}
           roughness={0.36}
           metalness={0.02}
-          clearcoat={0.22}
-          clearcoatRoughness={0.34}
+          clearcoat={0.35}
+          clearcoatRoughness={0.24}
+          iridescence={0.22}
+          iridescenceIOR={1.28}
+          iridescenceThicknessRange={[100, 300]}
         />
       </mesh>
 
