@@ -2,6 +2,7 @@ import { createFileRoute, Link, useRouter, useNavigate, notFound } from "@tansta
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { ArrowLeft, Fish, Ruler, Droplet, Thermometer, Users, Waves, AlertTriangle, ExternalLink, Info, Leaf, Plus, ShieldCheck } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { SpeciesPortrait } from "@/components/SpeciesPortrait";
 import type { Species } from "@/lib/types";
 import { BIOTOPE_LABEL } from "@/lib/types";
 
@@ -278,21 +279,35 @@ function SpeciesGuide() {
   if (s.legal_note) welfare.push(s.legal_note);
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-8 md:py-12">
+    <div className="mx-auto max-w-6xl px-4 py-8 md:py-12">
       <Link to="/" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground">
         <ArrowLeft className="h-4 w-4" /> Back to the builder
       </Link>
 
-      <header className="mt-6 flex flex-col gap-3">
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2.5 py-1 text-xs font-semibold text-muted-foreground">
-            <Fish className="h-3.5 w-3.5" /> {BIOTOPE_LABEL[s.biotope_region]}
-          </span>
-          <LegalBadge s={s} />
+      <header className="fishtankr-panel mt-6 grid overflow-hidden rounded-[2rem] lg:grid-cols-[1.1fr_.9fr]">
+        <SpeciesPortrait
+          commonName={s.common_name}
+          scientificName={s.scientific_name}
+          eager
+          className="min-h-[320px] lg:min-h-[470px]"
+        />
+        <div className="hero-grid flex flex-col justify-center p-6 sm:p-9">
+          <span className="science-label text-primary">Species dossier</span>
+          <div className="mt-5 flex flex-wrap items-center gap-2">
+            <span className="inline-flex items-center gap-1 rounded-full bg-white/80 px-2.5 py-1 text-xs font-semibold text-muted-foreground shadow-sm">
+              <Fish className="h-3.5 w-3.5" /> {BIOTOPE_LABEL[s.biotope_region]}
+            </span>
+            <LegalBadge s={s} />
+          </div>
+          <h1 className="mt-5 font-display text-4xl font-bold leading-none tracking-[-.045em] text-ink md:text-5xl">
+            {s.common_name}
+          </h1>
+          <p className="mt-2 font-display text-sm italic text-muted-foreground">{s.scientific_name}</p>
+          <p className="mt-6 max-w-md text-sm leading-relaxed text-muted-foreground">
+            A welfare-first profile covering adult needs, natural habitat, social behaviour and the evidence used by FishTankr.
+          </p>
+          <AddToTankButton species={s} />
         </div>
-        <h1 className="font-display text-3xl font-bold text-foreground md:text-4xl">{s.common_name}</h1>
-        <p className="italic text-muted-foreground">{s.scientific_name}</p>
-        <AddToTankButton species={s} />
       </header>
 
       <section className="mt-8">
