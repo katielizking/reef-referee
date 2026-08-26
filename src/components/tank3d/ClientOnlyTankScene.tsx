@@ -6,7 +6,7 @@ const TankScene = lazy(() => import("./TankScene"));
 
 function Fallback() {
   return (
-    <div className="flex h-[480px] w-full items-center justify-center rounded-3xl border bg-gradient-to-b from-[#e8f4f6] to-[#c9e5eb] text-sm text-muted-foreground">
+    <div className="flex h-[56svh] min-h-[360px] max-h-[520px] sm:h-[480px] sm:max-h-none w-full items-center justify-center rounded-3xl border bg-gradient-to-b from-[#e8f4f6] to-[#c9e5eb] text-sm text-muted-foreground">
       Loading tank preview…
     </div>
   );
