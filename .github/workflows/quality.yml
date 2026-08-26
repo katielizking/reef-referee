@@ -24,8 +24,10 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
-      - name: Validate Blender processor
-        run: python3 -m py_compile tools/blender/process_asset.py
+      - name: Validate Blender scripts
+        run: |
+          python3 -m py_compile tools/blender/process_asset.py
+          python3 -m py_compile tools/blender/generate_validation_species.py
 
       - name: Test
         run: bun run test
