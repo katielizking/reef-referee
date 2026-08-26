@@ -1,15 +1,16 @@
 import type { FishAssetDefinition } from "./types";
-import neonTetraGlb from "./assets/neon-tetra.premium.glb.asset.json";
 
-// Only species that need a photorealistic GLB path appear here. Everything
-// else falls through to the procedural renderer with zero configuration.
+// Only exact-species, reviewed 3D assets appear here. Everything else falls
+// through to a clearly labelled placeholder renderer.
 //
 // Registry is keyed by the Supabase species UUID (see the `species` table).
 // Do not key by slug or common name — those are not guaranteed to be stable.
 
 // Neon tetra — resolved from scientific_name = "Paracheirodon innesi"
 // against the live species catalogue.
+// Model by aeroplankton, CC-BY: https://blendswap.com/blend/32414
 const NEON_TETRA_ID = "19a5e713-7fa1-4abb-b6fc-ac564b6be103";
+const NEON_TETRA_MODEL = "/models/fish/neon-tetra/neon-tetra.glb";
 
 const REGISTRY: Record<string, FishAssetDefinition> = {
   [NEON_TETRA_ID]: {
@@ -18,30 +19,26 @@ const REGISTRY: Record<string, FishAssetDefinition> = {
     renderMode: "gltf",
     bodyFamily: "slender-schooler",
     models: {
-      // Premium code-generated GLB — 1.5MB, hosted on CDN.
-      medium: neonTetraGlb.url,
+      medium: NEON_TETRA_MODEL,
     },
     adultLengthCm: 4,
-    // Measured nose-to-caudal length of the GLB in its authored units.
-    // The runtime measures the actual bounding box on load and rescales
-    // from there, so this value is only used as a sanity fallback.
     modelReferenceLengthCm: 4,
     lengthMeasurement: "total",
     orientation: { forwardAxis: "+x", verticalOffset: 0 },
     animations: {
-      idle: "Idle",
-      hover: "Idle",
-      cruise: "Cruise",
-      fast: "FastSwim",
-      dart: "Dart",
-      turnLeft: "TurnL",
-      turnRight: "TurnR",
+      idle: "ArmatureAction",
+      hover: "ArmatureAction",
+      cruise: "ArmatureAction",
+      fast: "ArmatureAction",
+      dart: "ArmatureAction",
+      turnLeft: "ArmatureAction",
+      turnRight: "ArmatureAction",
     },
     materialProfile: {
-      bodyRoughness: 0.32,
-      iridescence: 0.6,
-      finOpacity: 0.85,
-      eyeClearcoat: 0.6,
+      bodyRoughness: 0.42,
+      iridescence: 0.45,
+      finOpacity: 0.8,
+      eyeClearcoat: 0.45,
     },
   },
 };
@@ -50,7 +47,7 @@ export function getFishAsset(speciesId: string): FishAssetDefinition | null {
   return REGISTRY[speciesId] ?? null;
 }
 
-/** Returns true only when a GLB URL is actually resolvable — otherwise fall back to procedural. */
+/** Returns true only when a GLB URL is actually resolvable — otherwise use the placeholder. */
 export function hasGltfAsset(speciesId: string): boolean {
   const asset = REGISTRY[speciesId];
   if (!asset || asset.renderMode !== "gltf") return false;
