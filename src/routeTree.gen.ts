@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as WelfareDisclaimerRouteImport } from './routes/welfare-disclaimer'
 import { Route as SavedRouteImport } from './routes/saved'
 import { Route as QuizRouteImport } from './routes/quiz'
 import { Route as MethodologyRouteImport } from './routes/methodology'
@@ -27,6 +28,11 @@ import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WelfareDisclaimerRoute = WelfareDisclaimerRouteImport.update({
+  id: '/welfare-disclaimer',
+  path: '/welfare-disclaimer',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SavedRoute = SavedRouteImport.update({
@@ -101,6 +107,7 @@ export interface FileRoutesByFullPath {
   '/quiz': typeof QuizRoute
   '/saved': typeof SavedRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/welfare-disclaimer': typeof WelfareDisclaimerRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/guides/$slug': typeof GuidesSlugRoute
   '/shops/$slug': typeof ShopsSlugRoute
@@ -117,6 +124,7 @@ export interface FileRoutesByTo {
   '/quiz': typeof QuizRoute
   '/saved': typeof SavedRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/welfare-disclaimer': typeof WelfareDisclaimerRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/guides/$slug': typeof GuidesSlugRoute
   '/shops/$slug': typeof ShopsSlugRoute
@@ -134,6 +142,7 @@ export interface FileRoutesById {
   '/quiz': typeof QuizRoute
   '/saved': typeof SavedRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/welfare-disclaimer': typeof WelfareDisclaimerRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/guides/$slug': typeof GuidesSlugRoute
   '/shops/$slug': typeof ShopsSlugRoute
@@ -152,6 +161,7 @@ export interface FileRouteTypes {
     | '/quiz'
     | '/saved'
     | '/sitemap.xml'
+    | '/welfare-disclaimer'
     | '/blog/$slug'
     | '/guides/$slug'
     | '/shops/$slug'
@@ -168,6 +178,7 @@ export interface FileRouteTypes {
     | '/quiz'
     | '/saved'
     | '/sitemap.xml'
+    | '/welfare-disclaimer'
     | '/blog/$slug'
     | '/guides/$slug'
     | '/shops/$slug'
@@ -184,6 +195,7 @@ export interface FileRouteTypes {
     | '/quiz'
     | '/saved'
     | '/sitemap.xml'
+    | '/welfare-disclaimer'
     | '/blog/$slug'
     | '/guides/$slug'
     | '/shops/$slug'
@@ -201,6 +213,7 @@ export interface RootRouteChildren {
   QuizRoute: typeof QuizRoute
   SavedRoute: typeof SavedRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  WelfareDisclaimerRoute: typeof WelfareDisclaimerRoute
   BlogSlugRoute: typeof BlogSlugRoute
   GuidesSlugRoute: typeof GuidesSlugRoute
   ShopsSlugRoute: typeof ShopsSlugRoute
@@ -219,6 +232,13 @@ declare module '@tanstack/react-router' {
       path: '/sitemap.xml'
       fullPath: '/sitemap.xml'
       preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/welfare-disclaimer': {
+      id: '/welfare-disclaimer'
+      path: '/welfare-disclaimer'
+      fullPath: '/welfare-disclaimer'
+      preLoaderRoute: typeof WelfareDisclaimerRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/saved': {
@@ -321,6 +341,7 @@ const rootRouteChildren: RootRouteChildren = {
   QuizRoute: QuizRoute,
   SavedRoute: SavedRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  WelfareDisclaimerRoute: WelfareDisclaimerRoute,
   BlogSlugRoute: BlogSlugRoute,
   GuidesSlugRoute: GuidesSlugRoute,
   ShopsSlugRoute: ShopsSlugRoute,
