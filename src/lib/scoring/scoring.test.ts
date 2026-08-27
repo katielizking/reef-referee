@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { scoreTank, WEIGHTS } from "./index";
+import {
+  isWaterTestCurrent,
+  scoreTank,
+  WATER_TEST_MAX_AGE_DAYS,
+  WEIGHTS,
+} from "./index";
 import type { BiotopeRegion, Filter, Species, TankState } from "../types";
 
 function species(
@@ -9,10 +14,11 @@ function species(
     biotope_region?: BiotopeRegion;
   },
 ): Species {
+  const { id, common_name, ...rest } = overrides;
   return {
-    id: overrides.id,
-    common_name: overrides.common_name,
-    scientific_name: overrides.common_name,
+    id,
+    common_name,
+    scientific_name: common_name,
     min_tank_litres: 40,
     adult_size_cm: 4,
     bioload_factor: 1,
@@ -39,7 +45,7 @@ function species(
     legal_source_url: null,
     legal_reviewed_on: null,
     legal_confidence: "incomplete",
-    ...overrides,
+    ...rest,
   };
 }
 
@@ -48,6 +54,8 @@ const filter: Filter = {
   name: "Test filter",
   rated_litres: 250,
   turnover_lph: 1000,
+  filter_type: "canister",
+  biological_media_level: "substantial",
 };
 
 function tank(overrides: Partial<TankState> = {}): TankState {
@@ -58,6 +66,16 @@ function tank(overrides: Partial<TankState> = {}): TankState {
     height_cm: 50,
     filter,
     maintenance_frequency: "weekly",
+    biological_media_level: "substantial",
+    filter_maturity: "established",
+    cycle_status: "verified",
+    cycle_method: "fishless",
+    tank_age_weeks: 8,
+    ammonia_mg_l: 0,
+    nitrite_mg_l: 0,
+    nitrate_mg_l: 10,
+    water_tested_on: new Date().toISOString().slice(0, 10),
+    seeded_media: false,
     target_ph: 7,
     target_temp_c: 25,
     plant_density: "medium",
@@ -97,9 +115,17 @@ describe("scoreTank", () => {
   });
 
   it("flags a schooling shortfall with a structured, actionable issue", () => {
-    const score = scoreTank(tank({ species: [{ species: tetra, quantity: 2 }] }));
-    expect(score.compatibility.issues.some((issue) => issue.code === "shoal-shortfall")).toBe(true);
-    expect(score.compatibility.fixes.some((fix) => /add 4 more/i.test(fix))).toBe(true);
+    const score = scoreTank(
+      tank({ species: [{ species: tetra, quantity: 2 }] }),
+    );
+    expect(
+      score.compatibility.issues.some(
+        (issue) => issue.code === "shoal-shortfall",
+      ),
+    ).toBe(true);
+    expect(
+      score.compatibility.fixes.some((fix) => /add 4 more/i.test(fix)),
+    ).toBe(true);
   });
 
   it("treats unsafe same-species aggression as critical", () => {
@@ -108,8 +134,14 @@ describe("scoreTank", () => {
       common_name: "Territorial fish",
       temperament: "aggressive",
     });
-    const score = scoreTank(tank({ species: [{ species: fighter, quantity: 2 }] }));
-    expect(score.compatibility.issues.some((issue) => issue.code === "conspecific-aggression")).toBe(true);
+    const score = scoreTank(
+      tank({ species: [{ species: fighter, quantity: 2 }] }),
+    );
+    expect(
+      score.compatibility.issues.some(
+        (issue) => issue.code === "conspecific-aggression",
+      ),
+    ).toBe(true);
     expect(score.priorityAction?.category).toBe("compatibility");
     expect(score.overall!).toBeLessThanOrEqual(40);
     expect(score.capReason).toMatch(/critical compatibility/i);
@@ -132,7 +164,9 @@ describe("scoreTank", () => {
         ],
       }),
     );
-    expect(score.compatibility.issues.some((issue) => issue.code === "predation")).toBe(true);
+    expect(
+      score.compatibility.issues.some((issue) => issue.code === "predation"),
+    ).toBe(true);
     expect(score.overall!).toBeLessThanOrEqual(40);
     expect(score.capReason).not.toBeNull();
   });
@@ -160,21 +194,89 @@ describe("scoreTank", () => {
 
   it("never rewards adding fish below the bioload plateau", () => {
     const one = scoreTank(tank({ species: [{ species: tetra, quantity: 6 }] }));
-    const more = scoreTank(tank({ species: [{ species: tetra, quantity: 12 }] }));
+    const more = scoreTank(
+      tank({ species: [{ species: tetra, quantity: 12 }] }),
+    );
     expect(more.bioload.score).toBeLessThanOrEqual(one.bioload.score);
   });
 
-  it("caps dangerous overstocking and explains the cap", () => {
-    const heavy = species({
-      id: "heavy",
-      common_name: "Heavy fish",
-      bioload_factor: 4,
-      min_tank_litres: 20,
+  it("keeps the experimental waste-load screen out of the headline score", () => {
+    const light = species({
+      id: "load",
+      common_name: "Load reference",
+      bioload_factor: 0.1,
     });
-    const score = scoreTank(tank({ species: [{ species: heavy, quantity: 30 }] }));
-    expect(score.bioload.loadPercent).toBeGreaterThan(110);
-    expect(score.overall!).toBeLessThanOrEqual(45);
-    expect(score.capReason).toMatch(/overstocked/i);
+    const heavy = species({
+      id: "load",
+      common_name: "Load reference",
+      bioload_factor: 12,
+    });
+    const a = scoreTank(tank({ species: [{ species: light, quantity: 6 }] }));
+    const b = scoreTank(tank({ species: [{ species: heavy, quantity: 6 }] }));
+    expect(a.bioload.loadBand).toBe("low");
+    expect(b.bioload.loadBand).toBe("very-high");
+    expect(b.overall).toBe(a.overall);
+    expect(b.capReason).toBeNull();
+  });
+
+  it("does not mistake higher pump turnover for higher biological capacity", () => {
+    const fastFilter: Filter = { ...filter, id: "fast", turnover_lph: 5000 };
+    const slowFilter: Filter = { ...filter, id: "slow", turnover_lph: 200 };
+    const a = scoreTank(
+      tank({ filter: slowFilter, species: [{ species: tetra, quantity: 12 }] }),
+    );
+    const b = scoreTank(
+      tank({ filter: fastFilter, species: [{ species: tetra, quantity: 12 }] }),
+    );
+    expect(b.bioload.loadPercent).toBe(a.bioload.loadPercent);
+  });
+
+  it("caps an unverified cycle even when the species plan is otherwise healthy", () => {
+    const score = scoreTank(
+      tank({
+        cycle_status: "unknown",
+        ammonia_mg_l: null,
+        nitrite_mg_l: null,
+        water_tested_on: null,
+        species: [{ species: tetra, quantity: 8 }],
+      }),
+    );
+    expect(score.readiness.status).toBe("unverified");
+    expect(score.overall!).toBeLessThanOrEqual(60);
+    expect(score.priorityAction?.category).toBe("readiness");
+  });
+
+  it("does not accept old zero readings as current cycle evidence", () => {
+    const score = scoreTank(
+      tank({
+        water_tested_on: "2000-01-01",
+        species: [{ species: tetra, quantity: 8 }],
+      }),
+    );
+    expect(score.readiness.status).toBe("unverified");
+    expect(
+      score.readiness.issues.some((issue) => issue.code === "water-test-stale"),
+    ).toBe(true);
+    expect(score.overall!).toBeLessThanOrEqual(60);
+  });
+
+  it("uses a bounded, explicit water-test freshness window", () => {
+    const now = new Date("2026-08-27T12:00:00Z");
+    expect(isWaterTestCurrent("2026-08-20", now)).toBe(true);
+    expect(isWaterTestCurrent("2026-08-19", now)).toBe(false);
+    expect(WATER_TEST_MAX_AGE_DAYS).toBe(7);
+  });
+
+  it("treats detectable ammonia as an immediate stop signal", () => {
+    const score = scoreTank(
+      tank({ ammonia_mg_l: 0.25, species: [{ species: tetra, quantity: 8 }] }),
+    );
+    expect(score.readiness.status).toBe("unsafe");
+    expect(
+      score.readiness.issues.some((issue) => issue.code === "ammonia-detected"),
+    ).toBe(true);
+    expect(score.overall!).toBeLessThanOrEqual(25);
+    expect(score.capReason).toMatch(/ammonia or nitrite/i);
   });
 
   it("keeps regional catalogue status out of welfare scoring", () => {
@@ -185,16 +287,21 @@ describe("scoreTank", () => {
       legal_in_australia: false,
       legal_status: "prohibited",
     });
-    const a = scoreTank(tank({ species: [{ species: permitted, quantity: 1 }] }));
-    const b = scoreTank(tank({ species: [{ species: regionRestricted, quantity: 1 }] }));
+    const a = scoreTank(
+      tank({ species: [{ species: permitted, quantity: 1 }] }),
+    );
+    const b = scoreTank(
+      tank({ species: [{ species: regionRestricted, quantity: 1 }] }),
+    );
     expect(b.overall).toBe(a.overall);
   });
 
   it("uses only welfare categories in the overall score", () => {
-    const score = scoreTank(tank({ species: [{ species: tetra, quantity: 6 }] }));
+    const score = scoreTank(
+      tank({ species: [{ species: tetra, quantity: 6 }] }),
+    );
     const expected = Math.round(
       score.compatibility.score * WEIGHTS.compatibility +
-        score.bioload.score * WEIGHTS.bioload +
         score.space.score * WEIGHTS.space +
         score.water.score * WEIGHTS.water,
     );

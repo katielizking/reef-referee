@@ -21,7 +21,8 @@ const tankQuery = (slug: string) =>
   });
 
 export const Route = createFileRoute("/t/$slug")({
-  loader: ({ context, params }) => context.queryClient.ensureQueryData(tankQuery(params.slug)),
+  loader: ({ context, params }) =>
+    context.queryClient.ensureQueryData(tankQuery(params.slug)),
   head: ({ loaderData, params }) => {
     const name = loaderData?.tank.name ?? "Shared tank";
     return {
@@ -45,7 +46,9 @@ export const Route = createFileRoute("/t/$slug")({
   component: SharedTank,
   errorComponent: ({ error }) => (
     <main className="mx-auto max-w-3xl px-4 py-12 text-center">
-      <h1 className="font-display text-xl font-semibold">Couldn't load this tank</h1>
+      <h1 className="font-display text-xl font-semibold">
+        Couldn't load this tank
+      </h1>
       <p className="mt-2 text-sm text-muted-foreground">{error.message}</p>
       <Link
         to="/"
@@ -58,7 +61,9 @@ export const Route = createFileRoute("/t/$slug")({
   notFoundComponent: () => (
     <main className="mx-auto max-w-3xl px-4 py-12 text-center">
       <h1 className="font-display text-xl font-semibold">Tank not found</h1>
-      <p className="mt-2 text-sm text-muted-foreground">The share link may be wrong or expired.</p>
+      <p className="mt-2 text-sm text-muted-foreground">
+        The share link may be wrong or expired.
+      </p>
       <Link
         to="/"
         className="mt-6 inline-flex rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:brightness-95"
@@ -94,6 +99,19 @@ function SharedTankBody() {
     height_cm: data.tank.height_cm,
     filter: data.filter,
     maintenance_frequency: data.tank.maintenance_frequency,
+    biological_media_level:
+      data.tank.biological_media_level ??
+      data.filter?.biological_media_level ??
+      "standard",
+    filter_maturity: data.tank.filter_maturity ?? "unknown",
+    cycle_status: data.tank.cycle_status ?? "unknown",
+    cycle_method: data.tank.cycle_method ?? "unknown",
+    tank_age_weeks: data.tank.tank_age_weeks ?? null,
+    ammonia_mg_l: data.tank.ammonia_mg_l ?? null,
+    nitrite_mg_l: data.tank.nitrite_mg_l ?? null,
+    nitrate_mg_l: data.tank.nitrate_mg_l ?? null,
+    water_tested_on: data.tank.water_tested_on ?? null,
+    seeded_media: data.tank.seeded_media ?? false,
     target_ph: data.tank.target_ph,
     target_temp_c: data.tank.target_temp_c,
     plant_density: data.tank.plant_density,
@@ -121,7 +139,8 @@ function SharedTankBody() {
         });
         return;
       } catch (error) {
-        if (error instanceof DOMException && error.name === "AbortError") return;
+        if (error instanceof DOMException && error.name === "AbortError")
+          return;
       }
     }
     await copyLink();
@@ -213,7 +232,10 @@ function ContentsList({ state }: { state: TankState }) {
       <ListCard title="Hardscape">
         {state.hardscape.length === 0 && <Empty />}
         {state.hardscape.map((h) => (
-          <li key={h.hardscape.id} className="flex justify-between py-1 text-sm">
+          <li
+            key={h.hardscape.id}
+            className="flex justify-between py-1 text-sm"
+          >
             <span>{h.hardscape.name}</span>
             <span className="text-muted-foreground">×{h.quantity}</span>
           </li>
@@ -223,7 +245,13 @@ function ContentsList({ state }: { state: TankState }) {
   );
 }
 
-function ListCard({ title, children }: { title: string; children: React.ReactNode }) {
+function ListCard({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
   return (
     <div className="rounded-2xl border bg-card p-4">
       <h3 className="mb-2 font-display text-xs font-semibold uppercase tracking-wide text-muted-foreground">

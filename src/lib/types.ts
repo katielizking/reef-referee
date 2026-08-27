@@ -5,11 +5,22 @@ export type BiotopeRegion =
   | "australian_native"
   | "unmapped";
 
-
 export type SwimZone = "top" | "mid" | "bottom";
 export type Temperament = "peaceful" | "semi-aggressive" | "aggressive";
 export type MaintenanceFrequency = "weekly" | "fortnightly" | "monthly";
 export type PlantDensity = "none" | "light" | "medium" | "heavy";
+export type FilterType =
+  | "sponge"
+  | "hang_on_back"
+  | "internal"
+  | "canister"
+  | "sump"
+  | "undergravel"
+  | "other";
+export type BiologicalMediaLevel = "minimal" | "standard" | "substantial";
+export type FilterMaturity = "new" | "maturing" | "established" | "unknown";
+export type CycleStatus = "not_started" | "cycling" | "verified" | "unknown";
+export type CycleMethod = "fishless" | "fish_in" | "unknown";
 
 export interface Species {
   id: string;
@@ -51,7 +62,6 @@ export interface Species {
   legal_confidence: "verified" | "medium" | "incomplete";
 }
 
-
 export interface Plant {
   id: string;
   common_name: string;
@@ -72,6 +82,10 @@ export interface Filter {
   name: string;
   rated_litres: number;
   turnover_lph: number;
+  /** Flow and biological filtration are separate. These catalogue fields describe
+   * the filter body; the builder records the media and maturity actually in use. */
+  filter_type: FilterType;
+  biological_media_level: BiologicalMediaLevel;
 }
 
 export interface TankRow {
@@ -84,6 +98,16 @@ export interface TankRow {
   height_cm: number;
   filter_id: string | null;
   maintenance_frequency: MaintenanceFrequency;
+  biological_media_level: BiologicalMediaLevel;
+  filter_maturity: FilterMaturity;
+  cycle_status: CycleStatus;
+  cycle_method: CycleMethod;
+  tank_age_weeks: number | null;
+  ammonia_mg_l: number | null;
+  nitrite_mg_l: number | null;
+  nitrate_mg_l: number | null;
+  water_tested_on: string | null;
+  seeded_media: boolean;
   target_ph: number;
   target_temp_c: number;
   plant_density: PlantDensity;
@@ -98,6 +122,16 @@ export interface TankState {
   height_cm: number;
   filter: Filter | null;
   maintenance_frequency: MaintenanceFrequency;
+  biological_media_level: BiologicalMediaLevel;
+  filter_maturity: FilterMaturity;
+  cycle_status: CycleStatus;
+  cycle_method: CycleMethod;
+  tank_age_weeks: number | null;
+  ammonia_mg_l: number | null;
+  nitrite_mg_l: number | null;
+  nitrate_mg_l: number | null;
+  water_tested_on: string | null;
+  seeded_media: boolean;
   target_ph: number;
   target_temp_c: number;
   plant_density: PlantDensity;
@@ -117,7 +151,6 @@ export interface TankState {
   >;
 }
 
-
 export const BIOTOPE_LABEL: Record<BiotopeRegion, string> = {
   amazon_blackwater: "Amazon blackwater",
   lake_malawi: "Lake Malawi rift",
@@ -136,4 +169,3 @@ export const BIOTOPE_WATER: Record<
   australian_native: { ph_min: 6.5, ph_max: 8.0, temp_min: 18, temp_max: 28 },
   unmapped: { ph_min: 6.5, ph_max: 7.5, temp_min: 22, temp_max: 27 },
 };
-

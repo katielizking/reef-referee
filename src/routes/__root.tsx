@@ -15,7 +15,6 @@ import { Toaster } from "@/components/ui/sonner";
 import { BrandLogo } from "@/components/BrandLogo";
 import { supabase } from "@/integrations/supabase/client";
 
-
 function NotFoundComponent() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
@@ -82,36 +81,42 @@ const TITLE = "FishTankr — Smarter tanks. Happier fish.";
 const DESC =
   "Simple tools that make fishkeeping easier to understand and better for the animals in our care. Plan a setup, check your stocking and see the biology behind a healthy aquarium.";
 
-export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
-  head: () => ({
-    meta: [
-      { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: TITLE },
-      { name: "description", content: DESC },
-      { name: "theme-color", content: "#37B8C6" },
-      { property: "og:title", content: TITLE },
-      { property: "og:description", content: DESC },
-      { property: "og:type", content: "website" },
-      { property: "og:site_name", content: "FishTankr" },
-      { name: "twitter:card", content: "summary_large_image" },
-    ],
-    links: [
-      { rel: "stylesheet", href: appCss },
-      { rel: "preconnect", href: "https://fonts.googleapis.com" },
-      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      {
-        rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap",
-      },
-      { rel: "icon", href: "/favicon.png", type: "image/png" },
-    ],
-  }),
-  shellComponent: RootShell,
-  component: RootComponent,
-  notFoundComponent: NotFoundComponent,
-  errorComponent: ErrorComponent,
-});
+export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
+  {
+    head: () => ({
+      meta: [
+        { charSet: "utf-8" },
+        { name: "viewport", content: "width=device-width, initial-scale=1" },
+        { title: TITLE },
+        { name: "description", content: DESC },
+        { name: "theme-color", content: "#37B8C6" },
+        { property: "og:title", content: TITLE },
+        { property: "og:description", content: DESC },
+        { property: "og:type", content: "website" },
+        { property: "og:site_name", content: "FishTankr" },
+        { name: "twitter:card", content: "summary_large_image" },
+      ],
+      links: [
+        { rel: "stylesheet", href: appCss },
+        { rel: "preconnect", href: "https://fonts.googleapis.com" },
+        {
+          rel: "preconnect",
+          href: "https://fonts.gstatic.com",
+          crossOrigin: "anonymous",
+        },
+        {
+          rel: "stylesheet",
+          href: "https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap",
+        },
+        { rel: "icon", href: "/favicon.png", type: "image/png" },
+      ],
+    }),
+    shellComponent: RootShell,
+    component: RootComponent,
+    notFoundComponent: NotFoundComponent,
+    errorComponent: ErrorComponent,
+  },
+);
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
@@ -175,6 +180,7 @@ const NAV_ITEMS: Array<{ to: string; label: string; exact?: boolean }> = [
   { to: "/quiz", label: "Quiz" },
   { to: "/species", label: "Species" },
   { to: "/guides", label: "Guides" },
+  { to: "/methodology", label: "Method" },
   { to: "/shops", label: "Shops" },
   { to: "/blog", label: "Blog" },
   { to: "/saved", label: "My tanks" },
@@ -188,7 +194,10 @@ function SiteHeader() {
         <Link to="/" aria-label="FishTankr home" className="rounded-lg">
           <BrandLogo />
         </Link>
-        <nav aria-label="Primary" className="hidden items-center gap-1 rounded-full border border-ink/10 bg-white/70 p-1 text-sm shadow-sm md:flex">
+        <nav
+          aria-label="Primary"
+          className="hidden items-center gap-1 rounded-full border border-ink/10 bg-white/70 p-1 text-sm shadow-sm md:flex"
+        >
           {NAV_ITEMS.map((item) => (
             <Link
               key={item.to}
@@ -211,7 +220,16 @@ function SiteHeader() {
           aria-expanded={open}
           onClick={() => setOpen((v) => !v)}
         >
-          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+          <svg
+            viewBox="0 0 24 24"
+            width="18"
+            height="18"
+            aria-hidden
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+          >
             {open ? (
               <>
                 <path d="M6 6l12 12" />
@@ -236,7 +254,10 @@ function SiteHeader() {
                 to={item.to}
                 onClick={() => setOpen(false)}
                 className="rounded-lg px-3 py-2 font-medium text-muted-foreground hover:bg-muted"
-                activeProps={{ className: "rounded-lg px-3 py-2 font-semibold bg-muted text-foreground" }}
+                activeProps={{
+                  className:
+                    "rounded-lg px-3 py-2 font-semibold bg-muted text-foreground",
+                }}
                 activeOptions={item.exact ? { exact: true } : undefined}
               >
                 {item.label}
@@ -261,16 +282,35 @@ function SiteFooter() {
             </span>
           </div>
           <p className="mt-2 max-w-md text-xs leading-relaxed text-white/60">
-            A guide, not a guarantee. Always check the needs of each species
-            and the rules where you live.
+            A guide, not a guarantee. Always check the needs of each species and
+            the rules where you live.
           </p>
         </div>
-        <nav aria-label="Footer" className="flex flex-wrap gap-x-4 gap-y-2 text-xs text-white/60">
-          <Link to="/species" className="transition-colors hover:text-white">Species</Link>
-          <Link to="/guides" className="transition-colors hover:text-white">Guides</Link>
-          <Link to="/blog" className="transition-colors hover:text-white">Blog</Link>
-          <Link to="/shops" className="transition-colors hover:text-white">Shops</Link>
-          <a href="/sitemap.xml" className="transition-colors hover:text-white">Sitemap</a>
+        <nav
+          aria-label="Footer"
+          className="flex flex-wrap gap-x-4 gap-y-2 text-xs text-white/60"
+        >
+          <Link to="/species" className="transition-colors hover:text-white">
+            Species
+          </Link>
+          <Link to="/guides" className="transition-colors hover:text-white">
+            Guides
+          </Link>
+          <Link
+            to="/methodology"
+            className="transition-colors hover:text-white"
+          >
+            Methodology
+          </Link>
+          <Link to="/blog" className="transition-colors hover:text-white">
+            Blog
+          </Link>
+          <Link to="/shops" className="transition-colors hover:text-white">
+            Shops
+          </Link>
+          <a href="/sitemap.xml" className="transition-colors hover:text-white">
+            Sitemap
+          </a>
         </nav>
       </div>
     </footer>

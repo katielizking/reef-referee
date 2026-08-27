@@ -121,18 +121,24 @@ export type Database = {
       }
       filters: {
         Row: {
+          biological_media_level: string
+          filter_type: string
           id: string
           name: string
           rated_litres: number
           turnover_lph: number
         }
         Insert: {
+          biological_media_level?: string
+          filter_type?: string
           id?: string
           name: string
           rated_litres: number
           turnover_lph: number
         }
         Update: {
+          biological_media_level?: string
+          filter_type?: string
           id?: string
           name?: string
           rated_litres?: number
@@ -364,51 +370,81 @@ export type Database = {
       }
       tanks: {
         Row: {
+          ammonia_mg_l: number | null
+          biological_media_level: string
           created_at: string
+          cycle_method: string
+          cycle_status: string
           filter_id: string | null
+          filter_maturity: string
           height_cm: number
           id: string
           length_cm: number
           maintenance_frequency: string
           name: string
+          nitrate_mg_l: number | null
+          nitrite_mg_l: number | null
           plant_density: string
           session_id: string | null
+          seeded_media: boolean
+          tank_age_weeks: number | null
           share_slug: string
           target_ph: number
           target_temp_c: number
           user_id: string | null
+          water_tested_on: string | null
           width_cm: number
         }
         Insert: {
+          ammonia_mg_l?: number | null
+          biological_media_level?: string
           created_at?: string
+          cycle_method?: string
+          cycle_status?: string
           filter_id?: string | null
+          filter_maturity?: string
           height_cm: number
           id?: string
           length_cm: number
           maintenance_frequency?: string
           name: string
+          nitrate_mg_l?: number | null
+          nitrite_mg_l?: number | null
           plant_density?: string
           session_id?: string | null
+          seeded_media?: boolean
+          tank_age_weeks?: number | null
           share_slug?: string
           target_ph?: number
           target_temp_c?: number
           user_id?: string | null
+          water_tested_on?: string | null
           width_cm: number
         }
         Update: {
+          ammonia_mg_l?: number | null
+          biological_media_level?: string
           created_at?: string
+          cycle_method?: string
+          cycle_status?: string
           filter_id?: string | null
+          filter_maturity?: string
           height_cm?: number
           id?: string
           length_cm?: number
           maintenance_frequency?: string
           name?: string
+          nitrate_mg_l?: number | null
+          nitrite_mg_l?: number | null
           plant_density?: string
           session_id?: string | null
+          seeded_media?: boolean
+          tank_age_weeks?: number | null
           share_slug?: string
           target_ph?: number
           target_temp_c?: number
           user_id?: string | null
+          water_tested_on?: string | null
           width_cm?: number
         }
         Relationships: [

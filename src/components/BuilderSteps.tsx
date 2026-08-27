@@ -1,11 +1,12 @@
 import { Check } from "lucide-react";
 import type { TankState } from "@/lib/types";
+import { isWaterTestCurrent } from "@/lib/scoring";
 
 export type StepId = "tank" | "filter" | "livestock" | "aquascape";
 
 const STEPS: Array<{ id: StepId; label: string; sub: string }> = [
   { id: "tank", label: "Tank", sub: "Size & water" },
-  { id: "filter", label: "Filter", sub: "Flow & care" },
+  { id: "filter", label: "Cycle", sub: "Filter & tests" },
   { id: "livestock", label: "Livestock", sub: "Fish community" },
   { id: "aquascape", label: "Aquascape", sub: "Plants & habitat" },
 ];
@@ -18,7 +19,14 @@ export function stepStatus(state: TankState): Record<StepId, boolean> {
       state.length_cm >= MIN_DIM &&
       state.width_cm >= MIN_DIM &&
       state.height_cm >= MIN_DIM,
-    filter: state.filter !== null,
+    filter:
+      state.filter !== null &&
+      state.biological_media_level !== "minimal" &&
+      state.filter_maturity === "established" &&
+      state.cycle_status === "verified" &&
+      isWaterTestCurrent(state.water_tested_on) &&
+      state.ammonia_mg_l === 0 &&
+      state.nitrite_mg_l === 0,
     livestock: state.species.length > 0,
     aquascape: state.plants.length + state.hardscape.length > 0,
   };
@@ -36,17 +44,27 @@ export function BuilderSteps({ state, onJump }: Props) {
   const progress = Math.round((completed / STEPS.length) * 100);
 
   return (
-    <nav aria-label="Builder progress" className="mb-4 overflow-hidden rounded-[1.25rem] sm:mb-5 sm:rounded-[1.5rem] bg-ink text-white shadow-[0_16px_40px_rgba(18,35,46,.16)]">
+    <nav
+      aria-label="Builder progress"
+      className="mb-4 overflow-hidden rounded-[1.25rem] sm:mb-5 sm:rounded-[1.5rem] bg-ink text-white shadow-[0_16px_40px_rgba(18,35,46,.16)]"
+    >
       <div className="flex items-center justify-between gap-3 border-b border-white/10 px-4 py-3 sm:gap-4 sm:px-5">
         <div>
           <p className="science-label text-blue">Tank build</p>
-          <p className="mt-1 text-xs text-white/55">{completed} of {STEPS.length} foundations set</p>
+          <p className="mt-1 text-xs text-white/55">
+            {completed} of {STEPS.length} foundations set
+          </p>
         </div>
         <div className="flex items-center gap-3">
           <div className="hidden h-1.5 w-28 overflow-hidden rounded-full bg-white/10 sm:block">
-            <div className="h-full rounded-full bg-lime transition-all duration-500" style={{ width: `${progress}%` }} />
+            <div
+              className="h-full rounded-full bg-lime transition-all duration-500"
+              style={{ width: `${progress}%` }}
+            />
           </div>
-          <span className="font-display text-sm font-bold text-lime">{progress}%</span>
+          <span className="font-display text-sm font-bold text-lime">
+            {progress}%
+          </span>
         </div>
       </div>
       <ol className="flex snap-x snap-mandatory overflow-x-auto overscroll-x-contain p-2 [scrollbar-width:none] sm:grid sm:grid-cols-4 sm:overflow-visible">
@@ -54,7 +72,10 @@ export function BuilderSteps({ state, onJump }: Props) {
           const done = status[step.id];
           const current = index === currentIdx;
           return (
-            <li key={step.id} className="min-w-[9.25rem] flex-1 snap-start sm:min-w-0">
+            <li
+              key={step.id}
+              className="min-w-[9.25rem] flex-1 snap-start sm:min-w-0"
+            >
               <button
                 type="button"
                 onClick={() => onJump(step.id)}
@@ -80,8 +101,12 @@ export function BuilderSteps({ state, onJump }: Props) {
                   {done ? <Check className="h-4 w-4" /> : index + 1}
                 </span>
                 <span className="min-w-0">
-                  <span className="block truncate font-display text-sm font-semibold">{step.label}</span>
-                  <span className={`block truncate text-[11px] ${current ? "text-ink/55" : "text-white/45"}`}>
+                  <span className="block truncate font-display text-sm font-semibold">
+                    {step.label}
+                  </span>
+                  <span
+                    className={`block truncate text-[11px] ${current ? "text-ink/55" : "text-white/45"}`}
+                  >
                     {done ? "Ready" : step.sub}
                   </span>
                 </span>

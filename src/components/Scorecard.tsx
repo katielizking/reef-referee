@@ -9,6 +9,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { useState, type ComponentType, type SVGProps } from "react";
+import { Link } from "@tanstack/react-router";
 
 type ResultKind = "good" | "watch" | "bad";
 
@@ -31,7 +32,7 @@ const RESULT: Record<
 > = {
   good: {
     label: "Looking good",
-    sub: "This setup looks appropriate based on the calculator.",
+    sub: "No current calculator flags require action.",
     icon: CheckCircle2,
     ringVar: "var(--lime)",
     chipBg: "bg-lime/30",
@@ -77,7 +78,14 @@ function ScoreRing({
       role="img"
       aria-label={`${label} score ${score} out of 100`}
     >
-      <circle cx={size / 2} cy={size / 2} r={r} stroke="var(--muted)" strokeWidth="8" fill="none" />
+      <circle
+        cx={size / 2}
+        cy={size / 2}
+        r={r}
+        stroke="var(--muted)"
+        strokeWidth="8"
+        fill="none"
+      />
       <circle
         cx={size / 2}
         cy={size / 2}
@@ -114,10 +122,10 @@ function ScoreRing({
   );
 }
 
-
 interface SubCardProps {
   title: string;
-  score: number;
+  score?: number;
+  statusLabel?: string;
   weightPct?: number;
   reasons: string[];
   fixes: string[];
@@ -125,7 +133,16 @@ interface SubCardProps {
   extra?: React.ReactNode;
 }
 
-function SubCard({ title, score, weightPct, reasons, fixes, calculation, extra }: SubCardProps) {
+function SubCard({
+  title,
+  score,
+  statusLabel,
+  weightPct,
+  reasons,
+  fixes,
+  calculation,
+  extra,
+}: SubCardProps) {
   const [open, setOpen] = useState(false);
   const hasFixes = fixes.length > 0;
   return (
@@ -137,24 +154,41 @@ function SubCard({ title, score, weightPct, reasons, fixes, calculation, extra }
               {title}
             </p>
             {typeof weightPct === "number" && (
-              <span className="rounded-full bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground" title={`Contributes ${weightPct}% to overall`}>
+              <span
+                className="rounded-full bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground"
+                title={`Contributes ${weightPct}% to overall`}
+              >
                 {weightPct}% weight
               </span>
             )}
           </div>
-          <div className="mt-1 flex items-baseline gap-1">
-            <span className="font-display text-2xl font-bold tracking-tight text-foreground">{score}</span>
-            <span className="text-xs text-muted-foreground">/ 100</span>
-          </div>
-          <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-muted">
-            <div
-              className={`h-full rounded-full transition-all duration-500 ${
-                score >= 75 ? "bg-lime" : score >= 45 ? "bg-warn" : "bg-coral"
-              }`}
-              style={{ width: `${score}%` }}
-              aria-hidden
-            />
-          </div>
+          {typeof score === "number" ? (
+            <>
+              <div className="mt-1 flex items-baseline gap-1">
+                <span className="font-display text-2xl font-bold tracking-tight text-foreground">
+                  {score}
+                </span>
+                <span className="text-xs text-muted-foreground">/ 100</span>
+              </div>
+              <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-muted">
+                <div
+                  className={`h-full rounded-full transition-all duration-500 ${
+                    score >= 75
+                      ? "bg-lime"
+                      : score >= 45
+                        ? "bg-warn"
+                        : "bg-coral"
+                  }`}
+                  style={{ width: `${score}%` }}
+                  aria-hidden
+                />
+              </div>
+            </>
+          ) : statusLabel ? (
+            <p className="mt-2 font-display text-xl font-bold capitalize tracking-tight text-foreground">
+              {statusLabel.replace("-", " ")}
+            </p>
+          ) : null}
         </div>
         {extra}
       </div>
@@ -170,8 +204,11 @@ function SubCard({ title, score, weightPct, reasons, fixes, calculation, extra }
           className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-primary hover:underline"
           onClick={() => setOpen((v) => !v)}
         >
-          {open ? "Hide" : "Show"} {fixes.length} suggestion{fixes.length > 1 ? "s" : ""}
-          <ChevronDown className={`h-3.5 w-3.5 transition ${open ? "rotate-180" : ""}`} />
+          {open ? "Hide" : "Show"} {fixes.length} suggestion
+          {fixes.length > 1 ? "s" : ""}
+          <ChevronDown
+            className={`h-3.5 w-3.5 transition ${open ? "rotate-180" : ""}`}
+          />
         </button>
       )}
       {open && (
@@ -232,16 +269,22 @@ export function ScorecardPanel({ scorecard }: { scorecard: Scorecard }) {
                   {Icon ? <Icon className="h-3.5 w-3.5" aria-hidden /> : null}
                   <span>{meta!.label}</span>
                 </div>
-                <p className="mt-2 text-sm text-muted-foreground">{meta!.sub}</p>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  {meta!.sub}
+                </p>
                 {s.capReason && (
                   <p className="mt-2 flex items-start gap-1.5 rounded-lg bg-warn/15 px-2.5 py-1.5 text-xs font-medium text-foreground">
-                    <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-warn" aria-hidden />
+                    <AlertTriangle
+                      className="mt-0.5 h-3.5 w-3.5 shrink-0 text-warn"
+                      aria-hidden
+                    />
                     <span>{s.capReason}</span>
                   </p>
                 )}
                 {s.biome.badge === "true-biotope" && (
                   <div className="mt-2 inline-flex items-center gap-1 rounded-full bg-lime/30 px-3 py-1 text-xs font-semibold text-foreground">
-                    <Sparkles className="h-3.5 w-3.5" aria-hidden /> True biotope
+                    <Sparkles className="h-3.5 w-3.5" aria-hidden /> True
+                    biotope
                   </div>
                 )}
               </>
@@ -253,8 +296,15 @@ export function ScorecardPanel({ scorecard }: { scorecard: Scorecard }) {
           <p className="mt-4 flex items-start gap-1.5 border-t border-border/70 pt-3 text-xs text-muted-foreground">
             <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden />
             <span>
-              This is a guide, not a guarantee. Individual species have different space and
-              care needs — always check before you stock.
+              The headline score covers compatibility, swimming space and water
+              suitability. Cycle readiness can cap it. The waste-load screen is
+              beta and informational only.{" "}
+              <Link
+                to="/methodology"
+                className="font-semibold text-primary hover:underline"
+              >
+                Read the methodology.
+              </Link>
             </span>
           </p>
         )}
@@ -270,7 +320,9 @@ export function ScorecardPanel({ scorecard }: { scorecard: Scorecard }) {
                 : "border-primary/30 bg-primary/5"
           }`}
         >
-          <p className="science-label text-foreground/60">Do this first · {s.priorityAction.category}</p>
+          <p className="science-label text-foreground/60">
+            Do this first · {s.priorityAction.category}
+          </p>
           <p className="mt-3 font-display text-lg font-bold tracking-tight text-foreground">
             {s.priorityAction.title}
           </p>
@@ -281,30 +333,49 @@ export function ScorecardPanel({ scorecard }: { scorecard: Scorecard }) {
       )}
 
       <SubCard
+        title="Cycle & biofilter readiness"
+        statusLabel={s.readiness.status}
+        reasons={s.readiness.reasons}
+        fixes={s.readiness.fixes}
+        calculation="Checks whether a biological filter is selected and established, whether the nitrogen-cycle status is recorded, and whether tests from the last 7 days show 0 mg/L ammonia and 0 mg/L nitrite. The 7-day window is an operational freshness rule, not a guarantee of future water quality. Readiness is a safety gate, not a weighted category."
+        extra={
+          <span
+            className={`rounded-full px-2 py-0.5 text-xs font-semibold ${
+              s.readiness.status === "ready"
+                ? "bg-lime/30 text-foreground"
+                : s.readiness.status === "unsafe"
+                  ? "bg-coral/20 text-foreground"
+                  : "bg-warn/20 text-foreground"
+            }`}
+          >
+            Safety gate
+          </span>
+        }
+      />
+      <SubCard
         title="Species compatibility"
         score={s.compatibility.score}
-        weightPct={35}
+        weightPct={45}
         reasons={s.compatibility.reasons}
         fixes={s.compatibility.fixes}
         calculation="Checks same-species group needs, aggression and territorial behaviour, then checks every species pair for temperament clashes, fin-nipping, predation and overlapping water ranges."
       />
       <SubCard
-        title="Bioload"
-        score={s.bioload.score}
-        weightPct={25}
-        reasons={s.bioload.headroom ? [...s.bioload.reasons, s.bioload.headroom] : s.bioload.reasons}
+        title="Waste-load screen"
+        statusLabel={s.bioload.loadBand}
+        reasons={s.bioload.reasons}
         fixes={s.bioload.fixes}
-        calculation="Compares livestock waste load with usable capacity based on tank volume, filter turnover, planting and maintenance. Light stocking is never penalised; the score only falls above the healthy 85% plateau."
+        calculation="Beta only. This retains the inherited litres/5 reference as a broad demand screen while a sourced model is developed. It does not treat pump turnover, plants or maintenance as extra biological capacity; it does not change the welfare score or calculate room for more fish."
         extra={
-          <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
-            {s.bioload.loadPercent}% load
+          <span className="rounded-full bg-warn/20 px-2 py-0.5 text-xs font-semibold text-foreground">
+            Beta · not scored
           </span>
         }
       />
       <SubCard
         title="Space to swim"
         score={s.space.score}
-        weightPct={25}
+        weightPct={35}
         reasons={s.space.reasons}
         fixes={s.space.fixes}
         calculation="Compares each species’ minimum tank volume and adult swimming-length requirement with this tank’s volume and length."
@@ -312,7 +383,7 @@ export function ScorecardPanel({ scorecard }: { scorecard: Scorecard }) {
       <SubCard
         title="Water suitability"
         score={s.water.score}
-        weightPct={15}
+        weightPct={20}
         reasons={s.water.reasons}
         fixes={s.water.fixes}
         calculation="Checks the tank’s selected pH and temperature against every fish’s care range. It is separate from pairwise compatibility, so a single fish in unsuitable water is still flagged."

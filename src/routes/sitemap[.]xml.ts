@@ -20,6 +20,7 @@ export const Route = createFileRoute("/sitemap.xml")({
           { path: "/", changefreq: "weekly", priority: "1.0" },
           { path: "/quiz", changefreq: "monthly", priority: "0.8" },
           { path: "/guides", changefreq: "monthly", priority: "0.7" },
+          { path: "/methodology", changefreq: "monthly", priority: "0.8" },
           { path: "/guides/cycling", changefreq: "monthly", priority: "0.8" },
           { path: "/blog", changefreq: "weekly", priority: "0.7" },
           { path: "/shops", changefreq: "weekly", priority: "0.7" },
@@ -34,19 +35,29 @@ export const Route = createFileRoute("/sitemap.xml")({
           supabase.from("species").select("id"),
         ]);
 
-        (posts.data ?? []).forEach((p: { slug: string; published_at: string | null }) => {
+        (posts.data ?? []).forEach(
+          (p: { slug: string; published_at: string | null }) => {
+            entries.push({
+              path: `/blog/${p.slug}`,
+              changefreq: "monthly",
+              priority: "0.6",
+              lastmod: p.published_at ?? undefined,
+            });
+          },
+        );
+        (shops.data ?? []).forEach((s: { slug: string }) => {
           entries.push({
-            path: `/blog/${p.slug}`,
+            path: `/shops/${s.slug}`,
             changefreq: "monthly",
-            priority: "0.6",
-            lastmod: p.published_at ?? undefined,
+            priority: "0.5",
           });
         });
-        (shops.data ?? []).forEach((s: { slug: string }) => {
-          entries.push({ path: `/shops/${s.slug}`, changefreq: "monthly", priority: "0.5" });
-        });
         (species.data ?? []).forEach((s: { id: string }) => {
-          entries.push({ path: `/species/${s.id}`, changefreq: "monthly", priority: "0.5" });
+          entries.push({
+            path: `/species/${s.id}`,
+            changefreq: "monthly",
+            priority: "0.5",
+          });
         });
 
         const urls = entries
@@ -55,7 +66,9 @@ export const Route = createFileRoute("/sitemap.xml")({
               "  <url>",
               `    <loc>${BASE_URL}${e.path}</loc>`,
               e.lastmod ? `    <lastmod>${e.lastmod}</lastmod>` : null,
-              e.changefreq ? `    <changefreq>${e.changefreq}</changefreq>` : null,
+              e.changefreq
+                ? `    <changefreq>${e.changefreq}</changefreq>`
+                : null,
               e.priority ? `    <priority>${e.priority}</priority>` : null,
               "  </url>",
             ]

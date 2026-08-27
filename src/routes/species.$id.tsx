@@ -437,7 +437,7 @@ function compatibilityCopy(s: Species): string {
 }
 
 function bioloadCopy(s: Species): string {
-  return `Each ${s.common_name} adds a bioload of ~${s.bioload_factor.toFixed(1)} to the tank. That's compared against your filter turnover, plant density and maintenance schedule to work out how heavily stocked you are.`;
+  return `Each ${s.common_name} currently adds an experimental waste-demand value of ~${s.bioload_factor.toFixed(1)}. FishTankr uses that only for a beta screening band: it is not a validated capacity figure, pump turnover does not increase it, and it never tells you how many more fish to add.`;
 }
 
 function spaceCopy(s: Species): string {

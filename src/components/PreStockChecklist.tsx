@@ -1,5 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
-import { AlertTriangle, ChevronDown, Info, ShieldCheck, TriangleAlert } from "lucide-react";
+import {
+  AlertTriangle,
+  ChevronDown,
+  Info,
+  ShieldCheck,
+  TriangleAlert,
+} from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -10,10 +16,13 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 import { Switch } from "@/components/ui/switch";
 import type { Issue, Scorecard } from "@/lib/scoring";
-import { litresOf } from "@/lib/scoring";
 import type { TankState } from "@/lib/types";
 
 const GUARD_KEY = "fishtankr:prestock-guard";
@@ -50,19 +59,34 @@ function issueTitle(issue: Issue): string {
     "footprint-crowded": "Tank footprint is crowded",
     "ph-unsuitable": "Target pH is unsuitable",
     "temp-unsuitable": "Target temperature is unsuitable",
+    "no-filter": "No biological filter selected",
+    "no-biological-media": "Biological media is insufficient",
+    "filter-not-mature": "Biofilter maturity is unverified",
+    "cycle-not-started": "Nitrogen cycle has not started",
+    "cycle-in-progress": "Nitrogen cycle is still in progress",
+    "cycle-unverified": "Nitrogen cycle is unverified",
+    "water-test-stale": "Water-test evidence is out of date",
+    "ammonia-detected": "Ammonia detected",
+    "nitrite-detected": "Nitrite detected",
   };
   return titles[issue.code] ?? "Care issue";
 }
 
 function checklistSeverity(issue: Issue): ChecklistSeverity {
+  if (issue.category === "readiness") return "must-fix";
   if (issue.severity === "critical") return "must-fix";
-  if (issue.severity === "high" || issue.severity === "medium") return "worth-look";
+  if (issue.severity === "high" || issue.severity === "medium")
+    return "worth-look";
   return "info";
 }
 
-export function buildChecklist(scorecard: Scorecard, state: TankState): ChecklistItem[] {
+export function buildChecklist(
+  scorecard: Scorecard,
+  state: TankState,
+): ChecklistItem[] {
   const items: ChecklistItem[] = [];
   const scoredIssues: Issue[] = [
+    ...scorecard.readiness.issues,
     ...scorecard.compatibility.issues,
     ...(scorecard.space.issues ?? []),
     ...(scorecard.water.issues ?? []),
@@ -78,25 +102,33 @@ export function buildChecklist(scorecard: Scorecard, state: TankState): Checklis
     });
   });
 
-  if (scorecard.bioload.loadPercent > 110) {
+  if (scorecard.bioload.loadBand === "very-high") {
     items.push({
-      id: "overstocked",
-      severity: "must-fix",
-      title: `Overstocked at ${Math.round(scorecard.bioload.loadPercent)}%`,
-      why: "Filtration and water changes will not keep pace with this stocking load.",
-      fix: scorecard.bioload.fixes[0] ?? "Reduce fish counts, improve filtration or move to a larger tank.",
-    });
-  } else if (scorecard.bioload.loadPercent > 85) {
-    items.push({
-      id: "near-capacity",
+      id: "waste-load-very-high",
       severity: "worth-look",
-      title: `Very little biological headroom (${Math.round(scorecard.bioload.loadPercent)}%)`,
-      why: "The tank is above FishTankr’s comfortable 85% capacity plateau.",
-      fix: scorecard.bioload.fixes[0] ?? "Treat the tank as full and keep maintenance weekly.",
+      title: "Very high preliminary waste-load flag",
+      why: "The experimental screen is high enough to justify a closer stocking review, but it is not a validated capacity percentage.",
+      fix:
+        scorecard.bioload.fixes[0] ??
+        "Review adult fish needs and water-test trends before adding livestock.",
+    });
+  } else if (scorecard.bioload.loadBand === "high") {
+    items.push({
+      id: "waste-load-high",
+      severity: "worth-look",
+      title: "High preliminary waste-load flag",
+      why: "This beta screen suggests reviewing the plan; it does not calculate how many fish the tank can safely hold.",
+      fix:
+        scorecard.bioload.fixes[0] ??
+        "Review the plan against adult fish needs and measured water quality.",
     });
   }
 
-  if (state.maintenance_frequency === "monthly" && scorecard.bioload.loadPercent > 60) {
+  if (
+    state.maintenance_frequency === "monthly" &&
+    (scorecard.bioload.loadBand === "high" ||
+      scorecard.bioload.loadBand === "very-high")
+  ) {
     items.push({
       id: "maint-thin",
       severity: "worth-look",
@@ -106,25 +138,17 @@ export function buildChecklist(scorecard: Scorecard, state: TankState): Checklis
     });
   }
 
-  const litres = litresOf(state);
-  if (state.filter && litres > 0) {
-    const turnover = state.filter.turnover_lph / litres;
-    if (turnover < 4) {
-      items.push({
-        id: "filter-undersized",
-        severity: "worth-look",
-        title: `Filter turnover is only ${turnover.toFixed(1)}× per hour`,
-        why: "Most freshwater community tanks need roughly 4–6× tank volume per hour of filter flow.",
-        fix: "Choose a higher-flow filter or add a second filter while keeping species-specific flow needs in mind.",
-      });
-    }
-  } else if (!state.filter && state.species.length > 0) {
+  if (
+    state.filter &&
+    state.filter.rated_litres <
+      (state.length_cm * state.width_cm * state.height_cm) / 1000
+  ) {
     items.push({
-      id: "no-filter",
-      severity: "must-fix",
-      title: "No filter selected",
-      why: "A stocked tank needs established biological filtration to process toxic waste.",
-      fix: "Choose a filter rated for at least this tank’s volume and cycle it before adding fish.",
+      id: "filter-manufacturer-rating",
+      severity: "worth-look",
+      title: "Filter is below the tank’s manufacturer rating",
+      why: "The selected filter is marketed for a smaller aquarium. Its flow rate alone does not prove biological capacity.",
+      fix: "Choose a filter rated for this tank or larger, then verify its media and cycle maturity separately.",
     });
   }
 
@@ -165,8 +189,17 @@ interface Props {
   onConfirmSave: () => void;
 }
 
-export function PreStockChecklist({ scorecard, state, pendingSave, onCancelSave, onConfirmSave }: Props) {
-  const items = useMemo(() => buildChecklist(scorecard, state), [scorecard, state]);
+export function PreStockChecklist({
+  scorecard,
+  state,
+  pendingSave,
+  onCancelSave,
+  onConfirmSave,
+}: Props) {
+  const items = useMemo(
+    () => buildChecklist(scorecard, state),
+    [scorecard, state],
+  );
   const mustFix = items.filter((i) => i.severity === "must-fix");
   const worthLook = items.filter((i) => i.severity === "worth-look");
   const info = items.filter((i) => i.severity === "info");
@@ -186,44 +219,72 @@ export function PreStockChecklist({ scorecard, state, pendingSave, onCancelSave,
           <CollapsibleTrigger className="flex w-full items-center justify-between gap-2 text-left">
             <div className="flex items-center gap-2">
               <ShieldCheck className="h-4 w-4 text-primary" />
-              <h3 className="font-display text-sm font-semibold text-foreground">Pre-stock check</h3>
+              <h3 className="font-display text-sm font-semibold text-foreground">
+                Pre-stock check
+              </h3>
             </div>
             <div className="flex items-center gap-2">
-              <CountBadges mustFix={mustFix.length} worthLook={worthLook.length} noFish={noFish} />
-              <ChevronDown className={`h-4 w-4 shrink-0 text-muted-foreground transition-transform ${open ? "rotate-180" : ""}`} />
+              <CountBadges
+                mustFix={mustFix.length}
+                worthLook={worthLook.length}
+                noFish={noFish}
+              />
+              <ChevronDown
+                className={`h-4 w-4 shrink-0 text-muted-foreground transition-transform ${open ? "rotate-180" : ""}`}
+              />
             </div>
           </CollapsibleTrigger>
           <CollapsibleContent className="mt-3 space-y-2">
-            {noFish ? (
+            {items.length === 0 && noFish ? (
               <p className="rounded-xl bg-muted/50 px-3 py-2 text-sm text-muted-foreground">
-                Add fish to run the check.
+                Cycle readiness is recorded. Add fish to run compatibility,
+                space and water checks.
               </p>
             ) : items.length === 0 ? (
               <p className="rounded-xl bg-lime/20 px-3 py-2 text-sm text-foreground">
-                Looking good — no risks flagged. Remember this is a guide, not a guarantee.
+                Looking good — no risks flagged. Remember this is a guide, not a
+                guarantee.
               </p>
             ) : (
               <>
-                {mustFix.map((it) => <ItemRow key={it.id} item={it} />)}
-                {worthLook.map((it) => <ItemRow key={it.id} item={it} />)}
-                {info.map((it) => <ItemRow key={it.id} item={it} />)}
+                {mustFix.map((it) => (
+                  <ItemRow key={it.id} item={it} />
+                ))}
+                {worthLook.map((it) => (
+                  <ItemRow key={it.id} item={it} />
+                ))}
+                {info.map((it) => (
+                  <ItemRow key={it.id} item={it} />
+                ))}
               </>
             )}
 
             <div className="mt-3 flex items-start justify-between gap-3 rounded-xl bg-muted/40 px-3 py-2">
               <div className="min-w-0">
-                <p className="text-sm font-medium text-foreground">Skip this check</p>
+                <p className="text-sm font-medium text-foreground">
+                  Skip this check
+                </p>
                 <p className="text-xs text-muted-foreground">
-                  Turn off if you know what you're doing. Save won't ask you to confirm.
+                  Turn off if you know what you're doing. Save won't ask you to
+                  confirm.
                 </p>
               </div>
-              <Switch checked={!guardOn} onCheckedChange={(v) => setGuardOn(!v)} aria-label="Skip pre-stock check" />
+              <Switch
+                checked={!guardOn}
+                onCheckedChange={(v) => setGuardOn(!v)}
+                aria-label="Skip pre-stock check"
+              />
             </div>
           </CollapsibleContent>
         </Collapsible>
       </section>
 
-      <AlertDialog open={pendingSave !== null} onOpenChange={(o) => { if (!o) onCancelSave(); }}>
+      <AlertDialog
+        open={pendingSave !== null}
+        onOpenChange={(o) => {
+          if (!o) onCancelSave();
+        }}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2">
@@ -231,23 +292,35 @@ export function PreStockChecklist({ scorecard, state, pendingSave, onCancelSave,
               Worth another look before you save
             </AlertDialogTitle>
             <AlertDialogDescription>
-              This setup has issues that will affect your fish. You can adjust the tank, or save anyway if it's intentional.
+              This setup has issues that will affect your fish. You can adjust
+              the tank, or save anyway if it's intentional.
             </AlertDialogDescription>
           </AlertDialogHeader>
 
           <div className="max-h-[50vh] space-y-2 overflow-auto">
-            {mustFix.map((it) => <ItemRow key={it.id} item={it} />)}
+            {mustFix.map((it) => (
+              <ItemRow key={it.id} item={it} />
+            ))}
             {worthLook.length > 0 && (
               <>
-                <p className="pt-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Also worth a look</p>
-                {worthLook.map((it) => <ItemRow key={it.id} item={it} />)}
+                <p className="pt-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                  Also worth a look
+                </p>
+                {worthLook.map((it) => (
+                  <ItemRow key={it.id} item={it} />
+                ))}
               </>
             )}
           </div>
 
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={onCancelSave}>Adjust tank</AlertDialogCancel>
-            <AlertDialogAction onClick={onConfirmSave} className="bg-coral text-white hover:bg-coral/90">
+            <AlertDialogCancel onClick={onCancelSave}>
+              Adjust tank
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={onConfirmSave}
+              className="bg-coral text-white hover:bg-coral/90"
+            >
               Save anyway
             </AlertDialogAction>
           </AlertDialogFooter>
@@ -257,18 +330,35 @@ export function PreStockChecklist({ scorecard, state, pendingSave, onCancelSave,
   );
 }
 
-function CountBadges({ mustFix, worthLook, noFish }: { mustFix: number; worthLook: number; noFish: boolean }) {
-  if (noFish) return <span className="text-xs text-muted-foreground">No fish yet</span>;
+function CountBadges({
+  mustFix,
+  worthLook,
+  noFish,
+}: {
+  mustFix: number;
+  worthLook: number;
+  noFish: boolean;
+}) {
+  if (noFish && mustFix === 0 && worthLook === 0)
+    return <span className="text-xs text-muted-foreground">No fish yet</span>;
   if (mustFix === 0 && worthLook === 0) {
-    return <span className="rounded-full bg-lime/30 px-2 py-0.5 text-xs font-semibold text-foreground">All clear</span>;
+    return (
+      <span className="rounded-full bg-lime/30 px-2 py-0.5 text-xs font-semibold text-foreground">
+        All clear
+      </span>
+    );
   }
   return (
     <span className="flex items-center gap-1 text-xs">
       {mustFix > 0 && (
-        <span className="rounded-full bg-coral/25 px-2 py-0.5 font-semibold text-foreground">{mustFix} must fix</span>
+        <span className="rounded-full bg-coral/25 px-2 py-0.5 font-semibold text-foreground">
+          {mustFix} must fix
+        </span>
       )}
       {worthLook > 0 && (
-        <span className="rounded-full bg-muted px-2 py-0.5 font-semibold text-foreground">{worthLook} look</span>
+        <span className="rounded-full bg-muted px-2 py-0.5 font-semibold text-foreground">
+          {worthLook} look
+        </span>
       )}
     </span>
   );
@@ -277,10 +367,19 @@ function CountBadges({ mustFix, worthLook, noFish }: { mustFix: number; worthLoo
 function ItemRow({ item }: { item: ChecklistItem }) {
   const styles =
     item.severity === "must-fix"
-      ? { bg: "bg-coral/10", icon: <TriangleAlert className="h-4 w-4 text-coral" /> }
+      ? {
+          bg: "bg-coral/10",
+          icon: <TriangleAlert className="h-4 w-4 text-coral" />,
+        }
       : item.severity === "worth-look"
-        ? { bg: "bg-muted/60", icon: <AlertTriangle className="h-4 w-4 text-foreground/70" /> }
-        : { bg: "bg-muted/40", icon: <Info className="h-4 w-4 text-muted-foreground" /> };
+        ? {
+            bg: "bg-muted/60",
+            icon: <AlertTriangle className="h-4 w-4 text-foreground/70" />,
+          }
+        : {
+            bg: "bg-muted/40",
+            icon: <Info className="h-4 w-4 text-muted-foreground" />,
+          };
   return (
     <div className={`rounded-xl px-3 py-2 text-sm ${styles.bg}`}>
       <div className="flex items-start gap-2">
@@ -299,11 +398,19 @@ function ItemRow({ item }: { item: ChecklistItem }) {
 
 /** Save gate hook. Wraps a save function so it checks the guard + must-fix items. */
 export function useSaveGate(scorecard: Scorecard, state: TankState) {
-  const items = useMemo(() => buildChecklist(scorecard, state), [scorecard, state]);
+  const items = useMemo(
+    () => buildChecklist(scorecard, state),
+    [scorecard, state],
+  );
   const mustFix = items.filter((i) => i.severity === "must-fix");
-  const [pendingSave, setPendingSave] = useState<null | { share: boolean }>(null);
+  const [pendingSave, setPendingSave] = useState<null | { share: boolean }>(
+    null,
+  );
 
-  const guardOn = typeof window !== "undefined" ? window.localStorage.getItem(GUARD_KEY) !== "off" : true;
+  const guardOn =
+    typeof window !== "undefined"
+      ? window.localStorage.getItem(GUARD_KEY) !== "off"
+      : true;
 
   function requestSave(share: boolean, doSave: (share: boolean) => void) {
     if (guardOn && mustFix.length > 0) {

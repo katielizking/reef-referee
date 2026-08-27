@@ -29,10 +29,10 @@ import {
 
 const HERO_DISMISS_KEY = "fishtankr:hero-dismissed";
 
-
-
 export const Route = createFileRoute("/")({
-  validateSearch: (search: Record<string, unknown>): { tank?: string; remix?: string } => ({
+  validateSearch: (
+    search: Record<string, unknown>,
+  ): { tank?: string; remix?: string } => ({
     tank: typeof search.tank === "string" ? search.tank : undefined,
     remix: typeof search.remix === "string" ? search.remix : undefined,
   }),
@@ -58,6 +58,16 @@ const DEFAULT_STATE: TankState = {
   height_cm: 45,
   filter: null,
   maintenance_frequency: "weekly",
+  biological_media_level: "standard",
+  filter_maturity: "unknown",
+  cycle_status: "unknown",
+  cycle_method: "unknown",
+  tank_age_weeks: null,
+  ammonia_mg_l: null,
+  nitrite_mg_l: null,
+  nitrate_mg_l: null,
+  water_tested_on: null,
+  seeded_media: false,
   target_ph: 7.0,
   target_temp_c: 25,
   plant_density: "medium",
@@ -123,6 +133,19 @@ function Builder() {
           height_cm: data.tank.height_cm,
           filter: data.filter,
           maintenance_frequency: data.tank.maintenance_frequency,
+          biological_media_level:
+            data.tank.biological_media_level ??
+            data.filter?.biological_media_level ??
+            "standard",
+          filter_maturity: data.tank.filter_maturity ?? "unknown",
+          cycle_status: data.tank.cycle_status ?? "unknown",
+          cycle_method: data.tank.cycle_method ?? "unknown",
+          tank_age_weeks: data.tank.tank_age_weeks ?? null,
+          ammonia_mg_l: data.tank.ammonia_mg_l ?? null,
+          nitrite_mg_l: data.tank.nitrite_mg_l ?? null,
+          nitrate_mg_l: data.tank.nitrate_mg_l ?? null,
+          water_tested_on: data.tank.water_tested_on ?? null,
+          seeded_media: data.tank.seeded_media ?? false,
           target_ph: data.tank.target_ph,
           target_temp_c: data.tank.target_temp_c,
           plant_density: data.tank.plant_density,
@@ -133,14 +156,17 @@ function Builder() {
         setSavedId(remixSlug ? undefined : data.tank.id);
         setHeroDismissed(true);
         toast.success(
-          remixSlug ? `Ready to remix ${data.tank.name}` : `Loaded ${data.tank.name}`,
+          remixSlug
+            ? `Ready to remix ${data.tank.name}`
+            : `Loaded ${data.tank.name}`,
         );
       })
       .catch((error) => {
         if (cancelled) return;
         console.error(error);
         toast.error("Couldn't open this tank", {
-          description: error instanceof Error ? error.message : "Try again in a moment.",
+          description:
+            error instanceof Error ? error.message : "Try again in a moment.",
         });
       })
       .finally(() => {
@@ -160,7 +186,6 @@ function Builder() {
     });
   }
 
-
   const dims = useMemo(() => {
     const CM_PER_UNIT = 10;
     const x = Math.max(state.length_cm, 20) / CM_PER_UNIT;
@@ -169,7 +194,6 @@ function Builder() {
     const substrateHeight = Math.min(0.4, y * 0.15);
     return { x, y, z, substrateY: -y / 2 + substrateHeight };
   }, [state.length_cm, state.width_cm, state.height_cm]);
-
 
   useEffect(() => {
     if (!species.data || sourceSlug) return;
@@ -232,9 +256,29 @@ function Builder() {
   // Auto-suggest a filter once dimensions are known and none is chosen.
   useEffect(() => {
     if (!filters.data || state.filter) return;
-    const pick = pickDefaultFilter(filters.data, state);
-    if (pick) setState((s) => (s.filter ? s : { ...s, filter: pick }));
-  }, [filters.data, state.filter, state.length_cm, state.width_cm, state.height_cm]);
+    const pick = pickDefaultFilter(filters.data, {
+      length_cm: state.length_cm,
+      width_cm: state.width_cm,
+      height_cm: state.height_cm,
+    });
+    if (pick) {
+      setState((s) =>
+        s.filter
+          ? s
+          : {
+              ...s,
+              filter: pick,
+              biological_media_level: pick.biological_media_level,
+            },
+      );
+    }
+  }, [
+    filters.data,
+    state.filter,
+    state.length_cm,
+    state.width_cm,
+    state.height_cm,
+  ]);
 
   // Capture a history snapshot when the state has settled after any edit
   // (drag commits itself synchronously on pointer-up).
@@ -242,8 +286,6 @@ function Builder() {
     const t = setTimeout(() => history.commit(), 500);
     return () => clearTimeout(t);
   }, [state, history]);
-
-
 
   async function doSave(share: boolean) {
     try {
@@ -260,7 +302,8 @@ function Builder() {
     } catch (err) {
       console.error(err);
       toast.error("Couldn't save this tank", {
-        description: err instanceof Error ? err.message : "Try again in a moment.",
+        description:
+          err instanceof Error ? err.message : "Try again in a moment.",
       });
     } finally {
       setSaving(false);
@@ -296,12 +339,16 @@ function Builder() {
               Smarter tanks. Happier fish.
             </h1>
             <p className="mt-5 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-              Plan your setup, check your stocking and understand the biology behind a
-              healthy aquarium with simple tools built around fish welfare.
+              Plan your setup, check your stocking and understand the biology
+              behind a healthy aquarium with simple tools built around fish
+              welfare.
             </p>
             <div className="mt-7 grid gap-3 sm:flex sm:flex-wrap">
               <button
-                onClick={() => { dismissHero(); scrollToBuilder(); }}
+                onClick={() => {
+                  dismissHero();
+                  scrollToBuilder();
+                }}
                 className="inline-flex min-h-12 w-full items-center justify-center rounded-full bg-ink px-6 py-3 sm:w-auto text-sm font-semibold text-white shadow-[0_8px_0_rgba(55,184,198,.28)] transition-all hover:-translate-y-0.5 hover:shadow-[0_10px_0_rgba(55,184,198,.34)]"
               >
                 Check my tank
@@ -314,17 +361,26 @@ function Builder() {
               </button>
             </div>
           </div>
-          <div className="hero-float relative mx-auto w-full max-w-lg rounded-[2rem] border border-white/70 bg-white/55 p-3 shadow-[0_30px_80px_rgba(18,35,46,.15)] backdrop-blur-sm"><HeroTankIllustration className="w-full" /><div className="absolute -bottom-3 left-5 rounded-full bg-lime px-3 py-1.5 font-display text-[10px] font-bold uppercase tracking-[.14em] text-ink shadow-sm">Live welfare score</div></div>
+          <div className="hero-float relative mx-auto w-full max-w-lg rounded-[2rem] border border-white/70 bg-white/55 p-3 shadow-[0_30px_80px_rgba(18,35,46,.15)] backdrop-blur-sm">
+            <HeroTankIllustration className="w-full" />
+            <div className="absolute -bottom-3 left-5 rounded-full bg-lime px-3 py-1.5 font-display text-[10px] font-bold uppercase tracking-[.14em] text-ink shadow-sm">
+              Live welfare score
+            </div>
+          </div>
         </section>
       )}
 
-      <div id="builder" className="mb-5 flex flex-col justify-between gap-3 border-b border-ink/10 pb-4 sm:mb-6 sm:gap-4 sm:pb-5 sm:flex-row sm:items-end">
+      <div
+        id="builder"
+        className="mb-5 flex flex-col justify-between gap-3 border-b border-ink/10 pb-4 sm:mb-6 sm:gap-4 sm:pb-5 sm:flex-row sm:items-end"
+      >
         <div>
           <h2 className="font-display text-3xl font-bold tracking-[-.035em] text-foreground">
             Design your tank
           </h2>
           <p className="text-sm text-muted-foreground">
-            Add livestock, plants and hardscape. Your scorecard updates as you go.
+            Add livestock, plants and hardscape. Your scorecard updates as you
+            go.
           </p>
         </div>
         <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
@@ -334,7 +390,11 @@ function Builder() {
             title={state.species.length === 0 ? "Add fish to save" : undefined}
             className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-xl border bg-card px-3 py-2 text-sm font-semibold text-foreground transition-colors hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+            {saving ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Save className="h-4 w-4" />
+            )}
             Save
           </button>
           <button
@@ -369,85 +429,97 @@ function Builder() {
                 setOpenSteps={setOpenSteps}
               />
             </aside>
-          <div className="order-1 space-y-4 xl:order-2">
-            <section className="overflow-hidden rounded-[1.5rem] border border-ink/15 bg-ink p-2 sm:rounded-[2rem] shadow-[0_28px_70px_rgba(18,35,46,.18)] sm:p-3">
-              <header className="flex flex-col items-stretch gap-2 px-2 pb-3 pt-1 text-white sm:flex-row sm:items-center sm:justify-between sm:gap-3 sm:px-3">
-                <div>
-                  <p className="science-label text-blue">Live aquarium</p>
-                  <p className="mt-1 font-display text-sm font-semibold">{state.name}</p>
+            <div className="order-1 space-y-4 xl:order-2">
+              <section className="overflow-hidden rounded-[1.5rem] border border-ink/15 bg-ink p-2 sm:rounded-[2rem] shadow-[0_28px_70px_rgba(18,35,46,.18)] sm:p-3">
+                <header className="flex flex-col items-stretch gap-2 px-2 pb-3 pt-1 text-white sm:flex-row sm:items-center sm:justify-between sm:gap-3 sm:px-3">
+                  <div>
+                    <p className="science-label text-blue">Live aquarium</p>
+                    <p className="mt-1 font-display text-sm font-semibold">
+                      {state.name}
+                    </p>
+                  </div>
+                  <div className="grid grid-cols-3 gap-1.5 text-[10px] sm:flex sm:flex-wrap font-semibold uppercase tracking-wide text-white/65">
+                    <span className="inline-flex min-w-0 items-center justify-center gap-1 rounded-full bg-white/10 px-2 py-1.5 text-center">
+                      <Ruler className="h-3 w-3 text-blue" /> {state.length_cm}{" "}
+                      × {state.width_cm} × {state.height_cm} cm
+                    </span>
+                    <span className="inline-flex items-center gap-1 rounded-full bg-white/10 px-2.5 py-1.5">
+                      <Waves className="h-3 w-3 text-blue" />{" "}
+                      {Math.round(
+                        (state.length_cm * state.width_cm * state.height_cm) /
+                          1000,
+                      )}{" "}
+                      L
+                    </span>
+                    <span className="inline-flex items-center gap-1 rounded-full bg-white/10 px-2.5 py-1.5">
+                      <Fish className="h-3 w-3 text-lime" />{" "}
+                      {state.species.reduce(
+                        (total, row) => total + row.quantity,
+                        0,
+                      )}{" "}
+                      fish
+                    </span>
+                  </div>
+                </header>
+                <div className="relative">
+                  <ClientOnlyTankScene
+                    state={state}
+                    setState={setState}
+                    commit={history.commit}
+                    onRemoveSpecies={(id) =>
+                      setState((s) => ({
+                        ...s,
+                        species: s.species.filter((x) => x.species.id !== id),
+                      }))
+                    }
+                  />
+                  <SceneToolbar
+                    canUndo={history.canUndo}
+                    canRedo={history.canRedo}
+                    onUndo={history.undo}
+                    onRedo={history.redo}
+                    onResetLayout={() => {
+                      setState((s) => ({ ...s, overrides: {} }));
+                      history.commit();
+                    }}
+                  />
                 </div>
-                <div className="grid grid-cols-3 gap-1.5 text-[10px] sm:flex sm:flex-wrap font-semibold uppercase tracking-wide text-white/65">
-                  <span className="inline-flex min-w-0 items-center justify-center gap-1 rounded-full bg-white/10 px-2 py-1.5 text-center">
-                    <Ruler className="h-3 w-3 text-blue" /> {state.length_cm} × {state.width_cm} × {state.height_cm} cm
-                  </span>
-                  <span className="inline-flex items-center gap-1 rounded-full bg-white/10 px-2.5 py-1.5">
-                    <Waves className="h-3 w-3 text-blue" /> {Math.round((state.length_cm * state.width_cm * state.height_cm) / 1000)} L
-                  </span>
-                  <span className="inline-flex items-center gap-1 rounded-full bg-white/10 px-2.5 py-1.5">
-                    <Fish className="h-3 w-3 text-lime" /> {state.species.reduce((total, row) => total + row.quantity, 0)} fish
-                  </span>
-                </div>
-              </header>
-              <div className="relative">
-              <ClientOnlyTankScene
-                state={state}
-                setState={setState}
-                commit={history.commit}
-                onRemoveSpecies={(id) =>
-                  setState((s) => ({
-                    ...s,
-                    species: s.species.filter((x) => x.species.id !== id),
-                  }))
-                }
-              />
-              <SceneToolbar
-                canUndo={history.canUndo}
-                canRedo={history.canRedo}
-                onUndo={history.undo}
-                onRedo={history.redo}
-                onResetLayout={() => {
-                  setState((s) => ({ ...s, overrides: {} }));
-                  history.commit();
-                }}
-              />
-              </div>
-            </section>
+              </section>
 
-            {selected ? (
-              <SelectedObjectPanel
+              {selected ? (
+                <SelectedObjectPanel
+                  state={state}
+                  setState={setState}
+                  interior={dims}
+                  commit={history.commit}
+                />
+              ) : (
+                <div className="fishtankr-panel rounded-[1.75rem] p-4 text-sm text-muted-foreground">
+                  <p>
+                    <span className="font-semibold text-foreground">
+                      Tap any fish, plant or décor to edit it.
+                    </span>{" "}
+                    Drag to reposition, then rotate, resize, duplicate or remove
+                    from the panel that appears. Undo with ⌘Z.
+                  </p>
+                </div>
+              )}
+            </div>
+
+            <aside className="order-3 space-y-4 xl:sticky xl:top-24 xl:self-start">
+              <PreStockChecklist
+                scorecard={scorecard}
                 state={state}
-                setState={setState}
-                interior={dims}
-                commit={history.commit}
+                pendingSave={gate.pendingSave}
+                onCancelSave={gate.cancel}
+                onConfirmSave={() => gate.confirm(doSave)}
               />
-            ) : (
-              <div className="fishtankr-panel rounded-[1.75rem] p-4 text-sm text-muted-foreground">
-                <p>
-                  <span className="font-semibold text-foreground">
-                    Tap any fish, plant or décor to edit it.
-                  </span>{" "}
-                  Drag to reposition, then rotate, resize, duplicate or remove
-                  from the panel that appears. Undo with ⌘Z.
-                </p>
-              </div>
-            )}
+              <ScorecardPanel scorecard={scorecard} />
+            </aside>
           </div>
-
-          <aside className="order-3 space-y-4 xl:sticky xl:top-24 xl:self-start">
-            <PreStockChecklist
-              scorecard={scorecard}
-              state={state}
-              pendingSave={gate.pendingSave}
-              onCancelSave={gate.cancel}
-              onConfirmSave={() => gate.confirm(doSave)}
-            />
-            <ScorecardPanel scorecard={scorecard} />
-          </aside>
-        </div>
         </>
       )}
       {ready && <MobileScoreBar scorecard={scorecard} />}
     </main>
-
   );
 }
