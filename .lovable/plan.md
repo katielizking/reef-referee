@@ -5,6 +5,7 @@ Advice only. Nothing here is implemented until you approve a build.
 ## 1. Blockers before anything else
 
 - `main` is broken at runtime: the engine rewrite landed without the components that read it. `Scorecard.tsx` and `PreStockChecklist.tsx` still expect a `legality` sub-score the new engine no longer returns, so the scorecard throws as soon as a tank is scored. PR #1 is the fix. Nothing below matters until that is merged.
+- Saving is also broken. `src/lib/data.ts` writes ten cycle and water-test columns (`cycle_status`, `cycle_method`, `filter_maturity`, `tank_age_weeks`, `ammonia_mg_l`, `nitrite_mg_l`, `nitrate_mg_l`, `water_tested_on`, `seeded_media`, `biological_media_level`) that do not exist on the `tanks` table, which currently fails the build at `data.ts:142` and `data.ts:152`. Fix: one migration adding those columns to `public.tanks` with the existing owner-scoped grants and policies untouched, and matching fields in the shared-tank read function so a shared link still returns cycle evidence. First job of the build pass, ahead of the banner.
 - CI cannot catch this class of break. `.github/workflows/quality.yml` runs test, build and an advisory lint, but `bun run build` is plain `vite build`, which strips types without checking them. Add a `tsc --noEmit` step and make it blocking.
 - Lint is `continue-on-error: true` with a formatting backlog. Run one formatting-only pass, then make lint blocking.
 - The site is not published, so every recommendation below about search and sharing is currently theoretical.
