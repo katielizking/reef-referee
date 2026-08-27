@@ -12,8 +12,6 @@ interface HardscapeClumpProps {
 
 export function HardscapeClump({ item, quantity, interior, groundY }: HardscapeClumpProps) {
   const colour = hardscapeColour(item);
-  // Substrate is drawn separately as a slab; skip meshes for substrate rows.
-  if (item.type === "substrate") return null;
   const y = groundY ?? interior.substrateY;
 
   const nodes = useMemo(() => {
@@ -28,6 +26,9 @@ export function HardscapeClump({ item, quantity, interior, groundY }: HardscapeC
     return out;
   }, [item.id, quantity, interior.x, interior.z, y]);
 
+  // Substrate is drawn separately as a slab; skip meshes for substrate rows.
+  // Returned after the hooks above so hook order stays stable across renders.
+  if (item.type === "substrate") return null;
 
   return (
     <>
