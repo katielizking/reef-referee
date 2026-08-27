@@ -194,12 +194,20 @@ function MethodologyPage() {
       </section>
 
       <div className="mt-10 border-t pt-6">
-        <Link
-          to="/"
-          className="inline-flex min-h-11 items-center justify-center rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:brightness-95"
-        >
-          Back to the tank builder
-        </Link>
+        <div className="flex flex-wrap gap-3">
+          <Link
+            to="/"
+            className="inline-flex min-h-11 items-center justify-center rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:brightness-95"
+          >
+            Back to the tank builder
+          </Link>
+          <Link
+            to="/welfare-disclaimer"
+            className="inline-flex min-h-11 items-center justify-center rounded-xl border bg-card px-4 py-2 text-sm font-semibold text-foreground"
+          >
+            Read the welfare disclaimer
+          </Link>
+        </div>
       </div>
     </main>
   );
