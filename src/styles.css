@@ -36,63 +36,81 @@
   --color-coral: var(--coral);
   --color-foam: var(--foam);
   --color-warn: var(--warn);
+  --color-paper: var(--paper);
+  --color-water: var(--water);
+  --color-rule: var(--rule);
+  --color-verdict-good: var(--verdict-good);
+  --color-verdict-caution: var(--verdict-caution);
+  --color-verdict-critical: var(--verdict-critical);
   --font-sans: "DM Sans", "Manrope", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Sora", "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, monospace;
+  --font-scientific: "Spectral", Georgia, "Times New Roman", serif;
 }
 
 :root {
-  --radius: 1rem;
+  --radius: 0.25rem;
 
-  /* FishTankr brand palette */
-  --ink: #12232E;
-  --blue: #37B8C6;
-  --lime: #B8E84A;
-  --coral: #FF7868;
-  --foam: #F4F8F5;
-  --warn: #E39A2B;
+  /* FishTankr: field notebook meets water */
+  --ink: #0F1D26;
+  --paper: #F2F0EA;
+  --water: #1F7F8C;
+  --blue: #1F7F8C;
+  --lime: #C9E86A;
+  --coral: #A83A2C;
+  --foam: #EAE7DF;
+  --warn: #B4761F;
+  --rule: rgba(15, 29, 38, 0.12);
+  --verdict-good: #4E7A3A;
+  --verdict-caution: #B4761F;
+  --verdict-critical: #A83A2C;
 
   /* Mapped shadcn tokens */
-  --background: #F4F8F5;
-  --foreground: #12232E;
-  --card: #FFFFFF;
-  --card-foreground: #12232E;
-  --popover: #FFFFFF;
-  --popover-foreground: #12232E;
-  --primary: #37B8C6;
-  --primary-foreground: #FFFFFF;
-  --secondary: #F4F8F5;
-  --secondary-foreground: #12232E;
-  --muted: #EEF3F1;
-  --muted-foreground: #556570;
-  --accent: #B8E84A;
-  --accent-foreground: #12232E;
-  --destructive: #FF7868;
-  --destructive-foreground: #FFFFFF;
-  --border: rgba(18, 35, 46, 0.10);
-  --input: rgba(18, 35, 46, 0.14);
-  --ring: #37B8C6;
+  --background: #F2F0EA;
+  --foreground: #0F1D26;
+  --card: #FBFAF6;
+  --card-foreground: #0F1D26;
+  --popover: #FBFAF6;
+  --popover-foreground: #0F1D26;
+  --primary: #1F7F8C;
+  --primary-foreground: #F7F6F1;
+  --secondary: #EAE7DF;
+  --secondary-foreground: #0F1D26;
+  --muted: #E6E3DA;
+  --muted-foreground: #55636B;
+  --accent: #C9E86A;
+  --accent-foreground: #0F1D26;
+  --destructive: #A83A2C;
+  --destructive-foreground: #F7F6F1;
+  --border: rgba(15, 29, 38, 0.12);
+  --input: rgba(15, 29, 38, 0.18);
+  --ring: #1F7F8C;
 }
 
 .dark {
-  --background: #0E1A22;
-  --foreground: #F4F8F5;
-  --card: #16242E;
-  --card-foreground: #F4F8F5;
-  --popover: #16242E;
-  --popover-foreground: #F4F8F5;
-  --primary: #37B8C6;
-  --primary-foreground: #0E1A22;
-  --secondary: #1A2A34;
-  --secondary-foreground: #F4F8F5;
-  --muted: #1A2A34;
-  --muted-foreground: #9BA9B2;
-  --accent: #B8E84A;
-  --accent-foreground: #0E1A22;
-  --destructive: #FF7868;
-  --destructive-foreground: #0E1A22;
-  --border: rgba(244, 248, 245, 0.10);
-  --input: rgba(244, 248, 245, 0.14);
-  --ring: #37B8C6;
+  --ink: #E9E5DB;
+  --paper: #101A1F;
+  --rule: rgba(233, 229, 219, 0.14);
+  --foam: #17232A;
+  --background: #101A1F;
+  --foreground: #E9E5DB;
+  --card: #16232A;
+  --card-foreground: #E9E5DB;
+  --popover: #16232A;
+  --popover-foreground: #E9E5DB;
+  --primary: #2E9AA8;
+  --primary-foreground: #0B1418;
+  --secondary: #17232A;
+  --secondary-foreground: #E9E5DB;
+  --muted: #1B282F;
+  --muted-foreground: #9AA5A9;
+  --accent: #C9E86A;
+  --accent-foreground: #0B1418;
+  --destructive: #C45443;
+  --destructive-foreground: #0B1418;
+  --border: rgba(233, 229, 219, 0.14);
+  --input: rgba(233, 229, 219, 0.2);
+  --ring: #2E9AA8;
 }
 
 @layer base {
@@ -117,66 +135,73 @@
 }
 
 
-/* FishTankr visual foundation — editorial bright-science system */
+/* FishTankr visual foundation: field notebook meets water.
+   Dry surfaces are flat and precise. Only water glows, blurs or moves. */
 @layer base {
-  html { scroll-behavior: smooth; scroll-padding-top: 5.5rem; background: var(--foam); }
+  html { scroll-behavior: smooth; scroll-padding-top: 5.5rem; background: var(--paper); }
   body {
     min-width: 320px;
     min-height: 100vh;
-    background:
-      radial-gradient(circle at 8% 4%, color-mix(in srgb, var(--lime) 20%, transparent) 0, transparent 24rem),
-      radial-gradient(circle at 92% 12%, color-mix(in srgb, var(--blue) 17%, transparent) 0, transparent 30rem),
-      var(--background);
+    background: var(--background);
   }
-  ::selection { color: var(--ink); background: color-mix(in srgb, var(--lime) 72%, white); }
+  ::selection { color: var(--ink); background: color-mix(in srgb, var(--lime) 70%, white); }
 }
 @layer components {
   .site-shell { position: relative; isolation: isolate; }
+  /* The page's only ornament: a measurement ruler down the left gutter. */
   .site-shell::before {
-    position: fixed; inset: 0; z-index: -1; pointer-events: none; content: ""; opacity: .22;
-    background-image: radial-gradient(rgba(18, 35, 46, .22) .55px, transparent .55px);
-    background-size: 8px 8px;
-    mask-image: linear-gradient(to bottom, black, transparent 75%);
+    position: fixed; top: 0; bottom: 0; left: 0; width: 14px; z-index: -1;
+    pointer-events: none; content: ""; opacity: .5;
+    border-right: 1px solid var(--rule);
+    background-image: linear-gradient(to bottom, var(--rule) 1px, transparent 1px);
+    background-size: 100% 10px;
   }
+  @media (max-width: 1023px) { .site-shell::before { display: none; } }
+
   .fishtankr-panel {
-    border: 1px solid color-mix(in srgb, var(--ink) 11%, transparent);
-    background: color-mix(in srgb, white 91%, transparent);
-    box-shadow: 0 22px 55px rgba(18, 35, 46, .08), 0 2px 0 rgba(18, 35, 46, .05);
-    backdrop-filter: blur(18px);
+    border: 1px solid var(--rule);
+    background: var(--card);
+    border-radius: 4px;
+    box-shadow: none;
   }
   .science-label {
-    display: inline-flex; align-items: center; gap: .45rem; font-family: var(--font-display);
-    font-size: .68rem; font-weight: 700; letter-spacing: .13em; line-height: 1; text-transform: uppercase;
+    display: inline-flex; align-items: center; gap: .5rem; font-family: var(--font-mono);
+    font-size: .68rem; font-weight: 500; letter-spacing: .1em; line-height: 1; text-transform: uppercase;
   }
   .science-label::before {
-    width: .5rem; height: .5rem; border: 2px solid currentColor; border-radius: 999px; content: "";
+    width: 1.25rem; height: 1px; background: currentColor; content: "";
   }
-  .hero-grid {
-    background-image:
-      linear-gradient(rgba(55, 184, 198, .09) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(55, 184, 198, .09) 1px, transparent 1px);
-    background-size: 28px 28px; background-position: center;
+  /* Numbers, units and readings are always mono. */
+  .data-mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
+  /* Scientific names carry the field-guide voice. */
+  .scientific { font-family: var(--font-scientific); font-style: italic; }
+  /* Legality and prohibition read as a document annotation, not a pill. */
+  .ink-stamp {
+    display: inline-block; padding: .2rem .5rem; border: 1.5px solid currentColor; border-radius: 2px;
+    font-family: var(--font-mono); font-size: .62rem; font-weight: 500; letter-spacing: .12em;
+    text-transform: uppercase; transform: rotate(-2.5deg); opacity: .85;
   }
+  .hero-grid { background-image: none; }
   .depth-card {
-    box-shadow: 0 18px 45px rgba(18, 35, 46, .08), 0 2px 0 rgba(18, 35, 46, .06);
-    transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+    box-shadow: none;
+    border-radius: 4px;
+    transition: border-color 140ms ease, background-color 140ms ease;
   }
-  .depth-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 24px 58px rgba(18, 35, 46, .11), 0 2px 0 rgba(18, 35, 46, .06);
-  }
+  .depth-card:hover { border-color: color-mix(in srgb, var(--ink) 35%, transparent); }
   .water-rule {
-    height: 4px;
-    background: radial-gradient(10px 5px at 10px -1px, transparent 8px, var(--blue) 9px, var(--blue) 10px, transparent 11px) repeat-x;
-    background-size: 20px 6px;
+    height: 1px;
+    background: var(--water);
+    opacity: .5;
   }
+  /* Wet things only: soft water light behind the tank. */
+  .water-glow { box-shadow: 0 18px 60px color-mix(in srgb, var(--water) 22%, transparent); }
 }
 @media (prefers-reduced-motion: no-preference) {
   @keyframes gentle-float {
-    0%, 100% { transform: translate3d(0, 0, 0) rotate(-.4deg); }
-    50% { transform: translate3d(0, -7px, 0) rotate(.4deg); }
+    0%, 100% { transform: translate3d(0, 0, 0); }
+    50% { transform: translate3d(0, -4px, 0); }
   }
-  .hero-float { animation: gentle-float 6s ease-in-out infinite; }
+  .hero-float { animation: gentle-float 7s ease-in-out infinite; }
 }
 
 
