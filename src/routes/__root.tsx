@@ -302,6 +302,12 @@ function SiteFooter() {
           >
             Methodology
           </Link>
+          <Link
+            to="/welfare-disclaimer"
+            className="transition-colors hover:text-white"
+          >
+            Welfare disclaimer
+          </Link>
           <Link to="/blog" className="transition-colors hover:text-white">
             Blog
           </Link>
