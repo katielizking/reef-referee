@@ -1,77 +1,67 @@
-# FishTankr audit and recommendations
+# Design audit and art direction overhaul
 
-Advice only. Nothing here is implemented until you approve a build.
+## What the app looks like right now
 
-## 1. Blockers before anything else
+The build reads as competent template work rather than a designed product. The tells, in order of how obvious they are:
 
-- `main` is broken at runtime: the engine rewrite landed without the components that read it. `Scorecard.tsx` and `PreStockChecklist.tsx` still expect a `legality` sub-score the new engine no longer returns, so the scorecard throws as soon as a tank is scored. PR #1 is the fix. Nothing below matters until that is merged.
-- Saving is also broken. `src/lib/data.ts` writes ten cycle and water-test columns (`cycle_status`, `cycle_method`, `filter_maturity`, `tank_age_weeks`, `ammonia_mg_l`, `nitrite_mg_l`, `nitrate_mg_l`, `water_tested_on`, `seeded_media`, `biological_media_level`) that do not exist on the `tanks` table, which currently fails the build at `data.ts:142` and `data.ts:152`. Fix: one migration adding those columns to `public.tanks` with the existing owner-scoped grants and policies untouched, and matching fields in the shared-tank read function so a shared link still returns cycle evidence. First job of the build pass, ahead of the banner.
-- CI cannot catch this class of break. `.github/workflows/quality.yml` runs test, build and an advisory lint, but `bun run build` is plain `vite build`, which strips types without checking them. Add a `tsc --noEmit` step and make it blocking.
-- Lint is `continue-on-error: true` with a formatting backlog. Run one formatting-only pass, then make lint blocking.
-- The site is not published, so every recommendation below about search and sharing is currently theoretical.
+- **Everything is a white rounded card floating on a tinted page.** Same radius, same soft shadow, same border, from the hero to the species grid to the scorecard. Nothing has hierarchy because everything has the same container.
+- **Two corner radial gradient blobs** behind the page (lime top-left, blue top-right) plus a dot grid plus a faint grid pattern in the hero. This exact combination is the most recognisable generated-page signature there is.
+- **Palette is untuned.** Teal + lime + coral on near-white reads as generic "friendly SaaS". The lime is used as an accent everywhere and never carries meaning.
+- **Icon-in-a-pill labels** (`o AQUARIUM PLANNING, DECODED`, `o LIVE AQUARIUM`, `o LIVE REFEREE`) repeated at the top of every block. Same treatment, no variation, so they stop being informative.
+- **Two-line stacked hero with two buttons and an illustration on the right.** The illustration is a flat outline tank that does not match the real 3D tank sitting 400px below it, so the page shows the product twice in two different visual languages.
+- **Species grid is four uniform photo cards per row** with three identical grey chip badges under each. Every card has a "SPECIES VERIFIED" overlay that adds nothing. Missing photos fall back to a pale outline fish icon, so the grid visibly breaks rhythm.
+- **Filters are three rows of pill chips**, all identical weight, taking a full screen band before any content.
+- Copy has generated cadence: em dashes, "research-grade observations", "Aquarium planning, decoded".
 
-## 2. Design
+## Artistic direction to commit to
 
-The visual identity is strong and distinctive: deep ink, freshwater blue, lime, coral, Sora and DM Sans. Keep it. Weak points:
+**"Field notebook meets water."** FishTankr is an instrument that tells you whether fish will live. It should look like a marine biologist's working document: measured, ink-on-paper, with water as the only place colour and softness are allowed. Dry surfaces are flat and precise. Wet surfaces (the tank, the score, anything live) are the only things that glow, blur or move.
 
-- The score is the product, but it is presented as five equal-looking rings in a right-hand column. It should read as one verdict with supporting detail: a single headline state (safe / risky / do not stock), then the sub-scores.
-- The 3D tank is beautiful and expensive, and it currently competes with the score for attention. On mobile it dominates while the score is squeezed into a bar.
-- Three-column desktop layout collapses into a long scroll on mobile with the scorecard last. Fish welfare advice ends up below the fold.
-- No empty-state illustration for a tank with no fish, and no visual language for severity beyond colour. Criticals need an icon and shape difference, not only red.
+This gives a rule that kills the AI look on its own: **no gradient, blur or glow anywhere except inside the water.**
 
-## 3. UX
+### Palette, retuned
 
-- Score explanation is thin. Every issue now carries a `reason` and a `fix`; those should be the primary content, grouped criticals first, with the number as secondary.
-- No undo affordance discoverability beyond a keyboard hint, and no onboarding tour of the 3D editor.
-- Saving is anonymous with no recovery path. If a user clears their browser, their tanks are gone and there is no warning saying so.
-- Share links are read-only but there is no "remix this tank" call to action on the shared view for the visitor, which is the main growth loop you already half-built.
-- The quiz, guides, blog and shops exist but are not connected to the builder. A quiz should end in a pre-filled tank.
-- Nineteen of the 118 species cannot live in the app's own default tank of pH 7.0 and 25 degrees. A user picking a default tank and a discus gets flagged with no explanation of the default. Defaults should adapt to the first species chosen, or the default should be explained.
-- Headroom is deliberately qualitative, which is correct, but users will read "some room" as permission. Word it as what happens to the fish.
+Keep the ink, deepen and desaturate the rest so the accents mean something.
 
-## 4. Commercial gaps
+- Ink `#0F1D26` — all type, all rules, all borders. Borders become 1px ink at 12%, hairline, not soft grey.
+- Paper `#F2F0EA` — warm off-white, replaces the cool mint `#F4F8F5`. Warm paper against cold water is the whole tension of the design.
+- Water `#1F7F8C` — deeper than the current teal, used only for live/wet things.
+- Verdict green `#4E7A3A`, caution amber `#B4761F`, critical `#A83A2C` — the three score states, muted and earthy, not fluorescent.
+- Lime is retired as a decorative accent and kept only as `#C9E86A` inside the tank glass for plant matter.
 
-Chosen direction: donations plus shop affiliates.
+### Type
 
-- No support surface at all today. A dismissible WIP banner with a Ko-fi $5 AUD button is the first commercial artefact. Placement: a slim bar under the header, dismissed state remembered in local storage, plus a permanent quieter link in the footer.
-- The shop directory is the natural revenue engine and is currently pure cost. It needs an outbound-link click model, a "featured listing" flag on the shop row, and a claim-this-shop contact path.
-- Affiliate links need disclosure and `rel="sponsored nofollow"` on outbound commercial links, which the directory does not do yet.
-- No email capture anywhere. A single "tell me when tank saving gets accounts" field is the cheapest asset you can build now.
-- Species pages are the long-tail traffic and the obvious place for gear and stock affiliate slots.
-- No analytics on the score itself. You cannot tell which failures users hit most, which is the data that should drive the roadmap.
+- Headings: keep a geometric display face but drop the letter-spacing tricks; set headlines large, tight, left, and stop stacking two short lines with a hard break.
+- Introduce a monospace for every number, unit, dimension, score and species code (`90 × 40 × 45 cm`, `162 L`, `pH 7.0`, `40/100`). Data in mono against prose in sans is the single strongest human-designer signal available and it suits an instrument.
+- Scientific names in italic serif, not italic sans, so the field-guide voice is carried by type rather than by a badge.
 
-## 5. Website compliance gaps
+### Structure moves
 
-- No privacy policy, no terms, no cookie or storage notice. You store anonymous auth sessions and saved tanks, so Australian Privacy Act disclosure applies once you publish and accept donations.
-- No welfare disclaimer page. The README says decision support not a guarantee; that sentence needs to be in the product, near the score.
-- No affiliate or sponsorship disclosure, required by ACCC guidance once shop listings are paid or referral-based.
-- No `robots.txt` in `public/`.
-- `sitemap.xml` has an empty `BASE_URL`, so it emits relative or malformed entries.
-- Every route's `canonical` and `og:url` is relative (`/`, `/species`, `/blog`). Crawlers need absolute URLs. Only `blog.$slug` sets an `og:image`.
-- No contact route, no attribution page for the 3D model licences, which the model licences require.
-- Species data policy is sound (source_url, reviewed_on, confidence) but not surfaced to users, which is your strongest credibility asset.
+1. **Kill the card grid.** Sections are separated by full-bleed bands and hairline rules, not by floating rounded boxes. Panels that remain (setup, scorecard) get square-ish 4px corners, a hard 1px ink border, and no shadow.
+2. **Remove the background blobs, the dot grid and the hero grid.** Replace with one device: a **faint measurement ruler** running down the left gutter, with centimetre ticks, echoing the tank dimensions. It is the page's only ornament and it is literal to the product.
+3. **Hero becomes the product.** Delete the flat outline tank illustration. The live 3D tank is the hero, cropped wide and full-bleed, with the headline set over the water and the verdict number sitting on the glass. One page, one tank, one visual language.
+4. **Scorecard as an instrument panel, not five rings.** One large mono verdict number with a state word, then the four welfare sub-scores as horizontal ruled bars in a stacked table with mono values, criticals pulled to the top with a solid ink-red left rule. Biotope sits below the rule, clearly labelled as a style goal.
+5. **Species cards become field-guide plates.** Photo cropped tall, ink hairline frame, name in sans, scientific name in italic serif beneath, and stats as one mono line (`11 cm · semi-aggressive · min 150 L`) instead of three chips. Drop the "SPECIES VERIFIED" overlay. Missing photos get a hand-drawn-feeling silhouette plate in ink on paper, so gaps look intentional rather than broken.
+6. **Filters collapse** into a single ink rule with inline text toggles, so the grid starts near the top of the page.
+7. **Legality and prohibited flags** get a stamp treatment — rotated ink outline, letterpress feel — rather than a coral pill. It reads as a document annotation, which is what it is.
+8. **Motion**: only water moves. Slow caustic light on the glass, score numbers tick up in mono, everything else is instant. No fade-up-on-scroll.
 
-## 6. Marketability
+### Copy pass
 
-- The differentiator is welfare, not stocking percentage. The homepage says "Smarter tanks. Happier fish." but never shows the AqAdvisor comparison that makes the point. A short "what other calculators miss" section, using your own reference cases (two male bettas in a 40 L: other tools say fine, FishTankr says critical), is the highest-value marketing content you own.
-- Methodology page is a trust asset and should be linked from the score, not buried in the footer.
-- Region positioning is contradictory: the README opens by calling FishTankr Australian-focused while the code has been deliberately de-regionalised. Pick one story. Recommended: global welfare scoring, Australian local-rules reference material clearly labelled.
-- Shareable score cards as images would be the single biggest organic reach lever and do not exist.
-- No open-source or WIP narrative, which is exactly what a Ko-fi banner can carry: honest, in-progress, community-supported.
-
-## 7. Recommended order of work
-
-1. Merge PR #1. Add blocking `tsc --noEmit`. Format once, make lint blocking.
-2. WIP banner with Ko-fi support button, plus footer link.
-3. Compliance pass: privacy, terms, welfare disclaimer, affiliate disclosure, 3D attribution, `robots.txt`, absolute canonical and og URLs, sitemap base URL.
-4. Score presentation rework: one verdict, issues grouped criticals first, methodology link beside it.
-5. Growth loop: remix call to action on shared tanks, quiz ends in a pre-filled tank, shareable score image.
-6. Shop monetisation: featured flag, outbound click tracking, disclosure, claim path.
-7. Debt from the project notes: capacity model, conspecific fields, cycling model, biotope regions.
+Rewrite hero, section headings and empty states to Australian English, sentence case, no em dashes, no "decoded"/"research-grade". Say what happens to the fish.
 
 ## Technical notes
 
-- Banner: new component rendered in `src/routes/__root.tsx` above the header, dismissal in local storage under a `fishtankr:` key, Ko-fi link `https://ko-fi.com/fishtankr` with `target="_blank" rel="noopener noreferrer"`, styled with existing tokens only.
-- Compliance pages: new leaf routes with their own `head()` including absolute canonical against `https://reef-referee.lovable.app` until a custom domain exists.
-- Absolute URLs: introduce one `SITE_URL` constant and use it in every route `head()` and in `sitemap[.]xml.ts`.
-- No region-specific strings in shared code; Australian rules stay in labelled reference material.
+- All of the above lands in `src/styles.css` tokens plus the `@layer components` block (`fishtankr-panel`, `science-label`, `hero-grid`, `site-shell::before`, `depth-card`) and the presentation layer of `BrandLogo`, `Scorecard`, `MobileScoreBar`, `TankSetupPanel`, `BuilderSteps`, `SpeciesPortrait`, `species.index.tsx`, `species.$id.tsx`, `index.tsx`.
+- Add a mono font and an italic serif via `<link>` in `src/routes/__root.tsx` (not `@import` in CSS).
+- New semantic tokens: `--paper`, `--water`, `--verdict-good`, `--verdict-caution`, `--verdict-critical`, `--rule`, `--font-mono`, `--font-scientific`. Components keep using tokens only, no hardcoded colours.
+- No scoring, data, Supabase or 3D behaviour changes. The 3D scene is reused in the hero, not rewritten.
+- Dark mode retuned as ink paper rather than inverted mint.
+
+## Suggested order
+
+1. Tokens, fonts, and removal of the blobs/dot grid/soft shadows — this alone changes the read of every page.
+2. Scorecard instrument panel.
+3. Hero as live tank.
+4. Species plates and filter rule.
+5. Copy pass and stamps.
