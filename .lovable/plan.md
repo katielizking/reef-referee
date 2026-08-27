@@ -65,3 +65,7 @@ Rewrite hero, section headings and empty states to Australian English, sentence 
 3. Hero as live tank.
 4. Species plates and filter rule.
 5. Copy pass and stamps.
+
+## Blocker to clear first (pre-existing, not part of this design work)
+
+`src/lib/data.ts` writes ten cycle-related columns to `tanks` (`cycle_status`, `cycle_method`, `filter_maturity`, `seeded_media`, `biological_media_level`, `tank_age_weeks`, `water_tested_on`, `ammonia_mg_l`, `nitrite_mg_l`, `nitrate_mg_l`) that do not exist on the live table, so typecheck fails and saving a tank would fail at runtime. The fix is one migration adding those columns to `public.tanks` (nullable, with the existing owner-scoped RLS unchanged). I will land that before the visual work, since nothing can be verified in the preview until the build is green.
