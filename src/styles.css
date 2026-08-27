@@ -36,8 +36,16 @@
   --color-coral: var(--coral);
   --color-foam: var(--foam);
   --color-warn: var(--warn);
+  --color-paper: var(--paper);
+  --color-water: var(--water);
+  --color-rule: var(--rule);
+  --color-verdict-good: var(--verdict-good);
+  --color-verdict-caution: var(--verdict-caution);
+  --color-verdict-critical: var(--verdict-critical);
   --font-sans: "DM Sans", "Manrope", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Sora", "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, monospace;
+  --font-scientific: "Spectral", Georgia, "Times New Roman", serif;
 }
 
 :root {
