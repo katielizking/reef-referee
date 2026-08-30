@@ -55,7 +55,12 @@ export interface Issue {
   code: IssueCode;
   severity: "critical" | "high" | "medium" | "low";
   category:
-    "readiness" | "compatibility" | "bioload" | "space" | "water" | "biome";
+    | "readiness"
+    | "compatibility"
+    | "bioload"
+    | "space"
+    | "water"
+    | "biome";
   weight: number;
   reason: string;
   fix: string;
@@ -69,7 +74,12 @@ export interface CompatibilitySubScore extends SubScore {
 export interface PriorityAction {
   severity: "critical" | "high" | "medium";
   category:
-    "readiness" | "compatibility" | "bioload" | "space" | "water" | "biome";
+    | "readiness"
+    | "compatibility"
+    | "bioload"
+    | "space"
+    | "water"
+    | "biome";
   title: string;
   action: string;
 }
