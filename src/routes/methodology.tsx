@@ -9,7 +9,7 @@ export const Route = createFileRoute("/methodology")({
       {
         name: "description",
         content:
-          "How FishTankr separates welfare scoring, nitrogen-cycle readiness and experimental stocking-demand screening.",
+          "How FishTankr checks compatibility, space, water and cycle status—and where the score has limits.",
       },
       { property: "og:url", content: absoluteUrl("/methodology") },
     ],
@@ -45,9 +45,9 @@ function MethodologyPage() {
           What the FishTankr score means
         </h1>
         <p className="mt-5 text-base leading-relaxed text-muted-foreground sm:text-lg">
-          FishTankr is decision support, not a promise that a tank is safe. The model deliberately
-          separates welfare checks we can explain from experimental signals that are not yet
-          validated well enough to drive the headline score.
+          FishTankr helps you spot problems in a stocking plan, but it cannot promise that a tank is
+          safe. The main score only uses checks we can explain clearly. Early-stage estimates stay
+          separate until there is enough evidence to rely on them.
         </p>
       </div>
 
@@ -74,19 +74,19 @@ function MethodologyPage() {
           <ShieldCheck className="mt-1 h-5 w-5 shrink-0 text-primary" aria-hidden />
           <div>
             <h2 className="font-display text-xl font-bold text-foreground">
-              Cycle readiness is a safety gate
+              The cycle can limit the score
             </h2>
             <p className="mt-2 leading-relaxed text-muted-foreground">
-              Filter flow is not treated as biological capacity. The builder records filter type,
-              biological-media amount, media maturity, tank age, cycling method, cycle status and
-              dated water tests. A cycle that is unverified or still in progress caps the result.
-              Detectable ammonia or nitrite triggers the strongest stop warning.
+              A fast pump does not automatically mean strong biological filtration. FishTankr looks
+              at the filter type, amount and age of biological media, tank age, cycling method and
+              recent water tests. If the cycle is unfinished or unverified, the score is limited. If
+              ammonia or nitrite is present, the app tells you not to add fish.
             </p>
             <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-              Zero-ammonia and zero-nitrite results must be dated within the previous seven days.
-              That is a transparent operational freshness rule, not a claim that one test predicts
-              the next seven days. FishTankr never treats one reading or a fixed number of elapsed
-              weeks as a guarantee.
+              We ask for zero-ammonia and zero-nitrite results from the past seven days. That keeps
+              the plan tied to reasonably recent information; it does not mean one test can predict
+              what happens next. No single reading or fixed number of weeks proves that a tank is
+              ready.
             </p>
           </div>
         </div>
@@ -101,15 +101,15 @@ function MethodologyPage() {
               The waste-load screen is not a stocking-capacity calculator
             </h2>
             <p className="mt-2 leading-relaxed text-muted-foreground">
-              The inherited species-load proxy and litres/5 reference have not been calibrated
-              against real aquariums. FishTankr now exposes only a broad low, moderate, high or very
-              high screening band. It is excluded from the headline score, cannot be improved by
-              pump turnover, plants or a maintenance multiplier, and never tells anyone how many
-              more fish to add.
+              The current estimate is based on an older species-load formula that has not been
+              tested against enough real aquariums. We only show a broad low, moderate, high or very
+              high band. It does not affect the main score, and extra pump flow, plants or frequent
+              maintenance cannot make the number look better. Most importantly, it never tells you
+              how many more fish to add.
             </p>
             <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-              It will remain labelled beta until a sourced species-demand model, biological-filter
-              model and independently reviewed validation set are available.
+              It will stay in beta until we have a sourced model for fish waste and biological
+              filtration, tested against independently reviewed tank examples.
             </p>
           </div>
         </div>
@@ -121,30 +121,31 @@ function MethodologyPage() {
           <PolicyCard
             title="What counts"
             items={[
-              "Species fields tied to a named source and review date",
-              "Confidence shown when evidence is incomplete or conflicting",
-              "Safety rules that can be explained in plain language",
-              "Regression scenarios approved independently of the implementation",
+              "Care information linked to a named source and review date",
+              "Clear confidence labels when sources are incomplete or disagree",
+              "Safety rules we can explain in plain language",
+              "Test tanks reviewed independently from the code",
             ]}
           />
           <PolicyCard
             title="What FishTankr does not claim"
             items={[
               "A universal number of fish per litre",
-              "That high pump flow equals biological filtration",
-              "That plants or water changes make incompatible stocking safe",
-              "That a score replaces observation, testing or qualified advice",
+              "That a faster pump means better biological filtration",
+              "That plants or water changes can make incompatible fish safe together",
+              "That a score can replace watching the fish, testing the water or getting expert help",
             ]}
           />
         </div>
       </section>
 
       <section className="mt-10">
-        <h2 className="font-display text-2xl font-bold text-foreground">Starting evidence</h2>
+        <h2 className="font-display text-2xl font-bold text-foreground">
+          Research behind the approach
+        </h2>
         <p className="mt-2 max-w-3xl text-sm leading-relaxed text-muted-foreground">
-          These sources support the present separation of microbial biofilter maturity,
-          water-quality evidence and multidimensional welfare checks. They do not validate the beta
-          waste-load proxy.
+          These studies support looking at biofilter maturity, water quality and several parts of
+          fish welfare separately. They do not prove that the beta waste-load estimate is accurate.
         </p>
         <ul className="mt-4 space-y-3">
           {SOURCES.map((source) => (

@@ -91,8 +91,8 @@ function ShopsIndex() {
     <main className="mx-auto max-w-5xl px-3 py-6 sm:px-4 sm:py-10">
       <h1 className="font-display text-4xl font-bold text-foreground">Aquarium shop directory</h1>
       <p className="mt-2 max-w-2xl text-muted-foreground">
-        Find specialist aquarium retailers. Australian coverage is the current starting dataset; the
-        directory structure now supports shops internationally.
+        Find specialist aquarium shops near you. We’re starting with Australian listings and adding
+        more countries over time.
       </p>
 
       <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
@@ -139,7 +139,7 @@ function ShopsIndex() {
                 </Link>
                 {shop.featured && (
                   <span className="rounded-full bg-lime/30 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-foreground">
-                    Featured · paid placement
+                    Featured · paid
                   </span>
                 )}
               </div>
@@ -199,8 +199,8 @@ function ShopsIndex() {
 
       <div className="mt-10 rounded-2xl border bg-muted/40 p-4 text-xs leading-relaxed text-muted-foreground">
         <p>
-          Featured means paid placement, not a welfare endorsement. Affiliate links may earn
-          FishTankr a commission.{" "}
+          Featured shops have paid for placement; it is not an endorsement of their animal care.
+          FishTankr may earn a commission from affiliate links.{" "}
           <Link to="/affiliate-disclosure" className="font-semibold text-primary underline">
             Read the disclosure.
           </Link>
@@ -214,14 +214,14 @@ function ShopsIndex() {
       </div>
       <div className="mt-4 flex flex-col gap-3 rounded-2xl border bg-primary/5 p-4 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-sm text-muted-foreground">
-          <strong className="text-foreground">Before you shop:</strong> score the complete tank,
-          cycle evidence and water settings.
+          <strong className="text-foreground">Before you shop:</strong> add the full fish community,
+          cycle details and water settings to your plan.
         </p>
         <Link
           to="/"
           className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-xl bg-primary px-4 text-sm font-semibold text-primary-foreground"
         >
-          Build a welfare-checked plan
+          Check my tank plan
         </Link>
       </div>
     </main>

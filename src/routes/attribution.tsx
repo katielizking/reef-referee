@@ -24,7 +24,7 @@ function AttributionPage() {
     <PolicyPage
       eyebrow="Credits"
       title="3D model attribution"
-      intro="FishTankr only registers a model after its source, creator and licence have been recorded."
+      intro="Every registered 3D model includes its creator, source and licence here."
     >
       <PolicySection title="Betta splendens">
         <p>
@@ -80,9 +80,9 @@ function AttributionPage() {
       </PolicySection>
       <PolicySection title="Procedural scene elements">
         <p>
-          Unverified species and general aquarium scenery may use project-authored procedural
-          geometry. They are not presented as verified anatomical reconstructions. See the
-          methodology for the distinction between verified and reference-informed assets.
+          Species without a verified model, along with general aquarium scenery, may use shapes
+          created by FishTankr. We do not present these as anatomically accurate models. The
+          methodology explains how verified and reference-based assets differ.
         </p>
       </PolicySection>
     </PolicyPage>

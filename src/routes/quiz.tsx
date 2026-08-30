@@ -12,13 +12,13 @@ export const Route = createFileRoute("/quiz")({
       {
         name: "description",
         content:
-          "Answer 7 quick questions and get 3–5 freshwater fish species matched to your tank size, experience and preferences. care needs and compatibility in mind.",
+          "Answer 7 quick questions and find freshwater fish that suit your tank size, experience and preferences.",
       },
       { property: "og:title", content: "What fish should I get? | FishTankr" },
       {
         property: "og:description",
         content:
-          "A 7-question quiz that recommends freshwater fish species for your tank. care and compatibility focused.",
+          "A 7-question quiz that suggests freshwater fish with care needs and compatibility in mind.",
       },
       { property: "og:url", content: absoluteUrl("/quiz") },
     ],
@@ -73,14 +73,14 @@ const questions: Array<{
   },
   {
     key: "hardness",
-    q: "What's your tap water like? (or what would you like to match)",
+    q: "What is your tap water like—or what would you prefer to match?",
     options: [
       {
         value: "soft",
-        label: "Soft & slightly acidic (rainwater / tank water)",
+        label: "Soft & slightly acidic (rainwater / naturally soft tap water)",
       },
       { value: "neutral", label: "Neutral" },
-      { value: "hard", label: "Hard & alkaline (bore / limestone areas)" },
+      { value: "hard", label: "Hard & alkaline (well water / limestone areas)" },
     ],
   },
   {
@@ -280,8 +280,8 @@ function QuizPage() {
           <h2 className="font-display text-2xl font-semibold">Your matches</h2>
           {results.length === 0 && (
             <p className="mt-2 text-muted-foreground">
-              No good matches — your tank might be too small for anything in our list. Try a bigger
-              size.
+              We couldn’t find a confident match in our current list. Try a larger tank size or
+              change a few answers.
             </p>
           )}
           <div className="mt-4 grid gap-3">
@@ -314,7 +314,7 @@ function QuizPage() {
                 onClick={startBuilderWithPicks}
                 className="rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:brightness-95"
               >
-                Start a tank with the top 3
+                Try the top 3 in the builder
               </button>
               <button
                 onClick={restart}
@@ -328,8 +328,8 @@ function QuizPage() {
           <p className="mt-6 flex items-start gap-2 rounded-xl border border-border/60 bg-muted/40 p-3 text-xs text-muted-foreground">
             <Info className="mt-0.5 h-4 w-4 flex-shrink-0" />
             <span>
-              These are starting points, not a stocking plan. Add them in the builder to see if your
-              filter, plants and other choices actually work together.
+              These are ideas, not a finished stocking plan. Check them together in the builder
+              before deciding what to buy.
             </span>
           </p>
         </div>

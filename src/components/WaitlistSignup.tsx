@@ -32,15 +32,15 @@ export function WaitlistSignup({ compact = false }: { compact?: boolean }) {
         <Mail className="mt-0.5 h-5 w-5 shrink-0 text-primary" aria-hidden />
         <div className="min-w-0 flex-1">
           <h2 className="font-display text-base font-semibold text-foreground">
-            Tell me when saving gets accounts
+            Want to keep your tanks safe?
           </h2>
           <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-            Anonymous saves can be lost if browser data is cleared. Join for the account-recovery
-            launch update.
+            Saved tanks currently live in this browser and can disappear if its data is cleared.
+            Leave your email and we’ll tell you when account backup is ready.
           </p>
           {done ? (
             <p className="mt-3 text-sm font-semibold text-primary">
-              Thanks — we'll only use it for the requested update.
+              You’re on the list. We’ll only email you about account backup.
             </p>
           ) : (
             <form onSubmit={submit} className="mt-3 flex flex-col gap-2 sm:flex-row">

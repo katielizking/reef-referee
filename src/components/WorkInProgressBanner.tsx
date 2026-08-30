@@ -19,9 +19,9 @@ export function WorkInProgressBanner() {
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-3">
         <p className="text-xs leading-relaxed text-foreground sm:text-sm">
           <strong className="font-semibold">
-            FishTankr is an open, work-in-progress welfare tool.
+            FishTankr is still growing, and it’s supported by fishkeepers like you.
           </strong>{" "}
-          Community support funds better species evidence and testing.
+          Your support helps us improve the care data and test every update.
         </p>
         <div className="flex shrink-0 items-center gap-1.5">
           <a

@@ -4,8 +4,8 @@ import type { TankState } from "./types";
 function verdict(scorecard: Scorecard): string {
   if (scorecard.overall === null) return "Not scored";
   if (scorecard.overall < 45) return "DO NOT STOCK";
-  if (scorecard.overall < 75 || scorecard.capReason) return "RISKY — REVISE FIRST";
-  return "SAFE TO CONSIDER";
+  if (scorecard.overall < 75 || scorecard.capReason) return "RISKY AS PLANNED";
+  return "LOOKS SUITABLE SO FAR";
 }
 
 function wrapText(
@@ -55,7 +55,7 @@ export async function shareScoreCard(
   ctx.fillText(String(scorecard.overall ?? "—"), 72, 430);
   ctx.font = "500 34px DM Sans, sans-serif";
   ctx.fillStyle = "rgba(255,255,255,.65)";
-  ctx.fillText("welfare screen / 100", 80, 480);
+  ctx.fillText("welfare score / 100", 80, 480);
   ctx.fillStyle = "#ffffff";
   ctx.font = "700 44px Sora, sans-serif";
   wrapText(ctx, state.name || "My tank", 80, 570, 900, 56);
@@ -74,7 +74,7 @@ export async function shareScoreCard(
   ctx.fillStyle = "rgba(255,255,255,.78)";
   wrapText(
     ctx,
-    scorecard.priorityAction?.action ?? "Keep monitoring water quality and animal behaviour.",
+    scorecard.priorityAction?.action ?? "Keep testing the water and watching how the fish behave.",
     80,
     795,
     900,
@@ -82,7 +82,7 @@ export async function shareScoreCard(
   );
   ctx.fillStyle = "rgba(255,255,255,.48)";
   ctx.font = "500 23px DM Sans, sans-serif";
-  ctx.fillText("Decision support, not a guarantee · fishtankr", 80, 1010);
+  ctx.fillText("A helpful guide, not a guarantee · fishtankr", 80, 1010);
 
   const blob = await new Promise<Blob>((resolve, reject) =>
     canvas.toBlob(
@@ -94,7 +94,7 @@ export async function shareScoreCard(
   if (navigator.share && navigator.canShare?.({ files: [file] })) {
     await navigator.share({
       title: `${state.name} — FishTankr score`,
-      text: "My FishTankr welfare screen",
+      text: "My FishTankr welfare score",
       files: [file],
     });
     return "shared";

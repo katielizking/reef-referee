@@ -346,7 +346,7 @@ function Builder() {
               Will these fish live well in your tank?
             </h1>
             <p className="mt-4 max-w-md text-sm leading-relaxed text-white/75 sm:text-base">
-              Set the glass, pick the fish, and see what happens to them before you buy anything.
+              Enter your tank size, choose your fish and spot welfare problems before you buy.
             </p>
             <p className="data-mono mt-4 text-xs uppercase tracking-[0.14em] text-white/60">
               {state.length_cm} × {state.width_cm} × {state.height_cm} cm ·{" "}
@@ -385,18 +385,17 @@ function Builder() {
               id="what-calculators-miss"
               className="mt-3 font-display text-2xl font-bold tracking-tight text-foreground"
             >
-              What simple capacity calculators miss
+              What basic stocking calculators miss
             </h2>
             <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-              Volume arithmetic cannot see aggression, social group needs, an uncycled biofilter or
-              water outside a species’ range. FishTankr reports those failure modes directly and
-              shows the reason and fix.
+              Tank volume alone cannot tell you whether fish will fight, need a larger group or suit
+              your water. FishTankr checks those risks and explains what to change.
             </p>
             <Link
               to="/methodology"
               className="mt-4 inline-flex min-h-11 items-center font-semibold text-primary underline"
             >
-              Inspect the methodology
+              See how the score works
             </Link>
           </div>
           <div className="grid gap-3 sm:grid-cols-2">
@@ -408,7 +407,7 @@ function Builder() {
                 Two male bettas · 40 L
               </p>
               <p className="mt-2 text-sm text-muted-foreground">
-                The litres and body-size arithmetic can look acceptable while ignoring territorial
+                A litres-and-body-size formula can approve this while missing the territorial
                 conflict.
               </p>
             </article>
@@ -418,8 +417,7 @@ function Builder() {
               </p>
               <p className="mt-2 font-display text-lg font-bold text-foreground">Do not stock</p>
               <p className="mt-2 text-sm text-muted-foreground">
-                Same-species territorial aggression is a critical conflict. The plan is capped until
-                the conflict is removed.
+                Two male bettas are likely to fight. Keep one betta or house them in separate tanks.
               </p>
             </article>
           </div>
@@ -435,7 +433,7 @@ function Builder() {
             Design your tank
           </h2>
           <p className="text-sm text-muted-foreground">
-            Add livestock, plants and hardscape. Your scorecard updates as you go.
+            Add fish, plants and décor. You’ll see how each choice affects the plan.
           </p>
         </div>
         <div className="grid grid-cols-3 gap-2 sm:flex sm:flex-wrap">
@@ -475,7 +473,7 @@ function Builder() {
             title={
               scorecard.overall === null
                 ? "Add fish to create a score card"
-                : "Share the welfare verdict as an image"
+                : "Share your score as an image"
             }
             className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-xl border bg-card px-3 py-2 text-sm font-semibold text-foreground transition-colors hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50"
           >
@@ -547,8 +545,8 @@ function Builder() {
                         Your tank is ready for a plan
                       </p>
                       <p className="mt-1 text-xs leading-relaxed text-white/75">
-                        Add the first species under Livestock. Water defaults will adapt to that
-                        fish, and the welfare verdict will explain every concern.
+                        Add your first fish under Livestock. We’ll adjust the starting water
+                        settings to suit it and explain anything that needs attention.
                       </p>
                     </div>
                   )}
@@ -580,8 +578,8 @@ function Builder() {
                     <span className="font-semibold text-foreground">
                       Tap any fish, plant or décor to edit it.
                     </span>{" "}
-                    Drag to reposition, then rotate, resize, duplicate or remove from the panel that
-                    appears. Undo with ⌘Z.
+                    Drag it to move it, then use the panel to rotate, resize, duplicate or remove
+                    it. You can undo from the toolbar or with ⌘Z.
                   </p>
                 </div>
               )}

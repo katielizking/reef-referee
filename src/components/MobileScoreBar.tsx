@@ -16,22 +16,22 @@ function toneFor(overall: number | null, capReason: string | null) {
   if (overall < 45)
     return {
       label: "Do not stock",
-      sub: "Resolve the critical concern",
+      sub: "Fix the serious risk first",
       bg: "bg-coral/15",
       chip: "bg-coral/20 text-foreground",
       Icon: AlertTriangle,
     };
   if (overall < 75 || capReason)
     return {
-      label: "Risky — revise first",
-      sub: "Resolve welfare concerns",
+      label: "Risky as planned",
+      sub: "Fix the welfare concerns first",
       bg: "bg-warn/15",
       chip: "bg-warn/20 text-foreground",
       Icon: AlertCircle,
     };
   return {
-    label: "Safe to consider",
-    sub: "Keep monitoring fish and water",
+    label: "Looks suitable so far",
+    sub: "Keep watching the fish and water",
     bg: "bg-lime/20",
     chip: "bg-lime/30 text-foreground",
     Icon: CheckCircle2,
@@ -67,7 +67,7 @@ export function MobileWelfareSummary({ scorecard }: { scorecard: Scorecard }) {
         </span>
       </div>
       <p className="mt-3 text-xs font-semibold text-primary">
-        Open the score bar below for reasons and fixes.
+        Open the score below to see what matters and what to do next.
       </p>
     </section>
   );

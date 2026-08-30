@@ -121,7 +121,7 @@ function ShopPage() {
       <h1 className="font-display text-4xl font-bold text-foreground">{shop.name}</h1>
       {shop.featured && (
         <p className="mt-3 inline-flex rounded-full bg-lime/30 px-3 py-1 text-xs font-bold uppercase tracking-wide text-foreground">
-          Featured · paid placement
+          Featured · paid
         </p>
       )}
       {loc && <p className="mt-1 text-muted-foreground">{loc}</p>}
@@ -199,13 +199,13 @@ function ShopPage() {
       <section className="mt-8 rounded-2xl border bg-muted/40 p-4 text-sm text-muted-foreground">
         <p>
           {shop.featured
-            ? "This is a paid featured placement. It is not a welfare endorsement."
-            : "This directory listing is not a welfare endorsement."}{" "}
-          Affiliate links may earn FishTankr a commission.
+            ? "This shop has paid for featured placement. That is not an endorsement of its animal care."
+            : "A directory listing is not an endorsement of a shop’s animal care."}{" "}
+          FishTankr may earn a commission from affiliate links.
         </p>
         <div className="mt-3 flex flex-wrap gap-3">
           <Link to="/affiliate-disclosure" className="font-semibold text-primary underline">
-            Commercial disclosure
+            How paid links work
           </Link>
           <Link
             to="/contact"

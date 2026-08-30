@@ -130,8 +130,8 @@ function SavedTanks() {
         Reopen, edit, copy or share the tanks saved in this browser.
       </p>
       <div className="mt-4 rounded-xl border border-warn/40 bg-warn/10 p-3 text-sm text-foreground">
-        <strong>Anonymous save:</strong> clearing browser data can disconnect these tanks from you,
-        and there is currently no account recovery path. Keep important share links somewhere safe.
+        <strong>Saved in this browser:</strong> if you clear your browser data, you may lose access
+        to these tanks. Keep any important share links somewhere safe.
       </div>
       <div className="mt-4">
         <WaitlistSignup />
@@ -151,7 +151,7 @@ function SavedTanks() {
               No saved tanks yet
             </p>
             <p className="mt-1 text-sm text-muted-foreground">
-              Build a tank and hit Save — it'll appear here.
+              Build a tank and save it. You’ll find it here next time.
             </p>
             <Link
               to="/"
@@ -236,7 +236,7 @@ function SavedTanks() {
             </h2>
           </div>
           <p className="mb-4 text-sm text-muted-foreground">
-            One-click starters. They open the builder pre-filled — tweak as you go.
+            Pick a starting point, then make it your own in the builder.
           </p>
           <ul className="grid gap-3 sm:grid-cols-2">
             {TANK_PRESETS.map((preset) => {
@@ -326,8 +326,8 @@ function SavedTanks() {
           <AlertDialogHeader>
             <AlertDialogTitle>Delete {deleteTarget?.name}?</AlertDialogTitle>
             <AlertDialogDescription>
-              This permanently removes the saved tank and its share link. This action cannot be
-              undone from FishTankr.
+              This will permanently delete the tank and stop its share link from working. You cannot
+              undo this.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

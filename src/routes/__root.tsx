@@ -81,7 +81,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
 
 const TITLE = "FishTankr — Smarter tanks. Happier fish.";
 const DESC =
-  "Simple tools that make fishkeeping easier to understand and better for the animals in our care. Plan a setup, check your stocking and see the biology behind a healthy aquarium.";
+  "Plan a freshwater tank, check whether the fish suit each other and understand what they need to thrive.";
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   head: () => ({
@@ -184,7 +184,7 @@ const NAV_ITEMS: Array<{ to: string; label: string; exact?: boolean }> = [
   { to: "/quiz", label: "Quiz" },
   { to: "/species", label: "Species" },
   { to: "/guides", label: "Guides" },
-  { to: "/methodology", label: "Method" },
+  { to: "/methodology", label: "How it works" },
   { to: "/shops", label: "Shops" },
   { to: "/blog", label: "Blog" },
   { to: "/saved", label: "My tanks" },

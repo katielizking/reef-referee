@@ -38,7 +38,7 @@ function issueTitle(issue: Issue): string {
     "temperament-clash": "Temperament mismatch",
     "both-territorial": "Competing territories",
     "fin-nipping": "Fin-nipping risk",
-    "fin-nipping-understocked": "Fin-nipping risk is elevated",
+    "fin-nipping-understocked": "Fin-nipping is more likely",
     predation: "Predation risk",
     "ph-no-overlap": "No shared pH range",
     "ph-marginal": "Very narrow shared pH range",
@@ -50,12 +50,12 @@ function issueTitle(issue: Issue): string {
     "ph-unsuitable": "Target pH is unsuitable",
     "temp-unsuitable": "Target temperature is unsuitable",
     "no-filter": "No biological filter selected",
-    "no-biological-media": "Biological media is insufficient",
-    "filter-not-mature": "Biofilter maturity is unverified",
+    "no-biological-media": "Not enough biological media",
+    "filter-not-mature": "Biofilter is not ready yet",
     "cycle-not-started": "Nitrogen cycle has not started",
     "cycle-in-progress": "Nitrogen cycle is still in progress",
-    "cycle-unverified": "Nitrogen cycle is unverified",
-    "water-test-stale": "Water-test evidence is out of date",
+    "cycle-unverified": "Cycle has not been verified",
+    "water-test-stale": "Water tests are out of date",
     "ammonia-detected": "Ammonia detected",
     "nitrite-detected": "Nitrite detected",
   };
@@ -92,21 +92,21 @@ export function buildChecklist(scorecard: Scorecard, state: TankState): Checklis
     items.push({
       id: "waste-load-very-high",
       severity: "worth-look",
-      title: "Very high preliminary waste-load flag",
-      why: "The experimental screen is high enough to justify a closer stocking review, but it is not a validated capacity percentage.",
+      title: "Waste load looks very high",
+      why: "The beta estimate is high enough to take another look at this stocking plan. It is not a proven capacity limit.",
       fix:
         scorecard.bioload.fixes[0] ??
-        "Review adult fish needs and water-test trends before adding livestock.",
+        "Check each fish's adult needs and your water-test trends before adding anything.",
     });
   } else if (scorecard.bioload.loadBand === "high") {
     items.push({
       id: "waste-load-high",
       severity: "worth-look",
-      title: "High preliminary waste-load flag",
-      why: "This beta screen suggests reviewing the plan; it does not calculate how many fish the tank can safely hold.",
+      title: "Waste load looks high",
+      why: "The beta estimate suggests taking another look at the plan. It cannot tell you how many fish are safe to add.",
       fix:
         scorecard.bioload.fixes[0] ??
-        "Review the plan against adult fish needs and measured water quality.",
+        "Check the plan against each fish's adult needs and your water-test results.",
     });
   }
 
@@ -117,7 +117,7 @@ export function buildChecklist(scorecard: Scorecard, state: TankState): Checklis
     items.push({
       id: "maint-thin",
       severity: "worth-look",
-      title: "Monthly maintenance is thin for this stocking",
+      title: "Monthly water changes may not be enough",
       why: "Nitrate and dissolved waste may build up faster than monthly water changes can remove them.",
       fix: "Switch to fortnightly or weekly water changes.",
     });
@@ -130,9 +130,9 @@ export function buildChecklist(scorecard: Scorecard, state: TankState): Checklis
     items.push({
       id: "filter-manufacturer-rating",
       severity: "worth-look",
-      title: "Filter is below the tank’s manufacturer rating",
-      why: "The selected filter is marketed for a smaller aquarium. Its flow rate alone does not prove biological capacity.",
-      fix: "Choose a filter rated for this tank or larger, then verify its media and cycle maturity separately.",
+      title: "This filter may be too small",
+      why: "The manufacturer rates it for a smaller tank. A high flow rate does not necessarily mean it can process more waste.",
+      fix: "Choose a filter rated for this tank or larger, then make sure its biological media is mature.",
     });
   }
 
@@ -214,11 +214,13 @@ export function PreStockChecklist({
           <CollapsibleContent className="mt-3 space-y-2">
             {items.length === 0 && noFish ? (
               <p className="rounded-xl bg-muted/50 px-3 py-2 text-sm text-muted-foreground">
-                Cycle readiness is recorded. Add fish to run compatibility, space and water checks.
+                Your cycle details are saved. Add fish to check compatibility, swimming space and
+                water needs.
               </p>
             ) : items.length === 0 ? (
               <p className="rounded-xl bg-lime/20 px-3 py-2 text-sm text-foreground">
-                Looking good — no risks flagged. Remember this is a guide, not a guarantee.
+                Looking good — nothing needs your attention right now. This is still a guide, not a
+                guarantee.
               </p>
             ) : (
               <>
@@ -236,9 +238,10 @@ export function PreStockChecklist({
 
             <div className="mt-3 flex items-start justify-between gap-3 rounded-xl bg-muted/40 px-3 py-2">
               <div className="min-w-0">
-                <p className="text-sm font-medium text-foreground">Skip this check</p>
+                <p className="text-sm font-medium text-foreground">Save without a warning</p>
                 <p className="text-xs text-muted-foreground">
-                  Turn off if you know what you're doing. Save won't ask you to confirm.
+                  Turn this on only if you do not want FishTankr to stop you before saving a risky
+                  plan.
                 </p>
               </div>
               <Switch
@@ -261,11 +264,11 @@ export function PreStockChecklist({
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2">
               <AlertTriangle className="h-5 w-5 text-coral" />
-              Worth another look before you save
+              Check this plan before you save
             </AlertDialogTitle>
             <AlertDialogDescription>
-              This setup has issues that will affect your fish. You can adjust the tank, or save
-              anyway if it's intentional.
+              Some parts of this setup could harm your fish. You can adjust the tank now or save it
+              as a draft anyway.
             </AlertDialogDescription>
           </AlertDialogHeader>
 

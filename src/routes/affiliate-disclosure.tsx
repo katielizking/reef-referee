@@ -23,27 +23,26 @@ function AffiliateDisclosure() {
     <PolicyPage
       eyebrow="Commercial transparency"
       title="Affiliate and sponsorship disclosure"
-      intro="Recommendations should remain understandable even when FishTankr may earn money from a link or listing."
+      intro="If FishTankr may earn money from a link or listing, we want that relationship to be easy to understand."
     >
       <PolicySection title="Affiliate links">
         <p>
-          A link labelled affiliate or commercial may earn FishTankr a commission if you buy after
-          following it, at no extra cost to you. Commercial outbound links use sponsored and
-          nofollow relationship attributes.
+          If you buy something after following a link labelled “affiliate” or “commercial,”
+          FishTankr may earn a commission at no extra cost to you. We also mark these links for
+          search engines as sponsored.
         </p>
       </PolicySection>
       <PolicySection title="Featured shops">
         <p>
-          A featured label means a shop has paid for placement or received enhanced visibility. It
-          does not mean the shop, its stock or its animal-care practices have been independently
-          endorsed. Ordinary verification and featured placement are separate.
+          A “featured” label means a shop has paid for more prominent placement. It does not mean we
+          have independently endorsed the shop, its stock or its animal-care practices. Verifying a
+          listing and selling featured placement are separate.
         </p>
       </PolicySection>
       <PolicySection title="Editorial independence">
         <p>
-          Payments do not change welfare scores or species requirements. FishTankr will identify
-          paid relationships near the relevant link and correct misleading listing information when
-          it is substantiated.
+          Payments never change welfare scores or species needs. We label paid relationships near
+          the relevant link and correct misleading listing information when we can verify a report.
         </p>
       </PolicySection>
     </PolicyPage>

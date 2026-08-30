@@ -115,7 +115,7 @@ function BlogPostPage() {
           {post.author_name && <span>{post.author_name}</span>}
           {post.published_at && (
             <time>
-              {new Date(post.published_at).toLocaleDateString("en-AU", {
+              {new Date(post.published_at).toLocaleDateString(undefined, {
                 day: "numeric",
                 month: "long",
                 year: "numeric",

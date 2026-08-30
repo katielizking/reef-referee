@@ -7,7 +7,7 @@ export type StepId = "tank" | "filter" | "livestock" | "aquascape";
 const STEPS: Array<{ id: StepId; label: string; sub: string }> = [
   { id: "tank", label: "Tank", sub: "Size & water" },
   { id: "filter", label: "Cycle", sub: "Filter & tests" },
-  { id: "livestock", label: "Livestock", sub: "Fish community" },
+  { id: "livestock", label: "Fish", sub: "Build a community" },
   { id: "aquascape", label: "Aquascape", sub: "Plants & habitat" },
 ];
 
@@ -47,7 +47,7 @@ export function BuilderSteps({ state, onJump }: Props) {
     >
       <div className="flex items-center justify-between gap-3 border-b border-white/10 px-4 py-3 sm:gap-4 sm:px-5">
         <div>
-          <p className="science-label text-blue">Tank build</p>
+          <p className="science-label text-blue">Your progress</p>
           <p className="mt-1 text-xs text-white/55">
             {completed} of {STEPS.length} foundations set
           </p>

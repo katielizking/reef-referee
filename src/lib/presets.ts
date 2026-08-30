@@ -14,7 +14,7 @@ export const TANK_PRESETS: TankPreset[] = [
   {
     id: "community-60l",
     name: "60 L peaceful community",
-    blurb: "Classic starter: schooling tetras plus a few tidy bottom-dwellers.",
+    blurb: "A classic starter with schooling tetras and a few peaceful bottom-dwellers.",
     region: "Amazon-inspired",
     base: {
       name: "60 L community",
@@ -30,7 +30,7 @@ export const TANK_PRESETS: TankPreset[] = [
   {
     id: "nano-shrimp-20l",
     name: "20 L cherry shrimp nano",
-    blurb: "Lightly planted invert-friendly nano — no fish needed.",
+    blurb: "A lightly planted nano tank for shrimp, with no fish needed.",
     region: "Nano planted",
     base: {
       name: "20 L nano",
@@ -46,7 +46,7 @@ export const TANK_PRESETS: TankPreset[] = [
   {
     id: "malawi-180l",
     name: "180 L Lake Malawi",
-    blurb: "Hard alkaline water, rockwork mounds, mbuna vibes.",
+    blurb: "Hard, alkaline water with plenty of rockwork for mbuna.",
     region: "Lake Malawi rift",
     base: {
       name: "180 L Malawi",
@@ -62,7 +62,7 @@ export const TANK_PRESETS: TankPreset[] = [
   {
     id: "se-asian-40l",
     name: "40 L SE Asian blackwater",
-    blurb: "Soft acid water, tannin-stained, driftwood and leaf litter.",
+    blurb: "Soft, acidic, tannin-stained water with driftwood and leaf litter.",
     region: "Southeast Asian stream",
     base: {
       name: "40 L blackwater",

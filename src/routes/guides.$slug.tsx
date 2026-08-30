@@ -39,11 +39,11 @@ const guides: Record<string, Guide> = {
       },
       {
         q: "Do live plants cycle a tank?",
-        a: "Plants can take up nitrogen, but they do not prove that a biological filter is established. Record current ammonia and nitrite results before stocking and keep testing after livestock is introduced.",
+        a: "Plants can take up nitrogen, but they do not prove that a biological filter is established. Test ammonia and nitrite before adding fish, then keep testing once the fish are in.",
       },
       {
         q: "What ammonia level is safe for fish?",
-        a: "FishTankr treats any detectable ammonia or nitrite as a stop signal for adding fish. If animals are already present, begin corrective care immediately and investigate the source.",
+        a: "FishTankr tells you not to add fish if any ammonia or nitrite is detected. If fish are already in the tank, act immediately to protect them and find the cause.",
       },
     ],
     body: () => (
@@ -51,14 +51,14 @@ const guides: Record<string, Guide> = {
         <section id="what-is-cycling">
           <h2>What cycling actually means</h2>
           <p>
-            A freshwater tank is a tiny sewage-treatment plant. Fish produce ammonia, which can harm
-            them. "Cycling" means establishing microbial communities on filter media and other wet
-            surfaces that convert ammonia → nitrite → nitrate. The time required varies, so a tank
-            is not considered ready just because a certain number of days has passed.
+            A freshwater tank is a tiny waste-treatment system. Fish produce ammonia, which can harm
+            them. “Cycling” means growing beneficial microbes on the filter media and other wet
+            surfaces. These microbes convert ammonia → nitrite → nitrate. Every tank takes a
+            different amount of time, so the calendar alone cannot tell you when yours is ready.
           </p>
           <p>
-            Adding fish to a tank that has not cycled is called <em>new tank syndrome</em>. It is
-            the single most common reason beginner fish die.
+            Adding fish before this process is established can cause <em>new tank syndrome</em>, a
+            common and preventable cause of illness and death in new aquariums.
           </p>
         </section>
 
@@ -74,16 +74,17 @@ const guides: Record<string, Guide> = {
               ammonia. Also harmful to fish.
             </li>
             <li>
-              <strong>Nitrate (NO₃⁻)</strong> — produced as nitrite-oxidising microbes process
-              nitrite. It is managed through a care plan based on measured water quality, livestock
-              and planting.
+              <strong>Nitrate (NO₃⁻)</strong> — produced when other microbes process nitrite.
+              Regular testing tells you when water changes and other maintenance are needed.
             </li>
           </ol>
         </section>
 
         <section id="fishless">
           <h2>Fishless cycle (recommended)</h2>
-          <p>The animal-welfare-friendly path. No fish suffer while the tank matures.</p>
+          <p>
+            This is the kindest way to cycle a tank because no fish are exposed while it matures.
+          </p>
           <ol>
             <li>
               <strong>Set up the tank fully</strong>: substrate, hardscape, plants, filter and any
@@ -103,9 +104,9 @@ const guides: Record<string, Guide> = {
               controlled challenge returns both ammonia and nitrite to zero.
             </li>
             <li>
-              <strong>Check the full water picture</strong>, including nitrate, pH and temperature.
-              Make an appropriately sized conditioned-water change when the measured results call
-              for it, then begin stocking gradually.
+              <strong>Check nitrate, pH and temperature too.</strong> If the results call for a
+              water change, use conditioned water that matches the tank temperature. Then add fish
+              gradually.
             </li>
           </ol>
         </section>
@@ -170,9 +171,9 @@ const guides: Record<string, Guide> = {
         <section id="next">
           <h2>Adding your first fish</h2>
           <p>
-            Once cycled, add fish in stages — a group at a time, a week apart. The bacteria colony
-            grows to match its food supply, and dumping in the full stocking list at once causes a
-            mini-cycle.
+            Once the tank is cycled, add fish gradually—a group at a time rather than the whole plan
+            at once. The biofilter needs time to grow with the added waste, and adding too much too
+            quickly can trigger another ammonia or nitrite spike.
           </p>
           <p>
             Not sure what to add? The{" "}
@@ -291,8 +292,8 @@ function GuidePage() {
           <div className="mt-10 rounded-2xl border bg-card p-6 not-prose">
             <p className="font-display text-lg font-semibold">Ready to plan a tank?</p>
             <p className="mt-1 text-sm text-muted-foreground">
-              Try the builder to see live welfare checks, cycle readiness and clearly labelled beta
-              signals as you add fish.
+              Add your fish to the builder and see compatibility, space, water and cycle concerns as
+              you build the plan.
             </p>
             <Link
               to="/"

@@ -181,24 +181,23 @@ export function scoreTank(state: TankState): Scorecard {
   if (compatibility.criticalConflicts.length > 0) {
     caps.push({
       cap: 40,
-      reason: "Score capped: a critical compatibility conflict will cost fish their lives.",
+      reason: "The score is limited because this mix could seriously injure or kill fish.",
     });
   }
   if (readiness.status === "unsafe") {
     caps.push({
       cap: 25,
-      reason: "Score capped: ammonia or nitrite is detectable. Do not add fish.",
+      reason: "The score is limited because ammonia or nitrite is present. Do not add fish.",
     });
   } else if (readiness.status === "cycling") {
     caps.push({
       cap: 35,
-      reason: "Score capped: the aquarium or filter is still cycling.",
+      reason: "The score is limited because the tank or filter is still cycling.",
     });
   } else if (readiness.status === "unverified") {
     caps.push({
       cap: 60,
-      reason:
-        "Score capped: biological filtration has not been verified with current test results.",
+      reason: "The score is limited until current water tests confirm that the biofilter is ready.",
     });
   }
 
@@ -239,7 +238,8 @@ function choosePriorityAction(
       severity: "critical",
       category: "readiness",
       title: "Do not add fish to this water",
-      action: issue?.fix ?? "Resolve detectable ammonia or nitrite and retest before stocking.",
+      action:
+        issue?.fix ?? "Find the cause of the ammonia or nitrite, then retest before adding fish.",
     };
   }
   const critical = scores.compatibility.issues.find((i) => i.severity === "critical");
@@ -258,10 +258,11 @@ function choosePriorityAction(
       category: "readiness",
       title:
         scores.readiness.status === "cycling"
-          ? "Finish cycling before stocking"
-          : "Verify the nitrogen cycle first",
+          ? "Finish cycling before adding fish"
+          : "Check the cycle before adding fish",
       action:
-        issue?.fix ?? "Confirm an established biofilter with current ammonia and nitrite results.",
+        issue?.fix ??
+        "Use current ammonia and nitrite tests to confirm that the biofilter is ready.",
     };
   }
   if (scores.water.score < 70 && scores.water.fixes.length > 0) {
@@ -293,7 +294,7 @@ function choosePriorityAction(
     return {
       severity: "medium",
       category: "bioload",
-      title: "Review the stocking demand",
+      title: "Take another look at the stocking level",
       action: scores.bioload.fixes[0],
     };
   }
@@ -337,7 +338,9 @@ function scoreCompatibility(state: TankState): CompatibilitySubScore {
         "shoal-shortfall",
         quantity === 1 ? "high" : "medium",
         quantity === 1 ? 18 : 12,
-        `${sp.common_name} is a shoaling fish kept in ${quantity}. It needs at least ${sp.min_group_size} to feel secure.`,
+        quantity === 1
+          ? `${sp.common_name} is a shoaling fish and should not be kept alone. It needs a group of at least ${sp.min_group_size}.`
+          : `${sp.common_name} needs a group of at least ${sp.min_group_size}, but this plan has ${quantity}.`,
         `Add ${short} more ${sp.common_name}.`,
       );
     }
@@ -359,7 +362,7 @@ function scoreCompatibility(state: TankState): CompatibilitySubScore {
         "conspecific-partial-group",
         "critical",
         50,
-        `${sp.common_name} is aggressive towards its own kind. In a part-group of ${quantity} the aggression lands on one fish instead of being spread across a full group of ${sp.min_group_size} or more.`,
+        `${sp.common_name} can be aggressive towards its own kind. In a small group of ${quantity}, one fish is likely to take most of the aggression.`,
         `Keep a single ${sp.common_name}, or commit to a full group of at least ${sp.min_group_size}.`,
       );
       criticalConflicts.push(`${sp.common_name} × ${quantity}`);
@@ -378,7 +381,7 @@ function scoreCompatibility(state: TankState): CompatibilitySubScore {
         "aggression-standing",
         "medium",
         14,
-        `${sp.common_name} stays aggressive towards its own kind even in a full group. Groups like this need a large tank, heavy hardscape and, usually, no other species.`,
+        `${sp.common_name} can stay aggressive towards its own kind even in a full group. These groups need a large tank, plenty of rockwork and usually no other species.`,
         `Plan this as a species-only tank, break up sight lines with rock, and watch for one fish being singled out.`,
       );
     }
@@ -389,7 +392,7 @@ function scoreCompatibility(state: TankState): CompatibilitySubScore {
           "conspecific-aggression",
           "critical",
           55,
-          `${sp.common_name} is aggressive towards its own kind. Keeping ${quantity} together will end in serious injury or death.`,
+          `${sp.common_name} is aggressive towards its own kind. Keeping ${quantity} together is likely to cause serious injury or death.`,
           `Keep a single ${sp.common_name}, or house the others in separate tanks.`,
         );
         criticalConflicts.push(`${sp.common_name} × ${quantity}`);
@@ -398,7 +401,7 @@ function scoreCompatibility(state: TankState): CompatibilitySubScore {
           "conspecific-territorial",
           "high",
           22,
-          `${sp.common_name} is territorial. In a group of ${quantity} the weakest fish has nowhere to hide.`,
+          `${sp.common_name} is territorial. In a group of ${quantity}, the weakest fish may not be able to escape.`,
           `Keep one ${sp.common_name}, or a larger group of at least 4 so aggression is spread.`,
         );
       }
@@ -423,7 +426,7 @@ function scoreCompatibility(state: TankState): CompatibilitySubScore {
           "both-aggressive",
           "critical",
           45,
-          `${a.common_name} and ${b.common_name} are both aggressive. Neither will back down.`,
+          `${a.common_name} and ${b.common_name} are both aggressive, so neither is likely to back down.`,
           `Keep only one of ${a.common_name} or ${b.common_name}.`,
         );
         criticalConflicts.push(`${a.common_name} ⇄ ${b.common_name}`);
@@ -440,8 +443,8 @@ function scoreCompatibility(state: TankState): CompatibilitySubScore {
           "both-territorial",
           "medium",
           8,
-          `${a.common_name} and ${b.common_name} are both territorial. Give them separate hiding places and broken sight lines.`,
-          `Add more hardscape so each has its own territory.`,
+          `${a.common_name} and ${b.common_name} are both territorial and need room to avoid each other.`,
+          `Give each species its own hiding places and break up sight lines with plants or hardscape.`,
         );
       }
 
@@ -455,16 +458,16 @@ function scoreCompatibility(state: TankState): CompatibilitySubScore {
             "fin-nipping-understocked",
             "high",
             22,
-            `${n.common_name} nips fins when kept in small numbers, and ${f.common_name} has long fins to nip.`,
-            `Raise ${n.common_name} to at least ${n.min_group_size} so they occupy each other, or remove ${f.common_name}.`,
+            `${n.common_name} is more likely to nip fins in a small group, putting ${f.common_name}'s long fins at risk.`,
+            `Keep at least ${n.min_group_size} ${n.common_name}, or choose a tank mate without long fins.`,
           );
         } else {
           add(
             "fin-nipping",
             "medium",
             10,
-            `${n.common_name} may nip ${f.common_name}'s long fins. Watch for frayed edges.`,
-            `Keep ${n.common_name} in a full group and give ${f.common_name} cover to retreat to.`,
+            `${n.common_name} may nip ${f.common_name}'s long fins. Watch for chasing or frayed fin edges.`,
+            `Keep ${n.common_name} in a full group and give ${f.common_name} plenty of cover.`,
           );
         }
       };
@@ -497,16 +500,16 @@ function scoreCompatibility(state: TankState): CompatibilitySubScore {
           "ph-no-overlap",
           "high",
           20,
-          `${a.common_name} and ${b.common_name} need different water chemistry, with no shared pH at all.`,
-          `Pick species with overlapping pH ranges.`,
+          `${a.common_name} and ${b.common_name} do not share a suitable pH range.`,
+          `Choose species whose pH ranges overlap.`,
         );
       } else if (phOverlap < 0.5) {
         add(
           "ph-marginal",
           "medium",
           9,
-          `${a.common_name} and ${b.common_name} only just overlap on pH.`,
-          `Aim for species with at least half a pH point in common.`,
+          `${a.common_name} and ${b.common_name} have very little overlap in their pH ranges.`,
+          `Choose species with at least half a pH point in common.`,
         );
       }
 
@@ -518,8 +521,8 @@ function scoreCompatibility(state: TankState): CompatibilitySubScore {
           "temp-no-overlap",
           "high",
           20,
-          `${a.common_name} and ${b.common_name} need different temperatures, with no shared range at all.`,
-          `Pick species with overlapping temperature ranges.`,
+          `${a.common_name} and ${b.common_name} do not share a suitable temperature range.`,
+          `Choose species whose temperature ranges overlap.`,
         );
       } else if (tOverlap < 2) {
         add(
@@ -527,7 +530,7 @@ function scoreCompatibility(state: TankState): CompatibilitySubScore {
           "medium",
           9,
           `${a.common_name} and ${b.common_name} share only ${tOverlap.toFixed(1)} °C of comfortable range.`,
-          `Aim for at least 2 °C of overlap so the tank has somewhere safe to sit.`,
+          `Choose species with at least 2 °C of overlap so you have a comfortable target temperature.`,
         );
       }
     }
@@ -536,7 +539,7 @@ function scoreCompatibility(state: TankState): CompatibilitySubScore {
   const score = aggregate(issues);
   const reasons = issues.length
     ? issues.map((i) => i.reason)
-    : ["No compatibility risks are currently flagged by the catalogue rules."];
+    : ["These fish look compatible based on the care information in our catalogue."];
   const fixes = issues.map((i) => i.fix);
   return { score, reasons, fixes, criticalConflicts, issues };
 }
@@ -559,7 +562,7 @@ function scoreReadiness(state: TankState): Scorecard["readiness"] {
       "critical",
       90,
       `Ammonia is detectable at ${state.ammonia_mg_l} mg/L.`,
-      "Do not add fish. Identify the source, protect any livestock already present and retest until ammonia remains at 0 mg/L.",
+      "Do not add fish. Find the cause, protect any fish already in the tank and keep testing until ammonia stays at 0 mg/L.",
     );
   }
   if (state.nitrite_mg_l !== null && state.nitrite_mg_l > 0) {
@@ -568,7 +571,7 @@ function scoreReadiness(state: TankState): Scorecard["readiness"] {
       "critical",
       90,
       `Nitrite is detectable at ${state.nitrite_mg_l} mg/L.`,
-      "Do not add fish. Continue cycling or correct the biofilter problem and retest until nitrite remains at 0 mg/L.",
+      "Do not add fish. Keep cycling or fix the biofilter problem, then test again until nitrite stays at 0 mg/L.",
     );
   }
 
@@ -577,8 +580,8 @@ function scoreReadiness(state: TankState): Scorecard["readiness"] {
       "no-filter",
       "critical",
       55,
-      "No filter is selected, so biological filtration cannot be assessed.",
-      "Choose a filter and establish its biological media before stocking.",
+      "You have not chosen a filter, so we cannot tell whether the tank has enough biological filtration.",
+      "Choose a filter and let its biological media mature before adding fish.",
     );
   }
   if (state.biological_media_level === "minimal") {
@@ -586,8 +589,8 @@ function scoreReadiness(state: TankState): Scorecard["readiness"] {
       "no-biological-media",
       "high",
       35,
-      "The selected setup has minimal biological media.",
-      "Add suitable biological media and allow its microbial community to establish before stocking.",
+      "This filter has very little biological media for beneficial bacteria to live on.",
+      "Add suitable biological media and give it time to mature before adding fish.",
     );
   }
   if (state.filter_maturity === "new" || state.filter_maturity === "maturing") {
@@ -596,17 +599,17 @@ function scoreReadiness(state: TankState): Scorecard["readiness"] {
       "critical",
       55,
       state.filter_maturity === "new"
-        ? "The filter media is new and does not yet have an established biofilter."
-        : "The filter media is still maturing.",
-      "Keep cycling and use water tests—not elapsed time alone—to decide when the biofilter is ready.",
+        ? "The filter media is new, so its biofilter is not established yet."
+        : "The biofilter is still maturing.",
+      "Keep cycling and use water tests, rather than time alone, to decide when it is ready.",
     );
   } else if (state.filter_maturity === "unknown") {
     add(
       "filter-not-mature",
       "high",
       30,
-      "The maturity of the biological filter has not been recorded.",
-      "Confirm whether the media is established. Seeded media can help, but current water tests still need to verify the cycle.",
+      "We do not know whether the biological media is mature yet.",
+      "Check whether the media is established. Seeded media can help, but you still need current water tests to confirm the cycle.",
     );
   }
 
@@ -615,8 +618,8 @@ function scoreReadiness(state: TankState): Scorecard["readiness"] {
       "cycle-not-started",
       "critical",
       70,
-      "The nitrogen cycle has not been started.",
-      "Cycle the aquarium before adding fish, then verify the result with ammonia and nitrite tests.",
+      "This tank has not started cycling yet.",
+      "Cycle the tank before adding fish, then confirm it with ammonia and nitrite tests.",
     );
   } else if (state.cycle_status === "cycling") {
     add(
@@ -624,7 +627,7 @@ function scoreReadiness(state: TankState): Scorecard["readiness"] {
       "critical",
       65,
       "The aquarium is still cycling.",
-      "Wait until the cycle is complete and current tests show 0 mg/L ammonia and 0 mg/L nitrite before stocking.",
+      "Wait until the cycle is complete and current tests show 0 mg/L ammonia and nitrite before adding fish.",
     );
   }
 
@@ -642,8 +645,8 @@ function scoreReadiness(state: TankState): Scorecard["readiness"] {
       !hasCurrentEvidence;
     const staleReason =
       testAgeDays !== null && testAgeDays < -1
-        ? "The recorded water-test date is in the future."
-        : `The recorded zero-ammonia and zero-nitrite results are ${testAgeDays ?? "more than seven"} days old.`;
+        ? "The water-test date is in the future. Check the date and try again."
+        : `Your zero-ammonia and zero-nitrite results are ${testAgeDays ?? "more than seven"} days old.`;
     add(
       staleDatedResults ? "water-test-stale" : "cycle-unverified",
       "critical",
@@ -651,9 +654,9 @@ function scoreReadiness(state: TankState): Scorecard["readiness"] {
       staleDatedResults
         ? staleReason
         : state.cycle_status === "verified"
-          ? "The cycle is marked verified, but current zero-ammonia and zero-nitrite results are missing."
-          : "The nitrogen-cycle status has not been verified.",
-      `Retest and record ammonia at 0 mg/L and nitrite at 0 mg/L within the last ${WATER_TEST_MAX_AGE_DAYS} days, then mark the cycle verified.`,
+          ? "The cycle is marked as verified, but current zero-ammonia and zero-nitrite results are missing."
+          : "The nitrogen cycle has not been verified yet.",
+      `Test the water and record 0 mg/L ammonia and nitrite results from the last ${WATER_TEST_MAX_AGE_DAYS} days, then mark the cycle as verified.`,
     );
   }
 
@@ -676,7 +679,7 @@ function scoreReadiness(state: TankState): Scorecard["readiness"] {
   const reasons = issues.length
     ? issues.map((issue) => issue.reason)
     : [
-        `An established biological filter and zero-ammonia/zero-nitrite results from the last ${WATER_TEST_MAX_AGE_DAYS} days are recorded.`,
+        `The biofilter is established, with zero-ammonia and zero-nitrite results from the last ${WATER_TEST_MAX_AGE_DAYS} days.`,
       ];
   return {
     status,
@@ -732,9 +735,9 @@ function scoreBioload(state: TankState): Scorecard["bioload"] {
   if (state.species.length === 0) {
     reasons.push("No fish added yet.");
   } else {
-    reasons.push(`The preliminary waste-load screen is ${loadBand.replace("-", " ")}.`);
+    reasons.push(`The beta waste-load estimate is ${loadBand.replace("-", " ")}.`);
     fixes.push(
-      "Use this as a review flag only. Do not use it to decide how many more fish to add; confirm species needs, biofilter maturity and water-test trends.",
+      "Treat this as a prompt to review the plan, not permission to add more fish. Check adult species needs, biofilter maturity and water-test trends.",
     );
   }
 
@@ -791,7 +794,7 @@ function scoreSpace(state: TankState): SubScore {
   const score = aggregate(issues);
   const reasons = issues.length
     ? issues.map((i) => i.reason)
-    : ["No space issues are currently flagged against the catalogue minima."];
+    : ["This tank meets the minimum space needs recorded for these fish."];
   return { score, reasons, fixes: issues.map((i) => i.fix), issues };
 }
 
@@ -854,7 +857,7 @@ function scoreWater(state: TankState): SubScore & { misfits: string[] } {
   const score = aggregate(issues);
   const reasons = issues.length
     ? issues.map((i) => i.reason)
-    : ["The selected settings fall within every recorded care range."];
+    : ["Your pH and temperature suit every fish in this plan."];
   return { score, reasons, fixes: issues.map((i) => i.fix), misfits, issues };
 }
 
@@ -867,7 +870,7 @@ function scoreBiome(
     return {
       ...empty,
       score: 0,
-      reasons: ["Add some fish to score biotope replication."],
+      reasons: ["Add fish to see how closely the tank follows one natural region."],
     };
   }
 
@@ -937,10 +940,10 @@ function scoreBiome(
     );
     fixes.push("For a biotope build, pick species that share one region.");
   } else {
-    reasons.push(`Dominant biotope: ${dominantLabel}, ${Math.round(cohesion * 100)}% of stock.`);
+    reasons.push(`${Math.round(cohesion * 100)}% of the fish come from ${dominantLabel}.`);
     if (unmappedShare > 0) {
       reasons.push(
-        `${Math.round(unmappedShare * 100)}% of the stock is from a region we have not mapped yet, so it cannot count towards authenticity.`,
+        `We have not mapped a natural region for ${Math.round(unmappedShare * 100)}% of these fish yet, so they do not count towards the biotope match.`,
       );
     }
     if (cohesion < 1)

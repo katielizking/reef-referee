@@ -192,8 +192,8 @@ function LegalityEvidence({ s }: { s: Species }) {
   const confidence = s.legal_confidence ?? "incomplete";
   const confidenceLabel = {
     verified: "Verified",
-    medium: "Government source, species detail needs review",
-    incomplete: "Incomplete — verify before relying on this",
+    medium: "Government source found; species details still need review",
+    incomplete: "Incomplete — check the current rules before relying on this",
   }[confidence];
 
   return (
@@ -205,7 +205,7 @@ function LegalityEvidence({ s }: { s: Species }) {
             Australia reference notes
           </h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Federal import eligibility and state possession rules are separate checks.
+            Import rules and the rules for keeping a fish are not always the same.
           </p>
         </div>
       </div>
@@ -253,14 +253,14 @@ function LegalityEvidence({ s }: { s: Species }) {
         </a>
       ) : (
         <p className="mt-4 text-sm text-muted-foreground">
-          {s.legal_source_label ?? "A jurisdiction-specific source still needs to be added."}
+          {s.legal_source_label ?? "We still need to add a source for this jurisdiction."}
         </p>
       )}
 
       <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
-        FishTankr’s catalogue includes Australia-specific reference research; it is not a global
-        availability verdict. Confirm current rules with your state or territory fisheries authority
-        before buying, moving or collecting fish.
+        These notes only cover Australia and may not apply where you live. Rules can also change, so
+        check with your local fisheries or wildlife authority before buying, moving or collecting
+        fish.
       </p>
     </section>
   );
@@ -329,7 +329,7 @@ function SpeciesGuide() {
           className="min-h-[320px] lg:min-h-[470px]"
         />
         <div className="hero-grid flex flex-col justify-center p-6 sm:p-9">
-          <span className="science-label text-primary">Species dossier</span>
+          <span className="science-label text-primary">Species guide</span>
           <div className="mt-5 flex flex-wrap items-center gap-2">
             <span className="inline-flex items-center gap-1 rounded-full bg-white/80 px-2.5 py-1 text-xs font-semibold text-muted-foreground shadow-sm">
               <Fish className="h-3.5 w-3.5" /> {BIOTOPE_LABEL[s.biotope_region]}
@@ -343,8 +343,8 @@ function SpeciesGuide() {
             {s.scientific_name}
           </p>
           <p className="mt-6 max-w-md text-sm leading-relaxed text-muted-foreground">
-            A welfare-first profile covering adult needs, natural habitat, social behaviour and the
-            evidence used by FishTankr.
+            A practical guide to this fish’s adult needs, natural habitat, social behaviour and care
+            sources.
           </p>
           <AddToTankButton species={s} />
         </div>
@@ -388,7 +388,7 @@ function SpeciesGuide() {
           <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-primary" aria-hidden />
           <div className="min-w-0 flex-1">
             <h2 className="font-display text-xl font-semibold text-foreground">
-              Care-data evidence
+              Where this care information comes from
             </h2>
             <p className="mt-1 text-sm text-muted-foreground">
               Confidence:{" "}
@@ -397,7 +397,7 @@ function SpeciesGuide() {
               </span>
               {s.care_reviewed_on
                 ? ` · reviewed ${new Date(`${s.care_reviewed_on}T00:00:00`).toLocaleDateString()}`
-                : " · review date not recorded"}
+                : " · not reviewed yet"}
             </p>
             {s.care_source_url ? (
               <a
@@ -411,8 +411,8 @@ function SpeciesGuide() {
               </a>
             ) : (
               <p className="mt-3 rounded-xl bg-warn/10 p-3 text-sm text-muted-foreground">
-                A field-level care source has not yet been attached. Treat this profile as
-                provisional and cross-check it before stocking.
+                We have not linked a care source to this profile yet. Check another reputable source
+                before adding this fish to your tank.
               </p>
             )}
             {s.conspecific_strategy && s.conspecific_strategy !== "unreviewed" && (
@@ -433,17 +433,18 @@ function SpeciesGuide() {
 
       <section className="mt-10">
         <h2 className="font-display text-xl font-semibold text-foreground">
-          How the calculator uses this species
+          How FishTankr checks this fish
         </h2>
         <p className="mt-2 text-sm text-muted-foreground">
-          The welfare score uses compatibility, swimming space and water suitability. Cycle
-          readiness is a safety gate; waste load and biome are shown separately.
+          This fish affects the compatibility, swimming-space and water parts of your score. The
+          tank’s cycle can limit the final result. Waste load and biotope match are shown
+          separately.
         </p>
         <div className="mt-4 space-y-3">
           <ScoreBlock title="Species compatibility" body={compatibilityCopy(s)} />
-          <ScoreBlock title="Bioload" body={bioloadCopy(s)} />
+          <ScoreBlock title="Waste load (beta)" body={bioloadCopy(s)} />
           <ScoreBlock title="Space to swim" body={spaceCopy(s)} />
-          <ScoreBlock title="Biome replication" body={biomeCopy(s)} />
+          <ScoreBlock title="Biotope match" body={biomeCopy(s)} />
           <ScoreBlock title="Regional reference" body={legalityCopy(s)} />
         </div>
       </section>
@@ -452,8 +453,8 @@ function SpeciesGuide() {
         <section className="mt-10">
           <h2 className="font-display text-xl font-semibold text-foreground">Related species</h2>
           <p className="mt-2 text-sm text-muted-foreground">
-            Potential matches based on swim zone, temperament and water ranges. Always score the
-            complete group in the builder.
+            These fish have promising swim-zone, temperament and water-range matches. Add the whole
+            group to the builder before deciding whether they can live together.
           </p>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
             {related.map(({ s: r, reason }) => (
@@ -506,8 +507,8 @@ function AddToTankButton({ species }: { species: Species }) {
       </button>
       {prohibited && (
         <p className="mt-2 text-xs text-muted-foreground">
-          Heads up — this species is flagged as prohibited or restricted and does not affect your
-          welfare score. Check current rules where you live before buying.
+          Heads up — our Australian reference data lists this fish as prohibited or restricted. This
+          does not affect the welfare score, but you should check the rules where you live.
         </p>
       )}
     </div>
@@ -527,38 +528,36 @@ function compatibilityCopy(s: Species): string {
   const flags: string[] = [];
   if (s.predatory)
     flags.push(
-      "it's a predator, so smaller tank mates will be eaten — a critical conflict that caps your overall score",
+      "it may eat smaller tank mates, which creates a critical conflict and limits the overall score",
     );
-  if (s.fin_nipper)
-    flags.push("as a fin-nipper it dings compatibility when paired with long-finned fish");
-  if (s.long_finned) flags.push("its long fins make it a target for known nippers");
+  if (s.fin_nipper) flags.push("it may nip the fins of long-finned fish");
+  if (s.long_finned) flags.push("known fin-nippers may damage its long fins");
   if (s.temperament === "aggressive")
-    flags.push("its aggressive temperament clashes with peaceful community fish");
-  if (s.temperament === "semi-aggressive")
-    flags.push("its semi-aggressive temperament can push peaceful fish around");
+    flags.push("its aggressive temperament can put peaceful community fish at risk");
+  if (s.temperament === "semi-aggressive") flags.push("it may chase or intimidate peaceful fish");
   if (flags.length === 0)
-    return "Peaceful temperament with no fin-nipping or predation flags — it plays well with most similarly-sized community fish.";
-  return `We check every pair in your tank: ${flags.join("; ")}.`;
+    return "This is a peaceful fish with no known fin-nipping or predation risks. It may suit similarly sized community fish, but check the full group in the builder.";
+  return `When FishTankr checks this fish against its tank mates, it considers that ${flags.join("; ")}.`;
 }
 
 function bioloadCopy(s: Species): string {
-  return `Each ${s.common_name} currently adds an experimental waste-demand value of ~${s.bioload_factor.toFixed(1)}. FishTankr uses that only for a beta screening band: it is not a validated capacity figure, pump turnover does not increase it, and it never tells you how many more fish to add.`;
+  return `Each ${s.common_name} adds about ${s.bioload_factor.toFixed(1)} to our early-stage waste estimate. We only use this to show a broad beta band. It does not set a safe fish limit, and a faster pump cannot improve it.`;
 }
 
 function spaceCopy(s: Species): string {
-  return `Needs at least ${s.min_tank_litres} L to have room for adult swimming and territory. ${s.active ? "This is an active swimmer, so tank length matters as much as volume." : "Not an especially active swimmer, but still needs the minimum volume."}`;
+  return `This fish needs at least ${s.min_tank_litres} L for adult swimming and territory. ${s.active ? "It is an active swimmer, so tank length matters as much as volume." : "It is not especially active, but still needs the minimum tank volume."}`;
 }
 
 function biomeCopy(s: Species): string {
-  return `Comes from ${BIOTOPE_LABEL[s.biotope_region]} (${s.native_habitat_type}), with a natural pH of ${s.native_ph_min}–${s.native_ph_max} and temperature of ${s.native_temp_min_c}–${s.native_temp_max_c} °C. Biome score rewards keeping species from the same region together at matching water parameters.`;
+  return `This fish comes from ${BIOTOPE_LABEL[s.biotope_region]} (${s.native_habitat_type}), where the pH is typically ${s.native_ph_min}–${s.native_ph_max} and the temperature ${s.native_temp_min_c}–${s.native_temp_max_c} °C. The optional biotope match looks for fish, water and décor from the same region.`;
 }
 
 function legalityCopy(s: Species): string {
   if (s.legal_status === "prohibited") {
-    return "Flagged as prohibited or restricted. This Australia-specific reference may not apply where you live. Check local import and keeping rules before buying.";
+    return "Our Australian reference data lists this fish as prohibited or restricted. Those rules may not apply where you live, so check local import and keeping laws before buying.";
   }
   if (s.legal_status === "native") {
-    return "This species is native to Australia. Collection, import and keeping rules vary by region; check local guidance before buying.";
+    return "This fish is native to Australia. Rules for collecting, importing and keeping it vary by region, so check your local guidance before buying.";
   }
-  return "Listed as permitted for federal import with conditions. State or territory possession rules can still apply, so review the evidence before buying.";
+  return "Australian federal records list this fish as permitted for import with conditions. State or territory rules may still apply, so check the source before buying.";
 }

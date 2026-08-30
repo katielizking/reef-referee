@@ -231,10 +231,10 @@ function kindLabel(k: PlacementKind): string {
 }
 
 function hintFor(k: PlacementKind): string {
-  if (k === "fish") return "Drag in the scene to reposition the school's centre.";
-  if (k === "plant") return "Sits on the substrate. Rotate and resize as needed.";
-  if (k === "hardscape") return "Sits on the substrate. Drag, rotate or resize.";
-  return "Snapped to the back glass. Drag left/right or up/down.";
+  if (k === "fish") return "Drag the group in the tank to move it.";
+  if (k === "plant") return "This sits on the substrate. Drag, rotate or resize it.";
+  if (k === "hardscape") return "This sits on the substrate. Drag, rotate or resize it.";
+  return "This stays on the back glass. Drag it left, right, up or down.";
 }
 
 function groupExists(state: TankState, kind: PlacementKind, refId: string): boolean {

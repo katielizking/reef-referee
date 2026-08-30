@@ -23,7 +23,7 @@ export function EditorOnboarding() {
       >
         <X className="h-4 w-4" aria-hidden />
       </button>
-      <p className="science-label text-primary">3D editor quick start</p>
+      <p className="science-label text-primary">Using the 3D editor</p>
       <div className="mt-3 grid gap-3 pr-8 text-sm text-muted-foreground sm:grid-cols-2">
         <p className="flex gap-2">
           <Move3D className="mt-0.5 h-4 w-4 shrink-0 text-foreground" aria-hidden />
@@ -35,8 +35,8 @@ export function EditorOnboarding() {
         <p className="flex gap-2">
           <RotateCcw className="mt-0.5 h-4 w-4 shrink-0 text-foreground" aria-hidden />
           <span>
-            <strong className="text-foreground">Undo is always visible.</strong> Use the toolbar
-            arrows after a move; keyboard shortcuts are optional.
+            <strong className="text-foreground">Changed your mind?</strong> Use the undo arrow in
+            the toolbar. Keyboard shortcuts work too.
           </span>
         </p>
       </div>

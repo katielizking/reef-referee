@@ -50,12 +50,12 @@ function ContactPage() {
     <PolicyPage
       eyebrow="Contact"
       title="Talk to FishTankr"
-      intro="Corrections are especially welcome when you can include a primary or specialist source."
+      intro="Found something that needs fixing? We’d love to hear from you, especially if you can share a primary or specialist source."
     >
       <PolicySection title="Send an enquiry">
         {sent ? (
           <p className="rounded-xl bg-lime/20 p-4 font-semibold text-foreground">
-            Thanks. Your message is in the FishTankr review queue.
+            Thanks — we’ve received your message and will take a look.
           </p>
         ) : (
           <form onSubmit={submit} className="space-y-3 rounded-2xl border bg-card p-4">
@@ -113,8 +113,8 @@ function ContactPage() {
       <PolicySection title="Claim or correct a shop listing">
         <p className="flex gap-2">
           <Store className="mt-1 h-4 w-4 shrink-0 text-primary" aria-hidden />
-          Choose “Claim or correct a shop” above and include the listing URL, your role and a
-          verifiable business contact method. Claiming a listing does not automatically make it
+          Choose “Claim or correct a shop” above, then include the listing link, your role and a
+          business contact we can verify. Claiming a listing will not automatically make it
           featured.
         </p>
       </PolicySection>

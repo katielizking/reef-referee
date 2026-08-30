@@ -221,8 +221,8 @@ export function TankSetupPanel({
                 {FILTER_TYPE_LABEL[state.filter.filter_type]} · {state.filter.turnover_lph} L/h flow
               </p>
               <p className="mt-1 text-muted-foreground">
-                Flow moves water; it does not prove biological capacity. Record the media and
-                maturity actually in this filter.
+                Flow tells you how quickly water moves, not how much waste the filter can process.
+                Add the amount and age of its biological media below.
               </p>
             </div>
           )}
@@ -352,7 +352,7 @@ export function TankSetupPanel({
         <AccordionTrigger className="py-3 hover:no-underline">
           <StepHeader
             n={3}
-            title="Livestock"
+            title="Fish"
             summary={
               fishCount === 0
                 ? "No fish yet"

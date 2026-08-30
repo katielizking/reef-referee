@@ -13,13 +13,13 @@ export const Route = createFileRoute("/species/")({
       {
         name: "description",
         content:
-          "Browse freshwater aquarium species with care parameters, biotope and regional availability notes. Filter by region, temperament and adult size.",
+          "Browse freshwater fish care guides and filter by natural region, temperament and adult size.",
       },
       { property: "og:title", content: "Freshwater fish species — FishTankr" },
       {
         property: "og:description",
         content:
-          "Care parameters, biotope and regional availability notes for popular freshwater aquarium species.",
+          "Practical care, habitat and behaviour notes for popular freshwater aquarium fish.",
       },
       { property: "og:url", content: absoluteUrl("/species") },
     ],
@@ -67,8 +67,8 @@ function SpeciesIndex() {
           before you bring them home.
         </h1>
         <p className="mt-5 max-w-2xl text-base leading-relaxed text-muted-foreground">
-          Explore {data?.length ?? 0} species through real, research-grade observations—then compare
-          their care, behaviour, habitat and regional care notes.
+          Explore {data?.length ?? 0} species and compare their care needs, behaviour, habitat and
+          regional notes before deciding what to bring home.
         </p>
         <div
           className="absolute -bottom-16 -right-12 h-52 w-52 rounded-full border-[34px] border-blue/10"

@@ -21,12 +21,12 @@ export const Route = createFileRoute("/blog/")({
       {
         name: "description",
         content:
-          "Guides, reviews and evidence-led deep-dives on freshwater aquariums — welfare, stocking, filtration and habitat design.",
+          "Practical, well-sourced guides to freshwater fish welfare, stocking, filtration and habitat design.",
       },
       { property: "og:title", content: "FishTankr Blog" },
       {
         property: "og:description",
-        content: "Guides and evidence-led reviews on freshwater aquariums.",
+        content: "Practical, well-sourced guides to freshwater aquariums.",
       },
       { property: "og:url", content: absoluteUrl("/blog") },
     ],
@@ -53,8 +53,8 @@ function BlogIndex() {
     <main className="mx-auto max-w-4xl px-4 py-10">
       <div className="mb-6 flex flex-col gap-3 rounded-2xl border bg-primary/5 p-4 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-sm text-muted-foreground">
-          <strong className="text-foreground">Reading for a real setup?</strong> Put the species and
-          water choices into the welfare screen as you go.
+          <strong className="text-foreground">Planning your own tank?</strong> Add the fish and
+          water settings to the builder as you read.
         </p>
         <Link
           to="/"
@@ -65,8 +65,7 @@ function BlogIndex() {
       </div>
       <h1 className="font-display text-4xl font-bold text-foreground">Blog</h1>
       <p className="mt-2 max-w-2xl text-muted-foreground">
-        Practical, evidence-led writing on freshwater aquariums — welfare, stocking, filtration and
-        habitat design for fishkeepers everywhere.
+        Clear, practical guides to fish welfare, stocking, filtration and freshwater habitats.
       </p>
 
       <div className="mt-8 grid gap-4">

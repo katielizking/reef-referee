@@ -12,18 +12,18 @@ function resultFor(overall: number, capReason: string | null): ResultKind {
 
 const RESULT: Record<ResultKind, { word: string; sub: string; var: string }> = {
   good: {
-    word: "Safe to consider",
-    sub: "No current screening flags require action. Keep monitoring the fish and water.",
+    word: "Looks suitable so far",
+    sub: "Nothing needs your attention right now. Keep watching the fish and testing the water.",
     var: "var(--verdict-good)",
   },
   watch: {
-    word: "Risky — revise first",
-    sub: "Resolve the welfare concerns before you stock.",
+    word: "Risky as planned",
+    sub: "There are welfare concerns to fix before you add fish.",
     var: "var(--verdict-caution)",
   },
   bad: {
     word: "Do not stock",
-    sub: "A critical welfare or safety concern needs action.",
+    sub: "This plan has a serious welfare risk. Fix it before adding fish.",
     var: "var(--verdict-critical)",
   },
 };
@@ -151,7 +151,7 @@ export function ScorecardPanel({ scorecard }: { scorecard: Scorecard }) {
           <>
             <p className="data-mono mt-3 text-5xl leading-none text-muted-foreground">—</p>
             <p className="mt-3 text-sm text-muted-foreground">
-              Add livestock and the referee will tell you how these fish will live.
+              Add fish to see how well this tank meets their needs.
             </p>
           </>
         ) : (
@@ -207,7 +207,7 @@ export function ScorecardPanel({ scorecard }: { scorecard: Scorecard }) {
       {/* Instrument panel */}
       <div className="fishtankr-panel px-5 py-2">
         <ScoreRow
-          title="Cycle and biofilter readiness"
+          title="Cycle and biofilter"
           statusLabel={s.readiness.status}
           tag="Safety gate"
           issues={s.readiness.issues}
@@ -249,7 +249,7 @@ export function ScorecardPanel({ scorecard }: { scorecard: Scorecard }) {
         <p className="science-label text-muted-foreground">Style goal · not part of the score</p>
         <div className="mt-3 flex items-baseline justify-between gap-3">
           <p className="text-sm font-semibold text-foreground">
-            Biotope replication
+            Biotope match
             {s.biome.dominantRegion && (
               <span className="ml-2 text-sm font-normal text-muted-foreground">
                 {BIOTOPE_LABEL[s.biome.dominantRegion]}
@@ -277,13 +277,13 @@ export function ScorecardPanel({ scorecard }: { scorecard: Scorecard }) {
 
       {s.overall !== null && (
         <p className="text-sm text-muted-foreground">
-          The score covers compatibility, swimming space and water suitability. Cycle readiness can
-          cap it. The waste-load screen is beta and informational only.{" "}
+          Your score is based on compatibility, swimming space and water suitability. An unverified
+          cycle can limit the result. Waste load is still in beta and does not affect the score.{" "}
           <Link to="/methodology" className="font-semibold text-water underline">
-            Read the methodology.
+            See how the score works.
           </Link>{" "}
           <Link to="/welfare-disclaimer" className="font-semibold text-water underline">
-            Understand the limits.
+            Know its limits.
           </Link>
         </p>
       )}
