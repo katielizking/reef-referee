@@ -12,7 +12,7 @@ import { useTankHistory } from "@/components/tank3d/useTankHistory";
 import { useEditorStore } from "@/components/tank3d/editorStore";
 import { ScorecardPanel } from "@/components/Scorecard";
 import { MobileScoreBar } from "@/components/MobileScoreBar";
-import { HeroTankIllustration } from "@/components/BrandLogo";
+
 import { PreStockChecklist, useSaveGate } from "@/components/PreStockChecklist";
 import { scoreTank } from "@/lib/scoring";
 import { pickDefaultFilter } from "@/lib/defaults";
