@@ -80,7 +80,8 @@ function profile(
  * it communicates characteristic behaviour without simulating animal AI.
  */
 export function fishBehaviourProfile(species: Species): FishBehaviourProfile {
-  const name = `${species.common_name} ${species.scientific_name}`.toLowerCase();
+  const name =
+    `${species.common_name} ${species.scientific_name}`.toLowerCase();
 
   // Slender substrate fish should visibly weave rather than move like corys.
   if (includesAny(name, ["kuhli", "pangio", "loach"])) {
@@ -128,7 +129,16 @@ export function fishBehaviourProfile(species: Species): FishBehaviourProfile {
   }
 
   // Algae eaters visibly browse surfaces and spend longer paused than cruising.
-  if (includesAny(name, ["otocinclus", "oto", "pleco", "bristlenose", "algae eater", "crossocheilus"])) {
+  if (
+    includesAny(name, [
+      "otocinclus",
+      "oto",
+      "pleco",
+      "bristlenose",
+      "algae eater",
+      "crossocheilus",
+    ])
+  ) {
     return profile({
       style: "grazer",
       cruiseSpeed: species.active ? 0.66 : 0.44,
@@ -172,7 +182,9 @@ export function fishBehaviourProfile(species: Species): FishBehaviourProfile {
   }
 
   // Tall-bodied fish glide and hold position instead of continuously circling.
-  if (includesAny(name, ["angelfish", "pterophyllum", "discus", "symphysodon"])) {
+  if (
+    includesAny(name, ["angelfish", "pterophyllum", "discus", "symphysodon"])
+  ) {
     return profile({
       style: species.is_schooling ? "loose-shoal" : "hoverer",
       cruiseSpeed: 0.4,
@@ -246,7 +258,14 @@ export function fishBehaviourProfile(species: Species): FishBehaviourProfile {
   // Small tetras and rasboras look best as a coordinated, compact school.
   if (
     species.is_schooling &&
-    includesAny(name, ["tetra", "rasbora", "hemigrammus", "hyphessobrycon", "paracheirodon", "boraras"])
+    includesAny(name, [
+      "tetra",
+      "rasbora",
+      "hemigrammus",
+      "hyphessobrycon",
+      "paracheirodon",
+      "boraras",
+    ])
   ) {
     return profile({
       style: "tight-school",
@@ -268,7 +287,10 @@ export function fishBehaviourProfile(species: Species): FishBehaviourProfile {
   }
 
   // Barbs shoal, but individuals peel away and rejoin more than tetras.
-  if (species.is_schooling && includesAny(name, ["barb", "puntius", "puntigrus"])) {
+  if (
+    species.is_schooling &&
+    includesAny(name, ["barb", "puntius", "puntigrus"])
+  ) {
     return profile({
       style: "loose-shoal",
       cruiseSpeed: species.active ? 1 : 0.8,
@@ -312,7 +334,13 @@ export function fishBehaviourProfile(species: Species): FishBehaviourProfile {
   // Cichlids and other assertive fish repeatedly patrol a defined patch.
   if (
     species.temperament !== "peaceful" ||
-    includesAny(name, ["cichlid", "aulonocara", "maylandia", "melanochromis", "labidochromis"])
+    includesAny(name, [
+      "cichlid",
+      "aulonocara",
+      "maylandia",
+      "melanochromis",
+      "labidochromis",
+    ])
   ) {
     return profile({
       style: "territorial",

@@ -33,5 +33,7 @@ export function useSelected() {
   return useEditorStore((s) => s.selected);
 }
 export function useIsSelected(kind: PlacementKind, refId: string) {
-  return useEditorStore((s) => s.selected?.kind === kind && s.selected?.refId === refId);
+  return useEditorStore(
+    (s) => s.selected?.kind === kind && s.selected?.refId === refId,
+  );
 }

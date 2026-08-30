@@ -13,7 +13,9 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "@/components/ui/sonner";
 import { BrandLogo } from "@/components/BrandLogo";
+import { WorkInProgressBanner } from "@/components/WorkInProgressBanner";
 import { supabase } from "@/integrations/supabase/client";
+import { absoluteUrl, SUPPORT_URL } from "@/lib/site";
 
 function NotFoundComponent() {
   return (
@@ -94,7 +96,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         { property: "og:description", content: DESC },
         { property: "og:type", content: "website" },
         { property: "og:site_name", content: "FishTankr" },
+        { property: "og:url", content: absoluteUrl("/") },
+        { property: "og:image", content: absoluteUrl("/favicon.png") },
         { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:image", content: absoluteUrl("/favicon.png") },
       ],
       links: [
         { rel: "stylesheet", href: appCss },
@@ -162,6 +167,7 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <div className="site-shell flex min-h-screen flex-col bg-background/80">
         <SiteHeader />
+        <WorkInProgressBanner />
 
         <div className="flex-1">
           <Outlet />
@@ -308,6 +314,41 @@ function SiteFooter() {
           <Link to="/shops" className="transition-colors hover:text-white">
             Shops
           </Link>
+          <Link to="/privacy" className="transition-colors hover:text-white">
+            Privacy
+          </Link>
+          <Link to="/terms" className="transition-colors hover:text-white">
+            Terms
+          </Link>
+          <Link
+            to="/welfare-disclaimer"
+            className="transition-colors hover:text-white"
+          >
+            Welfare disclaimer
+          </Link>
+          <Link
+            to="/affiliate-disclosure"
+            className="transition-colors hover:text-white"
+          >
+            Affiliate disclosure
+          </Link>
+          <Link
+            to="/attribution"
+            className="transition-colors hover:text-white"
+          >
+            3D credits
+          </Link>
+          <Link to="/contact" className="transition-colors hover:text-white">
+            Contact
+          </Link>
+          <a
+            href={SUPPORT_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-semibold text-lime transition-colors hover:text-white"
+          >
+            Support FishTankr
+          </a>
           <a href="/sitemap.xml" className="transition-colors hover:text-white">
             Sitemap
           </a>

@@ -129,15 +129,28 @@ export function groupFootprintRadius(
 }
 
 /** Convenience: name of a placement, for the selection panel. */
-export function placementLabel(state: TankState, kind: PlacementKind, refId: string): string {
+export function placementLabel(
+  state: TankState,
+  kind: PlacementKind,
+  refId: string,
+): string {
   if (kind === "fish") {
-    return state.species.find((s) => s.species.id === refId)?.species.common_name ?? "Fish";
+    return (
+      state.species.find((s) => s.species.id === refId)?.species.common_name ??
+      "Fish"
+    );
   }
   if (kind === "plant") {
-    return state.plants.find((p) => p.plant.id === refId)?.plant.common_name ?? "Plant";
+    return (
+      state.plants.find((p) => p.plant.id === refId)?.plant.common_name ??
+      "Plant"
+    );
   }
   if (kind === "hardscape") {
-    return state.hardscape.find((h) => h.hardscape.id === refId)?.hardscape.name ?? "Décor";
+    return (
+      state.hardscape.find((h) => h.hardscape.id === refId)?.hardscape.name ??
+      "Décor"
+    );
   }
   return state.filter?.name ?? "Equipment";
 }

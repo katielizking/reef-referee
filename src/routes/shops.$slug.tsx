@@ -1,6 +1,8 @@
 import { Link, createFileRoute, notFound } from "@tanstack/react-router";
+import { absoluteUrl } from "@/lib/site";
 import { supabase } from "@/integrations/supabase/client";
 import { ExternalLink, MapPin, Phone } from "lucide-react";
+import { recordShopOutbound } from "@/lib/commercial";
 
 type Shop = {
   id: string;
@@ -16,6 +18,11 @@ type Shop = {
   phone: string | null;
   specialties: string[];
   description: string | null;
+  country_code: string;
+  featured: boolean;
+  affiliate_url: string | null;
+  is_affiliate: boolean;
+  claimed_at: string | null;
 };
 
 async function fetchShop(slug: string): Promise<Shop | null> {
@@ -46,8 +53,10 @@ export const Route = createFileRoute("/shops/$slug")({
     const s = loaderData.shop;
     const loc = [s.suburb, s.state].filter(Boolean).join(", ");
     const title = `${s.name}${loc ? ` — ${loc}` : ""} | FishTankr`;
-    const desc = s.description ?? `Aquarium shop in ${loc || "Australia"}.`;
-    const url = `/shops/${params.slug}`;
+    const desc =
+      s.description ??
+      (loc ? `Aquarium shop in ${loc}.` : "Aquarium shop listed in FishTankr.");
+    const url = absoluteUrl(`/shops/${params.slug}`);
     return {
       meta: [
         { title },
@@ -74,11 +83,14 @@ export const Route = createFileRoute("/shops/$slug")({
               addressLocality: s.suburb ?? undefined,
               addressRegion: s.state ?? undefined,
               postalCode: s.postcode ?? undefined,
-              addressCountry: "AU",
             },
             geo:
               s.lat && s.lng
-                ? { "@type": "GeoCoordinates", latitude: s.lat, longitude: s.lng }
+                ? {
+                    "@type": "GeoCoordinates",
+                    latitude: s.lat,
+                    longitude: s.lng,
+                  }
                 : undefined,
           }),
         },
@@ -90,7 +102,9 @@ export const Route = createFileRoute("/shops/$slug")({
     <main className="mx-auto max-w-3xl px-4 py-16 text-center">
       <h1 className="font-display text-3xl font-bold">Shop not found</h1>
       <p className="mt-2 text-muted-foreground">
-        <Link to="/shops" className="text-primary underline">Back to all shops</Link>
+        <Link to="/shops" className="text-primary underline">
+          Back to all shops
+        </Link>
       </p>
     </main>
   ),
@@ -98,14 +112,26 @@ export const Route = createFileRoute("/shops/$slug")({
 
 function ShopPage() {
   const { shop } = Route.useLoaderData();
-  const loc = [shop.suburb, shop.state, shop.postcode].filter(Boolean).join(" ");
+  const loc = [shop.suburb, shop.state, shop.postcode]
+    .filter(Boolean)
+    .join(" ");
 
   return (
     <main className="mx-auto max-w-3xl px-4 py-10">
-      <Link to="/shops" className="mb-6 inline-block text-sm text-muted-foreground hover:text-foreground">
+      <Link
+        to="/shops"
+        className="mb-6 inline-block text-sm text-muted-foreground hover:text-foreground"
+      >
         ← All shops
       </Link>
-      <h1 className="font-display text-4xl font-bold text-foreground">{shop.name}</h1>
+      <h1 className="font-display text-4xl font-bold text-foreground">
+        {shop.name}
+      </h1>
+      {shop.featured && (
+        <p className="mt-3 inline-flex rounded-full bg-lime/30 px-3 py-1 text-xs font-bold uppercase tracking-wide text-foreground">
+          Featured · paid placement
+        </p>
+      )}
       {loc && <p className="mt-1 text-muted-foreground">{loc}</p>}
 
       {shop.description && (
@@ -133,16 +159,33 @@ function ShopPage() {
       <div className="mt-8 grid gap-3 rounded-2xl border bg-card p-5 text-sm">
         {shop.website && (
           <a
-            href={shop.website}
+            href={shop.affiliate_url ?? shop.website}
             target="_blank"
-            rel="noopener noreferrer"
+            rel={
+              shop.is_affiliate || shop.affiliate_url
+                ? "noopener noreferrer sponsored nofollow"
+                : "noopener noreferrer"
+            }
+            onClick={() =>
+              recordShopOutbound(
+                shop.id,
+                shop.is_affiliate || shop.affiliate_url
+                  ? "affiliate"
+                  : "website",
+              )
+            }
             className="inline-flex items-center gap-2 text-primary hover:underline"
           >
-            <ExternalLink className="h-4 w-4" /> {shop.website.replace(/^https?:\/\//, "")}
+            <ExternalLink className="h-4 w-4" />{" "}
+            {(shop.affiliate_url ?? shop.website).replace(/^https?:\/\//, "")}
+            {shop.is_affiliate || shop.affiliate_url ? " · affiliate link" : ""}
           </a>
         )}
         {shop.phone && (
-          <a href={`tel:${shop.phone}`} className="inline-flex items-center gap-2 text-foreground">
+          <a
+            href={`tel:${shop.phone}`}
+            className="inline-flex items-center gap-2 text-foreground"
+          >
             <Phone className="h-4 w-4" /> {shop.phone}
           </a>
         )}
@@ -151,6 +194,7 @@ function ShopPage() {
             href={`https://www.google.com/maps/search/?api=1&query=${shop.lat},${shop.lng}`}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={() => recordShopOutbound(shop.id, "map")}
             className="inline-flex items-center gap-2 text-primary hover:underline"
           >
             <MapPin className="h-4 w-4" /> Open in Google Maps
@@ -167,6 +211,29 @@ function ShopPage() {
           src={`https://www.google.com/maps?q=${shop.lat},${shop.lng}&z=14&output=embed`}
         />
       )}
+      <section className="mt-8 rounded-2xl border bg-muted/40 p-4 text-sm text-muted-foreground">
+        <p>
+          {shop.featured
+            ? "This is a paid featured placement. It is not a welfare endorsement."
+            : "This directory listing is not a welfare endorsement."}{" "}
+          Affiliate links may earn FishTankr a commission.
+        </p>
+        <div className="mt-3 flex flex-wrap gap-3">
+          <Link
+            to="/affiliate-disclosure"
+            className="font-semibold text-primary underline"
+          >
+            Commercial disclosure
+          </Link>
+          <Link
+            to="/contact"
+            onClick={() => recordShopOutbound(shop.id, "claim")}
+            className="font-semibold text-primary underline"
+          >
+            {shop.claimed_at ? "Correct this listing" : "Claim this shop"}
+          </Link>
+        </div>
+      </section>
     </main>
   );
 }

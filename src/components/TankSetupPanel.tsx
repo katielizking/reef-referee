@@ -27,6 +27,7 @@ import type {
 import { BIOTOPE_LABEL } from "@/lib/types";
 import { litresOf } from "@/lib/scoring";
 import { useOutsideClick } from "@/hooks/useOutsideClick";
+import { adaptWaterToFirstSpecies } from "@/lib/defaults";
 import {
   Accordion,
   AccordionContent,
@@ -612,8 +613,10 @@ function SpeciesAdder({
           ),
         };
       }
+      const adaptedWater = adaptWaterToFirstSpecies(s, sp);
       return {
         ...s,
+        ...adaptedWater,
         species: [
           ...s.species,
           { species: sp, quantity: sp.is_schooling ? sp.min_group_size : 1 },

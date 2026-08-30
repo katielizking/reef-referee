@@ -1,8 +1,17 @@
 export type BiotopeRegion =
   | "amazon_blackwater"
+  | "south_american_river"
+  | "central_american_river"
   | "lake_malawi"
+  | "lake_tanganyika"
   | "se_asian_stream"
+  | "south_asian_river"
+  | "east_asian_stream"
+  | "congo_basin"
+  | "west_african_stream"
   | "australian_native"
+  | "north_american_freshwater"
+  | "european_freshwater"
   | "unmapped";
 
 export type SwimZone = "top" | "mid" | "bottom";
@@ -60,6 +69,20 @@ export interface Species {
   legal_source_url: string | null;
   legal_reviewed_on: string | null;
   legal_confidence: "verified" | "medium" | "incomplete";
+  care_source_label?: string | null;
+  care_source_url?: string | null;
+  care_reviewed_on?: string | null;
+  care_confidence?: "unreviewed" | "low" | "medium" | "high";
+  conspecific_strategy?:
+    | "unreviewed"
+    | "solitary"
+    | "pair"
+    | "harem"
+    | "shoal"
+    | "colony"
+    | "territorial";
+  conspecific_sex_ratio_note?: string | null;
+  conspecific_notes?: string | null;
 }
 
 export interface Plant {
@@ -153,9 +176,18 @@ export interface TankState {
 
 export const BIOTOPE_LABEL: Record<BiotopeRegion, string> = {
   amazon_blackwater: "Amazon blackwater",
+  south_american_river: "South American river",
+  central_american_river: "Central American river",
   lake_malawi: "Lake Malawi rift",
+  lake_tanganyika: "Lake Tanganyika rift",
   se_asian_stream: "Southeast Asian stream",
+  south_asian_river: "South Asian river",
+  east_asian_stream: "East Asian stream",
+  congo_basin: "Congo Basin",
+  west_african_stream: "West African stream",
   australian_native: "Australian native",
+  north_american_freshwater: "North American freshwater",
+  european_freshwater: "European freshwater",
   unmapped: "Other / mixed",
 };
 
@@ -164,8 +196,32 @@ export const BIOTOPE_WATER: Record<
   { ph_min: number; ph_max: number; temp_min: number; temp_max: number }
 > = {
   amazon_blackwater: { ph_min: 4.5, ph_max: 6.5, temp_min: 24, temp_max: 29 },
+  south_american_river: {
+    ph_min: 5.5,
+    ph_max: 7.5,
+    temp_min: 22,
+    temp_max: 29,
+  },
+  central_american_river: {
+    ph_min: 6.5,
+    ph_max: 8.2,
+    temp_min: 22,
+    temp_max: 29,
+  },
   lake_malawi: { ph_min: 7.6, ph_max: 8.6, temp_min: 24, temp_max: 28 },
+  lake_tanganyika: { ph_min: 7.8, ph_max: 9, temp_min: 24, temp_max: 28 },
   se_asian_stream: { ph_min: 5.5, ph_max: 7.5, temp_min: 22, temp_max: 28 },
+  south_asian_river: { ph_min: 6, ph_max: 8, temp_min: 20, temp_max: 28 },
+  east_asian_stream: { ph_min: 6, ph_max: 8, temp_min: 16, temp_max: 26 },
+  congo_basin: { ph_min: 5.5, ph_max: 7.5, temp_min: 23, temp_max: 28 },
+  west_african_stream: { ph_min: 5.5, ph_max: 7.5, temp_min: 23, temp_max: 28 },
   australian_native: { ph_min: 6.5, ph_max: 8.0, temp_min: 18, temp_max: 28 },
+  north_american_freshwater: {
+    ph_min: 6,
+    ph_max: 8.2,
+    temp_min: 10,
+    temp_max: 26,
+  },
+  european_freshwater: { ph_min: 6.5, ph_max: 8.2, temp_min: 10, temp_max: 25 },
   unmapped: { ph_min: 6.5, ph_max: 7.5, temp_min: 22, temp_max: 27 },
 };

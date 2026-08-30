@@ -9,12 +9,14 @@ import {
   type FishTailStyle,
   type FishVisualProfile,
 } from "./fishVisuals";
-import { fishBehaviourProfile, type FishBehaviourProfile } from "./fishBehaviours";
+import {
+  fishBehaviourProfile,
+  type FishBehaviourProfile,
+} from "./fishBehaviours";
 import { useReducedMotion } from "./useReducedMotion";
 import { FishRenderer } from "./fish/FishRenderer";
 
 export type { FishGroupProps };
-
 
 interface FishGroupProps {
   species: Species;
@@ -29,9 +31,13 @@ interface FishGroupProps {
 
 const CM_PER_UNIT = 10;
 
-function zoneY(zone: "top" | "mid" | "bottom", interior: FishGroupProps["interior"]): number {
-  const bottom = interior.substrateY;
-  const top = interior.y / 2 - 0.15;
+function zoneY(
+  zone: "top" | "mid" | "bottom",
+  height: number,
+  substrateY: number,
+): number {
+  const bottom = substrateY;
+  const top = height / 2 - 0.15;
   const usable = top - bottom;
   if (zone === "top") return bottom + usable * 0.78;
   if (zone === "bottom") return bottom + usable * 0.18;
@@ -45,7 +51,14 @@ interface FishInstance {
   speed: number;
 }
 
-export function FishGroup({ species, quantity, interior, selected, onSelect, centerY }: FishGroupProps) {
+export function FishGroup({
+  species,
+  quantity,
+  interior,
+  selected,
+  onSelect,
+  centerY,
+}: FishGroupProps) {
   const colour = useMemo(() => speciesColour(species), [species]);
   const profile = useMemo(() => fishVisualProfile(species), [species]);
   const behaviour = useMemo(() => fishBehaviourProfile(species), [species]);
@@ -57,7 +70,8 @@ export function FishGroup({ species, quantity, interior, selected, onSelect, cen
   const fishLen = Math.max(0.12, Math.min(rawLen, maxLen));
 
   const instances = useMemo<FishInstance[]>(() => {
-    const yCentre = centerY ?? zoneY(species.swim_zone, interior);
+    const yCentre =
+      centerY ?? zoneY(species.swim_zone, interior.y, interior.substrateY);
 
     const school = species.is_schooling && quantity > 1;
     const out: FishInstance[] = [];
@@ -65,9 +79,19 @@ export function FishGroup({ species, quantity, interior, selected, onSelect, cen
 
     for (let i = 0; i < quantity; i++) {
       const rx = hashRange(species.id, i * 3 + 1, -clusterR, clusterR);
-      const rz = hashRange(species.id, i * 3 + 2, -interior.z * 0.4, interior.z * 0.4);
+      const rz = hashRange(
+        species.id,
+        i * 3 + 2,
+        -interior.z * 0.4,
+        interior.z * 0.4,
+      );
       const verticalSpread = species.swim_zone === "bottom" ? 0.12 : 0.25;
-      const ry = hashRange(species.id, i * 3 + 3, -verticalSpread, verticalSpread);
+      const ry = hashRange(
+        species.id,
+        i * 3 + 3,
+        -verticalSpread,
+        verticalSpread,
+      );
       out.push({
         offset: [rx, yCentre + ry, rz],
         phase: hash01(species.id, i * 7) * Math.PI * 2,
@@ -93,7 +117,6 @@ export function FishGroup({ species, quantity, interior, selected, onSelect, cen
     interior.substrateY,
     centerY,
   ]);
-
 
   return (
     <group>
@@ -121,7 +144,6 @@ export function FishGroup({ species, quantity, interior, selected, onSelect, cen
   );
 }
 
-
 export interface FishMeshProps {
   speciesId: string;
   instanceIndex: number;
@@ -138,8 +160,11 @@ export interface FishMeshProps {
   onSelect: () => void;
 }
 
-
-function makeTailShape(style: FishTailStyle, length: number, height: number): THREE.Shape {
+function makeTailShape(
+  style: FishTailStyle,
+  length: number,
+  height: number,
+): THREE.Shape {
   const shape = new THREE.Shape();
   const root = height * 0.32;
 
@@ -168,7 +193,14 @@ function makeTailShape(style: FishTailStyle, length: number, height: number): TH
       -length * 0.65,
       -height,
     );
-    shape.bezierCurveTo(-length * 0.34, -height * 0.9, -length * 0.12, -height * 0.48, 0.02, -root);
+    shape.bezierCurveTo(
+      -length * 0.34,
+      -height * 0.9,
+      -length * 0.12,
+      -height * 0.48,
+      0.02,
+      -root,
+    );
   } else if (style === "fan") {
     shape.bezierCurveTo(
       -length * 0.45,
@@ -188,8 +220,22 @@ function makeTailShape(style: FishTailStyle, length: number, height: number): TH
       -root,
     );
   } else {
-    shape.bezierCurveTo(-length * 0.55, height * 0.95, -length, height * 0.72, -length, 0);
-    shape.bezierCurveTo(-length, -height * 0.72, -length * 0.55, -height * 0.95, 0.02, -root);
+    shape.bezierCurveTo(
+      -length * 0.55,
+      height * 0.95,
+      -length,
+      height * 0.72,
+      -length,
+      0,
+    );
+    shape.bezierCurveTo(
+      -length,
+      -height * 0.72,
+      -length * 0.55,
+      -height * 0.95,
+      0.02,
+      -root,
+    );
   }
 
   shape.lineTo(0.02, root);
@@ -197,7 +243,11 @@ function makeTailShape(style: FishTailStyle, length: number, height: number): TH
   return shape;
 }
 
-function makeFinShape(width: number, height: number, swept = false): THREE.Shape {
+function makeFinShape(
+  width: number,
+  height: number,
+  swept = false,
+): THREE.Shape {
   const shape = new THREE.Shape();
   shape.moveTo(-width / 2, 0);
   shape.quadraticCurveTo(swept ? width * 0.15 : 0, height, width / 2, 0);
@@ -207,10 +257,16 @@ function makeFinShape(width: number, height: number, swept = false): THREE.Shape
 
 function colourSet(colour: string, speciesId: string) {
   const base = new THREE.Color(colour);
-  const secondary = base.clone().offsetHSL(hashRange(speciesId, 91, -0.035, 0.055), -0.05, 0.16);
+  const secondary = base
+    .clone()
+    .offsetHSL(hashRange(speciesId, 91, -0.035, 0.055), -0.05, 0.16);
   const accent = base
     .clone()
-    .offsetHSL(hashRange(speciesId, 97, 0.08, 0.22), 0.08, hashRange(speciesId, 101, -0.12, 0.05));
+    .offsetHSL(
+      hashRange(speciesId, 97, 0.08, 0.22),
+      0.08,
+      hashRange(speciesId, 101, -0.12, 0.05),
+    );
   const shadow = base.clone().offsetHSL(-0.015, -0.03, -0.18);
 
   return {
@@ -229,7 +285,13 @@ interface MarkingsProps {
   colour: string;
 }
 
-function Markings({ pattern, profile, speciesId, instanceIndex, colour }: MarkingsProps) {
+function Markings({
+  pattern,
+  profile,
+  speciesId,
+  instanceIndex,
+  colour,
+}: MarkingsProps) {
   const z = profile.bodyDepth * 1.02;
   const sides = [-1, 1];
 
@@ -239,9 +301,15 @@ function Markings({ pattern, profile, speciesId, instanceIndex, colour }: Markin
     return (
       <>
         {sides.map((side) => (
-          <mesh key={side} position={[0.02, -profile.bodyHeight * 0.04, side * z]}>
+          <mesh
+            key={side}
+            position={[0.02, -profile.bodyHeight * 0.04, side * z]}
+          >
             <planeGeometry
-              args={[profile.bodyHalfLength * 1.45, Math.max(0.018, profile.bodyHeight * 0.17)]}
+              args={[
+                profile.bodyHalfLength * 1.45,
+                Math.max(0.018, profile.bodyHeight * 0.17),
+              ]}
             />
             <meshBasicMaterial
               color={colour}
@@ -264,7 +332,10 @@ function Markings({ pattern, profile, speciesId, instanceIndex, colour }: Markin
           bands.map((x, index) => (
             <mesh key={`${side}-${index}`} position={[x, 0, side * z]}>
               <planeGeometry
-                args={[Math.max(0.025, profile.bodyHalfLength * 0.14), profile.bodyHeight * 1.55]}
+                args={[
+                  Math.max(0.025, profile.bodyHalfLength * 0.14),
+                  profile.bodyHeight * 1.55,
+                ]}
               />
               <meshBasicMaterial
                 color={colour}
@@ -293,7 +364,12 @@ function Markings({ pattern, profile, speciesId, instanceIndex, colour }: Markin
       -profile.bodyHeight * 0.52,
       profile.bodyHeight * 0.52,
     ),
-    size: hashRange(speciesId, instanceIndex * 41 + index * 5 + 3, 0.024, 0.052),
+    size: hashRange(
+      speciesId,
+      instanceIndex * 41 + index * 5 + 3,
+      0.024,
+      0.052,
+    ),
   }));
 
   return (
@@ -336,9 +412,13 @@ export function ProceduralFish({
   const leftPectoralRef = useRef<THREE.Mesh>(null);
   const rightPectoralRef = useRef<THREE.Mesh>(null);
   const target = useMemo(() => new THREE.Vector3(), []);
-  const colours = useMemo(() => colourSet(colour, speciesId), [colour, speciesId]);
+  const colours = useMemo(
+    () => colourSet(colour, speciesId),
+    [colour, speciesId],
+  );
   const tailShape = useMemo(
-    () => makeTailShape(profile.tailStyle, profile.tailLength, profile.tailHeight),
+    () =>
+      makeTailShape(profile.tailStyle, profile.tailLength, profile.tailHeight),
     [profile.tailStyle, profile.tailLength, profile.tailHeight],
   );
   const dorsalShape = useMemo(
@@ -384,10 +464,14 @@ export function ProceduralFish({
     const gy = Math.sin(gT * 0.3) * behaviour.verticalRange * bounds.y * 0.5;
 
     // Per-instance wander overlaid on top.
-    const iT = t * behaviour.cruiseSpeed * (0.85 + (instanceIndex % 5) * 0.06) + phase;
-    const ix = Math.sin(iT * 1.15) * behaviour.rangeX * bounds.x * 0.38 * wander;
-    const iz = Math.cos(iT * 0.93) * behaviour.rangeZ * bounds.z * 0.38 * wander;
-    const iy = Math.sin(iT * 1.3) * behaviour.verticalRange * bounds.y * 0.42 * wander;
+    const iT =
+      t * behaviour.cruiseSpeed * (0.85 + (instanceIndex % 5) * 0.06) + phase;
+    const ix =
+      Math.sin(iT * 1.15) * behaviour.rangeX * bounds.x * 0.38 * wander;
+    const iz =
+      Math.cos(iT * 0.93) * behaviour.rangeZ * bounds.z * 0.38 * wander;
+    const iy =
+      Math.sin(iT * 1.3) * behaviour.verticalRange * bounds.y * 0.42 * wander;
 
     // Burst modulation — occasional darts for active/predatory species.
     const burstCycle = Math.sin(t * 0.55 + phase * 2.7);
@@ -410,8 +494,14 @@ export function ProceduralFish({
 
     // Extra lateral wiggle for slender bottom fish (kuhli, loach).
     if (behaviour.bodyWiggle > 0) {
-      dz += Math.sin(t * behaviour.tailFrequency * 0.45 + phase) * behaviour.bodyWiggle * 0.35;
-      dx += Math.cos(t * behaviour.tailFrequency * 0.35 + phase) * behaviour.bodyWiggle * 0.2;
+      dz +=
+        Math.sin(t * behaviour.tailFrequency * 0.45 + phase) *
+        behaviour.bodyWiggle *
+        0.35;
+      dx +=
+        Math.cos(t * behaviour.tailFrequency * 0.35 + phase) *
+        behaviour.bodyWiggle *
+        0.2;
     }
 
     // Forage — nose down and pause periodically for bottom feeders/grazers.
@@ -426,10 +516,14 @@ export function ProceduralFish({
       }
     }
 
-    const modelHalfLength = length * (profile.bodyHalfLength + profile.tailLength + 0.2);
+    const modelHalfLength =
+      length * (profile.bodyHalfLength + profile.tailLength + 0.2);
     const horizontalMargin = Math.max(0.12, modelHalfLength);
     const depthMargin = Math.max(0.1, length * profile.bodyDepth * 1.6);
-    const verticalMargin = Math.max(0.1, length * (profile.bodyHeight + profile.dorsalHeight));
+    const verticalMargin = Math.max(
+      0.1,
+      length * (profile.bodyHeight + profile.dorsalHeight),
+    );
 
     const nx = THREE.MathUtils.clamp(
       basePosition[0] + dx,
@@ -455,20 +549,29 @@ export function ProceduralFish({
       Math.cos(gT * 0.6) * 0.6 * behaviour.rangeX * bounds.x * 0.5 * cohesion +
       Math.cos(iT * 1.15) * 1.15 * behaviour.rangeX * bounds.x * 0.38 * wander;
     const vz =
-      -Math.sin(gT * 0.42) * 0.42 * behaviour.rangeZ * bounds.z * 0.5 * cohesion -
+      -Math.sin(gT * 0.42) *
+        0.42 *
+        behaviour.rangeZ *
+        bounds.z *
+        0.5 *
+        cohesion -
       Math.sin(iT * 0.93) * 0.93 * behaviour.rangeZ * bounds.z * 0.38 * wander;
     const desiredHeading = Math.atan2(-vz, vx);
     const headingDelta = Math.atan2(
       Math.sin(desiredHeading - g.rotation.y),
       Math.cos(desiredHeading - g.rotation.y),
     );
-    g.rotation.y += headingDelta * Math.min(delta * behaviour.turnRate * 0.85, 1);
-    g.rotation.z = Math.sin(t * behaviour.tailFrequency * 0.14 + phase) * behaviour.bodyRoll;
+    g.rotation.y +=
+      headingDelta * Math.min(delta * behaviour.turnRate * 0.85, 1);
+    g.rotation.z =
+      Math.sin(t * behaviour.tailFrequency * 0.14 + phase) * behaviour.bodyRoll;
     g.rotation.x =
-      foragePitch + Math.sin(t * 0.42 + phase * 0.7) * behaviour.maxPitch * 0.15;
+      foragePitch +
+      Math.sin(t * 0.42 + phase * 0.7) * behaviour.maxPitch * 0.15;
 
     // Tail beat scales with speed.
-    const tailFreq = behaviour.tailFrequency * (0.55 + speedMul * 0.55) * pauseMul + 0.6;
+    const tailFreq =
+      behaviour.tailFrequency * (0.55 + speedMul * 0.55) * pauseMul + 0.6;
     const tailBeat = Math.sin(t * tailFreq + phase) * behaviour.tailAmplitude;
     if (tailRef.current) tailRef.current.rotation.y = tailBeat;
     if (leftPectoralRef.current)
@@ -516,7 +619,11 @@ export function ProceduralFish({
 
       {/* A translucent belly layer catches the aquarium light like real scales. */}
       <mesh
-        position={[-profile.bodyHalfLength * 0.02, bodyY - profile.bodyHeight * 0.24, 0]}
+        position={[
+          -profile.bodyHalfLength * 0.02,
+          bodyY - profile.bodyHeight * 0.24,
+          0,
+        ]}
         scale={[
           profile.bodyHalfLength * 0.91,
           profile.bodyHeight * 0.72,
@@ -541,7 +648,11 @@ export function ProceduralFish({
       {/* Softer, lighter head gives the silhouette a natural taper. */}
       <mesh
         position={[headX, bodyY - profile.bodyHeight * 0.02, 0]}
-        scale={[profile.headLength, profile.bodyHeight * 0.82, profile.bodyDepth * 0.9]}
+        scale={[
+          profile.headLength,
+          profile.bodyHeight * 0.82,
+          profile.bodyDepth * 0.9,
+        ]}
       >
         <sphereGeometry args={[1, 18, 12]} />
         <meshPhysicalMaterial
@@ -588,7 +699,10 @@ export function ProceduralFish({
           depthWrite={false}
         />
       </mesh>
-      <mesh position={[-0.04, bodyY - profile.bodyHeight * 0.78, 0]} rotation={[0, 0, Math.PI]}>
+      <mesh
+        position={[-0.04, bodyY - profile.bodyHeight * 0.78, 0]}
+        rotation={[0, 0, Math.PI]}
+      >
         <shapeGeometry args={[ventralShape, 8]} />
         <meshStandardMaterial
           color={colours.accent}
@@ -610,7 +724,11 @@ export function ProceduralFish({
               profile.bodyDepth * 0.86,
             ]}
             rotation={[-0.45, 0.18, -0.45]}
-            scale={[profile.pectoralSize, profile.pectoralSize * 0.55, profile.pectoralSize * 0.08]}
+            scale={[
+              profile.pectoralSize,
+              profile.pectoralSize * 0.55,
+              profile.pectoralSize * 0.08,
+            ]}
           >
             <coneGeometry args={[1, 1.35, 3]} />
             <meshStandardMaterial
@@ -629,7 +747,11 @@ export function ProceduralFish({
               -profile.bodyDepth * 0.86,
             ]}
             rotation={[0.45, -0.18, 0.45]}
-            scale={[profile.pectoralSize, profile.pectoralSize * 0.55, profile.pectoralSize * 0.08]}
+            scale={[
+              profile.pectoralSize,
+              profile.pectoralSize * 0.55,
+              profile.pectoralSize * 0.08,
+            ]}
           >
             <coneGeometry args={[1, 1.35, 3]} />
             <meshStandardMaterial
@@ -689,8 +811,16 @@ export function ProceduralFish({
 
       {/* Mouth and a subtle gill mark */}
       <mesh
-        position={[headX + profile.headLength * 0.88, bodyY - profile.bodyHeight * 0.12, 0]}
-        scale={[profile.mouthScale * 0.5, profile.mouthScale * 0.24, profile.bodyDepth * 0.42]}
+        position={[
+          headX + profile.headLength * 0.88,
+          bodyY - profile.bodyHeight * 0.12,
+          0,
+        ]}
+        scale={[
+          profile.mouthScale * 0.5,
+          profile.mouthScale * 0.24,
+          profile.bodyDepth * 0.42,
+        ]}
       >
         <sphereGeometry args={[1, 10, 8]} />
         <meshStandardMaterial color={colours.shadow} roughness={0.55} />
@@ -700,7 +830,11 @@ export function ProceduralFish({
         [-1, 1].map((side) => (
           <mesh
             key={side}
-            position={[headX - profile.headLength * 0.22, bodyY, side * profile.bodyDepth * 1.025]}
+            position={[
+              headX - profile.headLength * 0.22,
+              bodyY,
+              side * profile.bodyDepth * 1.025,
+            ]}
             rotation={[0, 0, Math.PI * 0.5]}
             scale={[profile.bodyHeight * 0.38, profile.bodyHeight * 0.56, 1]}
           >
@@ -745,15 +879,25 @@ export function ProceduralFish({
             ]}
             rotation={[0, 0, side * 0.12]}
           >
-            <cylinderGeometry args={[0.006, 0.002, profile.ventralHeight * 1.55 + 0.2, 6]} />
-            <meshStandardMaterial color={colours.accent} transparent opacity={0.72} />
+            <cylinderGeometry
+              args={[0.006, 0.002, profile.ventralHeight * 1.55 + 0.2, 6]}
+            />
+            <meshStandardMaterial
+              color={colours.accent}
+              transparent
+              opacity={0.72}
+            />
           </mesh>
         ))}
 
       {selected && (
         <mesh
           rotation={[-Math.PI / 2, 0, 0]}
-          position={[0, -Math.max(0.3, profile.bodyHeight + profile.ventralHeight + 0.12), 0]}
+          position={[
+            0,
+            -Math.max(0.3, profile.bodyHeight + profile.ventralHeight + 0.12),
+            0,
+          ]}
         >
           <ringGeometry args={[0.48, 0.61, 36]} />
           <meshBasicMaterial

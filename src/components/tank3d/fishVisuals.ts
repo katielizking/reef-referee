@@ -5,7 +5,8 @@ export type FishBodyStyle =
   "streamlined" | "deep" | "round" | "bottom" | "disc" | "flowing" | "predator";
 
 export type FishTailStyle = "forked" | "fan" | "rounded" | "flowing";
-export type FishPattern = "none" | "lateral-stripe" | "vertical-bands" | "spots";
+export type FishPattern =
+  "none" | "lateral-stripe" | "vertical-bands" | "spots";
 
 export interface FishVisualProfile {
   bodyStyle: FishBodyStyle;
@@ -48,11 +49,29 @@ function inferredPattern(species: Species, name: string): FishPattern {
     return "lateral-stripe";
   }
 
-  if (includesAny(name, ["zebra", "tiger", "banded", "angel", "discus", "frontosa"])) {
+  if (
+    includesAny(name, [
+      "zebra",
+      "tiger",
+      "banded",
+      "angel",
+      "discus",
+      "frontosa",
+    ])
+  ) {
     return "vertical-bands";
   }
 
-  if (includesAny(name, ["spotted", "peppered", "leopard", "dalmatian", "galaxy", "jaguar"])) {
+  if (
+    includesAny(name, [
+      "spotted",
+      "peppered",
+      "leopard",
+      "dalmatian",
+      "galaxy",
+      "jaguar",
+    ])
+  ) {
     return "spots";
   }
 
@@ -64,7 +83,8 @@ function inferredPattern(species: Species, name: string): FishPattern {
 }
 
 export function fishVisualProfile(species: Species): FishVisualProfile {
-  const name = `${species.common_name} ${species.scientific_name}`.toLowerCase();
+  const name =
+    `${species.common_name} ${species.scientific_name}`.toLowerCase();
   const pattern = inferredPattern(species, name);
 
   if (includesAny(name, ["angelfish", "pterophyllum"])) {
@@ -111,7 +131,10 @@ export function fishVisualProfile(species: Species): FishVisualProfile {
     };
   }
 
-  if (includesAny(name, ["betta", "siamese fighting fish"]) || species.long_finned) {
+  if (
+    includesAny(name, ["betta", "siamese fighting fish"]) ||
+    species.long_finned
+  ) {
     return {
       bodyStyle: "flowing",
       tailStyle: "flowing",
@@ -133,7 +156,9 @@ export function fishVisualProfile(species: Species): FishVisualProfile {
     };
   }
 
-  if (includesAny(name, ["cory", "catfish", "pleco", "bristlenose", "otocinclus"])) {
+  if (
+    includesAny(name, ["cory", "catfish", "pleco", "bristlenose", "otocinclus"])
+  ) {
     return {
       bodyStyle: "bottom",
       tailStyle: "forked",
@@ -180,7 +205,9 @@ export function fishVisualProfile(species: Species): FishVisualProfile {
   if (includesAny(name, ["goldfish", "fantail", "oranda"])) {
     return {
       bodyStyle: "round",
-      tailStyle: includesAny(name, ["fantail", "oranda"]) ? "flowing" : "forked",
+      tailStyle: includesAny(name, ["fantail", "oranda"])
+        ? "flowing"
+        : "forked",
       pattern,
       bodyHalfLength: 0.31,
       bodyHeight: 0.24,

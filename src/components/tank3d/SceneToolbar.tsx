@@ -9,7 +9,13 @@ interface Props {
   onResetLayout: () => void;
 }
 
-export function SceneToolbar({ canUndo, canRedo, onUndo, onRedo, onResetLayout }: Props) {
+export function SceneToolbar({
+  canUndo,
+  canRedo,
+  onUndo,
+  onRedo,
+  onResetLayout,
+}: Props) {
   const setCameraPreset = useEditorStore((s) => s.setCameraPreset);
   return (
     <>

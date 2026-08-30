@@ -8,7 +8,11 @@ interface BrandLogoProps {
  * FishTankr wordmark + mark. The mark is a rounded tank silhouette with a
  * waterline and a bubble — works as favicon, nav icon, or full wordmark.
  */
-export function BrandLogo({ size = 32, showWordmark = true, className }: BrandLogoProps) {
+export function BrandLogo({
+  size = 32,
+  showWordmark = true,
+  className,
+}: BrandLogoProps) {
   return (
     <span className={`inline-flex items-center gap-2 ${className ?? ""}`}>
       <svg
@@ -30,10 +34,7 @@ export function BrandLogo({ size = 32, showWordmark = true, className }: BrandLo
         {/* bubble */}
         <circle cx="22" cy="9" r="1.5" fill="white" />
         {/* small fish body */}
-        <path
-          d="M11 22 Q14 19 18 22 Q14 25 11 22 Z"
-          fill="white"
-        />
+        <path d="M11 22 Q14 19 18 22 Q14 25 11 22 Z" fill="white" />
         <path d="M18 22 L21 20 L21 24 Z" fill="white" />
       </svg>
       {showWordmark && (
@@ -55,9 +56,26 @@ export function HeroTankIllustration({ className }: { className?: string }) {
       aria-label="Illustration of a healthy aquarium"
     >
       {/* Tank body */}
-      <rect x="20" y="30" width="360" height="220" rx="22" fill="white" stroke="var(--blue)" strokeWidth="3" />
+      <rect
+        x="20"
+        y="30"
+        width="360"
+        height="220"
+        rx="22"
+        fill="white"
+        stroke="var(--blue)"
+        strokeWidth="3"
+      />
       {/* Water fill */}
-      <rect x="20" y="70" width="360" height="180" rx="22" fill="var(--blue)" opacity="0.10" />
+      <rect
+        x="20"
+        y="70"
+        width="360"
+        height="180"
+        rx="22"
+        fill="var(--blue)"
+        opacity="0.10"
+      />
       {/* Waterline */}
       <path
         d="M20 74 Q60 68 100 74 T180 74 T260 74 T340 74 T380 74"
@@ -69,7 +87,15 @@ export function HeroTankIllustration({ className }: { className?: string }) {
       {/* Measurement ticks on left */}
       {[100, 140, 180, 220].map((y) => (
         <g key={y}>
-          <line x1="20" y1={y} x2="30" y2={y} stroke="var(--ink)" strokeWidth="1" opacity="0.35" />
+          <line
+            x1="20"
+            y1={y}
+            x2="30"
+            y2={y}
+            stroke="var(--ink)"
+            strokeWidth="1"
+            opacity="0.35"
+          />
         </g>
       ))}
       {/* Substrate */}

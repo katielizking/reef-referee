@@ -52,78 +52,82 @@
   --radius: 0.25rem;
 
   /* FishTankr: field notebook meets water */
-  --ink: #0F1D26;
-  --paper: #F2F0EA;
-  --water: #1F7F8C;
-  --blue: #1F7F8C;
-  --lime: #C9E86A;
-  --coral: #A83A2C;
-  --foam: #EAE7DF;
-  --warn: #B4761F;
+  --ink: #0f1d26;
+  --paper: #f2f0ea;
+  --water: #1f7f8c;
+  --blue: #1f7f8c;
+  --lime: #c9e86a;
+  --coral: #a83a2c;
+  --foam: #eae7df;
+  --warn: #b4761f;
   --rule: rgba(15, 29, 38, 0.12);
-  --verdict-good: #4E7A3A;
-  --verdict-caution: #B4761F;
-  --verdict-critical: #A83A2C;
+  --verdict-good: #4e7a3a;
+  --verdict-caution: #b4761f;
+  --verdict-critical: #a83a2c;
 
   /* Mapped shadcn tokens */
-  --background: #F2F0EA;
-  --foreground: #0F1D26;
-  --card: #FBFAF6;
-  --card-foreground: #0F1D26;
-  --popover: #FBFAF6;
-  --popover-foreground: #0F1D26;
-  --primary: #1F7F8C;
-  --primary-foreground: #F7F6F1;
-  --secondary: #EAE7DF;
-  --secondary-foreground: #0F1D26;
-  --muted: #E6E3DA;
-  --muted-foreground: #55636B;
-  --accent: #C9E86A;
-  --accent-foreground: #0F1D26;
-  --destructive: #A83A2C;
-  --destructive-foreground: #F7F6F1;
+  --background: #f2f0ea;
+  --foreground: #0f1d26;
+  --card: #fbfaf6;
+  --card-foreground: #0f1d26;
+  --popover: #fbfaf6;
+  --popover-foreground: #0f1d26;
+  --primary: #1f7f8c;
+  --primary-foreground: #f7f6f1;
+  --secondary: #eae7df;
+  --secondary-foreground: #0f1d26;
+  --muted: #e6e3da;
+  --muted-foreground: #55636b;
+  --accent: #c9e86a;
+  --accent-foreground: #0f1d26;
+  --destructive: #a83a2c;
+  --destructive-foreground: #f7f6f1;
   --border: rgba(15, 29, 38, 0.12);
   --input: rgba(15, 29, 38, 0.18);
-  --ring: #1F7F8C;
+  --ring: #1f7f8c;
 }
 
 .dark {
-  --ink: #E9E5DB;
-  --paper: #101A1F;
+  --ink: #e9e5db;
+  --paper: #101a1f;
   --rule: rgba(233, 229, 219, 0.14);
-  --foam: #17232A;
-  --background: #101A1F;
-  --foreground: #E9E5DB;
-  --card: #16232A;
-  --card-foreground: #E9E5DB;
-  --popover: #16232A;
-  --popover-foreground: #E9E5DB;
-  --primary: #2E9AA8;
-  --primary-foreground: #0B1418;
-  --secondary: #17232A;
-  --secondary-foreground: #E9E5DB;
-  --muted: #1B282F;
-  --muted-foreground: #9AA5A9;
-  --accent: #C9E86A;
-  --accent-foreground: #0B1418;
-  --destructive: #C45443;
-  --destructive-foreground: #0B1418;
+  --foam: #17232a;
+  --background: #101a1f;
+  --foreground: #e9e5db;
+  --card: #16232a;
+  --card-foreground: #e9e5db;
+  --popover: #16232a;
+  --popover-foreground: #e9e5db;
+  --primary: #2e9aa8;
+  --primary-foreground: #0b1418;
+  --secondary: #17232a;
+  --secondary-foreground: #e9e5db;
+  --muted: #1b282f;
+  --muted-foreground: #9aa5a9;
+  --accent: #c9e86a;
+  --accent-foreground: #0b1418;
+  --destructive: #c45443;
+  --destructive-foreground: #0b1418;
   --border: rgba(233, 229, 219, 0.14);
   --input: rgba(233, 229, 219, 0.2);
-  --ring: #2E9AA8;
+  --ring: #2e9aa8;
 }
 
 @layer base {
   * {
     border-color: var(--color-border);
   }
-  html, body {
+  html,
+  body {
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
   }
-  h1, h2, h3, h4 {
+  h1,
+  h2,
+  h3,
+  h4 {
     font-family: var(--font-display);
     letter-spacing: -0.01em;
   }
@@ -134,29 +138,53 @@
   }
 }
 
-
 /* FishTankr visual foundation: field notebook meets water.
    Dry surfaces are flat and precise. Only water glows, blurs or moves. */
 @layer base {
-  html { scroll-behavior: smooth; scroll-padding-top: 5.5rem; background: var(--paper); }
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 5.5rem;
+    background: var(--paper);
+  }
   body {
     min-width: 320px;
     min-height: 100vh;
     background: var(--background);
   }
-  ::selection { color: var(--ink); background: color-mix(in srgb, var(--lime) 70%, white); }
+  ::selection {
+    color: var(--ink);
+    background: color-mix(in srgb, var(--lime) 70%, white);
+  }
 }
 @layer components {
-  .site-shell { position: relative; isolation: isolate; }
+  .site-shell {
+    position: relative;
+    isolation: isolate;
+  }
   /* The page's only ornament: a measurement ruler down the left gutter. */
   .site-shell::before {
-    position: fixed; top: 0; bottom: 0; left: 0; width: 14px; z-index: -1;
-    pointer-events: none; content: ""; opacity: .5;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 14px;
+    z-index: -1;
+    pointer-events: none;
+    content: "";
+    opacity: 0.5;
     border-right: 1px solid var(--rule);
-    background-image: linear-gradient(to bottom, var(--rule) 1px, transparent 1px);
+    background-image: linear-gradient(
+      to bottom,
+      var(--rule) 1px,
+      transparent 1px
+    );
     background-size: 100% 10px;
   }
-  @media (max-width: 1023px) { .site-shell::before { display: none; } }
+  @media (max-width: 1023px) {
+    .site-shell::before {
+      display: none;
+    }
+  }
 
   .fishtankr-panel {
     border: 1px solid var(--rule);
@@ -165,57 +193,117 @@
     box-shadow: none;
   }
   .science-label {
-    display: inline-flex; align-items: center; gap: .5rem; font-family: var(--font-mono);
-    font-size: .68rem; font-weight: 500; letter-spacing: .1em; line-height: 1; text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    line-height: 1;
+    text-transform: uppercase;
   }
   .science-label::before {
-    width: 1.25rem; height: 1px; background: currentColor; content: "";
+    width: 1.25rem;
+    height: 1px;
+    background: currentColor;
+    content: "";
   }
   /* Numbers, units and readings are always mono. */
-  .data-mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
+  .data-mono {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.01em;
+  }
   /* Scientific names carry the field-guide voice. */
-  .scientific { font-family: var(--font-scientific); font-style: italic; }
+  .scientific {
+    font-family: var(--font-scientific);
+    font-style: italic;
+  }
   /* Legality and prohibition read as a document annotation, not a pill. */
   .ink-stamp {
-    display: inline-block; padding: .2rem .5rem; border: 1.5px solid currentColor; border-radius: 2px;
-    font-family: var(--font-mono); font-size: .62rem; font-weight: 500; letter-spacing: .12em;
-    text-transform: uppercase; transform: rotate(-2.5deg); opacity: .85;
+    display: inline-block;
+    padding: 0.2rem 0.5rem;
+    border: 1.5px solid currentColor;
+    border-radius: 2px;
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    transform: rotate(-2.5deg);
+    opacity: 0.85;
   }
-  .hero-grid { background-image: none; }
+  .hero-grid {
+    background-image: none;
+  }
   .depth-card {
     box-shadow: none;
     border-radius: 4px;
-    transition: border-color 140ms ease, background-color 140ms ease;
+    transition:
+      border-color 140ms ease,
+      background-color 140ms ease;
   }
-  .depth-card:hover { border-color: color-mix(in srgb, var(--ink) 35%, transparent); }
+  .depth-card:hover {
+    border-color: color-mix(in srgb, var(--ink) 35%, transparent);
+  }
   .water-rule {
     height: 1px;
     background: var(--water);
-    opacity: .5;
+    opacity: 0.5;
   }
   /* Wet things only: soft water light behind the tank. */
-  .water-glow { box-shadow: 0 18px 60px color-mix(in srgb, var(--water) 22%, transparent); }
+  .water-glow {
+    box-shadow: 0 18px 60px color-mix(in srgb, var(--water) 22%, transparent);
+  }
 }
 @media (prefers-reduced-motion: no-preference) {
   @keyframes gentle-float {
-    0%, 100% { transform: translate3d(0, 0, 0); }
-    50% { transform: translate3d(0, -4px, 0); }
+    0%,
+    100% {
+      transform: translate3d(0, 0, 0);
+    }
+    50% {
+      transform: translate3d(0, -4px, 0);
+    }
   }
-  .hero-float { animation: gentle-float 7s ease-in-out infinite; }
+  .hero-float {
+    animation: gentle-float 7s ease-in-out infinite;
+  }
 }
-
 
 /* Mobile-first interaction guardrails */
 @layer base {
-  input, select, textarea { font-size: 16px; }
-  button, [role="button"], a { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+  input,
+  select,
+  textarea {
+    font-size: 16px;
+  }
+  button,
+  [role="button"],
+  a {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
 }
 @media (max-width: 639px) {
-  html { -webkit-text-size-adjust: 100%; }
-  body { overscroll-behavior-y: none; }
-  .site-shell::before { opacity: .14; }
-  .fishtankr-panel { backdrop-filter: blur(12px); }
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    overscroll-behavior-y: none;
+  }
+  .site-shell::before {
+    opacity: 0.14;
+  }
+  .fishtankr-panel {
+    backdrop-filter: blur(12px);
+  }
 }
 @media (min-width: 640px) {
-  input, select, textarea { font-size: inherit; }
+  input,
+  select,
+  textarea {
+    font-size: inherit;
+  }
 }

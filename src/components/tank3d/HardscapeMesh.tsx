@@ -10,17 +10,34 @@ interface HardscapeClumpProps {
   groundY?: number;
 }
 
-export function HardscapeClump({ item, quantity, interior, groundY }: HardscapeClumpProps) {
+export function HardscapeClump({
+  item,
+  quantity,
+  interior,
+  groundY,
+}: HardscapeClumpProps) {
   const colour = hardscapeColour(item);
-  // Substrate is drawn separately as a slab; skip meshes for substrate rows.
-  if (item.type === "substrate") return null;
   const y = groundY ?? interior.substrateY;
 
   const nodes = useMemo(() => {
-    const out: Array<{ pos: [number, number, number]; scale: number; rot: number }> = [];
+    const out: Array<{
+      pos: [number, number, number];
+      scale: number;
+      rot: number;
+    }> = [];
     for (let i = 0; i < quantity; i++) {
-      const x = hashRange(item.id, i * 4 + 1, -interior.x * 0.4, interior.x * 0.4);
-      const z = hashRange(item.id, i * 4 + 2, -interior.z * 0.4, interior.z * 0.4);
+      const x = hashRange(
+        item.id,
+        i * 4 + 1,
+        -interior.x * 0.4,
+        interior.x * 0.4,
+      );
+      const z = hashRange(
+        item.id,
+        i * 4 + 2,
+        -interior.z * 0.4,
+        interior.z * 0.4,
+      );
       const s = hashRange(item.id, i * 4 + 3, 0.6, 1.1);
       const r = hashRange(item.id, i * 4 + 4, 0, Math.PI * 2);
       out.push({ pos: [x, y, z], scale: s, rot: r });
@@ -28,11 +45,18 @@ export function HardscapeClump({ item, quantity, interior, groundY }: HardscapeC
     return out;
   }, [item.id, quantity, interior.x, interior.z, y]);
 
+  // Substrate is drawn separately as a slab; skip meshes for substrate rows.
+  if (item.type === "substrate") return null;
 
   return (
     <>
       {nodes.map((n, i) => (
-        <group key={i} position={n.pos} rotation={[0, n.rot, 0]} scale={n.scale}>
+        <group
+          key={i}
+          position={n.pos}
+          rotation={[0, n.rot, 0]}
+          scale={n.scale}
+        >
           {item.type === "wood" && (
             <mesh rotation={[0, 0, Math.PI / 2.4]} position={[0, 0.25, 0]}>
               <cylinderGeometry args={[0.12, 0.18, 1.4, 8]} />

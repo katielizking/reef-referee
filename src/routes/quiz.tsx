@@ -1,4 +1,5 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
+import { absoluteUrl } from "@/lib/site";
 import { useMemo, useState } from "react";
 import { useSpecies } from "@/lib/data";
 import type { Species } from "@/lib/types";
@@ -19,9 +20,9 @@ export const Route = createFileRoute("/quiz")({
         content:
           "A 7-question quiz that recommends freshwater fish species for your tank. care and compatibility focused.",
       },
-      { property: "og:url", content: "/quiz" },
+      { property: "og:url", content: absoluteUrl("/quiz") },
     ],
-    links: [{ rel: "canonical", href: "/quiz" }],
+    links: [{ rel: "canonical", href: absoluteUrl("/quiz") }],
   }),
   component: QuizPage,
 });
@@ -74,7 +75,10 @@ const questions: Array<{
     key: "hardness",
     q: "What's your tap water like? (or what would you like to match)",
     options: [
-      { value: "soft", label: "Soft & slightly acidic (rainwater / tank water)" },
+      {
+        value: "soft",
+        label: "Soft & slightly acidic (rainwater / tank water)",
+      },
       { value: "neutral", label: "Neutral" },
       { value: "hard", label: "Hard & alkaline (bore / limestone areas)" },
     ],
@@ -101,7 +105,10 @@ const questions: Array<{
     q: "How do you want the tank to feel?",
     options: [
       { value: "schooling", label: "Movement — schools of small fish" },
-      { value: "centrepiece", label: "Presence — a couple of larger characters" },
+      {
+        value: "centrepiece",
+        label: "Presence — a couple of larger characters",
+      },
       { value: "mixed", label: "A bit of both" },
     ],
   },
@@ -121,10 +128,11 @@ function scoreSpecies(sp: Species, a: Answers): number {
   const headroom = a.litres - Number(sp.min_tank_litres);
   score += Math.min(20, headroom / 5);
 
-
   // Experience — small, peaceful, hardy → beginner-friendly
   const beginnerFriendly =
-    sp.temperament === "peaceful" && Number(sp.adult_size_cm) < 8 && !sp.predatory;
+    sp.temperament === "peaceful" &&
+    Number(sp.adult_size_cm) < 8 &&
+    !sp.predatory;
   if (a.experience === "beginner") {
     if (beginnerFriendly) score += 12;
     else score -= 15;
@@ -136,7 +144,8 @@ function scoreSpecies(sp: Species, a: Answers): number {
   if (a.vibe === "peaceful" && sp.temperament === "aggressive") score -= 25;
   if (a.vibe === "showpiece" && Number(sp.adult_size_cm) >= 8) score += 12;
   if (a.vibe === "showpiece" && Number(sp.adult_size_cm) < 4) score -= 6;
-  if (a.vibe === "oddballs" && (sp.predatory || Number(sp.adult_size_cm) >= 15)) score += 10;
+  if (a.vibe === "oddballs" && (sp.predatory || Number(sp.adult_size_cm) >= 15))
+    score += 10;
 
   // Biome / hardness match via native pH
   const [phLo, phHi] = HARDNESS_PH[a.hardness];
@@ -160,7 +169,12 @@ function scoreSpecies(sp: Species, a: Answers): number {
   // Style
   if (a.style === "schooling" && sp.is_schooling) score += 12;
   if (a.style === "schooling" && !sp.is_schooling) score -= 6;
-  if (a.style === "centrepiece" && !sp.is_schooling && Number(sp.adult_size_cm) >= 7) score += 12;
+  if (
+    a.style === "centrepiece" &&
+    !sp.is_schooling &&
+    Number(sp.adult_size_cm) >= 7
+  )
+    score += 12;
 
   return score;
 }
@@ -189,7 +203,9 @@ function QuizPage() {
       scored.slice(0, 12).forEach((r) => {
         counts[r.sp.biotope_region] = (counts[r.sp.biotope_region] ?? 0) + 1;
       });
-      const topBiome = Object.entries(counts).sort((a, b) => b[1] - a[1])[0]?.[0];
+      const topBiome = Object.entries(counts).sort(
+        (a, b) => b[1] - a[1],
+      )[0]?.[0];
       if (topBiome) {
         scored.forEach((r) => {
           if (r.sp.biotope_region === topBiome) r.score += 15;
@@ -202,7 +218,10 @@ function QuizPage() {
   }, [showResults, answers, species]);
 
   const choose = (value: string) => {
-    const next = { ...answers, [currentQ.key]: currentQ.key === "litres" ? Number(value) : value };
+    const next = {
+      ...answers,
+      [currentQ.key]: currentQ.key === "litres" ? Number(value) : value,
+    };
     setAnswers(next as Partial<Answers>);
     if (step + 1 === total) setShowResults(true);
     else setStep(step + 1);
@@ -254,7 +273,9 @@ function QuizPage() {
               >
                 {o.label}
                 {o.hint && (
-                  <span className="ml-1 text-xs text-muted-foreground">— {o.hint}</span>
+                  <span className="ml-1 text-xs text-muted-foreground">
+                    — {o.hint}
+                  </span>
                 )}
               </button>
             ))}
@@ -275,7 +296,8 @@ function QuizPage() {
           <h2 className="font-display text-2xl font-semibold">Your matches</h2>
           {results.length === 0 && (
             <p className="mt-2 text-muted-foreground">
-              No good matches — your tank might be too small for anything in our list. Try a bigger size.
+              No good matches — your tank might be too small for anything in our
+              list. Try a bigger size.
             </p>
           )}
           <div className="mt-4 grid gap-3">
@@ -290,10 +312,12 @@ function QuizPage() {
                   <p className="font-display text-lg font-semibold text-foreground group-hover:text-primary">
                     {sp.common_name}
                   </p>
-                  <p className="text-sm italic text-muted-foreground">{sp.scientific_name}</p>
+                  <p className="text-sm italic text-muted-foreground">
+                    {sp.scientific_name}
+                  </p>
                   <p className="mt-2 text-xs text-muted-foreground">
-                    {sp.biotope_region} · {sp.temperament} · min {sp.min_tank_litres}L
-                    
+                    {sp.biotope_region} · {sp.temperament} · min{" "}
+                    {sp.min_tank_litres}L
                   </p>
                 </div>
                 <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
@@ -323,8 +347,9 @@ function QuizPage() {
           <p className="mt-6 flex items-start gap-2 rounded-xl border border-border/60 bg-muted/40 p-3 text-xs text-muted-foreground">
             <Info className="mt-0.5 h-4 w-4 flex-shrink-0" />
             <span>
-              These are starting points, not a stocking plan. Add them in the builder to
-              see if your filter, plants and other choices actually work together.
+              These are starting points, not a stocking plan. Add them in the
+              builder to see if your filter, plants and other choices actually
+              work together.
             </span>
           </p>
         </div>

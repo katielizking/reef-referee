@@ -1,8 +1,19 @@
 import { useState } from "react";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import { ScorecardPanel } from "@/components/Scorecard";
 import type { Scorecard } from "@/lib/scoring";
-import { AlertCircle, AlertTriangle, CheckCircle2, ChevronUp } from "lucide-react";
+import {
+  AlertCircle,
+  AlertTriangle,
+  CheckCircle2,
+  ChevronUp,
+} from "lucide-react";
 
 function toneFor(overall: number | null, capReason: string | null) {
   if (overall === null)
@@ -15,27 +26,64 @@ function toneFor(overall: number | null, capReason: string | null) {
     };
   if (overall < 45)
     return {
-      label: "Not recommended",
-      sub: "Tap for details",
+      label: "Do not stock",
+      sub: "Resolve the critical concern",
       bg: "bg-coral/15",
       chip: "bg-coral/20 text-foreground",
       Icon: AlertTriangle,
     };
   if (overall < 75 || capReason)
     return {
-      label: "Worth another look",
-      sub: "Tap for details",
+      label: "Risky — revise first",
+      sub: "Resolve welfare concerns",
       bg: "bg-warn/15",
       chip: "bg-warn/20 text-foreground",
       Icon: AlertCircle,
     };
   return {
-    label: "Looking good",
-    sub: "Tap for details",
+    label: "Safe to consider",
+    sub: "Keep monitoring fish and water",
     bg: "bg-lime/20",
     chip: "bg-lime/30 text-foreground",
     Icon: CheckCircle2,
   };
+}
+
+export function MobileWelfareSummary({ scorecard }: { scorecard: Scorecard }) {
+  const tone = toneFor(scorecard.overall, scorecard.capReason);
+  const Icon = tone.Icon;
+  return (
+    <section
+      className={`fishtankr-panel rounded-[1.5rem] border-l-4 p-4 lg:hidden ${scorecard.overall !== null && scorecard.overall < 45 ? "border-l-coral" : scorecard.capReason ? "border-l-warn" : "border-l-primary"}`}
+      aria-label="Current welfare verdict"
+    >
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className="science-label text-primary">Welfare verdict</p>
+          <p className="mt-1 flex items-center gap-2 font-display text-xl font-bold text-foreground">
+            <Icon className="h-5 w-5" aria-hidden />
+            {tone.label}
+          </p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {scorecard.priorityAction?.action ?? tone.sub}
+          </p>
+        </div>
+        <span
+          className="rounded-full bg-muted px-3 py-2 font-display text-lg font-bold text-foreground"
+          aria-label={
+            scorecard.overall === null
+              ? "No score yet"
+              : `Score ${scorecard.overall} out of 100`
+          }
+        >
+          {scorecard.overall ?? "—"}
+        </span>
+      </div>
+      <p className="mt-3 text-xs font-semibold text-primary">
+        Open the score bar below for reasons and fixes.
+      </p>
+    </section>
+  );
 }
 
 /**
@@ -64,7 +112,9 @@ export function MobileScoreBar({ scorecard }: { scorecard: Scorecard }) {
               {scorecard.overall ?? "—"}
             </div>
             <div className="text-left">
-              <div className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold ${tone.chip}`}>
+              <div
+                className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold ${tone.chip}`}
+              >
                 <Icon className="h-3 w-3" aria-hidden />
                 {tone.label}
               </div>
@@ -74,7 +124,10 @@ export function MobileScoreBar({ scorecard }: { scorecard: Scorecard }) {
           <ChevronUp className="h-4 w-4 text-muted-foreground" aria-hidden />
         </button>
       </SheetTrigger>
-      <SheetContent side="bottom" className="h-[min(85dvh,44rem)] overflow-y-auto rounded-t-[1.5rem] pb-[env(safe-area-inset-bottom)]">
+      <SheetContent
+        side="bottom"
+        className="h-[min(85dvh,44rem)] overflow-y-auto rounded-t-[1.5rem] pb-[env(safe-area-inset-bottom)]"
+      >
         <SheetHeader>
           <SheetTitle>Scorecard</SheetTitle>
         </SheetHeader>

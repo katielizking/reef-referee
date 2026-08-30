@@ -70,7 +70,8 @@ const REGISTRY: Record<string, FishAssetDefinition> = {
     },
     attribution: {
       creator: "BlueMesh",
-      sourceUrl: "https://sketchfab.com/3d-models/betta-splendens-f4eeb7f50ad24873842bd954ad27d23b",
+      sourceUrl:
+        "https://sketchfab.com/3d-models/betta-splendens-f4eeb7f50ad24873842bd954ad27d23b",
       licenseLabel: "CC BY 4.0",
       licenseUrl: "https://creativecommons.org/licenses/by/4.0/",
     },
@@ -95,7 +96,9 @@ export function getFishAsset(
   const direct = REGISTRY[speciesId];
   if (direct) return direct;
   const fallbackKey = scientificName?.trim().toLowerCase();
-  return fallbackKey ? REGISTRY[SCIENTIFIC_NAME_FALLBACKS[fallbackKey]] ?? null : null;
+  return fallbackKey
+    ? (REGISTRY[SCIENTIFIC_NAME_FALLBACKS[fallbackKey]] ?? null)
+    : null;
 }
 
 /** Returns true only when a GLB URL is actually resolvable — otherwise use the placeholder. */
@@ -118,5 +121,9 @@ export function resolveModelUrl(
       : preferred === "medium"
         ? [m.medium, m.high, m.low]
         : [m.low, m.medium, m.high];
-  return chain.find((url): url is string => typeof url === "string" && url.length > 0) ?? null;
+  return (
+    chain.find(
+      (url): url is string => typeof url === "string" && url.length > 0,
+    ) ?? null
+  );
 }

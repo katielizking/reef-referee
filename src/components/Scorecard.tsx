@@ -12,18 +12,18 @@ function resultFor(overall: number, capReason: string | null): ResultKind {
 
 const RESULT: Record<ResultKind, { word: string; sub: string; var: string }> = {
   good: {
-    word: "Safe to stock",
-    sub: "Nothing in this plan currently threatens the fish.",
+    word: "Safe to consider",
+    sub: "No current screening flags require action. Keep monitoring the fish and water.",
     var: "var(--verdict-good)",
   },
   watch: {
-    word: "Check first",
-    sub: "Some of these fish will struggle unless you change the plan.",
+    word: "Risky — revise first",
+    sub: "Resolve the welfare concerns before you stock.",
     var: "var(--verdict-caution)",
   },
   bad: {
-    word: "Fish will suffer",
-    sub: "As planned, this tank will harm the fish in it.",
+    word: "Do not stock",
+    sub: "A critical welfare or safety concern needs action.",
     var: "var(--verdict-critical)",
   },
 };
@@ -182,24 +182,27 @@ export function ScorecardPanel({ scorecard }: { scorecard: Scorecard }) {
           </>
         ) : (
           <>
-            <div className="mt-3 flex items-end gap-3">
-              <span
-                className="data-mono text-6xl leading-none"
-                style={{ color: meta!.var }}
-              >
-                {s.overall}
-              </span>
-              <span className="data-mono pb-1 text-sm text-muted-foreground">
-                /100
-              </span>
-            </div>
             <p
-              className="mt-3 text-lg font-semibold tracking-tight"
+              className="mt-3 text-xl font-semibold tracking-tight"
               style={{ color: meta!.var }}
             >
               {meta!.word}
             </p>
             <p className="mt-1 text-sm text-muted-foreground">{meta!.sub}</p>
+            <div
+              className="mt-4 flex items-end gap-2"
+              aria-label={`Welfare score ${s.overall} out of 100`}
+            >
+              <span
+                className="data-mono text-3xl leading-none"
+                style={{ color: meta!.var }}
+              >
+                {s.overall}
+              </span>
+              <span className="data-mono text-xs text-muted-foreground">
+                /100
+              </span>
+            </div>
             {s.capReason && (
               <p
                 className="mt-3 border-l-2 pl-3 text-sm text-foreground"
@@ -321,8 +324,17 @@ export function ScorecardPanel({ scorecard }: { scorecard: Scorecard }) {
           The score covers compatibility, swimming space and water suitability.
           Cycle readiness can cap it. The waste-load screen is beta and
           informational only.{" "}
-          <Link to="/methodology" className="font-semibold text-water underline">
+          <Link
+            to="/methodology"
+            className="font-semibold text-water underline"
+          >
             Read the methodology.
+          </Link>{" "}
+          <Link
+            to="/welfare-disclaimer"
+            className="font-semibold text-water underline"
+          >
+            Understand the limits.
           </Link>
         </p>
       )}

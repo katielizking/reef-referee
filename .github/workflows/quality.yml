@@ -29,6 +29,9 @@ jobs:
           python3 -m py_compile tools/blender/process_asset.py
           python3 -m py_compile tools/blender/generate_validation_species.py
 
+      - name: Typecheck
+        run: bun run typecheck
+
       - name: Test
         run: bun run test
 
@@ -38,8 +41,5 @@ jobs:
           VITE_SUPABASE_URL: https://example.supabase.co
           VITE_SUPABASE_PUBLISHABLE_KEY: sb_publishable_ci_placeholder
 
-      # The imported Lovable codebase currently has a large formatting backlog.
-      # Keep reporting it without blocking safe feature work until the baseline is cleaned.
-      - name: Lint (advisory)
-        continue-on-error: true
+      - name: Lint
         run: bun run lint

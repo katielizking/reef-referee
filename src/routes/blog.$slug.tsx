@@ -1,4 +1,5 @@
 import { Link, createFileRoute, notFound } from "@tanstack/react-router";
+import { absoluteUrl } from "@/lib/site";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { supabase } from "@/integrations/supabase/client";
@@ -46,7 +47,7 @@ export const Route = createFileRoute("/blog/$slug")({
     const p = loaderData.post;
     const title = p.meta_title ?? `${p.title} | FishTankr`;
     const desc = p.meta_description ?? p.excerpt ?? "";
-    const url = `/blog/${params.slug}`;
+    const url = absoluteUrl(`/blog/${params.slug}`);
     const meta: Array<{ [key: string]: string }> = [
       { title },
       { name: "description", content: desc },
@@ -70,7 +71,10 @@ export const Route = createFileRoute("/blog/$slug")({
             "@type": "BlogPosting",
             headline: p.title,
             description: desc,
-            author: { "@type": "Organization", name: p.author_name ?? "FishTankr" },
+            author: {
+              "@type": "Organization",
+              name: p.author_name ?? "FishTankr",
+            },
             datePublished: p.published_at,
             image: p.cover_image_url ?? undefined,
           }),
@@ -83,7 +87,9 @@ export const Route = createFileRoute("/blog/$slug")({
     <main className="mx-auto max-w-3xl px-4 py-16 text-center">
       <h1 className="font-display text-3xl font-bold">Post not found</h1>
       <p className="mt-2 text-muted-foreground">
-        <Link to="/blog" className="text-primary underline">Back to the blog</Link>
+        <Link to="/blog" className="text-primary underline">
+          Back to the blog
+        </Link>
       </p>
     </main>
   ),
@@ -107,7 +113,9 @@ function BlogPostPage() {
         />
       )}
       <header className="mb-8">
-        <h1 className="font-display text-4xl font-bold text-foreground">{post.title}</h1>
+        <h1 className="font-display text-4xl font-bold text-foreground">
+          {post.title}
+        </h1>
         <div className="mt-3 flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
           {post.author_name && <span>{post.author_name}</span>}
           {post.published_at && (
@@ -122,7 +130,9 @@ function BlogPostPage() {
         </div>
       </header>
       <article className="prose prose-slate max-w-none">
-        <ReactMarkdown remarkPlugins={[remarkGfm]}>{post.body_markdown}</ReactMarkdown>
+        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+          {post.body_markdown}
+        </ReactMarkdown>
       </article>
     </main>
   );

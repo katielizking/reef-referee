@@ -1,4 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { absoluteUrl } from "@/lib/site";
 import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
 import { Suspense } from "react";
 import { Copy, Loader2, Share2, WandSparkles } from "lucide-react";
@@ -38,9 +39,9 @@ export const Route = createFileRoute("/t/$slug")({
           content: `An aquarium design shared from FishTankr — smarter tanks, happier fish.`,
         },
         { property: "og:type", content: "article" },
-        { property: "og:url", content: `/t/${params.slug}` },
+        { property: "og:url", content: absoluteUrl(`/t/${params.slug}`) },
       ],
-      links: [{ rel: "canonical", href: `/t/${params.slug}` }],
+      links: [{ rel: "canonical", href: absoluteUrl(`/t/${params.slug}`) }],
     };
   },
   component: SharedTank,

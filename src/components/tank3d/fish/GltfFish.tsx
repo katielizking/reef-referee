@@ -4,7 +4,10 @@ import { useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import { clone as cloneSkinnedScene } from "three/examples/jsm/utils/SkeletonUtils.js";
 import type { FishMeshProps } from "../FishMesh";
-import type { FishAnimationState, FishAssetDefinition } from "@/lib/fish3d/types";
+import type {
+  FishAnimationState,
+  FishAssetDefinition,
+} from "@/lib/fish3d/types";
 import { computeRenderScale, forwardAxisRotationY } from "@/lib/fish3d/scaling";
 import { useFishAnimationController } from "./FishAnimationController";
 import type { Species } from "@/lib/types";
@@ -82,19 +85,31 @@ export function GltfFish({
     if (asset.commonName.toLowerCase() !== "betta") return null;
     const names = {
       tail: ["Bone.003_Armature", "Bone.004_Armature", "Bone.005_Armature"],
-      leftPectoral: ["Bone.046_Armature", "Bone.048_Armature", "Bone.050_Armature"],
-      rightPectoral: ["Bone.047_Armature", "Bone.049_Armature", "Bone.051_Armature"],
+      leftPectoral: [
+        "Bone.046_Armature",
+        "Bone.048_Armature",
+        "Bone.050_Armature",
+      ],
+      rightPectoral: [
+        "Bone.047_Armature",
+        "Bone.049_Armature",
+        "Bone.051_Armature",
+      ],
     };
     const resolve = (name: string) => {
       const bone = scene.getObjectByName(name);
-      return bone
-        ? { bone, rest: bone.quaternion.clone() }
-        : null;
+      return bone ? { bone, rest: bone.quaternion.clone() } : null;
     };
     return {
-      tail: names.tail.map(resolve).filter((entry): entry is NonNullable<typeof entry> => entry !== null),
-      leftPectoral: names.leftPectoral.map(resolve).filter((entry): entry is NonNullable<typeof entry> => entry !== null),
-      rightPectoral: names.rightPectoral.map(resolve).filter((entry): entry is NonNullable<typeof entry> => entry !== null),
+      tail: names.tail
+        .map(resolve)
+        .filter((entry): entry is NonNullable<typeof entry> => entry !== null),
+      leftPectoral: names.leftPectoral
+        .map(resolve)
+        .filter((entry): entry is NonNullable<typeof entry> => entry !== null),
+      rightPectoral: names.rightPectoral
+        .map(resolve)
+        .filter((entry): entry is NonNullable<typeof entry> => entry !== null),
     };
   }, [asset.commonName, scene]);
   const controller = useFishAnimationController({
@@ -109,10 +124,13 @@ export function GltfFish({
       if (!(object instanceof THREE.Mesh)) return;
       object.castShadow = true;
       object.receiveShadow = true;
-      const materials = Array.isArray(object.material) ? object.material : [object.material];
+      const materials = Array.isArray(object.material)
+        ? object.material
+        : [object.material];
       materials.forEach((material) => {
         if (!(material instanceof THREE.MeshStandardMaterial)) return;
-        material.roughness = asset.materialProfile?.bodyRoughness ?? material.roughness;
+        material.roughness =
+          asset.materialProfile?.bodyRoughness ?? material.roughness;
         material.envMapIntensity = 0.72;
         material.needsUpdate = true;
       });
@@ -131,7 +149,8 @@ export function GltfFish({
     }
 
     const t = clock.getElapsedTime();
-    const groupPhase = ((asset.speciesId.charCodeAt(0) * 13) % 100) / 100 * Math.PI * 2;
+    const groupPhase =
+      (((asset.speciesId.charCodeAt(0) * 13) % 100) / 100) * Math.PI * 2;
     const cohesion = behaviour.schoolingCohesion;
     const wander = behaviour.individualWander;
 
@@ -140,10 +159,14 @@ export function GltfFish({
     const gz = Math.cos(gT * 0.42) * behaviour.rangeZ * bounds.z * 0.5;
     const gy = Math.sin(gT * 0.3) * behaviour.verticalRange * bounds.y * 0.5;
 
-    const iT = t * behaviour.cruiseSpeed * (0.85 + (instanceIndex % 5) * 0.06) + phase;
-    const ix = Math.sin(iT * 1.15) * behaviour.rangeX * bounds.x * 0.38 * wander;
-    const iz = Math.cos(iT * 0.93) * behaviour.rangeZ * bounds.z * 0.38 * wander;
-    const iy = Math.sin(iT * 1.3) * behaviour.verticalRange * bounds.y * 0.42 * wander;
+    const iT =
+      t * behaviour.cruiseSpeed * (0.85 + (instanceIndex % 5) * 0.06) + phase;
+    const ix =
+      Math.sin(iT * 1.15) * behaviour.rangeX * bounds.x * 0.38 * wander;
+    const iz =
+      Math.cos(iT * 0.93) * behaviour.rangeZ * bounds.z * 0.38 * wander;
+    const iy =
+      Math.sin(iT * 1.3) * behaviour.verticalRange * bounds.y * 0.42 * wander;
 
     const burstCycle = Math.sin(t * 0.55 + phase * 2.7);
     const burst = burstCycle > 0.72 ? (burstCycle - 0.72) / 0.28 : 0;
@@ -179,21 +202,49 @@ export function GltfFish({
       Math.cos(gT * 0.6) * 0.6 * behaviour.rangeX * bounds.x * 0.5 * cohesion +
       Math.cos(iT * 1.15) * 1.15 * behaviour.rangeX * bounds.x * 0.38 * wander;
     const vz =
-      -Math.sin(gT * 0.42) * 0.42 * behaviour.rangeZ * bounds.z * 0.5 * cohesion -
+      -Math.sin(gT * 0.42) *
+        0.42 *
+        behaviour.rangeZ *
+        bounds.z *
+        0.5 *
+        cohesion -
       Math.sin(iT * 0.93) * 0.93 * behaviour.rangeZ * bounds.z * 0.38 * wander;
     const desiredHeading = Math.atan2(-vz, vx) + rotationY;
     const headingDelta = Math.atan2(
       Math.sin(desiredHeading - g.rotation.y),
       Math.cos(desiredHeading - g.rotation.y),
     );
-    g.rotation.y += headingDelta * Math.min(delta * behaviour.turnRate * 0.85, 1);
+    g.rotation.y +=
+      headingDelta * Math.min(delta * behaviour.turnRate * 0.85, 1);
     const bankTarget = THREE.MathUtils.clamp(-headingDelta * 0.42, -0.16, 0.16);
-    g.rotation.z = THREE.MathUtils.lerp(g.rotation.z, bankTarget, Math.min(delta * 3.2, 1));
+    g.rotation.z = THREE.MathUtils.lerp(
+      g.rotation.z,
+      bankTarget,
+      Math.min(delta * 3.2, 1),
+    );
     const verticalVelocity =
-      Math.cos(gT * 0.3) * 0.3 * behaviour.verticalRange * bounds.y * 0.5 * cohesion +
-      Math.cos(iT * 1.3) * 1.3 * behaviour.verticalRange * bounds.y * 0.42 * wander;
-    const pitchTarget = THREE.MathUtils.clamp(verticalVelocity * 0.16, -0.08, 0.08);
-    g.rotation.x = THREE.MathUtils.lerp(g.rotation.x, pitchTarget, Math.min(delta * 2.4, 1));
+      Math.cos(gT * 0.3) *
+        0.3 *
+        behaviour.verticalRange *
+        bounds.y *
+        0.5 *
+        cohesion +
+      Math.cos(iT * 1.3) *
+        1.3 *
+        behaviour.verticalRange *
+        bounds.y *
+        0.42 *
+        wander;
+    const pitchTarget = THREE.MathUtils.clamp(
+      verticalVelocity * 0.16,
+      -0.08,
+      0.08,
+    );
+    g.rotation.x = THREE.MathUtils.lerp(
+      g.rotation.x,
+      pitchTarget,
+      Math.min(delta * 2.4, 1),
+    );
 
     // State selection — coarse mapping; refined once real clips are authored.
     let state: FishAnimationState = "cruise";
@@ -215,7 +266,9 @@ export function GltfFish({
         bone.rotateZ(tailBeat * amplitude);
       });
 
-      const pectoralBeat = Math.sin(t * (swimRate * 1.55) + phase + Math.PI * 0.5);
+      const pectoralBeat = Math.sin(
+        t * (swimRate * 1.55) + phase + Math.PI * 0.5,
+      );
       // The paired fin chains are Bone.046 → .048 → .050 and
       // Bone.047 → .049 → .051 in the published BlueMesh armature.
       // Drive each joint with a small phase lag: this creates a recognisable
@@ -246,13 +299,23 @@ export function GltfFish({
       {/* Invisible pointer hitbox sized to the model's local bbox so
           translucent fins are not relied on for click/tap selection. */}
       <mesh visible={false}>
-        <boxGeometry args={[localBbox[0] * 1.15, localBbox[1] * 1.4, localBbox[2] * 1.4]} />
+        <boxGeometry
+          args={[localBbox[0] * 1.15, localBbox[1] * 1.4, localBbox[2] * 1.4]}
+        />
         <meshBasicMaterial transparent opacity={0} depthWrite={false} />
       </mesh>
       {selected && (
-        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -localBbox[1] * 0.6, 0]}>
+        <mesh
+          rotation={[-Math.PI / 2, 0, 0]}
+          position={[0, -localBbox[1] * 0.6, 0]}
+        >
           <ringGeometry args={[localBbox[0] * 0.55, localBbox[0] * 0.7, 36]} />
-          <meshBasicMaterial color="#B8E84A" transparent opacity={0.9} toneMapped={false} />
+          <meshBasicMaterial
+            color="#B8E84A"
+            transparent
+            opacity={0.9}
+            toneMapped={false}
+          />
         </mesh>
       )}
     </group>

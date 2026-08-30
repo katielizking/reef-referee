@@ -19,7 +19,10 @@ export function computeRenderScale(params: {
   cmPerUnit?: number;
 }): number {
   const cmPerUnit = params.cmPerUnit ?? CM_PER_UNIT;
-  if (!Number.isFinite(params.modelReferenceLengthCm) || params.modelReferenceLengthCm <= 0) {
+  if (
+    !Number.isFinite(params.modelReferenceLengthCm) ||
+    params.modelReferenceLengthCm <= 0
+  ) {
     return 1 / cmPerUnit;
   }
   return params.adultLengthCm / params.modelReferenceLengthCm / cmPerUnit;

@@ -1,9 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import type {} from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
-
-// TODO: replace with your project URL once a project name or custom domain is set.
-const BASE_URL = "";
+import { absoluteUrl } from "@/lib/site";
 
 interface Entry {
   path: string;
@@ -24,6 +22,20 @@ export const Route = createFileRoute("/sitemap.xml")({
           { path: "/guides/cycling", changefreq: "monthly", priority: "0.8" },
           { path: "/blog", changefreq: "weekly", priority: "0.7" },
           { path: "/shops", changefreq: "weekly", priority: "0.7" },
+          { path: "/privacy", changefreq: "yearly", priority: "0.3" },
+          { path: "/terms", changefreq: "yearly", priority: "0.3" },
+          {
+            path: "/welfare-disclaimer",
+            changefreq: "yearly",
+            priority: "0.6",
+          },
+          {
+            path: "/affiliate-disclosure",
+            changefreq: "yearly",
+            priority: "0.3",
+          },
+          { path: "/attribution", changefreq: "yearly", priority: "0.3" },
+          { path: "/contact", changefreq: "yearly", priority: "0.4" },
         ];
 
         const [posts, shops, species] = await Promise.all([
@@ -64,7 +76,7 @@ export const Route = createFileRoute("/sitemap.xml")({
           .map((e) =>
             [
               "  <url>",
-              `    <loc>${BASE_URL}${e.path}</loc>`,
+              `    <loc>${absoluteUrl(e.path)}</loc>`,
               e.lastmod ? `    <lastmod>${e.lastmod}</lastmod>` : null,
               e.changefreq
                 ? `    <changefreq>${e.changefreq}</changefreq>`

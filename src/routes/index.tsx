@@ -1,6 +1,15 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { Fish, Loader2, Ruler, Save, Share2, Waves, X } from "lucide-react";
+import {
+  Fish,
+  ImageDown,
+  Loader2,
+  Ruler,
+  Save,
+  Share2,
+  Waves,
+  X,
+} from "lucide-react";
 import { toast } from "sonner";
 
 import { TankSetupPanel } from "@/components/TankSetupPanel";
@@ -11,13 +20,19 @@ import { SceneToolbar } from "@/components/tank3d/SceneToolbar";
 import { useTankHistory } from "@/components/tank3d/useTankHistory";
 import { useEditorStore } from "@/components/tank3d/editorStore";
 import { ScorecardPanel } from "@/components/Scorecard";
-import { MobileScoreBar } from "@/components/MobileScoreBar";
-
+import {
+  MobileScoreBar,
+  MobileWelfareSummary,
+} from "@/components/MobileScoreBar";
 import { PreStockChecklist, useSaveGate } from "@/components/PreStockChecklist";
+import { EditorOnboarding } from "@/components/EditorOnboarding";
 import { scoreTank } from "@/lib/scoring";
-import { pickDefaultFilter } from "@/lib/defaults";
+import { adaptWaterToFirstSpecies, pickDefaultFilter } from "@/lib/defaults";
 import { PRESET_KEY, TANK_PRESETS } from "@/lib/presets";
 import type { TankState } from "@/lib/types";
+import { absoluteUrl } from "@/lib/site";
+import { shareScoreCard } from "@/lib/share-card";
+import { recordScoreEvent } from "@/lib/commercial";
 import {
   loadTankBySlug,
   saveTank,
@@ -44,9 +59,9 @@ export const Route = createFileRoute("/")({
         content:
           "Plan your setup, check your stocking and understand the biology behind a healthy aquarium with simple tools built around fish welfare.",
       },
-      { property: "og:url", content: "/" },
+      { property: "og:url", content: absoluteUrl("/") },
     ],
-    links: [{ rel: "canonical", href: "/" }],
+    links: [{ rel: "canonical", href: absoluteUrl("/") }],
   }),
   component: Builder,
 });
@@ -223,9 +238,13 @@ function Builder() {
       );
       return {
         ...prev,
+        ...(toAdd.length > 0 ? adaptWaterToFirstSpecies(prev, toAdd[0]) : {}),
         species: [
           ...prev.species,
-          ...toAdd.map((s) => ({ species: s, quantity: 1 })),
+          ...toAdd.map((s) => ({
+            species: s,
+            quantity: s.is_schooling ? s.min_group_size : 1,
+          })),
         ],
       };
     });
@@ -291,6 +310,7 @@ function Builder() {
     try {
       setSaving(true);
       const row = await saveTank(state, savedId);
+      recordScoreEvent(scorecard);
       setSavedId(row.id);
       if (share) {
         const url = `${window.location.origin}/t/${row.share_slug}`;
@@ -332,7 +352,6 @@ function Builder() {
             <X className="h-4 w-4" aria-hidden />
           </button>
 
-          {/* The product is the hero: one tank, one visual language. */}
           <div
             className="pointer-events-none relative h-[52svh] min-h-[320px] max-h-[520px] overflow-hidden [&_canvas]:!h-full"
             aria-hidden
@@ -386,6 +405,60 @@ function Builder() {
         </section>
       )}
 
+      {showHero && (
+        <section
+          className="mb-8 grid gap-4 rounded-[1.75rem] border bg-card p-5 sm:p-7 lg:grid-cols-[.8fr_1.2fr]"
+          aria-labelledby="what-calculators-miss"
+        >
+          <div>
+            <p className="science-label text-primary">The welfare difference</p>
+            <h2
+              id="what-calculators-miss"
+              className="mt-3 font-display text-2xl font-bold tracking-tight text-foreground"
+            >
+              What simple capacity calculators miss
+            </h2>
+            <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+              Volume arithmetic cannot see aggression, social group needs, an
+              uncycled biofilter or water outside a species’ range. FishTankr
+              reports those failure modes directly and shows the reason and fix.
+            </p>
+            <Link
+              to="/methodology"
+              className="mt-4 inline-flex min-h-11 items-center font-semibold text-primary underline"
+            >
+              Inspect the methodology
+            </Link>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <article className="rounded-2xl bg-muted/60 p-4">
+              <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
+                Volume-only view
+              </p>
+              <p className="mt-2 font-display text-lg font-bold text-foreground">
+                Two male bettas · 40 L
+              </p>
+              <p className="mt-2 text-sm text-muted-foreground">
+                The litres and body-size arithmetic can look acceptable while
+                ignoring territorial conflict.
+              </p>
+            </article>
+            <article className="rounded-2xl border-l-4 border-l-coral bg-coral/10 p-4">
+              <p className="text-xs font-bold uppercase tracking-wide text-coral">
+                FishTankr verdict
+              </p>
+              <p className="mt-2 font-display text-lg font-bold text-foreground">
+                Do not stock
+              </p>
+              <p className="mt-2 text-sm text-muted-foreground">
+                Same-species territorial aggression is a critical conflict. The
+                plan is capped until the conflict is removed.
+              </p>
+            </article>
+          </div>
+        </section>
+      )}
+
       <div
         id="builder"
         className="mb-5 flex flex-col justify-between gap-3 border-b border-ink/10 pb-4 sm:mb-6 sm:gap-4 sm:pb-5 sm:flex-row sm:items-end"
@@ -399,7 +472,7 @@ function Builder() {
             go.
           </p>
         </div>
-        <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
+        <div className="grid grid-cols-3 gap-2 sm:flex sm:flex-wrap">
           <button
             onClick={() => handleSave(false)}
             disabled={saving || state.species.length === 0}
@@ -422,6 +495,34 @@ function Builder() {
             <Share2 className="h-4 w-4" />
             Share
           </button>
+          <button
+            onClick={() =>
+              void shareScoreCard(scorecard, state)
+                .then((result) =>
+                  toast.success(
+                    result === "shared"
+                      ? "Score card shared"
+                      : "Score card downloaded",
+                  ),
+                )
+                .catch((error) =>
+                  toast.error("Couldn't create score card", {
+                    description:
+                      error instanceof Error ? error.message : "Try again.",
+                  }),
+                )
+            }
+            disabled={scorecard.overall === null}
+            title={
+              scorecard.overall === null
+                ? "Add fish to create a score card"
+                : "Share the welfare verdict as an image"
+            }
+            className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-xl border bg-card px-3 py-2 text-sm font-semibold text-foreground transition-colors hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            <ImageDown className="h-4 w-4" />
+            Card
+          </button>
         </div>
       </div>
 
@@ -432,6 +533,7 @@ function Builder() {
       ) : (
         <>
           <BuilderSteps state={state} onJump={jumpToStep} />
+          <MobileWelfareSummary scorecard={scorecard} />
           <div className="grid items-start gap-4 sm:gap-5 xl:grid-cols-[minmax(280px,320px)_minmax(520px,1fr)_minmax(300px,340px)]">
             <aside className="order-2 fishtankr-panel rounded-[1.5rem] p-3 sm:rounded-[1.75rem] sm:p-4 xl:order-1 xl:sticky xl:top-24">
               <TankSetupPanel
@@ -489,6 +591,19 @@ function Builder() {
                       }))
                     }
                   />
+                  {state.species.length === 0 && (
+                    <div className="pointer-events-none absolute inset-x-4 top-1/2 z-10 -translate-y-1/2 rounded-2xl border border-white/20 bg-ink/75 p-4 text-center text-white backdrop-blur-sm sm:left-1/2 sm:max-w-sm sm:-translate-x-1/2">
+                      <Fish className="mx-auto h-8 w-8 text-lime" aria-hidden />
+                      <p className="mt-2 font-display text-base font-bold">
+                        Your tank is ready for a plan
+                      </p>
+                      <p className="mt-1 text-xs leading-relaxed text-white/75">
+                        Add the first species under Livestock. Water defaults
+                        will adapt to that fish, and the welfare verdict will
+                        explain every concern.
+                      </p>
+                    </div>
+                  )}
                   <SceneToolbar
                     canUndo={history.canUndo}
                     canRedo={history.canRedo}
@@ -501,6 +616,8 @@ function Builder() {
                   />
                 </div>
               </section>
+
+              <EditorOnboarding />
 
               {selected ? (
                 <SelectedObjectPanel

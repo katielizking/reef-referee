@@ -1,6 +1,9 @@
 import { useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
-import type { FishAssetDefinition, FishAnimationState } from "@/lib/fish3d/types";
+import type {
+  FishAssetDefinition,
+  FishAnimationState,
+} from "@/lib/fish3d/types";
 
 /**
  * Priority chain used when a clip for the current state is not available.
@@ -44,19 +47,23 @@ export function useFishAnimationController(params: {
 }) {
   const { root, clips, asset, initialPhase = 0 } = params;
   const mixerRef = useRef<THREE.AnimationMixer | null>(null);
-  const currentRef = useRef<{ state: FishAnimationState; action: THREE.AnimationAction } | null>(
-    null,
-  );
+  const currentRef = useRef<{
+    state: FishAnimationState;
+    action: THREE.AnimationAction;
+  } | null>(null);
 
   const actionsByState = useMemo(() => {
-    if (!root || clips.length === 0) return new Map<FishAnimationState, THREE.AnimationAction>();
+    if (!root || clips.length === 0)
+      return new Map<FishAnimationState, THREE.AnimationAction>();
     const mixer = new THREE.AnimationMixer(root);
     mixerRef.current = mixer;
     const map = new Map<FishAnimationState, THREE.AnimationAction>();
     const anims = asset.animations ?? {};
     (Object.keys(anims) as FishAnimationState[]).forEach((state) => {
       const clipName = anims[state];
-      const clip = clipName ? clips.find((c) => c.name === clipName) : undefined;
+      const clip = clipName
+        ? clips.find((c) => c.name === clipName)
+        : undefined;
       if (clip) map.set(state, mixer.clipAction(clip));
     });
     return map;
@@ -69,7 +76,9 @@ export function useFishAnimationController(params: {
     };
   }, []);
 
-  const resolveAction = (state: FishAnimationState): {
+  const resolveAction = (
+    state: FishAnimationState,
+  ): {
     state: FishAnimationState;
     action: THREE.AnimationAction;
   } | null => {

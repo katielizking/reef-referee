@@ -40,7 +40,9 @@ async function fetchSpeciesPhoto(scientificName: string) {
     order_by: "votes",
     order: "desc",
   });
-  const response = await fetch(`https://api.inaturalist.org/v1/observations?${params}`);
+  const response = await fetch(
+    `https://api.inaturalist.org/v1/observations?${params}`,
+  );
   if (!response.ok) throw new Error("Species image unavailable");
   const body = (await response.json()) as InaturalistResponse;
 
@@ -49,13 +51,16 @@ async function fetchSpeciesPhoto(scientificName: string) {
       ALLOWED_LICENSES.has(candidate.license_code?.toLowerCase() ?? ""),
     );
     if (!photo) continue;
-    const source = photo.medium_url ?? photo.url?.replace("/square.", "/medium.");
+    const source =
+      photo.medium_url ?? photo.url?.replace("/square.", "/medium.");
     if (!source) continue;
     return {
       src: source,
       attribution: photo.attribution ?? "iNaturalist contributor",
       license: (photo.license_code ?? "").toUpperCase(),
-      sourceUrl: observation.uri ?? `https://www.inaturalist.org/observations/${observation.id}`,
+      sourceUrl:
+        observation.uri ??
+        `https://www.inaturalist.org/observations/${observation.id}`,
     };
   }
 
@@ -92,7 +97,10 @@ export function SpeciesPortrait({
       ) : (
         <div className="flex h-full min-h-40 items-center justify-center text-primary/55">
           <div className={`relative ${isLoading ? "animate-pulse" : ""}`}>
-            <Fish className={compact ? "h-14 w-14" : "h-24 w-24"} strokeWidth={1.15} />
+            <Fish
+              className={compact ? "h-14 w-14" : "h-24 w-24"}
+              strokeWidth={1.15}
+            />
             <span className="absolute -right-2 -top-2 h-2 w-2 rounded-full border border-current" />
             <span className="absolute -right-5 top-1 h-1 w-1 rounded-full border border-current" />
           </div>

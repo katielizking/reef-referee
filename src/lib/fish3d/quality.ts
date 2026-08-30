@@ -19,8 +19,11 @@ export function detectDeviceTier(): "high" | "medium" | "low" {
   if (typeof navigator === "undefined") return "medium";
 
   const cores = navigator.hardwareConcurrency ?? 4;
-  const memory = (navigator as unknown as { deviceMemory?: number }).deviceMemory ?? 4;
-  const mobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent ?? "");
+  const memory =
+    (navigator as unknown as { deviceMemory?: number }).deviceMemory ?? 4;
+  const mobile = /Mobi|Android|iPhone|iPad|iPod/i.test(
+    navigator.userAgent ?? "",
+  );
 
   let tier: "high" | "medium" | "low";
   if (mobile && (cores <= 4 || memory <= 2)) tier = "low";
@@ -37,7 +40,13 @@ export function detectDeviceTier(): "high" | "medium" | "low" {
  * anything else routes to the GLB path if the asset registry has a URL.
  */
 export function resolveQuality(inputs: QualityInputs): FishQualityTier {
-  const { deviceTier, quantity, prefersReducedMotion, showFineDetail, selected } = inputs;
+  const {
+    deviceTier,
+    quantity,
+    prefersReducedMotion,
+    showFineDetail,
+    selected,
+  } = inputs;
 
   if (prefersReducedMotion) return "procedural";
   if (!showFineDetail) return "procedural";
@@ -59,6 +68,8 @@ export function resolveQuality(inputs: QualityInputs): FishQualityTier {
   return selected ? "high" : "medium";
 }
 
-export function tierToLod(tier: Exclude<FishQualityTier, "procedural">): FishLod {
+export function tierToLod(
+  tier: Exclude<FishQualityTier, "procedural">,
+): FishLod {
   return tier;
 }

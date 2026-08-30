@@ -7,7 +7,10 @@ const LIMIT = 50;
  * Snapshot-based undo/redo for the builder. `commit(state)` should be called
  * after a discrete edit; continuous drags call `commit` once on pointer up.
  */
-export function useTankHistory(state: TankState, setState: (s: TankState) => void) {
+export function useTankHistory(
+  state: TankState,
+  setState: (s: TankState) => void,
+) {
   const past = useRef<TankState[]>([]);
   const future = useRef<TankState[]>([]);
   const [, force] = useState(0);
@@ -48,7 +51,8 @@ export function useTankHistory(state: TankState, setState: (s: TankState) => voi
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       const target = e.target as HTMLElement | null;
-      if (target && ["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName)) return;
+      if (target && ["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName))
+        return;
       const mod = e.metaKey || e.ctrlKey;
       if (!mod) return;
       if (e.key === "z" || e.key === "Z") {

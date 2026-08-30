@@ -2,9 +2,18 @@ import type { BiotopeRegion, Hardscape, Species, TankState } from "@/lib/types";
 
 const BIOTOPE_HUE: Record<BiotopeRegion, number> = {
   amazon_blackwater: 20, // warm oranges / reds (tetras, discus)
+  south_american_river: 28,
+  central_american_river: 55,
   lake_malawi: 210, // electric blues / yellows
+  lake_tanganyika: 225,
   se_asian_stream: 350, // reds / pinks (barbs, bettas)
+  south_asian_river: 330,
+  east_asian_stream: 175,
+  congo_basin: 265,
+  west_african_stream: 290,
   australian_native: 45, // gold / bronze (rainbowfish)
+  north_american_freshwater: 145,
+  european_freshwater: 165,
   unmapped: 190,
 };
 
@@ -18,7 +27,12 @@ export function hash01(id: string, salt = 0): number {
   return ((h >>> 0) % 10000) / 10000;
 }
 
-export function hashRange(id: string, salt: number, min: number, max: number): number {
+export function hashRange(
+  id: string,
+  salt: number,
+  min: number,
+  max: number,
+): number {
   return min + hash01(id, salt) * (max - min);
 }
 

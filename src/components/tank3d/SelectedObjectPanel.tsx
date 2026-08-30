@@ -19,7 +19,13 @@ interface Props {
   onClose?: () => void;
 }
 
-export function SelectedObjectPanel({ state, setState, interior, commit, onClose }: Props) {
+export function SelectedObjectPanel({
+  state,
+  setState,
+  interior,
+  commit,
+  onClose,
+}: Props) {
   const selected = useSelected();
   const clearSelection = useEditorStore((s) => s.select);
   if (!selected) return null;
@@ -27,7 +33,8 @@ export function SelectedObjectPanel({ state, setState, interior, commit, onClose
   const { kind, refId } = selected;
   const label = placementLabel(state, kind, refId);
   const placement = getPlacement(state.overrides, kind, refId, interior);
-  const fishAttribution = kind === "fish" ? getFishAsset(refId)?.attribution : undefined;
+  const fishAttribution =
+    kind === "fish" ? getFishAsset(refId)?.attribution : undefined;
 
   const rowExists = groupExists(state, kind, refId);
   if (!rowExists) {
@@ -84,9 +91,7 @@ export function SelectedObjectPanel({ state, setState, interior, commit, onClose
         </button>
       </div>
 
-      <p className="mb-3 text-xs text-muted-foreground">
-        {hintFor(kind)}
-      </p>
+      <p className="mb-3 text-xs text-muted-foreground">{hintFor(kind)}</p>
 
       <div className="space-y-3">
         <AxisSlider
@@ -95,7 +100,11 @@ export function SelectedObjectPanel({ state, setState, interior, commit, onClose
           min={-interior.x / 2}
           max={interior.x / 2}
           step={0.05}
-          onChange={(v) => updateOverride({ anchor: [v, placement.anchor[1], placement.anchor[2]] })}
+          onChange={(v) =>
+            updateOverride({
+              anchor: [v, placement.anchor[1], placement.anchor[2]],
+            })
+          }
           onCommit={commit}
         />
         <AxisSlider
@@ -104,7 +113,11 @@ export function SelectedObjectPanel({ state, setState, interior, commit, onClose
           min={-interior.z / 2}
           max={interior.z / 2}
           step={0.05}
-          onChange={(v) => updateOverride({ anchor: [placement.anchor[0], placement.anchor[1], v] })}
+          onChange={(v) =>
+            updateOverride({
+              anchor: [placement.anchor[0], placement.anchor[1], v],
+            })
+          }
           onCommit={commit}
         />
         {kind === "fish" && (
@@ -115,7 +128,9 @@ export function SelectedObjectPanel({ state, setState, interior, commit, onClose
             max={interior.y / 2 - 0.15}
             step={0.05}
             onChange={(v) =>
-              updateOverride({ anchor: [placement.anchor[0], v, placement.anchor[2]] })
+              updateOverride({
+                anchor: [placement.anchor[0], v, placement.anchor[2]],
+              })
             }
             onCommit={commit}
           />
@@ -149,11 +164,21 @@ export function SelectedObjectPanel({ state, setState, interior, commit, onClose
       {fishAttribution && (
         <p className="mt-4 rounded-xl border bg-muted/40 px-3 py-2 text-[11px] leading-relaxed text-muted-foreground">
           3D model by{" "}
-          <a href={fishAttribution.sourceUrl} target="_blank" rel="noreferrer" className="font-semibold text-foreground underline underline-offset-2">
+          <a
+            href={fishAttribution.sourceUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="font-semibold text-foreground underline underline-offset-2"
+          >
             {fishAttribution.creator}
           </a>{" "}
           ·{" "}
-          <a href={fishAttribution.licenseUrl ?? fishAttribution.sourceUrl} target="_blank" rel="noreferrer" className="underline underline-offset-2">
+          <a
+            href={fishAttribution.licenseUrl ?? fishAttribution.sourceUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="underline underline-offset-2"
+          >
             {fishAttribution.licenseLabel}
           </a>
         </p>
@@ -215,25 +240,40 @@ function kindLabel(k: PlacementKind): string {
 }
 
 function hintFor(k: PlacementKind): string {
-  if (k === "fish") return "Drag in the scene to reposition the school's centre.";
-  if (k === "plant") return "Sits on the substrate. Rotate and resize as needed.";
-  if (k === "hardscape") return "Sits on the substrate. Drag, rotate or resize.";
+  if (k === "fish")
+    return "Drag in the scene to reposition the school's centre.";
+  if (k === "plant")
+    return "Sits on the substrate. Rotate and resize as needed.";
+  if (k === "hardscape")
+    return "Sits on the substrate. Drag, rotate or resize.";
   return "Snapped to the back glass. Drag left/right or up/down.";
 }
 
-function groupExists(state: TankState, kind: PlacementKind, refId: string): boolean {
+function groupExists(
+  state: TankState,
+  kind: PlacementKind,
+  refId: string,
+): boolean {
   if (kind === "fish") return state.species.some((r) => r.species.id === refId);
   if (kind === "plant") return state.plants.some((r) => r.plant.id === refId);
-  if (kind === "hardscape") return state.hardscape.some((r) => r.hardscape.id === refId);
+  if (kind === "hardscape")
+    return state.hardscape.some((r) => r.hardscape.id === refId);
   return !!state.filter;
 }
 
-function bumpQuantity(state: TankState, kind: PlacementKind, refId: string, delta: number): TankState {
+function bumpQuantity(
+  state: TankState,
+  kind: PlacementKind,
+  refId: string,
+  delta: number,
+): TankState {
   if (kind === "fish") {
     return {
       ...state,
       species: state.species.map((r) =>
-        r.species.id === refId ? { ...r, quantity: Math.max(1, r.quantity + delta) } : r,
+        r.species.id === refId
+          ? { ...r, quantity: Math.max(1, r.quantity + delta) }
+          : r,
       ),
     };
   }
@@ -241,7 +281,9 @@ function bumpQuantity(state: TankState, kind: PlacementKind, refId: string, delt
     return {
       ...state,
       plants: state.plants.map((r) =>
-        r.plant.id === refId ? { ...r, quantity: Math.max(1, r.quantity + delta) } : r,
+        r.plant.id === refId
+          ? { ...r, quantity: Math.max(1, r.quantity + delta) }
+          : r,
       ),
     };
   }
@@ -249,22 +291,37 @@ function bumpQuantity(state: TankState, kind: PlacementKind, refId: string, delt
     return {
       ...state,
       hardscape: state.hardscape.map((r) =>
-        r.hardscape.id === refId ? { ...r, quantity: Math.max(1, r.quantity + delta) } : r,
+        r.hardscape.id === refId
+          ? { ...r, quantity: Math.max(1, r.quantity + delta) }
+          : r,
       ),
     };
   }
   return state;
 }
 
-function removeGroup(state: TankState, kind: PlacementKind, refId: string): TankState {
+function removeGroup(
+  state: TankState,
+  kind: PlacementKind,
+  refId: string,
+): TankState {
   if (kind === "fish") {
-    return { ...state, species: state.species.filter((r) => r.species.id !== refId) };
+    return {
+      ...state,
+      species: state.species.filter((r) => r.species.id !== refId),
+    };
   }
   if (kind === "plant") {
-    return { ...state, plants: state.plants.filter((r) => r.plant.id !== refId) };
+    return {
+      ...state,
+      plants: state.plants.filter((r) => r.plant.id !== refId),
+    };
   }
   if (kind === "hardscape") {
-    return { ...state, hardscape: state.hardscape.filter((r) => r.hardscape.id !== refId) };
+    return {
+      ...state,
+      hardscape: state.hardscape.filter((r) => r.hardscape.id !== refId),
+    };
   }
   return { ...state, filter: null };
 }
