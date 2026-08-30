@@ -341,17 +341,17 @@ function Builder() {
           </div>
 
           <div className="absolute inset-0 z-10 flex flex-col justify-end p-5 sm:justify-center sm:p-10 lg:p-12">
-            <span className="science-label text-blue">Live referee</span>
+            <span className="science-label text-blue">Welfare-first tank planner</span>
             <h1 className="mt-4 max-w-[18ch] font-display text-4xl font-bold leading-[.95] tracking-[-.045em] text-white sm:text-5xl lg:text-6xl">
-              Will these fish live well in your tank?
+              A better tank starts before you buy the fish.
             </h1>
             <p className="mt-4 max-w-md text-sm leading-relaxed text-white/75 sm:text-base">
-              Enter your tank size, choose your fish and spot welfare problems before you buy.
+              Add your tank and the fish you’re considering. FishTankr checks whether they suit the
+              space, the water and each other.
             </p>
             <p className="data-mono mt-4 text-xs uppercase tracking-[0.14em] text-white/60">
               {state.length_cm} × {state.width_cm} × {state.height_cm} cm ·{" "}
-              {Math.round((state.length_cm * state.width_cm * state.height_cm) / 1000)} L · no fish
-              yet
+              {Math.round((state.length_cm * state.width_cm * state.height_cm) / 1000)} L
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
               <button
@@ -361,13 +361,13 @@ function Builder() {
                 }}
                 className="inline-flex min-h-12 items-center justify-center border border-white bg-white px-6 py-3 text-sm font-semibold text-ink transition-colors hover:bg-transparent hover:text-white"
               >
-                Start with my tank
+                Check my tank
               </button>
               <button
                 onClick={() => navigate({ to: "/species" })}
                 className="inline-flex min-h-12 items-center justify-center border border-white/40 px-6 py-3 text-sm font-semibold text-white transition-colors hover:border-white"
               >
-                Browse the species
+                Explore fish
               </button>
             </div>
           </div>
