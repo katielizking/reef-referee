@@ -322,49 +322,65 @@ function Builder() {
   return (
     <main className="mx-auto max-w-[1500px] px-3 py-4 pb-28 sm:px-4 sm:py-6 lg:pb-6">
       {showHero && (
-        <section className="hero-grid fishtankr-panel relative mb-7 grid gap-7 overflow-hidden rounded-[1.5rem] p-5 sm:mb-10 sm:min-h-[430px] sm:rounded-[2rem] sm:p-10 lg:grid-cols-[minmax(0,1.08fr)_minmax(360px,.92fr)] lg:items-center lg:p-12">
+        <section className="relative mb-7 overflow-hidden border border-rule bg-ink sm:mb-10">
           <button
             type="button"
             onClick={dismissHero}
             aria-label="Dismiss welcome"
-            className="absolute right-3 top-3 rounded-full p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+            className="absolute right-3 top-3 z-20 p-1.5 text-white/60 transition-colors hover:text-white"
           >
             <X className="h-4 w-4" aria-hidden />
           </button>
-          <div className="relative z-10">
-            <span className="science-label text-primary">
-              Aquarium planning, decoded
-            </span>
-            <h1 className="mt-5 max-w-2xl font-display text-4xl font-bold leading-[.98] tracking-[-.045em] text-ink sm:text-5xl lg:text-6xl">
-              Smarter tanks. Happier fish.
+
+          {/* The product is the hero: one tank, one visual language. */}
+          <div
+            className="pointer-events-none relative h-[52svh] min-h-[320px] max-h-[520px] overflow-hidden [&_canvas]:!h-full"
+            aria-hidden
+          >
+            <div className="absolute inset-0 scale-110">
+              <ClientOnlyTankScene state={state} interactive={false} />
+            </div>
+            <div
+              className="absolute inset-0"
+              style={{
+                background:
+                  "linear-gradient(to right, color-mix(in srgb, var(--ink) 88%, transparent) 0%, color-mix(in srgb, var(--ink) 55%, transparent) 55%, transparent 100%)",
+              }}
+            />
+          </div>
+
+          <div className="absolute inset-0 z-10 flex flex-col justify-end p-5 sm:justify-center sm:p-10 lg:p-12">
+            <span className="science-label text-blue">Live referee</span>
+            <h1 className="mt-4 max-w-[18ch] font-display text-4xl font-bold leading-[.95] tracking-[-.045em] text-white sm:text-5xl lg:text-6xl">
+              Will these fish live well in your tank?
             </h1>
-            <p className="mt-5 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-              Plan your setup, check your stocking and understand the biology
-              behind a healthy aquarium with simple tools built around fish
-              welfare.
+            <p className="mt-4 max-w-md text-sm leading-relaxed text-white/75 sm:text-base">
+              Set the glass, pick the fish, and see what happens to them before
+              you buy anything.
             </p>
-            <div className="mt-7 grid gap-3 sm:flex sm:flex-wrap">
+            <p className="data-mono mt-4 text-xs uppercase tracking-[0.14em] text-white/60">
+              {state.length_cm} × {state.width_cm} × {state.height_cm} cm ·{" "}
+              {Math.round(
+                (state.length_cm * state.width_cm * state.height_cm) / 1000,
+              )}{" "}
+              L · no fish yet
+            </p>
+            <div className="mt-6 flex flex-wrap gap-3">
               <button
                 onClick={() => {
                   dismissHero();
                   scrollToBuilder();
                 }}
-                className="inline-flex min-h-12 w-full items-center justify-center rounded-full bg-ink px-6 py-3 sm:w-auto text-sm font-semibold text-white shadow-[0_8px_0_rgba(55,184,198,.28)] transition-all hover:-translate-y-0.5 hover:shadow-[0_10px_0_rgba(55,184,198,.34)]"
+                className="inline-flex min-h-12 items-center justify-center border border-white bg-white px-6 py-3 text-sm font-semibold text-ink transition-colors hover:bg-transparent hover:text-white"
               >
-                Check my tank
+                Start with my tank
               </button>
               <button
-                onClick={() => navigate({ to: "/saved" })}
-                className="inline-flex min-h-12 w-full items-center justify-center rounded-full border border-ink/15 bg-white/70 px-6 py-3 sm:w-auto text-sm font-semibold text-foreground transition-all hover:border-primary hover:bg-white"
+                onClick={() => navigate({ to: "/species" })}
+                className="inline-flex min-h-12 items-center justify-center border border-white/40 px-6 py-3 text-sm font-semibold text-white transition-colors hover:border-white"
               >
-                Explore the tools
+                Browse the species
               </button>
-            </div>
-          </div>
-          <div className="hero-float relative mx-auto w-full max-w-lg rounded-[2rem] border border-white/70 bg-white/55 p-3 shadow-[0_30px_80px_rgba(18,35,46,.15)] backdrop-blur-sm">
-            <HeroTankIllustration className="w-full" />
-            <div className="absolute -bottom-3 left-5 rounded-full bg-lime px-3 py-1.5 font-display text-[10px] font-bold uppercase tracking-[.14em] text-ink shadow-sm">
-              Live welfare score
             </div>
           </div>
         </section>
