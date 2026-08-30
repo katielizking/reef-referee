@@ -83,45 +83,43 @@ const TITLE = "FishTankr — Smarter tanks. Happier fish.";
 const DESC =
   "Simple tools that make fishkeeping easier to understand and better for the animals in our care. Plan a setup, check your stocking and see the biology behind a healthy aquarium.";
 
-export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
-  {
-    head: () => ({
-      meta: [
-        { charSet: "utf-8" },
-        { name: "viewport", content: "width=device-width, initial-scale=1" },
-        { title: TITLE },
-        { name: "description", content: DESC },
-        { name: "theme-color", content: "#37B8C6" },
-        { property: "og:title", content: TITLE },
-        { property: "og:description", content: DESC },
-        { property: "og:type", content: "website" },
-        { property: "og:site_name", content: "FishTankr" },
-        { property: "og:url", content: absoluteUrl("/") },
-        { property: "og:image", content: absoluteUrl("/favicon.png") },
-        { name: "twitter:card", content: "summary_large_image" },
-        { name: "twitter:image", content: absoluteUrl("/favicon.png") },
-      ],
-      links: [
-        { rel: "stylesheet", href: appCss },
-        { rel: "preconnect", href: "https://fonts.googleapis.com" },
-        {
-          rel: "preconnect",
-          href: "https://fonts.gstatic.com",
-          crossOrigin: "anonymous",
-        },
-        {
-          rel: "stylesheet",
-          href: "https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Spectral:ital,wght@1,400;1,500&display=swap",
-        },
-        { rel: "icon", href: "/favicon.png", type: "image/png" },
-      ],
-    }),
-    shellComponent: RootShell,
-    component: RootComponent,
-    notFoundComponent: NotFoundComponent,
-    errorComponent: ErrorComponent,
-  },
-);
+export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
+  head: () => ({
+    meta: [
+      { charSet: "utf-8" },
+      { name: "viewport", content: "width=device-width, initial-scale=1" },
+      { title: TITLE },
+      { name: "description", content: DESC },
+      { name: "theme-color", content: "#37B8C6" },
+      { property: "og:title", content: TITLE },
+      { property: "og:description", content: DESC },
+      { property: "og:type", content: "website" },
+      { property: "og:site_name", content: "FishTankr" },
+      { property: "og:url", content: absoluteUrl("/") },
+      { property: "og:image", content: absoluteUrl("/favicon.png") },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:image", content: absoluteUrl("/favicon.png") },
+    ],
+    links: [
+      { rel: "stylesheet", href: appCss },
+      { rel: "preconnect", href: "https://fonts.googleapis.com" },
+      {
+        rel: "preconnect",
+        href: "https://fonts.gstatic.com",
+        crossOrigin: "anonymous",
+      },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Spectral:ital,wght@1,400;1,500&display=swap",
+      },
+      { rel: "icon", href: "/favicon.png", type: "image/png" },
+    ],
+  }),
+  shellComponent: RootShell,
+  component: RootComponent,
+  notFoundComponent: NotFoundComponent,
+  errorComponent: ErrorComponent,
+});
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
@@ -210,8 +208,7 @@ function SiteHeader() {
               to={item.to}
               className="rounded-full px-3 py-1.5 font-medium text-muted-foreground transition-all hover:bg-foam hover:text-foreground"
               activeProps={{
-                className:
-                  "rounded-full bg-ink px-3 py-1.5 font-semibold text-white shadow-sm",
+                className: "rounded-full bg-ink px-3 py-1.5 font-semibold text-white shadow-sm",
               }}
               activeOptions={item.exact ? { exact: true } : undefined}
             >
@@ -261,8 +258,7 @@ function SiteHeader() {
                 onClick={() => setOpen(false)}
                 className="rounded-lg px-3 py-2 font-medium text-muted-foreground hover:bg-muted"
                 activeProps={{
-                  className:
-                    "rounded-lg px-3 py-2 font-semibold bg-muted text-foreground",
+                  className: "rounded-lg px-3 py-2 font-semibold bg-muted text-foreground",
                 }}
                 activeOptions={item.exact ? { exact: true } : undefined}
               >
@@ -288,24 +284,18 @@ function SiteFooter() {
             </span>
           </div>
           <p className="mt-2 max-w-md text-xs leading-relaxed text-white/60">
-            A guide, not a guarantee. Always check the needs of each species and
-            the rules where you live.
+            A guide, not a guarantee. Always check the needs of each species and the rules where you
+            live.
           </p>
         </div>
-        <nav
-          aria-label="Footer"
-          className="flex flex-wrap gap-x-4 gap-y-2 text-xs text-white/60"
-        >
+        <nav aria-label="Footer" className="flex flex-wrap gap-x-4 gap-y-2 text-xs text-white/60">
           <Link to="/species" className="transition-colors hover:text-white">
             Species
           </Link>
           <Link to="/guides" className="transition-colors hover:text-white">
             Guides
           </Link>
-          <Link
-            to="/methodology"
-            className="transition-colors hover:text-white"
-          >
+          <Link to="/methodology" className="transition-colors hover:text-white">
             Methodology
           </Link>
           <Link to="/blog" className="transition-colors hover:text-white">
@@ -320,22 +310,13 @@ function SiteFooter() {
           <Link to="/terms" className="transition-colors hover:text-white">
             Terms
           </Link>
-          <Link
-            to="/welfare-disclaimer"
-            className="transition-colors hover:text-white"
-          >
+          <Link to="/welfare-disclaimer" className="transition-colors hover:text-white">
             Welfare disclaimer
           </Link>
-          <Link
-            to="/affiliate-disclosure"
-            className="transition-colors hover:text-white"
-          >
+          <Link to="/affiliate-disclosure" className="transition-colors hover:text-white">
             Affiliate disclosure
           </Link>
-          <Link
-            to="/attribution"
-            className="transition-colors hover:text-white"
-          >
+          <Link to="/attribution" className="transition-colors hover:text-white">
             3D credits
           </Link>
           <Link to="/contact" className="transition-colors hover:text-white">

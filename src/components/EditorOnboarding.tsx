@@ -26,24 +26,17 @@ export function EditorOnboarding() {
       <p className="science-label text-primary">3D editor quick start</p>
       <div className="mt-3 grid gap-3 pr-8 text-sm text-muted-foreground sm:grid-cols-2">
         <p className="flex gap-2">
-          <Move3D
-            className="mt-0.5 h-4 w-4 shrink-0 text-foreground"
-            aria-hidden
-          />
+          <Move3D className="mt-0.5 h-4 w-4 shrink-0 text-foreground" aria-hidden />
           <span>
-            <strong className="text-foreground">Tap, then drag.</strong> Select
-            any fish, plant or décor and move it inside the tank.
+            <strong className="text-foreground">Tap, then drag.</strong> Select any fish, plant or
+            décor and move it inside the tank.
           </span>
         </p>
         <p className="flex gap-2">
-          <RotateCcw
-            className="mt-0.5 h-4 w-4 shrink-0 text-foreground"
-            aria-hidden
-          />
+          <RotateCcw className="mt-0.5 h-4 w-4 shrink-0 text-foreground" aria-hidden />
           <span>
-            <strong className="text-foreground">Undo is always visible.</strong>{" "}
-            Use the toolbar arrows after a move; keyboard shortcuts are
-            optional.
+            <strong className="text-foreground">Undo is always visible.</strong> Use the toolbar
+            arrows after a move; keyboard shortcuts are optional.
           </span>
         </p>
       </div>

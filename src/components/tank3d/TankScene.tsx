@@ -29,12 +29,7 @@ interface Props {
   interactive?: boolean;
 }
 
-export default function TankScene({
-  state,
-  setState,
-  commit,
-  interactive = true,
-}: Props) {
+export default function TankScene({ state, setState, commit, interactive = true }: Props) {
   const select = useEditorStore((s) => s.select);
   const selected = useEditorStore((s) => s.selected);
 
@@ -61,22 +56,13 @@ export default function TankScene({
   useEffect(() => {
     if (!selected) return;
     const exists =
-      (selected.kind === "fish" &&
-        state.species.some((r) => r.species.id === selected.refId)) ||
-      (selected.kind === "plant" &&
-        state.plants.some((r) => r.plant.id === selected.refId)) ||
+      (selected.kind === "fish" && state.species.some((r) => r.species.id === selected.refId)) ||
+      (selected.kind === "plant" && state.plants.some((r) => r.plant.id === selected.refId)) ||
       (selected.kind === "hardscape" &&
         state.hardscape.some((r) => r.hardscape.id === selected.refId)) ||
       (selected.kind === "equipment" && !!state.filter);
     if (!exists) select(null);
-  }, [
-    selected,
-    state.species,
-    state.plants,
-    state.hardscape,
-    state.filter,
-    select,
-  ]);
+  }, [selected, state.species, state.plants, state.hardscape, state.filter, select]);
 
   function onChangePlacement(next: PlacementOverride) {
     if (!setState) return;
@@ -116,11 +102,7 @@ export default function TankScene({
           shadow-mapSize-width={quality === "high" ? 2048 : 1024}
           shadow-mapSize-height={quality === "high" ? 2048 : 1024}
         />
-        <directionalLight
-          position={[-4, 3, -3]}
-          intensity={0.45}
-          color="#69b7c9"
-        />
+        <directionalLight position={[-4, 3, -3]} intensity={0.45} color="#69b7c9" />
         <pointLight
           position={[0, dims.y * 0.55, dims.z * 0.15]}
           intensity={0.65}
@@ -128,11 +110,7 @@ export default function TankScene({
           distance={largest * 2.5}
         />
         <CausticLight dims={dims} reduced={!richEffects} />
-        <mesh
-          position={[0, -dims.y / 2 - 0.13, 0]}
-          rotation={[-Math.PI / 2, 0, 0]}
-          receiveShadow
-        >
+        <mesh position={[0, -dims.y / 2 - 0.13, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
           <planeGeometry args={[dims.x * 1.18, dims.z * 1.25]} />
           <shadowMaterial transparent opacity={0.24} />
         </mesh>
@@ -151,26 +129,16 @@ export default function TankScene({
         </mesh>
         <WaterSurface dims={dims} reduced={!richEffects} />
         <GlassShell dims={dims} />
-        {richEffects && (
-          <SuspendedParticles
-            dims={dims}
-            count={quality === "high" ? 150 : 75}
-          />
-        )}
+        {richEffects && <SuspendedParticles dims={dims} count={quality === "high" ? 150 : 75} />}
 
         {/* Reinforced glass edges */}
         <lineSegments>
-          <edgesGeometry
-            args={[new THREE.BoxGeometry(dims.x, dims.y, dims.z)]}
-          />
+          <edgesGeometry args={[new THREE.BoxGeometry(dims.x, dims.y, dims.z)]} />
           <lineBasicMaterial color="#335f6b" transparent opacity={0.72} />
         </lineSegments>
 
         {/* Substrate slab with a lightweight granular surface. */}
-        <mesh
-          position={[0, -dims.y / 2 + substrateHeight / 2, 0]}
-          receiveShadow
-        >
+        <mesh position={[0, -dims.y / 2 + substrateHeight / 2, 0]} receiveShadow>
           <boxGeometry args={[dims.x - 0.02, substrateHeight, dims.z - 0.02]} />
           <meshStandardMaterial color={subColour} roughness={0.96} />
         </mesh>
@@ -180,21 +148,13 @@ export default function TankScene({
           colour={subColour}
           count={quality === "high" ? 180 : quality === "medium" ? 90 : 40}
         />
-        {richEffects && (
-          <BubbleColumn dims={dims} count={quality === "high" ? 28 : 14} />
-        )}
+        {richEffects && <BubbleColumn dims={dims} count={quality === "high" ? 28 : 14} />}
 
         {/* Hardscape */}
         {state.hardscape.map(({ hardscape, quantity }) => {
           if (hardscape.type === "substrate") return null;
-          const placement = getPlacement(
-            state.overrides,
-            "hardscape",
-            hardscape.id,
-            interior,
-          );
-          const isSel =
-            selected?.kind === "hardscape" && selected?.refId === hardscape.id;
+          const placement = getPlacement(state.overrides, "hardscape", hardscape.id, interior);
+          const isSel = selected?.kind === "hardscape" && selected?.refId === hardscape.id;
           return (
             <DragGroup
               key={hardscape.id}
@@ -220,14 +180,8 @@ export default function TankScene({
 
         {/* Plants */}
         {state.plants.map(({ plant, quantity }) => {
-          const placement = getPlacement(
-            state.overrides,
-            "plant",
-            plant.id,
-            interior,
-          );
-          const isSel =
-            selected?.kind === "plant" && selected?.refId === plant.id;
+          const placement = getPlacement(state.overrides, "plant", plant.id, interior);
+          const isSel = selected?.kind === "plant" && selected?.refId === plant.id;
           return (
             <DragGroup
               key={plant.id}
@@ -240,12 +194,7 @@ export default function TankScene({
               interactive={interactive}
             >
               <group scale={placement.scale}>
-                <PlantClump
-                  plant={plant}
-                  quantity={quantity}
-                  interior={interior}
-                  groundY={0}
-                />
+                <PlantClump plant={plant} quantity={quantity} interior={interior} groundY={0} />
               </group>
             </DragGroup>
           );
@@ -253,14 +202,8 @@ export default function TankScene({
 
         {/* Fish */}
         {state.species.map(({ species, quantity }) => {
-          const placement = getPlacement(
-            state.overrides,
-            "fish",
-            species.id,
-            interior,
-          );
-          const isSel =
-            selected?.kind === "fish" && selected?.refId === species.id;
+          const placement = getPlacement(state.overrides, "fish", species.id, interior);
+          const isSel = selected?.kind === "fish" && selected?.refId === species.id;
           const hasOverride = !!state.overrides?.[`fish:${species.id}`];
           return (
             <DragGroup
@@ -288,14 +231,8 @@ export default function TankScene({
         {/* Equipment (filter) */}
         {state.filter &&
           (() => {
-            const placement = getPlacement(
-              state.overrides,
-              "equipment",
-              "filter",
-              interior,
-            );
-            const isSel =
-              selected?.kind === "equipment" && selected?.refId === "filter";
+            const placement = getPlacement(state.overrides, "equipment", "filter", interior);
+            const isSel = selected?.kind === "equipment" && selected?.refId === "filter";
             return (
               <DragGroup
                 placement={placement}
@@ -345,8 +282,7 @@ function WaterSurface({
   useFrame(({ clock }) => {
     if (!surface.current || reduced) return;
     const t = clock.getElapsedTime();
-    surface.current.position.y =
-      dims.y / 2 - 0.035 + Math.sin(t * 0.65) * 0.012;
+    surface.current.position.y = dims.y / 2 - 0.035 + Math.sin(t * 0.65) * 0.012;
     surface.current.rotation.z = Math.sin(t * 0.32) * 0.008;
   });
 
@@ -399,22 +335,13 @@ function SubstrateGrains({
     return next;
   }, [count, dims.x, dims.z, y]);
 
-  const grainColour = useMemo(
-    () => new THREE.Color(colour).offsetHSL(0, -0.08, 0.14),
-    [colour],
-  );
+  const grainColour = useMemo(() => new THREE.Color(colour).offsetHSL(0, -0.08, 0.14), [colour]);
 
   useEffect(() => () => geometry.dispose(), [geometry]);
 
   return (
     <points geometry={geometry}>
-      <pointsMaterial
-        color={grainColour}
-        size={0.045}
-        sizeAttenuation
-        transparent
-        opacity={0.7}
-      />
+      <pointsMaterial color={grainColour} size={0.045} sizeAttenuation transparent opacity={0.7} />
     </points>
   );
 }
@@ -428,8 +355,7 @@ function BubbleColumn({
 }) {
   const points = useRef<THREE.Points>(null);
   const speeds = useMemo(
-    () =>
-      Float32Array.from({ length: count }, (_, i) => 0.16 + (i % 7) * 0.025),
+    () => Float32Array.from({ length: count }, (_, i) => 0.16 + (i % 7) * 0.025),
     [count],
   );
   const geometry = useMemo(() => {
@@ -569,10 +495,8 @@ function SuspendedParticles({
     const positions = new Float32Array(count * 3);
     for (let index = 0; index < count; index++) {
       positions[index * 3] = (hashNoise(index * 7 + 1) - 0.5) * dims.x * 0.94;
-      positions[index * 3 + 1] =
-        (hashNoise(index * 7 + 2) - 0.5) * dims.y * 0.9;
-      positions[index * 3 + 2] =
-        (hashNoise(index * 7 + 3) - 0.5) * dims.z * 0.9;
+      positions[index * 3 + 1] = (hashNoise(index * 7 + 2) - 0.5) * dims.y * 0.9;
+      positions[index * 3 + 2] = (hashNoise(index * 7 + 3) - 0.5) * dims.z * 0.9;
     }
     const next = new THREE.BufferGeometry();
     next.setAttribute("position", new THREE.BufferAttribute(positions, 3));

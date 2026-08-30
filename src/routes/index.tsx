@@ -1,15 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import {
-  Fish,
-  ImageDown,
-  Loader2,
-  Ruler,
-  Save,
-  Share2,
-  Waves,
-  X,
-} from "lucide-react";
+import { Fish, ImageDown, Loader2, Ruler, Save, Share2, Waves, X } from "lucide-react";
 import { toast } from "sonner";
 
 import { TankSetupPanel } from "@/components/TankSetupPanel";
@@ -20,10 +11,7 @@ import { SceneToolbar } from "@/components/tank3d/SceneToolbar";
 import { useTankHistory } from "@/components/tank3d/useTankHistory";
 import { useEditorStore } from "@/components/tank3d/editorStore";
 import { ScorecardPanel } from "@/components/Scorecard";
-import {
-  MobileScoreBar,
-  MobileWelfareSummary,
-} from "@/components/MobileScoreBar";
+import { MobileScoreBar, MobileWelfareSummary } from "@/components/MobileScoreBar";
 import { PreStockChecklist, useSaveGate } from "@/components/PreStockChecklist";
 import { EditorOnboarding } from "@/components/EditorOnboarding";
 import { scoreTank } from "@/lib/scoring";
@@ -45,9 +33,7 @@ import {
 const HERO_DISMISS_KEY = "fishtankr:hero-dismissed";
 
 export const Route = createFileRoute("/")({
-  validateSearch: (
-    search: Record<string, unknown>,
-  ): { tank?: string; remix?: string } => ({
+  validateSearch: (search: Record<string, unknown>): { tank?: string; remix?: string } => ({
     tank: typeof search.tank === "string" ? search.tank : undefined,
     remix: typeof search.remix === "string" ? search.remix : undefined,
   }),
@@ -149,9 +135,7 @@ function Builder() {
           filter: data.filter,
           maintenance_frequency: data.tank.maintenance_frequency,
           biological_media_level:
-            data.tank.biological_media_level ??
-            data.filter?.biological_media_level ??
-            "standard",
+            data.tank.biological_media_level ?? data.filter?.biological_media_level ?? "standard",
           filter_maturity: data.tank.filter_maturity ?? "unknown",
           cycle_status: data.tank.cycle_status ?? "unknown",
           cycle_method: data.tank.cycle_method ?? "unknown",
@@ -170,18 +154,13 @@ function Builder() {
         });
         setSavedId(remixSlug ? undefined : data.tank.id);
         setHeroDismissed(true);
-        toast.success(
-          remixSlug
-            ? `Ready to remix ${data.tank.name}`
-            : `Loaded ${data.tank.name}`,
-        );
+        toast.success(remixSlug ? `Ready to remix ${data.tank.name}` : `Loaded ${data.tank.name}`);
       })
       .catch((error) => {
         if (cancelled) return;
         console.error(error);
         toast.error("Couldn't open this tank", {
-          description:
-            error instanceof Error ? error.message : "Try again in a moment.",
+          description: error instanceof Error ? error.message : "Try again in a moment.",
         });
       })
       .finally(() => {
@@ -291,13 +270,7 @@ function Builder() {
             },
       );
     }
-  }, [
-    filters.data,
-    state.filter,
-    state.length_cm,
-    state.width_cm,
-    state.height_cm,
-  ]);
+  }, [filters.data, state.filter, state.length_cm, state.width_cm, state.height_cm]);
 
   // Capture a history snapshot when the state has settled after any edit
   // (drag commits itself synchronously on pointer-up).
@@ -322,8 +295,7 @@ function Builder() {
     } catch (err) {
       console.error(err);
       toast.error("Couldn't save this tank", {
-        description:
-          err instanceof Error ? err.message : "Try again in a moment.",
+        description: err instanceof Error ? err.message : "Try again in a moment.",
       });
     } finally {
       setSaving(false);
@@ -374,15 +346,12 @@ function Builder() {
               Will these fish live well in your tank?
             </h1>
             <p className="mt-4 max-w-md text-sm leading-relaxed text-white/75 sm:text-base">
-              Set the glass, pick the fish, and see what happens to them before
-              you buy anything.
+              Set the glass, pick the fish, and see what happens to them before you buy anything.
             </p>
             <p className="data-mono mt-4 text-xs uppercase tracking-[0.14em] text-white/60">
               {state.length_cm} × {state.width_cm} × {state.height_cm} cm ·{" "}
-              {Math.round(
-                (state.length_cm * state.width_cm * state.height_cm) / 1000,
-              )}{" "}
-              L · no fish yet
+              {Math.round((state.length_cm * state.width_cm * state.height_cm) / 1000)} L · no fish
+              yet
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
               <button
@@ -419,9 +388,9 @@ function Builder() {
               What simple capacity calculators miss
             </h2>
             <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-              Volume arithmetic cannot see aggression, social group needs, an
-              uncycled biofilter or water outside a species’ range. FishTankr
-              reports those failure modes directly and shows the reason and fix.
+              Volume arithmetic cannot see aggression, social group needs, an uncycled biofilter or
+              water outside a species’ range. FishTankr reports those failure modes directly and
+              shows the reason and fix.
             </p>
             <Link
               to="/methodology"
@@ -439,20 +408,18 @@ function Builder() {
                 Two male bettas · 40 L
               </p>
               <p className="mt-2 text-sm text-muted-foreground">
-                The litres and body-size arithmetic can look acceptable while
-                ignoring territorial conflict.
+                The litres and body-size arithmetic can look acceptable while ignoring territorial
+                conflict.
               </p>
             </article>
             <article className="rounded-2xl border-l-4 border-l-coral bg-coral/10 p-4">
               <p className="text-xs font-bold uppercase tracking-wide text-coral">
                 FishTankr verdict
               </p>
-              <p className="mt-2 font-display text-lg font-bold text-foreground">
-                Do not stock
-              </p>
+              <p className="mt-2 font-display text-lg font-bold text-foreground">Do not stock</p>
               <p className="mt-2 text-sm text-muted-foreground">
-                Same-species territorial aggression is a critical conflict. The
-                plan is capped until the conflict is removed.
+                Same-species territorial aggression is a critical conflict. The plan is capped until
+                the conflict is removed.
               </p>
             </article>
           </div>
@@ -468,8 +435,7 @@ function Builder() {
             Design your tank
           </h2>
           <p className="text-sm text-muted-foreground">
-            Add livestock, plants and hardscape. Your scorecard updates as you
-            go.
+            Add livestock, plants and hardscape. Your scorecard updates as you go.
           </p>
         </div>
         <div className="grid grid-cols-3 gap-2 sm:flex sm:flex-wrap">
@@ -479,11 +445,7 @@ function Builder() {
             title={state.species.length === 0 ? "Add fish to save" : undefined}
             className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-xl border bg-card px-3 py-2 text-sm font-semibold text-foreground transition-colors hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {saving ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <Save className="h-4 w-4" />
-            )}
+            {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
             Save
           </button>
           <button
@@ -500,15 +462,12 @@ function Builder() {
               void shareScoreCard(scorecard, state)
                 .then((result) =>
                   toast.success(
-                    result === "shared"
-                      ? "Score card shared"
-                      : "Score card downloaded",
+                    result === "shared" ? "Score card shared" : "Score card downloaded",
                   ),
                 )
                 .catch((error) =>
                   toast.error("Couldn't create score card", {
-                    description:
-                      error instanceof Error ? error.message : "Try again.",
+                    description: error instanceof Error ? error.message : "Try again.",
                   }),
                 )
             }
@@ -552,30 +511,20 @@ function Builder() {
                 <header className="flex flex-col items-stretch gap-2 px-2 pb-3 pt-1 text-white sm:flex-row sm:items-center sm:justify-between sm:gap-3 sm:px-3">
                   <div>
                     <p className="science-label text-blue">Live aquarium</p>
-                    <p className="mt-1 font-display text-sm font-semibold">
-                      {state.name}
-                    </p>
+                    <p className="mt-1 font-display text-sm font-semibold">{state.name}</p>
                   </div>
                   <div className="grid grid-cols-3 gap-1.5 text-[10px] sm:flex sm:flex-wrap font-semibold uppercase tracking-wide text-white/65">
                     <span className="inline-flex min-w-0 items-center justify-center gap-1 rounded-full bg-white/10 px-2 py-1.5 text-center">
-                      <Ruler className="h-3 w-3 text-blue" /> {state.length_cm}{" "}
-                      × {state.width_cm} × {state.height_cm} cm
+                      <Ruler className="h-3 w-3 text-blue" /> {state.length_cm} × {state.width_cm} ×{" "}
+                      {state.height_cm} cm
                     </span>
                     <span className="inline-flex items-center gap-1 rounded-full bg-white/10 px-2.5 py-1.5">
                       <Waves className="h-3 w-3 text-blue" />{" "}
-                      {Math.round(
-                        (state.length_cm * state.width_cm * state.height_cm) /
-                          1000,
-                      )}{" "}
-                      L
+                      {Math.round((state.length_cm * state.width_cm * state.height_cm) / 1000)} L
                     </span>
                     <span className="inline-flex items-center gap-1 rounded-full bg-white/10 px-2.5 py-1.5">
                       <Fish className="h-3 w-3 text-lime" />{" "}
-                      {state.species.reduce(
-                        (total, row) => total + row.quantity,
-                        0,
-                      )}{" "}
-                      fish
+                      {state.species.reduce((total, row) => total + row.quantity, 0)} fish
                     </span>
                   </div>
                 </header>
@@ -598,9 +547,8 @@ function Builder() {
                         Your tank is ready for a plan
                       </p>
                       <p className="mt-1 text-xs leading-relaxed text-white/75">
-                        Add the first species under Livestock. Water defaults
-                        will adapt to that fish, and the welfare verdict will
-                        explain every concern.
+                        Add the first species under Livestock. Water defaults will adapt to that
+                        fish, and the welfare verdict will explain every concern.
                       </p>
                     </div>
                   )}
@@ -632,8 +580,8 @@ function Builder() {
                     <span className="font-semibold text-foreground">
                       Tap any fish, plant or décor to edit it.
                     </span>{" "}
-                    Drag to reposition, then rotate, resize, duplicate or remove
-                    from the panel that appears. Undo with ⌘Z.
+                    Drag to reposition, then rotate, resize, duplicate or remove from the panel that
+                    appears. Undo with ⌘Z.
                   </p>
                 </div>
               )}

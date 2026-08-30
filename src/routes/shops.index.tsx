@@ -37,8 +37,7 @@ export const Route = createFileRoute("/shops/")({
       { property: "og:title", content: "Aquarium shops directory | FishTankr" },
       {
         property: "og:description",
-        content:
-          "Freshwater and marine aquarium shops, with specialties and location details.",
+        content: "Freshwater and marine aquarium shops, with specialties and location details.",
       },
       { property: "og:url", content: absoluteUrl("/shops") },
     ],
@@ -54,10 +53,7 @@ function ShopsIndex() {
   const { data, isLoading } = useQuery({
     queryKey: ["shops"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("aquarium_shops")
-        .select("*")
-        .order("name");
+      const { data, error } = await supabase.from("aquarium_shops").select("*").order("name");
       if (error) throw error;
       return data as Shop[];
     },
@@ -68,31 +64,22 @@ function ShopsIndex() {
     return data
       .filter((s) => {
         const locationKey = `${s.country_code}:${s.state ?? "All"}`;
-        if (locationFilter !== "All" && locationKey !== locationFilter)
-          return false;
+        if (locationFilter !== "All" && locationKey !== locationFilter) return false;
         if (search) {
           const q = search.toLowerCase();
-          const hay =
-            `${s.name} ${s.suburb ?? ""} ${s.specialties.join(" ")}`.toLowerCase();
+          const hay = `${s.name} ${s.suburb ?? ""} ${s.specialties.join(" ")}`.toLowerCase();
           if (!hay.includes(q)) return false;
         }
         return true;
       })
-      .sort(
-        (a, b) =>
-          Number(b.featured) - Number(a.featured) ||
-          a.name.localeCompare(b.name),
-      );
+      .sort((a, b) => Number(b.featured) - Number(a.featured) || a.name.localeCompare(b.name));
   }, [data, locationFilter, search]);
 
   const locations = useMemo(() => {
     const values = new Map<string, string>();
     for (const shop of data ?? []) {
       const key = `${shop.country_code}:${shop.state ?? "All"}`;
-      values.set(
-        key,
-        shop.state ? `${shop.state}, ${shop.country_code}` : shop.country_code,
-      );
+      values.set(key, shop.state ? `${shop.state}, ${shop.country_code}` : shop.country_code);
     }
     return [
       ["All", "All regions"] as const,
@@ -102,13 +89,10 @@ function ShopsIndex() {
 
   return (
     <main className="mx-auto max-w-5xl px-3 py-6 sm:px-4 sm:py-10">
-      <h1 className="font-display text-4xl font-bold text-foreground">
-        Aquarium shop directory
-      </h1>
+      <h1 className="font-display text-4xl font-bold text-foreground">Aquarium shop directory</h1>
       <p className="mt-2 max-w-2xl text-muted-foreground">
-        Find specialist aquarium retailers. Australian coverage is the current
-        starting dataset; the directory structure now supports shops
-        internationally.
+        Find specialist aquarium retailers. Australian coverage is the current starting dataset; the
+        directory structure now supports shops internationally.
       </p>
 
       <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
@@ -140,15 +124,10 @@ function ShopsIndex() {
       <div className="mt-8 grid gap-4">
         {isLoading && <p className="text-sm text-muted-foreground">Loading…</p>}
         {!isLoading && filtered.length === 0 && (
-          <p className="text-sm text-muted-foreground">
-            No shops match those filters.
-          </p>
+          <p className="text-sm text-muted-foreground">No shops match those filters.</p>
         )}
         {filtered.map((shop) => (
-          <div
-            key={shop.id}
-            className="rounded-[1.25rem] border bg-card p-4 sm:rounded-2xl sm:p-5"
-          >
+          <div key={shop.id} className="rounded-[1.25rem] border bg-card p-4 sm:rounded-2xl sm:p-5">
             <div className="flex flex-wrap items-baseline justify-between gap-2">
               <div className="flex flex-wrap items-center gap-2">
                 <Link
@@ -172,16 +151,11 @@ function ShopsIndex() {
               )}
             </div>
             {shop.description && (
-              <p className="mt-2 text-sm text-muted-foreground">
-                {shop.description}
-              </p>
+              <p className="mt-2 text-sm text-muted-foreground">{shop.description}</p>
             )}
             <div className="mt-3 flex flex-wrap items-center gap-3 text-xs">
               {shop.specialties.map((sp) => (
-                <span
-                  key={sp}
-                  className="rounded-full bg-muted px-2 py-0.5 text-muted-foreground"
-                >
+                <span key={sp} className="rounded-full bg-muted px-2 py-0.5 text-muted-foreground">
                   {sp}
                 </span>
               ))}
@@ -197,17 +171,13 @@ function ShopsIndex() {
                   onClick={() =>
                     recordShopOutbound(
                       shop.id,
-                      shop.is_affiliate || shop.affiliate_url
-                        ? "affiliate"
-                        : "website",
+                      shop.is_affiliate || shop.affiliate_url ? "affiliate" : "website",
                     )
                   }
                   className="inline-flex items-center gap-1 text-primary hover:underline"
                 >
                   Website
-                  {shop.is_affiliate || shop.affiliate_url
-                    ? " · affiliate"
-                    : ""}{" "}
+                  {shop.is_affiliate || shop.affiliate_url ? " · affiliate" : ""}{" "}
                   <ExternalLink className="h-3 w-3" />
                 </a>
               )}
@@ -229,12 +199,9 @@ function ShopsIndex() {
 
       <div className="mt-10 rounded-2xl border bg-muted/40 p-4 text-xs leading-relaxed text-muted-foreground">
         <p>
-          Featured means paid placement, not a welfare endorsement. Affiliate
-          links may earn FishTankr a commission.{" "}
-          <Link
-            to="/affiliate-disclosure"
-            className="font-semibold text-primary underline"
-          >
+          Featured means paid placement, not a welfare endorsement. Affiliate links may earn
+          FishTankr a commission.{" "}
+          <Link to="/affiliate-disclosure" className="font-semibold text-primary underline">
             Read the disclosure.
           </Link>
         </p>
@@ -247,8 +214,8 @@ function ShopsIndex() {
       </div>
       <div className="mt-4 flex flex-col gap-3 rounded-2xl border bg-primary/5 p-4 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-sm text-muted-foreground">
-          <strong className="text-foreground">Before you shop:</strong> score
-          the complete tank, cycle evidence and water settings.
+          <strong className="text-foreground">Before you shop:</strong> score the complete tank,
+          cycle evidence and water settings.
         </p>
         <Link
           to="/"

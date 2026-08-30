@@ -1,10 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  isWaterTestCurrent,
-  scoreTank,
-  WATER_TEST_MAX_AGE_DAYS,
-  WEIGHTS,
-} from "./index";
+import { isWaterTestCurrent, scoreTank, WATER_TEST_MAX_AGE_DAYS, WEIGHTS } from "./index";
 import type { BiotopeRegion, Filter, Species, TankState } from "../types";
 
 function species(
@@ -106,26 +101,16 @@ describe("scoreTank", () => {
   });
 
   it("keeps a healthy compatible setup in the looking-good range", () => {
-    const score = scoreTank(
-      tank({ species: [{ species: tetra, quantity: 8 }], target_ph: 6.8 }),
-    );
+    const score = scoreTank(tank({ species: [{ species: tetra, quantity: 8 }], target_ph: 6.8 }));
     expect(score.overall).not.toBeNull();
     expect(score.overall!).toBeGreaterThanOrEqual(75);
     expect(score.capReason).toBeNull();
   });
 
   it("flags a schooling shortfall with a structured, actionable issue", () => {
-    const score = scoreTank(
-      tank({ species: [{ species: tetra, quantity: 2 }] }),
-    );
-    expect(
-      score.compatibility.issues.some(
-        (issue) => issue.code === "shoal-shortfall",
-      ),
-    ).toBe(true);
-    expect(
-      score.compatibility.fixes.some((fix) => /add 4 more/i.test(fix)),
-    ).toBe(true);
+    const score = scoreTank(tank({ species: [{ species: tetra, quantity: 2 }] }));
+    expect(score.compatibility.issues.some((issue) => issue.code === "shoal-shortfall")).toBe(true);
+    expect(score.compatibility.fixes.some((fix) => /add 4 more/i.test(fix))).toBe(true);
   });
 
   it("treats unsafe same-species aggression as critical", () => {
@@ -134,13 +119,9 @@ describe("scoreTank", () => {
       common_name: "Territorial fish",
       temperament: "aggressive",
     });
-    const score = scoreTank(
-      tank({ species: [{ species: fighter, quantity: 2 }] }),
-    );
+    const score = scoreTank(tank({ species: [{ species: fighter, quantity: 2 }] }));
     expect(
-      score.compatibility.issues.some(
-        (issue) => issue.code === "conspecific-aggression",
-      ),
+      score.compatibility.issues.some((issue) => issue.code === "conspecific-aggression"),
     ).toBe(true);
     expect(score.priorityAction?.category).toBe("compatibility");
     expect(score.overall!).toBeLessThanOrEqual(40);
@@ -164,9 +145,7 @@ describe("scoreTank", () => {
         ],
       }),
     );
-    expect(
-      score.compatibility.issues.some((issue) => issue.code === "predation"),
-    ).toBe(true);
+    expect(score.compatibility.issues.some((issue) => issue.code === "predation")).toBe(true);
     expect(score.overall!).toBeLessThanOrEqual(40);
     expect(score.capReason).not.toBeNull();
   });
@@ -194,9 +173,7 @@ describe("scoreTank", () => {
 
   it("never rewards adding fish below the bioload plateau", () => {
     const one = scoreTank(tank({ species: [{ species: tetra, quantity: 6 }] }));
-    const more = scoreTank(
-      tank({ species: [{ species: tetra, quantity: 12 }] }),
-    );
+    const more = scoreTank(tank({ species: [{ species: tetra, quantity: 12 }] }));
     expect(more.bioload.score).toBeLessThanOrEqual(one.bioload.score);
   });
 
@@ -222,12 +199,8 @@ describe("scoreTank", () => {
   it("does not mistake higher pump turnover for higher biological capacity", () => {
     const fastFilter: Filter = { ...filter, id: "fast", turnover_lph: 5000 };
     const slowFilter: Filter = { ...filter, id: "slow", turnover_lph: 200 };
-    const a = scoreTank(
-      tank({ filter: slowFilter, species: [{ species: tetra, quantity: 12 }] }),
-    );
-    const b = scoreTank(
-      tank({ filter: fastFilter, species: [{ species: tetra, quantity: 12 }] }),
-    );
+    const a = scoreTank(tank({ filter: slowFilter, species: [{ species: tetra, quantity: 12 }] }));
+    const b = scoreTank(tank({ filter: fastFilter, species: [{ species: tetra, quantity: 12 }] }));
     expect(b.bioload.loadPercent).toBe(a.bioload.loadPercent);
   });
 
@@ -254,9 +227,7 @@ describe("scoreTank", () => {
       }),
     );
     expect(score.readiness.status).toBe("unverified");
-    expect(
-      score.readiness.issues.some((issue) => issue.code === "water-test-stale"),
-    ).toBe(true);
+    expect(score.readiness.issues.some((issue) => issue.code === "water-test-stale")).toBe(true);
     expect(score.overall!).toBeLessThanOrEqual(60);
   });
 
@@ -272,9 +243,7 @@ describe("scoreTank", () => {
       tank({ ammonia_mg_l: 0.25, species: [{ species: tetra, quantity: 8 }] }),
     );
     expect(score.readiness.status).toBe("unsafe");
-    expect(
-      score.readiness.issues.some((issue) => issue.code === "ammonia-detected"),
-    ).toBe(true);
+    expect(score.readiness.issues.some((issue) => issue.code === "ammonia-detected")).toBe(true);
     expect(score.overall!).toBeLessThanOrEqual(25);
     expect(score.capReason).toMatch(/ammonia or nitrite/i);
   });
@@ -287,19 +256,13 @@ describe("scoreTank", () => {
       legal_in_australia: false,
       legal_status: "prohibited",
     });
-    const a = scoreTank(
-      tank({ species: [{ species: permitted, quantity: 1 }] }),
-    );
-    const b = scoreTank(
-      tank({ species: [{ species: regionRestricted, quantity: 1 }] }),
-    );
+    const a = scoreTank(tank({ species: [{ species: permitted, quantity: 1 }] }));
+    const b = scoreTank(tank({ species: [{ species: regionRestricted, quantity: 1 }] }));
     expect(b.overall).toBe(a.overall);
   });
 
   it("uses only welfare categories in the overall score", () => {
-    const score = scoreTank(
-      tank({ species: [{ species: tetra, quantity: 6 }] }),
-    );
+    const score = scoreTank(tank({ species: [{ species: tetra, quantity: 6 }] }));
     const expected = Math.round(
       score.compatibility.score * WEIGHTS.compatibility +
         score.space.score * WEIGHTS.space +

@@ -27,18 +27,12 @@ export function adaptWaterToFirstSpecies(
   species: Species,
 ): Pick<TankState, "target_ph" | "target_temp_c"> {
   const starterUntouched =
-    state.species.length === 0 &&
-    state.target_ph === 7 &&
-    state.target_temp_c === 25;
+    state.species.length === 0 && state.target_ph === 7 && state.target_temp_c === 25;
   if (!starterUntouched) {
     return { target_ph: state.target_ph, target_temp_c: state.target_temp_c };
   }
   return {
-    target_ph:
-      Math.round(((species.native_ph_min + species.native_ph_max) / 2) * 10) /
-      10,
-    target_temp_c: Math.round(
-      (species.native_temp_min_c + species.native_temp_max_c) / 2,
-    ),
+    target_ph: Math.round(((species.native_ph_min + species.native_ph_max) / 2) * 10) / 10,
+    target_temp_c: Math.round((species.native_temp_min_c + species.native_temp_max_c) / 2),
   };
 }

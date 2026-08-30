@@ -28,12 +28,7 @@ const RESULT: Record<ResultKind, { word: string; sub: string; var: string }> = {
   },
 };
 
-const SEVERITY_ORDER: Issue["severity"][] = [
-  "critical",
-  "high",
-  "medium",
-  "low",
-];
+const SEVERITY_ORDER: Issue["severity"][] = ["critical", "high", "medium", "low"];
 
 const SEVERITY_LABEL: Record<Issue["severity"], string> = {
   critical: "Critical",
@@ -95,16 +90,7 @@ interface RowProps {
   reasons: string[];
 }
 
-function ScoreRow({
-  title,
-  score,
-  statusLabel,
-  weightPct,
-  note,
-  tag,
-  issues,
-  reasons,
-}: RowProps) {
+function ScoreRow({ title, score, statusLabel, weightPct, note, tag, issues, reasons }: RowProps) {
   const list = issues ?? [];
   return (
     <div className="border-t border-rule py-4 first:border-t-0">
@@ -135,15 +121,8 @@ function ScoreRow({
       </div>
 
       {typeof score === "number" && (
-        <div
-          className="mt-2 h-[3px] w-full"
-          style={{ background: "var(--rule)" }}
-          aria-hidden
-        >
-          <div
-            className="h-full"
-            style={{ width: `${score}%`, background: barColour(score) }}
-          />
+        <div className="mt-2 h-[3px] w-full" style={{ background: "var(--rule)" }} aria-hidden>
+          <div className="h-full" style={{ width: `${score}%`, background: barColour(score) }} />
         </div>
       )}
 
@@ -152,9 +131,7 @@ function ScoreRow({
       {list.length > 0 ? (
         <IssueList issues={list} />
       ) : (
-        reasons.length > 0 && (
-          <p className="mt-2 text-sm text-muted-foreground">{reasons[0]}</p>
-        )
+        reasons.length > 0 && <p className="mt-2 text-sm text-muted-foreground">{reasons[0]}</p>
       )}
     </div>
   );
@@ -172,20 +149,14 @@ export function ScorecardPanel({ scorecard }: { scorecard: Scorecard }) {
         <p className="science-label text-water">Live referee</p>
         {s.overall === null ? (
           <>
-            <p className="data-mono mt-3 text-5xl leading-none text-muted-foreground">
-              —
-            </p>
+            <p className="data-mono mt-3 text-5xl leading-none text-muted-foreground">—</p>
             <p className="mt-3 text-sm text-muted-foreground">
-              Add livestock and the referee will tell you how these fish will
-              live.
+              Add livestock and the referee will tell you how these fish will live.
             </p>
           </>
         ) : (
           <>
-            <p
-              className="mt-3 text-xl font-semibold tracking-tight"
-              style={{ color: meta!.var }}
-            >
+            <p className="mt-3 text-xl font-semibold tracking-tight" style={{ color: meta!.var }}>
               {meta!.word}
             </p>
             <p className="mt-1 text-sm text-muted-foreground">{meta!.sub}</p>
@@ -193,15 +164,10 @@ export function ScorecardPanel({ scorecard }: { scorecard: Scorecard }) {
               className="mt-4 flex items-end gap-2"
               aria-label={`Welfare score ${s.overall} out of 100`}
             >
-              <span
-                className="data-mono text-3xl leading-none"
-                style={{ color: meta!.var }}
-              >
+              <span className="data-mono text-3xl leading-none" style={{ color: meta!.var }}>
                 {s.overall}
               </span>
-              <span className="data-mono text-xs text-muted-foreground">
-                /100
-              </span>
+              <span className="data-mono text-xs text-muted-foreground">/100</span>
             </div>
             {s.capReason && (
               <p
@@ -234,9 +200,7 @@ export function ScorecardPanel({ scorecard }: { scorecard: Scorecard }) {
           <p className="mt-3 text-base font-semibold tracking-tight text-foreground">
             {s.priorityAction.title}
           </p>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {s.priorityAction.action}
-          </p>
+          <p className="mt-1 text-sm text-muted-foreground">{s.priorityAction.action}</p>
         </div>
       )}
 
@@ -282,9 +246,7 @@ export function ScorecardPanel({ scorecard }: { scorecard: Scorecard }) {
 
       {/* Style goal, below the rule */}
       <div className="fishtankr-panel p-5">
-        <p className="science-label text-muted-foreground">
-          Style goal · not part of the score
-        </p>
+        <p className="science-label text-muted-foreground">Style goal · not part of the score</p>
         <div className="mt-3 flex items-baseline justify-between gap-3">
           <p className="text-sm font-semibold text-foreground">
             Biotope replication
@@ -299,11 +261,7 @@ export function ScorecardPanel({ scorecard }: { scorecard: Scorecard }) {
             <span className="text-muted-foreground">/100</span>
           </span>
         </div>
-        <div
-          className="mt-2 h-[3px] w-full"
-          style={{ background: "var(--rule)" }}
-          aria-hidden
-        >
+        <div className="mt-2 h-[3px] w-full" style={{ background: "var(--rule)" }} aria-hidden>
           <div
             className="h-full"
             style={{ width: `${s.biome.score}%`, background: "var(--water)" }}
@@ -313,27 +271,18 @@ export function ScorecardPanel({ scorecard }: { scorecard: Scorecard }) {
           <span className="ink-stamp mt-3 inline-block">True biotope</span>
         )}
         {s.biome.reasons.length > 0 && (
-          <p className="mt-2 text-sm text-muted-foreground">
-            {s.biome.reasons[0]}
-          </p>
+          <p className="mt-2 text-sm text-muted-foreground">{s.biome.reasons[0]}</p>
         )}
       </div>
 
       {s.overall !== null && (
         <p className="text-sm text-muted-foreground">
-          The score covers compatibility, swimming space and water suitability.
-          Cycle readiness can cap it. The waste-load screen is beta and
-          informational only.{" "}
-          <Link
-            to="/methodology"
-            className="font-semibold text-water underline"
-          >
+          The score covers compatibility, swimming space and water suitability. Cycle readiness can
+          cap it. The waste-load screen is beta and informational only.{" "}
+          <Link to="/methodology" className="font-semibold text-water underline">
             Read the methodology.
           </Link>{" "}
-          <Link
-            to="/welfare-disclaimer"
-            className="font-semibold text-water underline"
-          >
+          <Link to="/welfare-disclaimer" className="font-semibold text-water underline">
             Understand the limits.
           </Link>
         </p>

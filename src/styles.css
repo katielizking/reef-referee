@@ -173,11 +173,7 @@
     content: "";
     opacity: 0.5;
     border-right: 1px solid var(--rule);
-    background-image: linear-gradient(
-      to bottom,
-      var(--rule) 1px,
-      transparent 1px
-    );
+    background-image: linear-gradient(to bottom, var(--rule) 1px, transparent 1px);
     background-size: 100% 10px;
   }
   @media (max-width: 1023px) {

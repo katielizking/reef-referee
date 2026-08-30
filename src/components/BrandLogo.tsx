@@ -8,20 +8,10 @@ interface BrandLogoProps {
  * FishTankr wordmark + mark. The mark is a rounded tank silhouette with a
  * waterline and a bubble — works as favicon, nav icon, or full wordmark.
  */
-export function BrandLogo({
-  size = 32,
-  showWordmark = true,
-  className,
-}: BrandLogoProps) {
+export function BrandLogo({ size = 32, showWordmark = true, className }: BrandLogoProps) {
   return (
     <span className={`inline-flex items-center gap-2 ${className ?? ""}`}>
-      <svg
-        width={size}
-        height={size}
-        viewBox="0 0 32 32"
-        aria-hidden="true"
-        className="shrink-0"
-      >
+      <svg width={size} height={size} viewBox="0 0 32 32" aria-hidden="true" className="shrink-0">
         <rect x="3" y="3" width="26" height="26" rx="7" fill="var(--blue)" />
         {/* waterline */}
         <path
@@ -67,15 +57,7 @@ export function HeroTankIllustration({ className }: { className?: string }) {
         strokeWidth="3"
       />
       {/* Water fill */}
-      <rect
-        x="20"
-        y="70"
-        width="360"
-        height="180"
-        rx="22"
-        fill="var(--blue)"
-        opacity="0.10"
-      />
+      <rect x="20" y="70" width="360" height="180" rx="22" fill="var(--blue)" opacity="0.10" />
       {/* Waterline */}
       <path
         d="M20 74 Q60 68 100 74 T180 74 T260 74 T340 74 T380 74"
@@ -87,15 +69,7 @@ export function HeroTankIllustration({ className }: { className?: string }) {
       {/* Measurement ticks on left */}
       {[100, 140, 180, 220].map((y) => (
         <g key={y}>
-          <line
-            x1="20"
-            y1={y}
-            x2="30"
-            y2={y}
-            stroke="var(--ink)"
-            strokeWidth="1"
-            opacity="0.35"
-          />
+          <line x1="20" y1={y} x2="30" y2={y} stroke="var(--ink)" strokeWidth="1" opacity="0.35" />
         </g>
       ))}
       {/* Substrate */}

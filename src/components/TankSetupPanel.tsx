@@ -1,14 +1,5 @@
 import { useMemo, useRef, useState } from "react";
-import {
-  AlertTriangle,
-  Search,
-  Plus,
-  Minus,
-  X,
-  Info,
-  Fish,
-  Sprout,
-} from "lucide-react";
+import { AlertTriangle, Search, Plus, Minus, X, Info, Fish, Sprout } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import type {
   BiologicalMediaLevel,
@@ -72,11 +63,8 @@ export function TankSetupPanel({
 }: Props) {
   const litres = Math.round(litresOf(state));
   const dimInvalid =
-    state.length_cm < MIN_DIM ||
-    state.width_cm < MIN_DIM ||
-    state.height_cm < MIN_DIM;
-  const filterUndersized =
-    state.filter && litres > 0 && state.filter.rated_litres < litres;
+    state.length_cm < MIN_DIM || state.width_cm < MIN_DIM || state.height_cm < MIN_DIM;
+  const filterUndersized = state.filter && litres > 0 && state.filter.rated_litres < litres;
 
   const fishCount = state.species.reduce((n, x) => n + x.quantity, 0);
   const scapeCount = state.plants.length + state.hardscape.length;
@@ -110,9 +98,7 @@ export function TankSetupPanel({
             <input
               className="min-h-11 w-full rounded-xl border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
               value={state.name}
-              onChange={(e) =>
-                setState((s) => ({ ...s, name: e.target.value }))
-              }
+              onChange={(e) => setState((s) => ({ ...s, name: e.target.value }))}
               placeholder="Living room 60"
             />
           </label>
@@ -154,9 +140,7 @@ export function TankSetupPanel({
               max={9}
               step={0.1}
               value={state.target_ph}
-              onChange={(e) =>
-                setState((s) => ({ ...s, target_ph: Number(e.target.value) }))
-              }
+              onChange={(e) => setState((s) => ({ ...s, target_ph: Number(e.target.value) }))}
               className="w-full accent-[var(--color-teal)]"
               aria-label="Target pH"
             />
@@ -210,8 +194,7 @@ export function TankSetupPanel({
               setState((s) => ({
                 ...s,
                 filter: f,
-                biological_media_level:
-                  f?.biological_media_level ?? s.biological_media_level,
+                biological_media_level: f?.biological_media_level ?? s.biological_media_level,
               }));
             }}
             aria-label="Filter"
@@ -219,32 +202,27 @@ export function TankSetupPanel({
             <option value="">Choose a filter…</option>
             {filters.map((f) => (
               <option key={f.id} value={f.id}>
-                {f.name} — {FILTER_TYPE_LABEL[f.filter_type]}, rated{" "}
-                {f.rated_litres} L
+                {f.name} — {FILTER_TYPE_LABEL[f.filter_type]}, rated {f.rated_litres} L
               </option>
             ))}
           </select>
           {filterUndersized && (
             <p className="flex items-start gap-1.5 rounded-lg bg-warn/15 px-2.5 py-1.5 text-xs font-medium text-foreground">
-              <AlertTriangle
-                className="mt-0.5 h-3.5 w-3.5 shrink-0 text-warn"
-                aria-hidden
-              />
+              <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-warn" aria-hidden />
               <span>
-                This filter is rated for {state.filter!.rated_litres} L but your
-                tank is {litres} L. Consider a larger filter.
+                This filter is rated for {state.filter!.rated_litres} L but your tank is {litres} L.
+                Consider a larger filter.
               </span>
             </p>
           )}
           {state.filter && (
             <div className="rounded-xl border border-primary/20 bg-primary/5 px-3 py-2 text-xs text-foreground/80">
               <p className="font-semibold text-foreground">
-                {FILTER_TYPE_LABEL[state.filter.filter_type]} ·{" "}
-                {state.filter.turnover_lph} L/h flow
+                {FILTER_TYPE_LABEL[state.filter.filter_type]} · {state.filter.turnover_lph} L/h flow
               </p>
               <p className="mt-1 text-muted-foreground">
-                Flow moves water; it does not prove biological capacity. Record
-                the media and maturity actually in this filter.
+                Flow moves water; it does not prove biological capacity. Record the media and
+                maturity actually in this filter.
               </p>
             </div>
           )}
@@ -256,9 +234,7 @@ export function TankSetupPanel({
               { value: "standard", label: "Standard" },
               { value: "substantial", label: "Substantial" },
             ]}
-            onChange={(v) =>
-              setState((s) => ({ ...s, biological_media_level: v }))
-            }
+            onChange={(v) => setState((s) => ({ ...s, biological_media_level: v }))}
           />
           <Segmented<FilterMaturity>
             label="Filter-media maturity"
@@ -273,9 +249,7 @@ export function TankSetupPanel({
           />
           <label className="flex min-h-11 items-center justify-between gap-3 rounded-xl border bg-background px-3 py-2 text-sm">
             <span>
-              <span className="block font-medium text-foreground">
-                Seeded media used
-              </span>
+              <span className="block font-medium text-foreground">Seeded media used</span>
               <span className="block text-xs text-muted-foreground">
                 Media transferred from an established healthy filter
               </span>
@@ -283,9 +257,7 @@ export function TankSetupPanel({
             <input
               type="checkbox"
               checked={state.seeded_media}
-              onChange={(e) =>
-                setState((s) => ({ ...s, seeded_media: e.target.checked }))
-              }
+              onChange={(e) => setState((s) => ({ ...s, seeded_media: e.target.checked }))}
               className="h-5 w-5 accent-[var(--color-teal)]"
             />
           </label>
@@ -354,12 +326,9 @@ export function TankSetupPanel({
           </label>
           {((state.ammonia_mg_l ?? 0) > 0 || (state.nitrite_mg_l ?? 0) > 0) && (
             <p className="flex items-start gap-1.5 rounded-lg bg-coral/10 px-2.5 py-2 text-xs font-semibold text-foreground">
-              <AlertTriangle
-                className="mt-0.5 h-3.5 w-3.5 shrink-0 text-coral"
-                aria-hidden
-              />
-              Detectable ammonia or nitrite is a stop signal. Do not add fish
-              until the cause is resolved and both remain at 0 mg/L.
+              <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-coral" aria-hidden />
+              Detectable ammonia or nitrite is a stop signal. Do not add fish until the cause is
+              resolved and both remain at 0 mg/L.
             </p>
           )}
           <Segmented<MaintenanceFrequency>
@@ -370,9 +339,7 @@ export function TankSetupPanel({
               { value: "fortnightly", label: "Fortnightly" },
               { value: "monthly", label: "Monthly" },
             ]}
-            onChange={(v) =>
-              setState((s) => ({ ...s, maintenance_frequency: v }))
-            }
+            onChange={(v) => setState((s) => ({ ...s, maintenance_frequency: v }))}
           />
         </AccordionContent>
       </AccordionItem>
@@ -437,11 +404,7 @@ export function TankSetupPanel({
               <PlantAdder state={state} setState={setState} plants={plants} />
             </TabsContent>
             <TabsContent value="hardscape" className="mt-3">
-              <HardscapeAdder
-                state={state}
-                setState={setState}
-                hardscape={hardscape}
-              />
+              <HardscapeAdder state={state} setState={setState} hardscape={hardscape} />
             </TabsContent>
           </Tabs>
         </AccordionContent>
@@ -471,9 +434,7 @@ function StepHeader({
           {icon}
           {title}
         </p>
-        <p className="truncate text-xs font-normal text-muted-foreground">
-          {summary}
-        </p>
+        <p className="truncate text-xs font-normal text-muted-foreground">{summary}</p>
       </div>
     </div>
   );
@@ -551,11 +512,7 @@ function Segmented<T extends string>({
   return (
     <div>
       <p className="mb-1 text-xs text-muted-foreground">{label}</p>
-      <div
-        className="flex flex-wrap gap-1 rounded-xl bg-muted p-1"
-        role="group"
-        aria-label={label}
-      >
+      <div className="flex flex-wrap gap-1 rounded-xl bg-muted p-1" role="group" aria-label={label}>
         {options.map((o) => (
           <button
             key={o.value}
@@ -617,10 +574,7 @@ function SpeciesAdder({
       return {
         ...s,
         ...adaptedWater,
-        species: [
-          ...s.species,
-          { species: sp, quantity: sp.is_schooling ? sp.min_group_size : 1 },
-        ],
+        species: [...s.species, { species: sp, quantity: sp.is_schooling ? sp.min_group_size : 1 }],
       };
     });
     setQ("");
@@ -629,9 +583,7 @@ function SpeciesAdder({
 
   return (
     <section className="space-y-2">
-      <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-        Fish
-      </h3>
+      <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Fish</h3>
       <div className="relative" ref={containerRef}>
         <Search
           className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
@@ -651,9 +603,7 @@ function SpeciesAdder({
         {showResults && (
           <div className="absolute z-10 mt-1 max-h-72 w-full overflow-auto rounded-xl border bg-popover shadow-lg">
             {results.length === 0 && (
-              <div className="p-3 text-sm text-muted-foreground">
-                No species match.
-              </div>
+              <div className="p-3 text-sm text-muted-foreground">No species match.</div>
             )}
             {results.map((sp) => (
               <div
@@ -672,10 +622,7 @@ function SpeciesAdder({
                       {sp.scientific_name} · {BIOTOPE_LABEL[sp.biotope_region]}
                     </div>
                   </div>
-                  <Plus
-                    className="mt-0.5 h-4 w-4 shrink-0 text-primary"
-                    aria-hidden
-                  />
+                  <Plus className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden />
                 </button>
                 <Link
                   to="/species/$id"
@@ -707,9 +654,7 @@ function SpeciesAdder({
             >
               <div className="flex min-w-0 items-center gap-1.5">
                 <div className="min-w-0">
-                  <p className="truncate font-medium">
-                    {s.species.common_name}
-                  </p>
+                  <p className="truncate font-medium">{s.species.common_name}</p>
                   <p className="truncate text-xs text-muted-foreground">
                     {BIOTOPE_LABEL[s.species.biotope_region]}
                   </p>
@@ -732,20 +677,14 @@ function SpeciesAdder({
                   setState((st) => ({
                     ...st,
                     species: st.species
-                      .map((x) =>
-                        x.species.id === s.species.id
-                          ? { ...x, quantity: v }
-                          : x,
-                      )
+                      .map((x) => (x.species.id === s.species.id ? { ...x, quantity: v } : x))
                       .filter((x) => x.quantity > 0),
                   }))
                 }
                 onRemove={() =>
                   setState((st) => ({
                     ...st,
-                    species: st.species.filter(
-                      (x) => x.species.id !== s.species.id,
-                    ),
+                    species: st.species.filter((x) => x.species.id !== s.species.id),
                   }))
                 }
               />
@@ -776,9 +715,7 @@ function PlantAdder({
         quantity: p.quantity,
       }))}
       getLabel={(p) => p.common_name}
-      getSubtitle={(p) =>
-        `${BIOTOPE_LABEL[p.biotope_region]} · ${p.light_need} light`
-      }
+      getSubtitle={(p) => `${BIOTOPE_LABEL[p.biotope_region]} · ${p.light_need} light`}
       onAdd={(plant) =>
         setState((s) => {
           const ex = s.plants.find((x) => x.plant.id === plant.id);
@@ -786,9 +723,7 @@ function PlantAdder({
             return {
               ...s,
               plants: s.plants.map((x) =>
-                x.plant.id === plant.id
-                  ? { ...x, quantity: x.quantity + 1 }
-                  : x,
+                x.plant.id === plant.id ? { ...x, quantity: x.quantity + 1 } : x,
               ),
             };
           return { ...s, plants: [...s.plants, { plant, quantity: 1 }] };
@@ -831,9 +766,7 @@ function HardscapeAdder({
         quantity: h.quantity,
       }))}
       getLabel={(h) => h.name}
-      getSubtitle={(h) =>
-        `${h.type.replace("_", " ")} · ${BIOTOPE_LABEL[h.biotope_region]}`
-      }
+      getSubtitle={(h) => `${h.type.replace("_", " ")} · ${BIOTOPE_LABEL[h.biotope_region]}`}
       onAdd={(item) =>
         setState((s) => {
           const ex = s.hardscape.find((x) => x.hardscape.id === item.id);
@@ -841,9 +774,7 @@ function HardscapeAdder({
             return {
               ...s,
               hardscape: s.hardscape.map((x) =>
-                x.hardscape.id === item.id
-                  ? { ...x, quantity: x.quantity + 1 }
-                  : x,
+                x.hardscape.id === item.id ? { ...x, quantity: x.quantity + 1 } : x,
               ),
             };
           return {
@@ -890,9 +821,7 @@ function ItemAdder<T extends { id: string }>(props: ItemAdderProps<T>) {
   const results = useMemo(() => {
     const term = q.trim().toLowerCase();
     const list = term
-      ? props.items.filter((x) =>
-          props.getLabel(x).toLowerCase().includes(term),
-        )
+      ? props.items.filter((x) => props.getLabel(x).toLowerCase().includes(term))
       : props.items;
     return list.slice(0, 10);
   }, [q, props]);
@@ -933,12 +862,8 @@ function ItemAdder<T extends { id: string }>(props: ItemAdderProps<T>) {
                 }}
               >
                 <div>
-                  <div className="text-sm font-medium">
-                    {props.getLabel(it)}
-                  </div>
-                  <div className="text-xs text-muted-foreground">
-                    {props.getSubtitle(it)}
-                  </div>
+                  <div className="text-sm font-medium">{props.getLabel(it)}</div>
+                  <div className="text-xs text-muted-foreground">{props.getSubtitle(it)}</div>
                 </div>
                 <Plus className="h-4 w-4 shrink-0 text-primary" aria-hidden />
               </button>
@@ -960,9 +885,7 @@ function ItemAdder<T extends { id: string }>(props: ItemAdderProps<T>) {
             >
               <div className="min-w-0">
                 <p className="truncate font-medium">{props.getLabel(item)}</p>
-                <p className="truncate text-xs text-muted-foreground">
-                  {props.getSubtitle(item)}
-                </p>
+                <p className="truncate text-xs text-muted-foreground">{props.getSubtitle(item)}</p>
               </div>
               <QtyStepper
                 itemLabel={props.getLabel(item)}

@@ -38,10 +38,7 @@ export const Route = createFileRoute("/blog/$slug")({
   head: ({ loaderData, params }) => {
     if (!loaderData) {
       return {
-        meta: [
-          { title: "Post not found | FishTankr" },
-          { name: "robots", content: "noindex" },
-        ],
+        meta: [{ title: "Post not found | FishTankr" }, { name: "robots", content: "noindex" }],
       };
     }
     const p = loaderData.post;
@@ -113,9 +110,7 @@ function BlogPostPage() {
         />
       )}
       <header className="mb-8">
-        <h1 className="font-display text-4xl font-bold text-foreground">
-          {post.title}
-        </h1>
+        <h1 className="font-display text-4xl font-bold text-foreground">{post.title}</h1>
         <div className="mt-3 flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
           {post.author_name && <span>{post.author_name}</span>}
           {post.published_at && (
@@ -130,9 +125,7 @@ function BlogPostPage() {
         </div>
       </header>
       <article className="prose prose-slate max-w-none">
-        <ReactMarkdown remarkPlugins={[remarkGfm]}>
-          {post.body_markdown}
-        </ReactMarkdown>
+        <ReactMarkdown remarkPlugins={[remarkGfm]}>{post.body_markdown}</ReactMarkdown>
       </article>
     </main>
   );

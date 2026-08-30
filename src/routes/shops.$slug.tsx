@@ -44,18 +44,14 @@ export const Route = createFileRoute("/shops/$slug")({
   head: ({ loaderData, params }) => {
     if (!loaderData) {
       return {
-        meta: [
-          { title: "Shop not found | FishTankr" },
-          { name: "robots", content: "noindex" },
-        ],
+        meta: [{ title: "Shop not found | FishTankr" }, { name: "robots", content: "noindex" }],
       };
     }
     const s = loaderData.shop;
     const loc = [s.suburb, s.state].filter(Boolean).join(", ");
     const title = `${s.name}${loc ? ` — ${loc}` : ""} | FishTankr`;
     const desc =
-      s.description ??
-      (loc ? `Aquarium shop in ${loc}.` : "Aquarium shop listed in FishTankr.");
+      s.description ?? (loc ? `Aquarium shop in ${loc}.` : "Aquarium shop listed in FishTankr.");
     const url = absoluteUrl(`/shops/${params.slug}`);
     return {
       meta: [
@@ -112,9 +108,7 @@ export const Route = createFileRoute("/shops/$slug")({
 
 function ShopPage() {
   const { shop } = Route.useLoaderData();
-  const loc = [shop.suburb, shop.state, shop.postcode]
-    .filter(Boolean)
-    .join(" ");
+  const loc = [shop.suburb, shop.state, shop.postcode].filter(Boolean).join(" ");
 
   return (
     <main className="mx-auto max-w-3xl px-4 py-10">
@@ -124,9 +118,7 @@ function ShopPage() {
       >
         ← All shops
       </Link>
-      <h1 className="font-display text-4xl font-bold text-foreground">
-        {shop.name}
-      </h1>
+      <h1 className="font-display text-4xl font-bold text-foreground">{shop.name}</h1>
       {shop.featured && (
         <p className="mt-3 inline-flex rounded-full bg-lime/30 px-3 py-1 text-xs font-bold uppercase tracking-wide text-foreground">
           Featured · paid placement
@@ -134,9 +126,7 @@ function ShopPage() {
       )}
       {loc && <p className="mt-1 text-muted-foreground">{loc}</p>}
 
-      {shop.description && (
-        <p className="mt-6 text-base text-foreground">{shop.description}</p>
-      )}
+      {shop.description && <p className="mt-6 text-base text-foreground">{shop.description}</p>}
 
       {shop.specialties.length > 0 && (
         <div className="mt-6">
@@ -169,9 +159,7 @@ function ShopPage() {
             onClick={() =>
               recordShopOutbound(
                 shop.id,
-                shop.is_affiliate || shop.affiliate_url
-                  ? "affiliate"
-                  : "website",
+                shop.is_affiliate || shop.affiliate_url ? "affiliate" : "website",
               )
             }
             className="inline-flex items-center gap-2 text-primary hover:underline"
@@ -182,10 +170,7 @@ function ShopPage() {
           </a>
         )}
         {shop.phone && (
-          <a
-            href={`tel:${shop.phone}`}
-            className="inline-flex items-center gap-2 text-foreground"
-          >
+          <a href={`tel:${shop.phone}`} className="inline-flex items-center gap-2 text-foreground">
             <Phone className="h-4 w-4" /> {shop.phone}
           </a>
         )}
@@ -219,10 +204,7 @@ function ShopPage() {
           Affiliate links may earn FishTankr a commission.
         </p>
         <div className="mt-3 flex flex-wrap gap-3">
-          <Link
-            to="/affiliate-disclosure"
-            className="font-semibold text-primary underline"
-          >
+          <Link to="/affiliate-disclosure" className="font-semibold text-primary underline">
             Commercial disclosure
           </Link>
           <Link

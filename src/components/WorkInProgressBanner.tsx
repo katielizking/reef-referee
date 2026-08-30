@@ -15,10 +15,7 @@ export function WorkInProgressBanner() {
   if (!visible) return null;
 
   return (
-    <aside
-      className="border-b border-ink/10 bg-lime/25 px-4 py-2"
-      aria-label="Support FishTankr"
-    >
+    <aside className="border-b border-ink/10 bg-lime/25 px-4 py-2" aria-label="Support FishTankr">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-3">
         <p className="text-xs leading-relaxed text-foreground sm:text-sm">
           <strong className="font-semibold">

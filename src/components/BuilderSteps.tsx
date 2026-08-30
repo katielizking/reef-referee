@@ -15,10 +15,7 @@ const MIN_DIM = 10;
 
 export function stepStatus(state: TankState): Record<StepId, boolean> {
   return {
-    tank:
-      state.length_cm >= MIN_DIM &&
-      state.width_cm >= MIN_DIM &&
-      state.height_cm >= MIN_DIM,
+    tank: state.length_cm >= MIN_DIM && state.width_cm >= MIN_DIM && state.height_cm >= MIN_DIM,
     filter:
       state.filter !== null &&
       state.biological_media_level !== "minimal" &&
@@ -62,9 +59,7 @@ export function BuilderSteps({ state, onJump }: Props) {
               style={{ width: `${progress}%` }}
             />
           </div>
-          <span className="font-display text-sm font-bold text-lime">
-            {progress}%
-          </span>
+          <span className="font-display text-sm font-bold text-lime">{progress}%</span>
         </div>
       </div>
       <ol className="flex snap-x snap-mandatory overflow-x-auto overscroll-x-contain p-2 [scrollbar-width:none] sm:grid sm:grid-cols-4 sm:overflow-visible">
@@ -72,10 +67,7 @@ export function BuilderSteps({ state, onJump }: Props) {
           const done = status[step.id];
           const current = index === currentIdx;
           return (
-            <li
-              key={step.id}
-              className="min-w-[9.25rem] flex-1 snap-start sm:min-w-0"
-            >
+            <li key={step.id} className="min-w-[9.25rem] flex-1 snap-start sm:min-w-0">
               <button
                 type="button"
                 onClick={() => onJump(step.id)}

@@ -41,9 +41,7 @@ function BlogIndex() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("blog_posts")
-        .select(
-          "id, slug, title, excerpt, cover_image_url, author_name, tags, published_at",
-        )
+        .select("id, slug, title, excerpt, cover_image_url, author_name, tags, published_at")
         .eq("published", true)
         .order("published_at", { ascending: false });
       if (error) throw error;
@@ -55,8 +53,8 @@ function BlogIndex() {
     <main className="mx-auto max-w-4xl px-4 py-10">
       <div className="mb-6 flex flex-col gap-3 rounded-2xl border bg-primary/5 p-4 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-sm text-muted-foreground">
-          <strong className="text-foreground">Reading for a real setup?</strong>{" "}
-          Put the species and water choices into the welfare screen as you go.
+          <strong className="text-foreground">Reading for a real setup?</strong> Put the species and
+          water choices into the welfare screen as you go.
         </p>
         <Link
           to="/"
@@ -67,8 +65,8 @@ function BlogIndex() {
       </div>
       <h1 className="font-display text-4xl font-bold text-foreground">Blog</h1>
       <p className="mt-2 max-w-2xl text-muted-foreground">
-        Practical, evidence-led writing on freshwater aquariums — welfare,
-        stocking, filtration and habitat design for fishkeepers everywhere.
+        Practical, evidence-led writing on freshwater aquariums — welfare, stocking, filtration and
+        habitat design for fishkeepers everywhere.
       </p>
 
       <div className="mt-8 grid gap-4">
@@ -94,11 +92,7 @@ function BlogIndex() {
                 </time>
               )}
             </div>
-            {post.excerpt && (
-              <p className="mt-2 text-sm text-muted-foreground">
-                {post.excerpt}
-              </p>
-            )}
+            {post.excerpt && <p className="mt-2 text-sm text-muted-foreground">{post.excerpt}</p>}
             {post.tags?.length > 0 && (
               <div className="mt-3 flex flex-wrap gap-1.5">
                 {post.tags.map((t) => (

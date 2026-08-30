@@ -77,11 +77,7 @@ export function getPlacement(
   const existing = overrides?.[key];
   if (existing) return existing;
   const defaultY =
-    kind === "plant" || kind === "hardscape"
-      ? interior.substrateY
-      : kind === "equipment"
-        ? 0
-        : 0;
+    kind === "plant" || kind === "hardscape" ? interior.substrateY : kind === "equipment" ? 0 : 0;
   return {
     kind,
     refId,
@@ -92,10 +88,7 @@ export function getPlacement(
 }
 
 /** Merge a partial override into the map. */
-export function setPlacement(
-  overrides: PlacementMap,
-  patch: PlacementOverride,
-): PlacementMap {
+export function setPlacement(overrides: PlacementMap, patch: PlacementOverride): PlacementMap {
   return { ...overrides, [placementKey(patch.kind, patch.refId)]: patch };
 }
 
@@ -129,28 +122,15 @@ export function groupFootprintRadius(
 }
 
 /** Convenience: name of a placement, for the selection panel. */
-export function placementLabel(
-  state: TankState,
-  kind: PlacementKind,
-  refId: string,
-): string {
+export function placementLabel(state: TankState, kind: PlacementKind, refId: string): string {
   if (kind === "fish") {
-    return (
-      state.species.find((s) => s.species.id === refId)?.species.common_name ??
-      "Fish"
-    );
+    return state.species.find((s) => s.species.id === refId)?.species.common_name ?? "Fish";
   }
   if (kind === "plant") {
-    return (
-      state.plants.find((p) => p.plant.id === refId)?.plant.common_name ??
-      "Plant"
-    );
+    return state.plants.find((p) => p.plant.id === refId)?.plant.common_name ?? "Plant";
   }
   if (kind === "hardscape") {
-    return (
-      state.hardscape.find((h) => h.hardscape.id === refId)?.hardscape.name ??
-      "Décor"
-    );
+    return state.hardscape.find((h) => h.hardscape.id === refId)?.hardscape.name ?? "Décor";
   }
   return state.filter?.name ?? "Equipment";
 }

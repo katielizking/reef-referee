@@ -35,18 +35,15 @@ export function WaitlistSignup({ compact = false }: { compact?: boolean }) {
             Tell me when saving gets accounts
           </h2>
           <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-            Anonymous saves can be lost if browser data is cleared. Join for the
-            account-recovery launch update.
+            Anonymous saves can be lost if browser data is cleared. Join for the account-recovery
+            launch update.
           </p>
           {done ? (
             <p className="mt-3 text-sm font-semibold text-primary">
               Thanks — we'll only use it for the requested update.
             </p>
           ) : (
-            <form
-              onSubmit={submit}
-              className="mt-3 flex flex-col gap-2 sm:flex-row"
-            >
+            <form onSubmit={submit} className="mt-3 flex flex-col gap-2 sm:flex-row">
               <label className="sr-only" htmlFor="account-waitlist-email">
                 Email address
               </label>
@@ -64,9 +61,7 @@ export function WaitlistSignup({ compact = false }: { compact?: boolean }) {
                 disabled={busy}
                 className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-primary px-4 text-sm font-semibold text-primary-foreground disabled:opacity-60"
               >
-                {busy && (
-                  <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
-                )}
+                {busy && <Loader2 className="h-4 w-4 animate-spin" aria-hidden />}
                 Notify me
               </button>
             </form>

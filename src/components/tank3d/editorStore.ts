@@ -25,15 +25,12 @@ export const useEditorStore = create<EditorState>((set) => ({
   cameraToken: 0,
   select: (selected) => set({ selected }),
   hover: (hovered) => set({ hovered }),
-  setCameraPreset: (cameraPreset) =>
-    set((s) => ({ cameraPreset, cameraToken: s.cameraToken + 1 })),
+  setCameraPreset: (cameraPreset) => set((s) => ({ cameraPreset, cameraToken: s.cameraToken + 1 })),
 }));
 
 export function useSelected() {
   return useEditorStore((s) => s.selected);
 }
 export function useIsSelected(kind: PlacementKind, refId: string) {
-  return useEditorStore(
-    (s) => s.selected?.kind === kind && s.selected?.refId === refId,
-  );
+  return useEditorStore((s) => s.selected?.kind === kind && s.selected?.refId === refId);
 }

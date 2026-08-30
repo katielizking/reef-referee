@@ -39,24 +39,19 @@ export const Route = createFileRoute("/sitemap.xml")({
         ];
 
         const [posts, shops, species] = await Promise.all([
-          supabase
-            .from("blog_posts")
-            .select("slug, published_at")
-            .eq("published", true),
+          supabase.from("blog_posts").select("slug, published_at").eq("published", true),
           supabase.from("aquarium_shops").select("slug"),
           supabase.from("species").select("id"),
         ]);
 
-        (posts.data ?? []).forEach(
-          (p: { slug: string; published_at: string | null }) => {
-            entries.push({
-              path: `/blog/${p.slug}`,
-              changefreq: "monthly",
-              priority: "0.6",
-              lastmod: p.published_at ?? undefined,
-            });
-          },
-        );
+        (posts.data ?? []).forEach((p: { slug: string; published_at: string | null }) => {
+          entries.push({
+            path: `/blog/${p.slug}`,
+            changefreq: "monthly",
+            priority: "0.6",
+            lastmod: p.published_at ?? undefined,
+          });
+        });
         (shops.data ?? []).forEach((s: { slug: string }) => {
           entries.push({
             path: `/shops/${s.slug}`,
@@ -78,9 +73,7 @@ export const Route = createFileRoute("/sitemap.xml")({
               "  <url>",
               `    <loc>${absoluteUrl(e.path)}</loc>`,
               e.lastmod ? `    <lastmod>${e.lastmod}</lastmod>` : null,
-              e.changefreq
-                ? `    <changefreq>${e.changefreq}</changefreq>`
-                : null,
+              e.changefreq ? `    <changefreq>${e.changefreq}</changefreq>` : null,
               e.priority ? `    <priority>${e.priority}</priority>` : null,
               "  </url>",
             ]

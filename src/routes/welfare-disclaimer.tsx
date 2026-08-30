@@ -27,34 +27,29 @@ function WelfareDisclaimer() {
     >
       <PolicySection title="What the score checks">
         <p>
-          The current score screens recorded species compatibility, swimming
-          space and selected pH and temperature. Cycle and biological-filter
-          readiness can cap the result. The experimental waste-load band is
-          informational and never tells you how many more fish to add.
+          The current score screens recorded species compatibility, swimming space and selected pH
+          and temperature. Cycle and biological-filter readiness can cap the result. The
+          experimental waste-load band is informational and never tells you how many more fish to
+          add.
         </p>
       </PolicySection>
       <PolicySection title="What it cannot observe">
         <p>
-          FishTankr cannot see individual temperament, dissolved oxygen,
-          disease, toxins, actual filter bacteria, inaccurate test kits, décor
-          hazards, feeding, maintenance quality or rapid changes after a score
-          is calculated. A high score does not make stocking safe when animals
-          show distress or water tests are unsafe.
+          FishTankr cannot see individual temperament, dissolved oxygen, disease, toxins, actual
+          filter bacteria, inaccurate test kits, décor hazards, feeding, maintenance quality or
+          rapid changes after a score is calculated. A high score does not make stocking safe when
+          animals show distress or water tests are unsafe.
         </p>
       </PolicySection>
       <PolicySection title="Act on the fish and the water">
         <p>
-          Delay stocking if cycle evidence is uncertain. Detectable ammonia or
-          nitrite requires immediate investigation. If fish gasp, hide
-          persistently, fight, stop eating or show illness, test the water and
-          seek experienced local or veterinary help rather than relying on the
-          score.
+          Delay stocking if cycle evidence is uncertain. Detectable ammonia or nitrite requires
+          immediate investigation. If fish gasp, hide persistently, fight, stop eating or show
+          illness, test the water and seek experienced local or veterinary help rather than relying
+          on the score.
         </p>
         <p>
-          <Link
-            to="/methodology"
-            className="font-semibold text-primary underline"
-          >
+          <Link to="/methodology" className="font-semibold text-primary underline">
             Read the methodology and evidence limits.
           </Link>
         </p>

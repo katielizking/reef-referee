@@ -1,19 +1,8 @@
 import { useState } from "react";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { ScorecardPanel } from "@/components/Scorecard";
 import type { Scorecard } from "@/lib/scoring";
-import {
-  AlertCircle,
-  AlertTriangle,
-  CheckCircle2,
-  ChevronUp,
-} from "lucide-react";
+import { AlertCircle, AlertTriangle, CheckCircle2, ChevronUp } from "lucide-react";
 
 function toneFor(overall: number | null, capReason: string | null) {
   if (overall === null)
@@ -71,9 +60,7 @@ export function MobileWelfareSummary({ scorecard }: { scorecard: Scorecard }) {
         <span
           className="rounded-full bg-muted px-3 py-2 font-display text-lg font-bold text-foreground"
           aria-label={
-            scorecard.overall === null
-              ? "No score yet"
-              : `Score ${scorecard.overall} out of 100`
+            scorecard.overall === null ? "No score yet" : `Score ${scorecard.overall} out of 100`
           }
         >
           {scorecard.overall ?? "—"}

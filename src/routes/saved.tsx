@@ -1,15 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import {
-  Copy,
-  Eye,
-  FishSymbol,
-  Loader2,
-  Pencil,
-  Sparkles,
-  Trash2,
-} from "lucide-react";
+import { Copy, Eye, FishSymbol, Loader2, Pencil, Sparkles, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 import {
@@ -80,8 +72,7 @@ function SavedTanks() {
     } catch (error) {
       console.error(error);
       toast.error("Couldn't duplicate this tank", {
-        description:
-          error instanceof Error ? error.message : "Try again in a moment.",
+        description: error instanceof Error ? error.message : "Try again in a moment.",
       });
     } finally {
       setBusyId(null);
@@ -99,8 +90,7 @@ function SavedTanks() {
     } catch (error) {
       console.error(error);
       toast.error("Couldn't rename this tank", {
-        description:
-          error instanceof Error ? error.message : "Try again in a moment.",
+        description: error instanceof Error ? error.message : "Try again in a moment.",
       });
     } finally {
       setBusyId(null);
@@ -119,8 +109,7 @@ function SavedTanks() {
     } catch (error) {
       console.error(error);
       toast.error("Couldn't delete this tank", {
-        description:
-          error instanceof Error ? error.message : "Try again in a moment.",
+        description: error instanceof Error ? error.message : "Try again in a moment.",
       });
     } finally {
       setBusyId(null);
@@ -141,9 +130,8 @@ function SavedTanks() {
         Reopen, edit, copy or share the tanks saved in this browser.
       </p>
       <div className="mt-4 rounded-xl border border-warn/40 bg-warn/10 p-3 text-sm text-foreground">
-        <strong>Anonymous save:</strong> clearing browser data can disconnect
-        these tanks from you, and there is currently no account recovery path.
-        Keep important share links somewhere safe.
+        <strong>Anonymous save:</strong> clearing browser data can disconnect these tanks from you,
+        and there is currently no account recovery path. Keep important share links somewhere safe.
       </div>
       <div className="mt-4">
         <WaitlistSignup />
@@ -175,26 +163,19 @@ function SavedTanks() {
         ) : (
           <ul className="space-y-3">
             {data.map((tank) => {
-              const litres = Math.round(
-                (tank.length_cm * tank.width_cm * tank.height_cm) / 1000,
-              );
+              const litres = Math.round((tank.length_cm * tank.width_cm * tank.height_cm) / 1000);
               const busy = busyId === tank.id;
               return (
                 <li key={tank.id} className="rounded-2xl border bg-card p-4">
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                     <div>
-                      <div className="font-display font-semibold text-foreground">
-                        {tank.name}
-                      </div>
+                      <div className="font-display font-semibold text-foreground">{tank.name}</div>
                       <div className="text-xs text-muted-foreground">
-                        {tank.length_cm}×{tank.width_cm}×{tank.height_cm} cm ·{" "}
-                        {litres} L ·{" "}
+                        {tank.length_cm}×{tank.width_cm}×{tank.height_cm} cm · {litres} L ·{" "}
                         {new Date(tank.created_at).toLocaleDateString()}
                       </div>
                     </div>
-                    {busy && (
-                      <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
-                    )}
+                    {busy && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
                   </div>
 
                   <div className="mt-4 flex flex-wrap gap-2">
@@ -255,8 +236,7 @@ function SavedTanks() {
             </h2>
           </div>
           <p className="mb-4 text-sm text-muted-foreground">
-            One-click starters. They open the builder pre-filled — tweak as you
-            go.
+            One-click starters. They open the builder pre-filled — tweak as you go.
           </p>
           <ul className="grid gap-3 sm:grid-cols-2">
             {TANK_PRESETS.map((preset) => {
@@ -280,12 +260,10 @@ function SavedTanks() {
                         {preset.region}
                       </span>
                     </div>
-                    <p className="mt-1 text-sm text-muted-foreground">
-                      {preset.blurb}
-                    </p>
+                    <p className="mt-1 text-sm text-muted-foreground">{preset.blurb}</p>
                     <p className="mt-2 text-xs text-muted-foreground">
-                      {preset.base.length_cm}×{preset.base.width_cm}×
-                      {preset.base.height_cm} cm · ~{Math.round(litres)} L
+                      {preset.base.length_cm}×{preset.base.width_cm}×{preset.base.height_cm} cm · ~
+                      {Math.round(litres)} L
                     </p>
                   </button>
                 </li>
@@ -305,10 +283,7 @@ function SavedTanks() {
           <DialogHeader>
             <DialogTitle>Rename tank</DialogTitle>
           </DialogHeader>
-          <label
-            className="text-sm font-medium text-foreground"
-            htmlFor="tank-name"
-          >
+          <label className="text-sm font-medium text-foreground" htmlFor="tank-name">
             Tank name
           </label>
           <input
@@ -317,8 +292,7 @@ function SavedTanks() {
             value={renameValue}
             onChange={(event) => setRenameValue(event.target.value)}
             onKeyDown={(event) => {
-              if (event.key === "Enter" && renameValue.trim())
-                void handleRename();
+              if (event.key === "Enter" && renameValue.trim()) void handleRename();
             }}
             className="rounded-xl border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
           />
@@ -352,8 +326,8 @@ function SavedTanks() {
           <AlertDialogHeader>
             <AlertDialogTitle>Delete {deleteTarget?.name}?</AlertDialogTitle>
             <AlertDialogDescription>
-              This permanently removes the saved tank and its share link. This
-              action cannot be undone from FishTankr.
+              This permanently removes the saved tank and its share link. This action cannot be
+              undone from FishTankr.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

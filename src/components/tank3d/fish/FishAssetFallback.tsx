@@ -22,10 +22,7 @@ export class FishAssetErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: unknown): void {
-    console.warn(
-      "[fish3d] GLB render failed, falling back to procedural:",
-      error,
-    );
+    console.warn("[fish3d] GLB render failed, falling back to procedural:", error);
   }
 
   render() {

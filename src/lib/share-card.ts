@@ -4,8 +4,7 @@ import type { TankState } from "./types";
 function verdict(scorecard: Scorecard): string {
   if (scorecard.overall === null) return "Not scored";
   if (scorecard.overall < 45) return "DO NOT STOCK";
-  if (scorecard.overall < 75 || scorecard.capReason)
-    return "RISKY — REVISE FIRST";
+  if (scorecard.overall < 75 || scorecard.capReason) return "RISKY — REVISE FIRST";
   return "SAFE TO CONSIDER";
 }
 
@@ -75,8 +74,7 @@ export async function shareScoreCard(
   ctx.fillStyle = "rgba(255,255,255,.78)";
   wrapText(
     ctx,
-    scorecard.priorityAction?.action ??
-      "Keep monitoring water quality and animal behaviour.",
+    scorecard.priorityAction?.action ?? "Keep monitoring water quality and animal behaviour.",
     80,
     795,
     900,
@@ -88,10 +86,7 @@ export async function shareScoreCard(
 
   const blob = await new Promise<Blob>((resolve, reject) =>
     canvas.toBlob(
-      (value) =>
-        value
-          ? resolve(value)
-          : reject(new Error("Could not create score image.")),
+      (value) => (value ? resolve(value) : reject(new Error("Could not create score image."))),
       "image/png",
     ),
   );

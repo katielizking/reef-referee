@@ -11,11 +11,8 @@ export interface SharedTankPayload {
   hardscape: Array<{ quantity: number; hardscape: Hardscape }>;
 }
 
-export async function fetchSharedTank(
-  slug: string,
-): Promise<SharedTankPayload | null> {
-  const { supabaseAdmin } =
-    await import("@/integrations/supabase/client.server");
+export async function fetchSharedTank(slug: string): Promise<SharedTankPayload | null> {
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const { data, error } = await supabaseAdmin.rpc("get_shared_tank", {
     p_slug: slug,
   });

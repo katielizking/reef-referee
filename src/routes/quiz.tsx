@@ -130,9 +130,7 @@ function scoreSpecies(sp: Species, a: Answers): number {
 
   // Experience — small, peaceful, hardy → beginner-friendly
   const beginnerFriendly =
-    sp.temperament === "peaceful" &&
-    Number(sp.adult_size_cm) < 8 &&
-    !sp.predatory;
+    sp.temperament === "peaceful" && Number(sp.adult_size_cm) < 8 && !sp.predatory;
   if (a.experience === "beginner") {
     if (beginnerFriendly) score += 12;
     else score -= 15;
@@ -144,8 +142,7 @@ function scoreSpecies(sp: Species, a: Answers): number {
   if (a.vibe === "peaceful" && sp.temperament === "aggressive") score -= 25;
   if (a.vibe === "showpiece" && Number(sp.adult_size_cm) >= 8) score += 12;
   if (a.vibe === "showpiece" && Number(sp.adult_size_cm) < 4) score -= 6;
-  if (a.vibe === "oddballs" && (sp.predatory || Number(sp.adult_size_cm) >= 15))
-    score += 10;
+  if (a.vibe === "oddballs" && (sp.predatory || Number(sp.adult_size_cm) >= 15)) score += 10;
 
   // Biome / hardness match via native pH
   const [phLo, phHi] = HARDNESS_PH[a.hardness];
@@ -169,12 +166,7 @@ function scoreSpecies(sp: Species, a: Answers): number {
   // Style
   if (a.style === "schooling" && sp.is_schooling) score += 12;
   if (a.style === "schooling" && !sp.is_schooling) score -= 6;
-  if (
-    a.style === "centrepiece" &&
-    !sp.is_schooling &&
-    Number(sp.adult_size_cm) >= 7
-  )
-    score += 12;
+  if (a.style === "centrepiece" && !sp.is_schooling && Number(sp.adult_size_cm) >= 7) score += 12;
 
   return score;
 }
@@ -203,9 +195,7 @@ function QuizPage() {
       scored.slice(0, 12).forEach((r) => {
         counts[r.sp.biotope_region] = (counts[r.sp.biotope_region] ?? 0) + 1;
       });
-      const topBiome = Object.entries(counts).sort(
-        (a, b) => b[1] - a[1],
-      )[0]?.[0];
+      const topBiome = Object.entries(counts).sort((a, b) => b[1] - a[1])[0]?.[0];
       if (topBiome) {
         scored.forEach((r) => {
           if (r.sp.biotope_region === topBiome) r.score += 15;
@@ -261,9 +251,7 @@ function QuizPage() {
           <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
             Question {step + 1} of {total}
           </p>
-          <h2 className="mt-2 font-display text-xl font-semibold text-foreground">
-            {currentQ.q}
-          </h2>
+          <h2 className="mt-2 font-display text-xl font-semibold text-foreground">{currentQ.q}</h2>
           <div className="mt-4 grid gap-2">
             {currentQ.options.map((o) => (
               <button
@@ -272,11 +260,7 @@ function QuizPage() {
                 className="min-h-14 rounded-xl border bg-background px-4 py-3 text-left text-sm font-medium text-foreground transition-colors hover:border-primary hover:bg-muted"
               >
                 {o.label}
-                {o.hint && (
-                  <span className="ml-1 text-xs text-muted-foreground">
-                    — {o.hint}
-                  </span>
-                )}
+                {o.hint && <span className="ml-1 text-xs text-muted-foreground">— {o.hint}</span>}
               </button>
             ))}
           </div>
@@ -296,8 +280,8 @@ function QuizPage() {
           <h2 className="font-display text-2xl font-semibold">Your matches</h2>
           {results.length === 0 && (
             <p className="mt-2 text-muted-foreground">
-              No good matches — your tank might be too small for anything in our
-              list. Try a bigger size.
+              No good matches — your tank might be too small for anything in our list. Try a bigger
+              size.
             </p>
           )}
           <div className="mt-4 grid gap-3">
@@ -312,12 +296,9 @@ function QuizPage() {
                   <p className="font-display text-lg font-semibold text-foreground group-hover:text-primary">
                     {sp.common_name}
                   </p>
-                  <p className="text-sm italic text-muted-foreground">
-                    {sp.scientific_name}
-                  </p>
+                  <p className="text-sm italic text-muted-foreground">{sp.scientific_name}</p>
                   <p className="mt-2 text-xs text-muted-foreground">
-                    {sp.biotope_region} · {sp.temperament} · min{" "}
-                    {sp.min_tank_litres}L
+                    {sp.biotope_region} · {sp.temperament} · min {sp.min_tank_litres}L
                   </p>
                 </div>
                 <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
@@ -347,9 +328,8 @@ function QuizPage() {
           <p className="mt-6 flex items-start gap-2 rounded-xl border border-border/60 bg-muted/40 p-3 text-xs text-muted-foreground">
             <Info className="mt-0.5 h-4 w-4 flex-shrink-0" />
             <span>
-              These are starting points, not a stocking plan. Add them in the
-              builder to see if your filter, plants and other choices actually
-              work together.
+              These are starting points, not a stocking plan. Add them in the builder to see if your
+              filter, plants and other choices actually work together.
             </span>
           </p>
         </div>

@@ -17,9 +17,7 @@ export function PolicyPage({
       <h1 className="mt-3 font-display text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
         {title}
       </h1>
-      <p className="mt-4 text-base leading-relaxed text-muted-foreground">
-        {intro}
-      </p>
+      <p className="mt-4 text-base leading-relaxed text-muted-foreground">{intro}</p>
       <div className="policy-copy mt-9 space-y-8 text-sm leading-7 text-foreground/85">
         {children}
       </div>
@@ -27,18 +25,10 @@ export function PolicyPage({
   );
 }
 
-export function PolicySection({
-  title,
-  children,
-}: {
-  title: string;
-  children: ReactNode;
-}) {
+export function PolicySection({ title, children }: { title: string; children: ReactNode }) {
   return (
     <section>
-      <h2 className="font-display text-xl font-semibold text-foreground">
-        {title}
-      </h2>
+      <h2 className="font-display text-xl font-semibold text-foreground">{title}</h2>
       <div className="mt-2 space-y-3">{children}</div>
     </section>
   );

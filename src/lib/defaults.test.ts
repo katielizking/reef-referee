@@ -26,20 +26,15 @@ describe("first-species water defaults", () => {
   });
 
   it("does not overwrite user-selected water", () => {
-    expect(
-      adaptWaterToFirstSpecies(
-        { ...tank, target_ph: 7.4, target_temp_c: 24 },
-        fish,
-      ),
-    ).toEqual({ target_ph: 7.4, target_temp_c: 24 });
+    expect(adaptWaterToFirstSpecies({ ...tank, target_ph: 7.4, target_temp_c: 24 }, fish)).toEqual({
+      target_ph: 7.4,
+      target_temp_c: 24,
+    });
   });
 
   it("does not change water after livestock already exists", () => {
     expect(
-      adaptWaterToFirstSpecies(
-        { ...tank, species: [{ species: fish, quantity: 1 }] },
-        fish,
-      ),
+      adaptWaterToFirstSpecies({ ...tank, species: [{ species: fish, quantity: 1 }] }, fish),
     ).toEqual({ target_ph: 7, target_temp_c: 25 });
   });
 });

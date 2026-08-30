@@ -4,11 +4,7 @@ import { useMemo, useState } from "react";
 import { Loader2, Search } from "lucide-react";
 import { useSpecies } from "@/lib/data";
 import { SpeciesPortrait } from "@/components/SpeciesPortrait";
-import {
-  BIOTOPE_LABEL,
-  type BiotopeRegion,
-  type Temperament,
-} from "@/lib/types";
+import { BIOTOPE_LABEL, type BiotopeRegion, type Temperament } from "@/lib/types";
 
 export const Route = createFileRoute("/species/")({
   head: () => ({
@@ -49,8 +45,7 @@ function SpeciesIndex() {
       if (region !== "all" && s.biotope_region !== region) return false;
       if (temperament !== "all" && s.temperament !== temperament) return false;
       if (size === "small" && s.adult_size_cm >= 6) return false;
-      if (size === "medium" && (s.adult_size_cm < 6 || s.adult_size_cm > 15))
-        return false;
+      if (size === "medium" && (s.adult_size_cm < 6 || s.adult_size_cm > 15)) return false;
       if (size === "large" && s.adult_size_cm <= 15) return false;
       if (
         term &&
@@ -65,18 +60,15 @@ function SpeciesIndex() {
   return (
     <main className="mx-auto max-w-7xl px-3 py-5 sm:px-4 sm:py-8 md:py-12">
       <header className="hero-grid fishtankr-panel relative overflow-hidden rounded-[1.5rem] px-5 py-8 sm:rounded-[2rem] sm:px-10 sm:py-14">
-        <span className="science-label text-primary">
-          Field guide · freshwater
-        </span>
+        <span className="science-label text-primary">Field guide · freshwater</span>
         <h1 className="mt-5 max-w-3xl font-display text-3xl font-bold sm:text-4xl leading-[.98] tracking-[-.045em] text-ink sm:text-6xl">
           Meet the fish,
           <br />
           before you bring them home.
         </h1>
         <p className="mt-5 max-w-2xl text-base leading-relaxed text-muted-foreground">
-          Explore {data?.length ?? 0} species through real, research-grade
-          observations—then compare their care, behaviour, habitat and regional
-          care notes.
+          Explore {data?.length ?? 0} species through real, research-grade observations—then compare
+          their care, behaviour, habitat and regional care notes.
         </p>
         <div
           className="absolute -bottom-16 -right-12 h-52 w-52 rounded-full border-[34px] border-blue/10"
@@ -161,9 +153,7 @@ function SpeciesIndex() {
                 <div className="p-4">
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0">
-                      <p className="font-display font-semibold text-foreground">
-                        {s.common_name}
-                      </p>
+                      <p className="font-display font-semibold text-foreground">{s.common_name}</p>
                       <p className="truncate text-xs italic text-muted-foreground">
                         {s.scientific_name}
                       </p>
@@ -173,12 +163,8 @@ function SpeciesIndex() {
                     {BIOTOPE_LABEL[s.biotope_region]}
                   </p>
                   <p className="mt-3 flex flex-wrap gap-1.5 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-                    <span className="rounded-full bg-muted px-2 py-1">
-                      {s.adult_size_cm} cm
-                    </span>
-                    <span className="rounded-full bg-muted px-2 py-1">
-                      {s.temperament}
-                    </span>
+                    <span className="rounded-full bg-muted px-2 py-1">{s.adult_size_cm} cm</span>
+                    <span className="rounded-full bg-muted px-2 py-1">{s.temperament}</span>
                     <span className="rounded-full bg-muted px-2 py-1">
                       min {s.min_tank_litres} L
                     </span>

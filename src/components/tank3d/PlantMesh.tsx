@@ -15,12 +15,7 @@ interface PlantClumpProps {
  * Uses an accurate, permissively licensed observation as the fallback until
  * a botanically verified 3D model is installed for this exact taxon.
  */
-export function PlantClump({
-  plant,
-  quantity,
-  interior,
-  groundY,
-}: PlantClumpProps) {
+export function PlantClump({ plant, quantity, interior, groundY }: PlantClumpProps) {
   const y = groundY ?? interior.substrateY;
   const position = useMemo<[number, number, number]>(
     () => [
@@ -47,9 +42,7 @@ export function PlantClump({
           />
           <div className="bg-ink px-2 py-1.5 text-center text-[8px] font-semibold leading-tight text-white">
             {plant.common_name}
-            {quantity > 1 ? (
-              <span className="ml-1 text-lime">×{quantity}</span>
-            ) : null}
+            {quantity > 1 ? <span className="ml-1 text-lime">×{quantity}</span> : null}
             <span className="mt-0.5 block font-normal italic text-white/55">
               photographic reference
             </span>

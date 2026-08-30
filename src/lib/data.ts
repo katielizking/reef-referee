@@ -12,10 +12,7 @@ export function useSpecies() {
   return useQuery({
     queryKey: ["species"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("species")
-        .select("*")
-        .order("common_name");
+      const { data, error } = await supabase.from("species").select("*").order("common_name");
       if (error) throw error;
       return data as unknown as Species[];
     },
@@ -27,10 +24,7 @@ export function usePlants() {
   return useQuery({
     queryKey: ["plants"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("plants")
-        .select("*")
-        .order("common_name");
+      const { data, error } = await supabase.from("plants").select("*").order("common_name");
       if (error) throw error;
       return data as unknown as Plant[];
     },
@@ -42,10 +36,7 @@ export function useHardscape() {
   return useQuery({
     queryKey: ["hardscape"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("hardscape")
-        .select("*")
-        .order("name");
+      const { data, error } = await supabase.from("hardscape").select("*").order("name");
       if (error) throw error;
       return data as unknown as Hardscape[];
     },
@@ -57,10 +48,7 @@ export function useFilters() {
   return useQuery({
     queryKey: ["filters"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("filters")
-        .select("*")
-        .order("rated_litres");
+      const { data, error } = await supabase.from("filters").select("*").order("rated_litres");
       if (error) throw error;
       return data as unknown as Filter[];
     },
@@ -147,11 +135,7 @@ export async function saveTank(
     if (error) throw error;
     tank = data as unknown as TankRow;
   } else {
-    const { data, error } = await supabase
-      .from("tanks")
-      .insert(tankFields)
-      .select("*")
-      .single();
+    const { data, error } = await supabase.from("tanks").insert(tankFields).select("*").single();
     if (error) throw error;
     tank = data as unknown as TankRow;
   }
@@ -180,13 +164,9 @@ export async function saveTank(
   }));
 
   const results = await Promise.all([
-    speciesRows.length
-      ? supabase.from("tank_species").insert(speciesRows)
-      : null,
+    speciesRows.length ? supabase.from("tank_species").insert(speciesRows) : null,
     plantRows.length ? supabase.from("tank_plants").insert(plantRows) : null,
-    hardscapeRows.length
-      ? supabase.from("tank_hardscape").insert(hardscapeRows)
-      : null,
+    hardscapeRows.length ? supabase.from("tank_hardscape").insert(hardscapeRows) : null,
   ]);
   for (const res of results) {
     if (res?.error) throw res.error;
@@ -227,9 +207,7 @@ export async function duplicateTank(slug: string): Promise<TankRow> {
     filter: source.filter,
     maintenance_frequency: source.tank.maintenance_frequency,
     biological_media_level:
-      source.tank.biological_media_level ??
-      source.filter?.biological_media_level ??
-      "standard",
+      source.tank.biological_media_level ?? source.filter?.biological_media_level ?? "standard",
     filter_maturity: source.tank.filter_maturity ?? "unknown",
     cycle_status: source.tank.cycle_status ?? "unknown",
     cycle_method: source.tank.cycle_method ?? "unknown",

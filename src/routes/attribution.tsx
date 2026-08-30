@@ -58,9 +58,9 @@ function AttributionPage() {
           .
         </p>
         <p>
-          FishTankr removed staging geometry, reoriented the model to +X, scaled
-          it to a 6 cm total-length reference and optimised texture delivery.
-          The original skin, animation and PBR materials were retained.
+          FishTankr removed staging geometry, reoriented the model to +X, scaled it to a 6 cm
+          total-length reference and optimised texture delivery. The original skin, animation and
+          PBR materials were retained.
         </p>
       </PolicySection>
       <PolicySection title="Neon tetra">
@@ -74,17 +74,15 @@ function AttributionPage() {
           >
             Neon tetra on Blend Swap
           </a>
-          . The source listing records CC-BY; its version was not specified in
-          the captured asset metadata. FishTankr preserves creator and source
-          attribution on distributed derivatives.
+          . The source listing records CC-BY; its version was not specified in the captured asset
+          metadata. FishTankr preserves creator and source attribution on distributed derivatives.
         </p>
       </PolicySection>
       <PolicySection title="Procedural scene elements">
         <p>
-          Unverified species and general aquarium scenery may use
-          project-authored procedural geometry. They are not presented as
-          verified anatomical reconstructions. See the methodology for the
-          distinction between verified and reference-informed assets.
+          Unverified species and general aquarium scenery may use project-authored procedural
+          geometry. They are not presented as verified anatomical reconstructions. See the
+          methodology for the distinction between verified and reference-informed assets.
         </p>
       </PolicySection>
     </PolicyPage>

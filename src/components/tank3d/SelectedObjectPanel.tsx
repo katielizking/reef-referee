@@ -19,13 +19,7 @@ interface Props {
   onClose?: () => void;
 }
 
-export function SelectedObjectPanel({
-  state,
-  setState,
-  interior,
-  commit,
-  onClose,
-}: Props) {
+export function SelectedObjectPanel({ state, setState, interior, commit, onClose }: Props) {
   const selected = useSelected();
   const clearSelection = useEditorStore((s) => s.select);
   if (!selected) return null;
@@ -33,8 +27,7 @@ export function SelectedObjectPanel({
   const { kind, refId } = selected;
   const label = placementLabel(state, kind, refId);
   const placement = getPlacement(state.overrides, kind, refId, interior);
-  const fishAttribution =
-    kind === "fish" ? getFishAsset(refId)?.attribution : undefined;
+  const fishAttribution = kind === "fish" ? getFishAsset(refId)?.attribution : undefined;
 
   const rowExists = groupExists(state, kind, refId);
   if (!rowExists) {
@@ -74,9 +67,7 @@ export function SelectedObjectPanel({
           <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
             Selected · {kindLabel(kind)}
           </p>
-          <h3 className="truncate font-display text-base font-semibold text-foreground">
-            {label}
-          </h3>
+          <h3 className="truncate font-display text-base font-semibold text-foreground">{label}</h3>
         </div>
         <button
           type="button"
@@ -240,24 +231,16 @@ function kindLabel(k: PlacementKind): string {
 }
 
 function hintFor(k: PlacementKind): string {
-  if (k === "fish")
-    return "Drag in the scene to reposition the school's centre.";
-  if (k === "plant")
-    return "Sits on the substrate. Rotate and resize as needed.";
-  if (k === "hardscape")
-    return "Sits on the substrate. Drag, rotate or resize.";
+  if (k === "fish") return "Drag in the scene to reposition the school's centre.";
+  if (k === "plant") return "Sits on the substrate. Rotate and resize as needed.";
+  if (k === "hardscape") return "Sits on the substrate. Drag, rotate or resize.";
   return "Snapped to the back glass. Drag left/right or up/down.";
 }
 
-function groupExists(
-  state: TankState,
-  kind: PlacementKind,
-  refId: string,
-): boolean {
+function groupExists(state: TankState, kind: PlacementKind, refId: string): boolean {
   if (kind === "fish") return state.species.some((r) => r.species.id === refId);
   if (kind === "plant") return state.plants.some((r) => r.plant.id === refId);
-  if (kind === "hardscape")
-    return state.hardscape.some((r) => r.hardscape.id === refId);
+  if (kind === "hardscape") return state.hardscape.some((r) => r.hardscape.id === refId);
   return !!state.filter;
 }
 
@@ -271,9 +254,7 @@ function bumpQuantity(
     return {
       ...state,
       species: state.species.map((r) =>
-        r.species.id === refId
-          ? { ...r, quantity: Math.max(1, r.quantity + delta) }
-          : r,
+        r.species.id === refId ? { ...r, quantity: Math.max(1, r.quantity + delta) } : r,
       ),
     };
   }
@@ -281,9 +262,7 @@ function bumpQuantity(
     return {
       ...state,
       plants: state.plants.map((r) =>
-        r.plant.id === refId
-          ? { ...r, quantity: Math.max(1, r.quantity + delta) }
-          : r,
+        r.plant.id === refId ? { ...r, quantity: Math.max(1, r.quantity + delta) } : r,
       ),
     };
   }
@@ -291,20 +270,14 @@ function bumpQuantity(
     return {
       ...state,
       hardscape: state.hardscape.map((r) =>
-        r.hardscape.id === refId
-          ? { ...r, quantity: Math.max(1, r.quantity + delta) }
-          : r,
+        r.hardscape.id === refId ? { ...r, quantity: Math.max(1, r.quantity + delta) } : r,
       ),
     };
   }
   return state;
 }
 
-function removeGroup(
-  state: TankState,
-  kind: PlacementKind,
-  refId: string,
-): TankState {
+function removeGroup(state: TankState, kind: PlacementKind, refId: string): TankState {
   if (kind === "fish") {
     return {
       ...state,

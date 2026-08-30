@@ -1,11 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import {
-  AlertTriangle,
-  ChevronDown,
-  Info,
-  ShieldCheck,
-  TriangleAlert,
-} from "lucide-react";
+import { AlertTriangle, ChevronDown, Info, ShieldCheck, TriangleAlert } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -16,11 +10,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Switch } from "@/components/ui/switch";
 import type { Issue, Scorecard } from "@/lib/scoring";
 import type { TankState } from "@/lib/types";
@@ -75,15 +65,11 @@ function issueTitle(issue: Issue): string {
 function checklistSeverity(issue: Issue): ChecklistSeverity {
   if (issue.category === "readiness") return "must-fix";
   if (issue.severity === "critical") return "must-fix";
-  if (issue.severity === "high" || issue.severity === "medium")
-    return "worth-look";
+  if (issue.severity === "high" || issue.severity === "medium") return "worth-look";
   return "info";
 }
 
-export function buildChecklist(
-  scorecard: Scorecard,
-  state: TankState,
-): ChecklistItem[] {
+export function buildChecklist(scorecard: Scorecard, state: TankState): ChecklistItem[] {
   const items: ChecklistItem[] = [];
   const scoredIssues: Issue[] = [
     ...scorecard.readiness.issues,
@@ -126,8 +112,7 @@ export function buildChecklist(
 
   if (
     state.maintenance_frequency === "monthly" &&
-    (scorecard.bioload.loadBand === "high" ||
-      scorecard.bioload.loadBand === "very-high")
+    (scorecard.bioload.loadBand === "high" || scorecard.bioload.loadBand === "very-high")
   ) {
     items.push({
       id: "maint-thin",
@@ -140,8 +125,7 @@ export function buildChecklist(
 
   if (
     state.filter &&
-    state.filter.rated_litres <
-      (state.length_cm * state.width_cm * state.height_cm) / 1000
+    state.filter.rated_litres < (state.length_cm * state.width_cm * state.height_cm) / 1000
   ) {
     items.push({
       id: "filter-manufacturer-rating",
@@ -196,10 +180,7 @@ export function PreStockChecklist({
   onCancelSave,
   onConfirmSave,
 }: Props) {
-  const items = useMemo(
-    () => buildChecklist(scorecard, state),
-    [scorecard, state],
-  );
+  const items = useMemo(() => buildChecklist(scorecard, state), [scorecard, state]);
   const mustFix = items.filter((i) => i.severity === "must-fix");
   const worthLook = items.filter((i) => i.severity === "worth-look");
   const info = items.filter((i) => i.severity === "info");
@@ -224,11 +205,7 @@ export function PreStockChecklist({
               </h3>
             </div>
             <div className="flex items-center gap-2">
-              <CountBadges
-                mustFix={mustFix.length}
-                worthLook={worthLook.length}
-                noFish={noFish}
-              />
+              <CountBadges mustFix={mustFix.length} worthLook={worthLook.length} noFish={noFish} />
               <ChevronDown
                 className={`h-4 w-4 shrink-0 text-muted-foreground transition-transform ${open ? "rotate-180" : ""}`}
               />
@@ -237,13 +214,11 @@ export function PreStockChecklist({
           <CollapsibleContent className="mt-3 space-y-2">
             {items.length === 0 && noFish ? (
               <p className="rounded-xl bg-muted/50 px-3 py-2 text-sm text-muted-foreground">
-                Cycle readiness is recorded. Add fish to run compatibility,
-                space and water checks.
+                Cycle readiness is recorded. Add fish to run compatibility, space and water checks.
               </p>
             ) : items.length === 0 ? (
               <p className="rounded-xl bg-lime/20 px-3 py-2 text-sm text-foreground">
-                Looking good — no risks flagged. Remember this is a guide, not a
-                guarantee.
+                Looking good — no risks flagged. Remember this is a guide, not a guarantee.
               </p>
             ) : (
               <>
@@ -261,12 +236,9 @@ export function PreStockChecklist({
 
             <div className="mt-3 flex items-start justify-between gap-3 rounded-xl bg-muted/40 px-3 py-2">
               <div className="min-w-0">
-                <p className="text-sm font-medium text-foreground">
-                  Skip this check
-                </p>
+                <p className="text-sm font-medium text-foreground">Skip this check</p>
                 <p className="text-xs text-muted-foreground">
-                  Turn off if you know what you're doing. Save won't ask you to
-                  confirm.
+                  Turn off if you know what you're doing. Save won't ask you to confirm.
                 </p>
               </div>
               <Switch
@@ -292,8 +264,8 @@ export function PreStockChecklist({
               Worth another look before you save
             </AlertDialogTitle>
             <AlertDialogDescription>
-              This setup has issues that will affect your fish. You can adjust
-              the tank, or save anyway if it's intentional.
+              This setup has issues that will affect your fish. You can adjust the tank, or save
+              anyway if it's intentional.
             </AlertDialogDescription>
           </AlertDialogHeader>
 
@@ -314,9 +286,7 @@ export function PreStockChecklist({
           </div>
 
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={onCancelSave}>
-              Adjust tank
-            </AlertDialogCancel>
+            <AlertDialogCancel onClick={onCancelSave}>Adjust tank</AlertDialogCancel>
             <AlertDialogAction
               onClick={onConfirmSave}
               className="bg-coral text-white hover:bg-coral/90"
@@ -398,19 +368,12 @@ function ItemRow({ item }: { item: ChecklistItem }) {
 
 /** Save gate hook. Wraps a save function so it checks the guard + must-fix items. */
 export function useSaveGate(scorecard: Scorecard, state: TankState) {
-  const items = useMemo(
-    () => buildChecklist(scorecard, state),
-    [scorecard, state],
-  );
+  const items = useMemo(() => buildChecklist(scorecard, state), [scorecard, state]);
   const mustFix = items.filter((i) => i.severity === "must-fix");
-  const [pendingSave, setPendingSave] = useState<null | { share: boolean }>(
-    null,
-  );
+  const [pendingSave, setPendingSave] = useState<null | { share: boolean }>(null);
 
   const guardOn =
-    typeof window !== "undefined"
-      ? window.localStorage.getItem(GUARD_KEY) !== "off"
-      : true;
+    typeof window !== "undefined" ? window.localStorage.getItem(GUARD_KEY) !== "off" : true;
 
   function requestSave(share: boolean, doSave: (share: boolean) => void) {
     if (guardOn && mustFix.length > 0) {

@@ -90,16 +90,10 @@ export function DragGroup({
     if (!raycaster.ray.intersectPlane(plane, hit)) return;
     const raw: [number, number, number] = [
       hit.x + grabOffsetRef.current.x,
-      placement.kind === "equipment"
-        ? hit.y + grabOffsetRef.current.y
-        : placement.anchor[1],
+      placement.kind === "equipment" ? hit.y + grabOffsetRef.current.y : placement.anchor[1],
       hit.z + grabOffsetRef.current.z,
     ];
-    const radius = groupFootprintRadius(
-      placement.kind,
-      interior,
-      placement.scale,
-    );
+    const radius = groupFootprintRadius(placement.kind, interior, placement.scale);
     let clamped = clampAnchor(placement.kind, raw, interior, radius);
     if (placement.kind === "equipment") {
       clamped = snapEquipmentToBack(clamped, interior);
@@ -134,25 +128,14 @@ export function DragGroup({
   );
 }
 
-function SelectionRing({
-  kind,
-  interior,
-}: {
-  kind: PlacementKind;
-  interior: Interior;
-}) {
+function SelectionRing({ kind, interior }: { kind: PlacementKind; interior: Interior }) {
   // Draw the selection halo where it reads best: on the substrate for
   // grounded objects, or at the group's local origin otherwise.
   const y = kind === "plant" || kind === "hardscape" ? 0.01 : 0;
   return (
     <mesh position={[0, y, 0]} rotation={[-Math.PI / 2, 0, 0]}>
       <ringGeometry args={[0.55, 0.68, 32]} />
-      <meshBasicMaterial
-        color="#22d3ee"
-        transparent
-        opacity={0.9}
-        toneMapped={false}
-      />
+      <meshBasicMaterial color="#22d3ee" transparent opacity={0.9} toneMapped={false} />
     </mesh>
   );
 }

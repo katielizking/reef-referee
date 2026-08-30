@@ -27,12 +27,7 @@ export function hash01(id: string, salt = 0): number {
   return ((h >>> 0) % 10000) / 10000;
 }
 
-export function hashRange(
-  id: string,
-  salt: number,
-  min: number,
-  max: number,
-): number {
+export function hashRange(id: string, salt: number, min: number, max: number): number {
   return min + hash01(id, salt) * (max - min);
 }
 

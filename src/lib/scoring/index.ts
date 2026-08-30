@@ -1,9 +1,4 @@
-import {
-  BIOTOPE_LABEL,
-  BIOTOPE_WATER,
-  type BiotopeRegion,
-  type TankState,
-} from "../types";
+import { BIOTOPE_LABEL, BIOTOPE_WATER, type BiotopeRegion, type TankState } from "../types";
 
 export interface SubScore {
   score: number;
@@ -54,13 +49,7 @@ export const GROUP_CODES: ReadonlySet<IssueCode> = new Set<IssueCode>([
 export interface Issue {
   code: IssueCode;
   severity: "critical" | "high" | "medium" | "low";
-  category:
-    | "readiness"
-    | "compatibility"
-    | "bioload"
-    | "space"
-    | "water"
-    | "biome";
+  category: "readiness" | "compatibility" | "bioload" | "space" | "water" | "biome";
   weight: number;
   reason: string;
   fix: string;
@@ -73,13 +62,7 @@ export interface CompatibilitySubScore extends SubScore {
 
 export interface PriorityAction {
   severity: "critical" | "high" | "medium";
-  category:
-    | "readiness"
-    | "compatibility"
-    | "bioload"
-    | "space"
-    | "water"
-    | "biome";
+  category: "readiness" | "compatibility" | "bioload" | "space" | "water" | "biome";
   title: string;
   action: string;
 }
@@ -120,9 +103,7 @@ export const BIOLOAD_PLATEAU = 85;
 /** Score lost per percentage point of load above the plateau. */
 export const BIOLOAD_DECAY = 2.2;
 
-export function litresOf(
-  state: Pick<TankState, "length_cm" | "width_cm" | "height_cm">,
-) {
+export function litresOf(state: Pick<TankState, "length_cm" | "width_cm" | "height_cm">) {
   return (state.length_cm * state.width_cm * state.height_cm) / 1000;
 }
 
@@ -136,26 +117,16 @@ export function clamp(n: number, lo = 0, hi = 100) {
  */
 export const WATER_TEST_MAX_AGE_DAYS = 7;
 
-export function waterTestAgeDays(
-  testedOn: string | null,
-  now = new Date(),
-): number | null {
+export function waterTestAgeDays(testedOn: string | null, now = new Date()): number | null {
   if (!testedOn || !/^\d{4}-\d{2}-\d{2}$/.test(testedOn)) return null;
   const [year, month, day] = testedOn.split("-").map(Number);
   const testDay = Date.UTC(year, month - 1, day);
-  const today = Date.UTC(
-    now.getUTCFullYear(),
-    now.getUTCMonth(),
-    now.getUTCDate(),
-  );
+  const today = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
   if (!Number.isFinite(testDay)) return null;
   return Math.floor((today - testDay) / 86_400_000);
 }
 
-export function isWaterTestCurrent(
-  testedOn: string | null,
-  now = new Date(),
-): boolean {
+export function isWaterTestCurrent(testedOn: string | null, now = new Date()): boolean {
   const age = waterTestAgeDays(testedOn, now);
   // A one-day future tolerance prevents an Australian-local date entered just
   // after midnight from being rejected while the UTC date is still yesterday.
@@ -210,15 +181,13 @@ export function scoreTank(state: TankState): Scorecard {
   if (compatibility.criticalConflicts.length > 0) {
     caps.push({
       cap: 40,
-      reason:
-        "Score capped: a critical compatibility conflict will cost fish their lives.",
+      reason: "Score capped: a critical compatibility conflict will cost fish their lives.",
     });
   }
   if (readiness.status === "unsafe") {
     caps.push({
       cap: 25,
-      reason:
-        "Score capped: ammonia or nitrite is detectable. Do not add fish.",
+      reason: "Score capped: ammonia or nitrite is detectable. Do not add fish.",
     });
   } else if (readiness.status === "cycling") {
     caps.push({
@@ -262,10 +231,7 @@ export function scoreTank(state: TankState): Scorecard {
 }
 
 function choosePriorityAction(
-  scores: Pick<
-    Scorecard,
-    "readiness" | "compatibility" | "bioload" | "space" | "water" | "biome"
-  >,
+  scores: Pick<Scorecard, "readiness" | "compatibility" | "bioload" | "space" | "water" | "biome">,
 ): PriorityAction | null {
   if (scores.readiness.status === "unsafe") {
     const issue = scores.readiness.issues[0];
@@ -273,14 +239,10 @@ function choosePriorityAction(
       severity: "critical",
       category: "readiness",
       title: "Do not add fish to this water",
-      action:
-        issue?.fix ??
-        "Resolve detectable ammonia or nitrite and retest before stocking.",
+      action: issue?.fix ?? "Resolve detectable ammonia or nitrite and retest before stocking.",
     };
   }
-  const critical = scores.compatibility.issues.find(
-    (i) => i.severity === "critical",
-  );
+  const critical = scores.compatibility.issues.find((i) => i.severity === "critical");
   if (critical) {
     return {
       severity: "critical",
@@ -299,8 +261,7 @@ function choosePriorityAction(
           ? "Finish cycling before stocking"
           : "Verify the nitrogen cycle first",
       action:
-        issue?.fix ??
-        "Confirm an established biofilter with current ammonia and nitrite results.",
+        issue?.fix ?? "Confirm an established biofilter with current ammonia and nitrite results.",
     };
   }
   if (scores.water.score < 70 && scores.water.fixes.length > 0) {
@@ -328,10 +289,7 @@ function choosePriorityAction(
       action: high.fix,
     };
   }
-  if (
-    scores.bioload.loadBand === "very-high" &&
-    scores.bioload.fixes.length > 0
-  ) {
+  if (scores.bioload.loadBand === "very-high" && scores.bioload.fixes.length > 0) {
     return {
       severity: "medium",
       category: "bioload",
@@ -351,8 +309,7 @@ const AGGRESSION: Record<string, number> = {
 };
 
 function scoreCompatibility(state: TankState): CompatibilitySubScore {
-  if (state.species.length === 0)
-    return { ...empty, criticalConflicts: [], issues: [] };
+  if (state.species.length === 0) return { ...empty, criticalConflicts: [], issues: [] };
 
   const issues: Issue[] = [];
   const criticalConflicts: string[] = [];
@@ -534,8 +491,7 @@ function scoreCompatibility(state: TankState): CompatibilitySubScore {
       // Parameter overlap, with a margin. A single degree or a tenth of a pH
       // point of overlap is not a shared range, it is a coincidence.
       const phOverlap =
-        Math.min(a.native_ph_max, b.native_ph_max) -
-        Math.max(a.native_ph_min, b.native_ph_min);
+        Math.min(a.native_ph_max, b.native_ph_max) - Math.max(a.native_ph_min, b.native_ph_min);
       if (phOverlap < 0) {
         add(
           "ph-no-overlap",
@@ -595,8 +551,7 @@ function scoreReadiness(state: TankState): Scorecard["readiness"] {
     weight: number,
     reason: string,
     fix: string,
-  ) =>
-    issues.push({ code, severity, category: "readiness", weight, reason, fix });
+  ) => issues.push({ code, severity, category: "readiness", weight, reason, fix });
 
   if (state.ammonia_mg_l !== null && state.ammonia_mg_l > 0) {
     add(
@@ -675,8 +630,7 @@ function scoreReadiness(state: TankState): Scorecard["readiness"] {
 
   const hasZeroResults = state.ammonia_mg_l === 0 && state.nitrite_mg_l === 0;
   const testAgeDays = waterTestAgeDays(state.water_tested_on);
-  const hasCurrentEvidence =
-    hasZeroResults && isWaterTestCurrent(state.water_tested_on);
+  const hasCurrentEvidence = hasZeroResults && isWaterTestCurrent(state.water_tested_on);
   if (
     state.cycle_status === "unknown" ||
     (state.cycle_status === "verified" && !hasCurrentEvidence)
@@ -705,10 +659,7 @@ function scoreReadiness(state: TankState): Scorecard["readiness"] {
 
   let status: Scorecard["readiness"]["status"] = "ready";
   if (
-    issues.some(
-      (issue) =>
-        issue.code === "ammonia-detected" || issue.code === "nitrite-detected",
-    )
+    issues.some((issue) => issue.code === "ammonia-detected" || issue.code === "nitrite-detected")
   ) {
     status = "unsafe";
   } else if (
@@ -756,12 +707,8 @@ function scoreBioload(state: TankState): Scorecard["bioload"] {
   // planting and maintenance no longer inflate a fictional biological capacity,
   // and the result never contributes to the headline welfare score.
   const legacyReference = litres / 5;
-  const load = state.species.reduce(
-    (s, x) => s + x.species.bioload_factor * x.quantity,
-    0,
-  );
-  const loadPercent =
-    legacyReference > 0 ? Math.round((load / legacyReference) * 100) : 0;
+  const load = state.species.reduce((s, x) => s + x.species.bioload_factor * x.quantity, 0);
+  const loadPercent = legacyReference > 0 ? Math.round((load / legacyReference) * 100) : 0;
   const loadBand: Scorecard["bioload"]["loadBand"] =
     loadPercent > 110
       ? "very-high"
@@ -785,9 +732,7 @@ function scoreBioload(state: TankState): Scorecard["bioload"] {
   if (state.species.length === 0) {
     reasons.push("No fish added yet.");
   } else {
-    reasons.push(
-      `The preliminary waste-load screen is ${loadBand.replace("-", " ")}.`,
-    );
+    reasons.push(`The preliminary waste-load screen is ${loadBand.replace("-", " ")}.`);
     fixes.push(
       "Use this as a review flag only. Do not use it to decide how many more fish to add; confirm species needs, biofilter maturity and water-test trends.",
     );
@@ -832,11 +777,7 @@ function scoreSpace(state: TankState): SubScore {
         `Use a longer tank, at least ${Math.round(requiredLength)} cm, for ${sp.common_name}.`,
       );
     }
-    if (
-      sp.adult_size_cm >= 15 &&
-      quantity > 1 &&
-      litres / quantity < sp.min_tank_litres
-    ) {
+    if (sp.adult_size_cm >= 15 && quantity > 1 && litres / quantity < sp.min_tank_litres) {
       add(
         "footprint-crowded",
         "medium",
@@ -936,9 +877,7 @@ function scoreBiome(
     counts[sp.biotope_region] = (counts[sp.biotope_region] ?? 0) + quantity;
     total += quantity;
   }
-  const dominant = Object.entries(counts).sort(
-    (a, b) => b[1] - a[1],
-  )[0][0] as BiotopeRegion;
+  const dominant = Object.entries(counts).sort((a, b) => b[1] - a[1])[0][0] as BiotopeRegion;
 
   // "unmapped" is a bucket for species we have not placed, not a habitat.
   // Treating it as cohesive handed a true-biotope badge to tanks spanning
@@ -961,8 +900,7 @@ function scoreBiome(
               2,
         );
   const tempFit =
-    state.target_temp_c >= water.temp_min &&
-    state.target_temp_c <= water.temp_max
+    state.target_temp_c >= water.temp_min && state.target_temp_c <= water.temp_max
       ? 1
       : Math.max(
           0,
@@ -978,19 +916,15 @@ function scoreBiome(
   const hardscapeMatch =
     !mapped || state.hardscape.length === 0
       ? 0.5
-      : state.hardscape.filter((h) => h.hardscape.biotope_region === dominant)
-          .length / state.hardscape.length;
+      : state.hardscape.filter((h) => h.hardscape.biotope_region === dominant).length /
+        state.hardscape.length;
   const plantMatch =
     !mapped || state.plants.length === 0
       ? 0.5
       : state.plants.filter((p) => p.plant.biotope_region === dominant).length /
         state.plants.length;
 
-  const raw =
-    cohesion * 45 +
-    waterAuthenticity * 25 +
-    hardscapeMatch * 15 +
-    plantMatch * 15;
+  const raw = cohesion * 45 + waterAuthenticity * 25 + hardscapeMatch * 15 + plantMatch * 15;
   const score = Math.round(clamp(raw));
 
   const reasons: string[] = [];
@@ -1003,29 +937,23 @@ function scoreBiome(
     );
     fixes.push("For a biotope build, pick species that share one region.");
   } else {
-    reasons.push(
-      `Dominant biotope: ${dominantLabel}, ${Math.round(cohesion * 100)}% of stock.`,
-    );
+    reasons.push(`Dominant biotope: ${dominantLabel}, ${Math.round(cohesion * 100)}% of stock.`);
     if (unmappedShare > 0) {
       reasons.push(
         `${Math.round(unmappedShare * 100)}% of the stock is from a region we have not mapped yet, so it cannot count towards authenticity.`,
       );
     }
     if (cohesion < 1)
-      fixes.push(
-        `Remove species from other regions to strengthen the ${dominantLabel} theme.`,
-      );
+      fixes.push(`Remove species from other regions to strengthen the ${dominantLabel} theme.`);
     if (waterAuthenticity < 0.8)
       fixes.push(
         `Move target pH and temperature towards ${dominantLabel} ranges: ${water.ph_min}–${water.ph_max} pH, ${water.temp_min}–${water.temp_max} °C.`,
       );
     if (hardscapeMatch < 0.7)
       fixes.push(`Swap hardscape for items from the ${dominantLabel} region.`);
-    if (plantMatch < 0.7)
-      fixes.push(`Swap plants for species from the ${dominantLabel} region.`);
+    if (plantMatch < 0.7) fixes.push(`Swap plants for species from the ${dominantLabel} region.`);
   }
 
-  const badge =
-    mapped && cohesion === 1 && score >= 85 ? "true-biotope" : undefined;
+  const badge = mapped && cohesion === 1 && score >= 85 ? "true-biotope" : undefined;
   return { score, reasons, fixes, badge, dominantRegion: dominant };
 }

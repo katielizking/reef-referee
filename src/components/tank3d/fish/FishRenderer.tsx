@@ -4,16 +4,10 @@ import type { Species } from "@/lib/types";
 import { SpeciesPortrait } from "@/components/SpeciesPortrait";
 import type { FishMeshProps } from "../FishMesh";
 import { getFishAsset, resolveModelUrl } from "@/lib/fish3d/registry";
-import {
-  detectDeviceTier,
-  resolveQuality,
-  tierToLod,
-} from "@/lib/fish3d/quality";
+import { detectDeviceTier, resolveQuality, tierToLod } from "@/lib/fish3d/quality";
 import { FishAssetErrorBoundary } from "./FishAssetFallback";
 
-const GltfFish = lazy(() =>
-  import("./GltfFish").then((mod) => ({ default: mod.GltfFish })),
-);
+const GltfFish = lazy(() => import("./GltfFish").then((mod) => ({ default: mod.GltfFish })));
 
 export interface FishRendererProps extends FishMeshProps {
   species: Species;
@@ -30,24 +24,14 @@ function UnverifiedFishMarker({
   onSelect,
 }: Pick<
   FishRendererProps,
-  | "species"
-  | "basePosition"
-  | "length"
-  | "selected"
-  | "instanceIndex"
-  | "quantity"
-  | "onSelect"
+  "species" | "basePosition" | "length" | "selected" | "instanceIndex" | "quantity" | "onSelect"
 >) {
   if (instanceIndex > 0) return null;
 
   return (
     <group position={basePosition}>
       <mesh
-        scale={[
-          Math.max(length * 0.55, 0.18),
-          Math.max(length * 0.24, 0.09),
-          0.08,
-        ]}
+        scale={[Math.max(length * 0.55, 0.18), Math.max(length * 0.24, 0.09), 0.08]}
         onPointerDown={(event) => {
           event.stopPropagation();
           onSelect();
@@ -70,9 +54,7 @@ function UnverifiedFishMarker({
           />
           <div className="bg-ink px-2 py-1.5 text-center text-[8px] font-semibold leading-tight text-white">
             {species.common_name}
-            {quantity > 1 ? (
-              <span className="ml-1 text-lime">×{quantity}</span>
-            ) : null}
+            {quantity > 1 ? <span className="ml-1 text-lime">×{quantity}</span> : null}
             <span className="mt-0.5 block font-normal italic text-white/55">
               photographic reference
             </span>
@@ -84,8 +66,7 @@ function UnverifiedFishMarker({
 }
 
 export function FishRenderer(props: FishRendererProps) {
-  const { species, quantity, reduced, selected, showFineDetail, ...rest } =
-    props;
+  const { species, quantity, reduced, selected, showFineDetail, ...rest } = props;
   const asset = getFishAsset(species.id, species.scientific_name);
 
   const tier = resolveQuality({
@@ -97,8 +78,7 @@ export function FishRenderer(props: FishRendererProps) {
   });
 
   const canUseGltf = tier !== "procedural" && asset !== null;
-  const modelUrl =
-    canUseGltf && asset ? resolveModelUrl(asset, tierToLod(tier)) : null;
+  const modelUrl = canUseGltf && asset ? resolveModelUrl(asset, tierToLod(tier)) : null;
   const marker = (
     <UnverifiedFishMarker
       species={species}

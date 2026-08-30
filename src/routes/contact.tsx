@@ -58,14 +58,9 @@ function ContactPage() {
             Thanks. Your message is in the FishTankr review queue.
           </p>
         ) : (
-          <form
-            onSubmit={submit}
-            className="space-y-3 rounded-2xl border bg-card p-4"
-          >
+          <form onSubmit={submit} className="space-y-3 rounded-2xl border bg-card p-4">
             <label className="block">
-              <span className="text-xs font-semibold text-muted-foreground">
-                Email
-              </span>
+              <span className="text-xs font-semibold text-muted-foreground">Email</span>
               <input
                 type="email"
                 required
@@ -76,9 +71,7 @@ function ContactPage() {
               />
             </label>
             <label className="block">
-              <span className="text-xs font-semibold text-muted-foreground">
-                Topic
-              </span>
+              <span className="text-xs font-semibold text-muted-foreground">Topic</span>
               <select
                 value={topic}
                 onChange={(event) => setTopic(event.target.value)}
@@ -92,9 +85,7 @@ function ContactPage() {
               </select>
             </label>
             <label className="block">
-              <span className="text-xs font-semibold text-muted-foreground">
-                Message
-              </span>
+              <span className="text-xs font-semibold text-muted-foreground">Message</span>
               <textarea
                 required
                 minLength={10}
@@ -122,9 +113,9 @@ function ContactPage() {
       <PolicySection title="Claim or correct a shop listing">
         <p className="flex gap-2">
           <Store className="mt-1 h-4 w-4 shrink-0 text-primary" aria-hidden />
-          Choose “Claim or correct a shop” above and include the listing URL,
-          your role and a verifiable business contact method. Claiming a listing
-          does not automatically make it featured.
+          Choose “Claim or correct a shop” above and include the listing URL, your role and a
+          verifiable business contact method. Claiming a listing does not automatically make it
+          featured.
         </p>
       </PolicySection>
     </PolicyPage>

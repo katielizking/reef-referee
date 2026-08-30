@@ -1,10 +1,4 @@
-import {
-  createFileRoute,
-  Link,
-  useRouter,
-  useNavigate,
-  notFound,
-} from "@tanstack/react-router";
+import { createFileRoute, Link, useRouter, useNavigate, notFound } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import {
   ArrowLeft,
@@ -31,11 +25,7 @@ const speciesByIdQuery = (id: string) =>
   queryOptions({
     queryKey: ["species", id],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("species")
-        .select("*")
-        .eq("id", id)
-        .maybeSingle();
+      const { data, error } = await supabase.from("species").select("*").eq("id", id).maybeSingle();
       if (error) throw error;
       if (!data) throw notFound();
       return data as unknown as Species;
@@ -53,10 +43,7 @@ const allSpeciesQuery = queryOptions({
   staleTime: 5 * 60 * 1000,
 });
 
-function findRelated(
-  target: Species,
-  all: Species[],
-): Array<{ s: Species; reason: string }> {
+function findRelated(target: Species, all: Species[]): Array<{ s: Species; reason: string }> {
   const zoneLabel = { top: "top", mid: "mid-water", bottom: "bottom" } as const;
   const scored = all
     .filter((s) => s.id !== target.id)
@@ -64,17 +51,12 @@ function findRelated(
     .filter((s) => {
       // temperament / behavioural compatibility
       if (s.predatory || target.predatory) return false;
-      if (s.temperament === "aggressive" && target.temperament === "peaceful")
-        return false;
-      if (target.temperament === "aggressive" && s.temperament === "peaceful")
-        return false;
+      if (s.temperament === "aggressive" && target.temperament === "peaceful") return false;
+      if (target.temperament === "aggressive" && s.temperament === "peaceful") return false;
       if (s.fin_nipper && target.long_finned) return false;
       if (target.fin_nipper && s.long_finned) return false;
       // water params overlap
-      if (
-        s.native_ph_max < target.native_ph_min ||
-        s.native_ph_min > target.native_ph_max
-      )
+      if (s.native_ph_max < target.native_ph_min || s.native_ph_min > target.native_ph_max)
         return false;
       if (
         s.native_temp_max_c < target.native_temp_min_c ||
@@ -116,10 +98,7 @@ export const Route = createFileRoute("/species/$id")({
   head: ({ loaderData }) => {
     if (!loaderData) {
       return {
-        meta: [
-          { title: "Species — FishTankr" },
-          { name: "robots", content: "noindex" },
-        ],
+        meta: [{ title: "Species — FishTankr" }, { name: "robots", content: "noindex" }],
       };
     }
     const s = loaderData;
@@ -145,12 +124,8 @@ export const Route = createFileRoute("/species/$id")({
 function SpeciesNotFound() {
   return (
     <div className="mx-auto max-w-3xl px-4 py-16 text-center">
-      <h1 className="font-display text-2xl font-semibold">
-        We couldn't find that species
-      </h1>
-      <p className="mt-2 text-sm text-muted-foreground">
-        It may have been removed from the guide.
-      </p>
+      <h1 className="font-display text-2xl font-semibold">We couldn't find that species</h1>
+      <p className="mt-2 text-sm text-muted-foreground">It may have been removed from the guide.</p>
       <Link
         to="/"
         className="mt-6 inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground"
@@ -165,9 +140,7 @@ function SpeciesError({ error }: { error: Error }) {
   const router = useRouter();
   return (
     <div className="mx-auto max-w-3xl px-4 py-16 text-center">
-      <h1 className="font-display text-2xl font-semibold">
-        Something went wrong
-      </h1>
+      <h1 className="font-display text-2xl font-semibold">Something went wrong</h1>
       <p className="mt-2 text-sm text-muted-foreground">{error.message}</p>
       <button
         onClick={() => router.invalidate()}
@@ -210,11 +183,9 @@ function LegalityEvidence({ s }: { s: Species }) {
   }[s.legal_import_status ?? "unknown"];
 
   const possessionLabel = {
-    generally_permitted_check_state:
-      "Generally kept; check state and territory rules",
+    generally_permitted_check_state: "Generally kept; check state and territory rules",
     check_state_permits: "State or territory permits may apply",
-    prohibited_or_restricted:
-      "Prohibited or restricted; check your jurisdiction",
+    prohibited_or_restricted: "Prohibited or restricted; check your jurisdiction",
     check_state_rules: "Check state or territory rules",
   }[s.legal_possession_status ?? "check_state_rules"];
 
@@ -228,17 +199,13 @@ function LegalityEvidence({ s }: { s: Species }) {
   return (
     <section className="mt-10 rounded-2xl border bg-card p-5">
       <div className="flex items-start gap-3">
-        <ShieldCheck
-          className="mt-0.5 h-5 w-5 shrink-0 text-primary"
-          aria-hidden
-        />
+        <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-primary" aria-hidden />
         <div className="min-w-0 flex-1">
           <h2 className="font-display text-xl font-semibold text-foreground">
             Australia reference notes
           </h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Federal import eligibility and state possession rules are separate
-            checks.
+            Federal import eligibility and state possession rules are separate checks.
           </p>
         </div>
       </div>
@@ -248,25 +215,19 @@ function LegalityEvidence({ s }: { s: Species }) {
           <dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
             Federal import
           </dt>
-          <dd className="mt-1 text-sm font-medium text-foreground">
-            {importLabel}
-          </dd>
+          <dd className="mt-1 text-sm font-medium text-foreground">{importLabel}</dd>
         </div>
         <div className="rounded-xl bg-muted/50 p-3">
           <dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
             Keeping this species
           </dt>
-          <dd className="mt-1 text-sm font-medium text-foreground">
-            {possessionLabel}
-          </dd>
+          <dd className="mt-1 text-sm font-medium text-foreground">{possessionLabel}</dd>
         </div>
         <div className="rounded-xl bg-muted/50 p-3">
           <dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
             Evidence confidence
           </dt>
-          <dd className="mt-1 text-sm font-medium text-foreground">
-            {confidenceLabel}
-          </dd>
+          <dd className="mt-1 text-sm font-medium text-foreground">{confidenceLabel}</dd>
         </div>
         <div className="rounded-xl bg-muted/50 p-3">
           <dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
@@ -292,38 +253,26 @@ function LegalityEvidence({ s }: { s: Species }) {
         </a>
       ) : (
         <p className="mt-4 text-sm text-muted-foreground">
-          {s.legal_source_label ??
-            "A jurisdiction-specific source still needs to be added."}
+          {s.legal_source_label ?? "A jurisdiction-specific source still needs to be added."}
         </p>
       )}
 
       <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
-        FishTankr’s catalogue includes Australia-specific reference research; it
-        is not a global availability verdict. Confirm current rules with your
-        state or territory fisheries authority before buying, moving or
-        collecting fish.
+        FishTankr’s catalogue includes Australia-specific reference research; it is not a global
+        availability verdict. Confirm current rules with your state or territory fisheries authority
+        before buying, moving or collecting fish.
       </p>
     </section>
   );
 }
 
-function Stat({
-  icon: Icon,
-  label,
-  value,
-}: {
-  icon: typeof Ruler;
-  label: string;
-  value: string;
-}) {
+function Stat({ icon: Icon, label, value }: { icon: typeof Ruler; label: string; value: string }) {
   return (
     <div className="rounded-2xl border bg-card p-4">
       <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
         <Icon className="h-3.5 w-3.5" /> {label}
       </div>
-      <div className="mt-1 font-display text-xl font-semibold text-foreground">
-        {value}
-      </div>
+      <div className="mt-1 font-display text-xl font-semibold text-foreground">{value}</div>
     </div>
   );
 }
@@ -334,14 +283,9 @@ function SpeciesGuide() {
   const { data: allSpecies } = useSuspenseQuery(allSpeciesQuery);
   const related = findRelated(s, allSpecies);
 
-  const zoneLabel = { top: "Top", mid: "Mid-water", bottom: "Bottom" }[
-    s.swim_zone
-  ];
-  const temperament =
-    s.temperament.charAt(0).toUpperCase() + s.temperament.slice(1);
-  const groupText = s.is_schooling
-    ? `Schools of ${s.min_group_size}+`
-    : "Can be kept singly";
+  const zoneLabel = { top: "Top", mid: "Mid-water", bottom: "Bottom" }[s.swim_zone];
+  const temperament = s.temperament.charAt(0).toUpperCase() + s.temperament.slice(1);
+  const groupText = s.is_schooling ? `Schools of ${s.min_group_size}+` : "Can be kept singly";
 
   const welfare: string[] = [];
   if (s.is_schooling) {
@@ -355,14 +299,10 @@ function SpeciesGuide() {
     );
   }
   if (s.long_finned) {
-    welfare.push(
-      "Has long, delicate fins. Vulnerable to fin-nippers and strong currents.",
-    );
+    welfare.push("Has long, delicate fins. Vulnerable to fin-nippers and strong currents.");
   }
   if (s.predatory) {
-    welfare.push(
-      "A predator. Will eat any tank mate small enough to fit in its mouth.",
-    );
+    welfare.push("A predator. Will eat any tank mate small enough to fit in its mouth.");
   }
   if (s.temperament === "aggressive") {
     welfare.push(
@@ -403,8 +343,8 @@ function SpeciesGuide() {
             {s.scientific_name}
           </p>
           <p className="mt-6 max-w-md text-sm leading-relaxed text-muted-foreground">
-            A welfare-first profile covering adult needs, natural habitat,
-            social behaviour and the evidence used by FishTankr.
+            A welfare-first profile covering adult needs, natural habitat, social behaviour and the
+            evidence used by FishTankr.
           </p>
           <AddToTankButton species={s} />
         </div>
@@ -415,16 +355,8 @@ function SpeciesGuide() {
           At a glance
         </h2>
         <div className="mt-3 grid grid-cols-2 gap-3 md:grid-cols-3">
-          <Stat
-            icon={Ruler}
-            label="Adult size"
-            value={`${s.adult_size_cm} cm`}
-          />
-          <Stat
-            icon={Droplet}
-            label="Minimum tank"
-            value={`${s.min_tank_litres} L`}
-          />
+          <Stat icon={Ruler} label="Adult size" value={`${s.adult_size_cm} cm`} />
+          <Stat icon={Droplet} label="Minimum tank" value={`${s.min_tank_litres} L`} />
           <Stat icon={Waves} label="Swim zone" value={zoneLabel} />
           <Stat icon={Users} label="Temperament" value={temperament} />
           <Stat icon={Fish} label="Group size" value={groupText} />
@@ -437,9 +369,7 @@ function SpeciesGuide() {
       </section>
 
       <section className="mt-10">
-        <h2 className="font-display text-xl font-semibold text-foreground">
-          Welfare notes
-        </h2>
+        <h2 className="font-display text-xl font-semibold text-foreground">Welfare notes</h2>
         <ul className="mt-3 space-y-2">
           {welfare.map((w, i) => (
             <li
@@ -455,10 +385,7 @@ function SpeciesGuide() {
 
       <section className="mt-10 rounded-2xl border bg-card p-5">
         <div className="flex items-start gap-3">
-          <ShieldCheck
-            className="mt-0.5 h-5 w-5 shrink-0 text-primary"
-            aria-hidden
-          />
+          <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-primary" aria-hidden />
           <div className="min-w-0 flex-1">
             <h2 className="font-display text-xl font-semibold text-foreground">
               Care-data evidence
@@ -484,26 +411,19 @@ function SpeciesGuide() {
               </a>
             ) : (
               <p className="mt-3 rounded-xl bg-warn/10 p-3 text-sm text-muted-foreground">
-                A field-level care source has not yet been attached. Treat this
-                profile as provisional and cross-check it before stocking.
+                A field-level care source has not yet been attached. Treat this profile as
+                provisional and cross-check it before stocking.
               </p>
             )}
-            {s.conspecific_strategy &&
-              s.conspecific_strategy !== "unreviewed" && (
-                <p className="mt-3 text-sm text-muted-foreground">
-                  <span className="font-semibold text-foreground">
-                    Same-species strategy:
-                  </span>{" "}
-                  {s.conspecific_strategy.replace("_", " ")}
-                  {s.conspecific_sex_ratio_note
-                    ? ` · ${s.conspecific_sex_ratio_note}`
-                    : ""}
-                </p>
-              )}
-            {s.conspecific_notes && (
-              <p className="mt-2 text-sm text-muted-foreground">
-                {s.conspecific_notes}
+            {s.conspecific_strategy && s.conspecific_strategy !== "unreviewed" && (
+              <p className="mt-3 text-sm text-muted-foreground">
+                <span className="font-semibold text-foreground">Same-species strategy:</span>{" "}
+                {s.conspecific_strategy.replace("_", " ")}
+                {s.conspecific_sex_ratio_note ? ` · ${s.conspecific_sex_ratio_note}` : ""}
               </p>
+            )}
+            {s.conspecific_notes && (
+              <p className="mt-2 text-sm text-muted-foreground">{s.conspecific_notes}</p>
             )}
           </div>
         </div>
@@ -516,15 +436,11 @@ function SpeciesGuide() {
           How the calculator uses this species
         </h2>
         <p className="mt-2 text-sm text-muted-foreground">
-          The welfare score uses compatibility, swimming space and water
-          suitability. Cycle readiness is a safety gate; waste load and biome
-          are shown separately.
+          The welfare score uses compatibility, swimming space and water suitability. Cycle
+          readiness is a safety gate; waste load and biome are shown separately.
         </p>
         <div className="mt-4 space-y-3">
-          <ScoreBlock
-            title="Species compatibility"
-            body={compatibilityCopy(s)}
-          />
+          <ScoreBlock title="Species compatibility" body={compatibilityCopy(s)} />
           <ScoreBlock title="Bioload" body={bioloadCopy(s)} />
           <ScoreBlock title="Space to swim" body={spaceCopy(s)} />
           <ScoreBlock title="Biome replication" body={biomeCopy(s)} />
@@ -534,12 +450,10 @@ function SpeciesGuide() {
 
       {related.length > 0 && (
         <section className="mt-10">
-          <h2 className="font-display text-xl font-semibold text-foreground">
-            Related species
-          </h2>
+          <h2 className="font-display text-xl font-semibold text-foreground">Related species</h2>
           <p className="mt-2 text-sm text-muted-foreground">
-            Potential matches based on swim zone, temperament and water ranges.
-            Always score the complete group in the builder.
+            Potential matches based on swim zone, temperament and water ranges. Always score the
+            complete group in the builder.
           </p>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
             {related.map(({ s: r, reason }) => (
@@ -554,17 +468,13 @@ function SpeciesGuide() {
                     <div className="font-display text-base font-semibold text-foreground group-hover:text-primary">
                       {r.common_name}
                     </div>
-                    <div className="text-xs italic text-muted-foreground">
-                      {r.scientific_name}
-                    </div>
+                    <div className="text-xs italic text-muted-foreground">{r.scientific_name}</div>
                   </div>
                   <span className="shrink-0 rounded-full bg-muted px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
                     {BIOTOPE_LABEL[r.biotope_region]}
                   </span>
                 </div>
-                <div className="mt-1 text-xs text-muted-foreground">
-                  {reason}
-                </div>
+                <div className="mt-1 text-xs text-muted-foreground">{reason}</div>
               </Link>
             ))}
           </div>
@@ -572,8 +482,8 @@ function SpeciesGuide() {
       )}
 
       <p className="mt-10 rounded-xl bg-muted/60 px-4 py-3 text-xs text-muted-foreground">
-        This is a guide, not a guarantee. Individual fish vary — always check
-        the needs of each species and your local regulations before you buy.
+        This is a guide, not a guarantee. Individual fish vary — always check the needs of each
+        species and your local regulations before you buy.
       </p>
     </div>
   );
@@ -596,9 +506,8 @@ function AddToTankButton({ species }: { species: Species }) {
       </button>
       {prohibited && (
         <p className="mt-2 text-xs text-muted-foreground">
-          Heads up — this species is flagged as prohibited or restricted and
-          does not affect your welfare score. Check current rules where you live
-          before buying.
+          Heads up — this species is flagged as prohibited or restricted and does not affect your
+          welfare score. Check current rules where you live before buying.
         </p>
       )}
     </div>
@@ -608,9 +517,7 @@ function AddToTankButton({ species }: { species: Species }) {
 function ScoreBlock({ title, body }: { title: string; body: string }) {
   return (
     <div className="rounded-2xl border bg-card p-4">
-      <h3 className="font-display text-sm font-semibold text-foreground">
-        {title}
-      </h3>
+      <h3 className="font-display text-sm font-semibold text-foreground">{title}</h3>
       <p className="mt-1 text-sm text-muted-foreground">{body}</p>
     </div>
   );
@@ -623,15 +530,10 @@ function compatibilityCopy(s: Species): string {
       "it's a predator, so smaller tank mates will be eaten — a critical conflict that caps your overall score",
     );
   if (s.fin_nipper)
-    flags.push(
-      "as a fin-nipper it dings compatibility when paired with long-finned fish",
-    );
-  if (s.long_finned)
-    flags.push("its long fins make it a target for known nippers");
+    flags.push("as a fin-nipper it dings compatibility when paired with long-finned fish");
+  if (s.long_finned) flags.push("its long fins make it a target for known nippers");
   if (s.temperament === "aggressive")
-    flags.push(
-      "its aggressive temperament clashes with peaceful community fish",
-    );
+    flags.push("its aggressive temperament clashes with peaceful community fish");
   if (s.temperament === "semi-aggressive")
     flags.push("its semi-aggressive temperament can push peaceful fish around");
   if (flags.length === 0)
