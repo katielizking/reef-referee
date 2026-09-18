@@ -1,32 +1,7 @@
 import { BIOTOPE_LABEL } from "@/lib/types";
 import { WEIGHTS, type Issue, type Scorecard } from "@/lib/scoring";
 import { Link } from "@tanstack/react-router";
-
-type ResultKind = "good" | "watch" | "bad";
-
-function resultFor(overall: number, capReason: string | null): ResultKind {
-  if (overall < 45) return "bad";
-  if (overall < 75 || capReason) return "watch";
-  return "good";
-}
-
-const RESULT: Record<ResultKind, { word: string; sub: string; var: string }> = {
-  good: {
-    word: "Looks suitable so far",
-    sub: "Nothing needs your attention right now. Keep watching the fish and testing the water.",
-    var: "var(--verdict-good)",
-  },
-  watch: {
-    word: "Risky as planned",
-    sub: "There are welfare concerns to fix before you add fish.",
-    var: "var(--verdict-caution)",
-  },
-  bad: {
-    word: "Do not stock",
-    sub: "This plan has a serious welfare risk. Fix it before adding fish.",
-    var: "var(--verdict-critical)",
-  },
-};
+import { WelfareVerdictCard } from "@/components/WelfareVerdictCard";
 
 const SEVERITY_ORDER: Issue["severity"][] = ["critical", "high", "medium", "low"];
 
@@ -139,70 +114,10 @@ function ScoreRow({ title, score, statusLabel, weightPct, note, tag, issues, rea
 
 export function ScorecardPanel({ scorecard }: { scorecard: Scorecard }) {
   const s = scorecard;
-  const result = s.overall === null ? null : resultFor(s.overall, s.capReason);
-  const meta = result ? RESULT[result] : null;
 
   return (
     <div className="space-y-4">
-      {/* Verdict */}
-      <div className="fishtankr-panel p-5">
-        <p className="science-label text-water">Live referee</p>
-        {s.overall === null ? (
-          <>
-            <p className="data-mono mt-3 text-5xl leading-none text-muted-foreground">—</p>
-            <p className="mt-3 text-sm text-muted-foreground">
-              Add fish to see how well this tank meets their needs.
-            </p>
-          </>
-        ) : (
-          <>
-            <p className="mt-3 text-xl font-semibold tracking-tight" style={{ color: meta!.var }}>
-              {meta!.word}
-            </p>
-            <p className="mt-1 text-sm text-muted-foreground">{meta!.sub}</p>
-            <div
-              className="mt-4 flex items-end gap-2"
-              aria-label={`Welfare score ${s.overall} out of 100`}
-            >
-              <span className="data-mono text-3xl leading-none" style={{ color: meta!.var }}>
-                {s.overall}
-              </span>
-              <span className="data-mono text-xs text-muted-foreground">/100</span>
-            </div>
-            {s.capReason && (
-              <p
-                className="mt-3 border-l-2 pl-3 text-sm text-foreground"
-                style={{ borderColor: "var(--verdict-caution)" }}
-              >
-                {s.capReason}
-              </p>
-            )}
-          </>
-        )}
-      </div>
-
-      {/* Do this first */}
-      {s.priorityAction && (
-        <div
-          className="fishtankr-panel border-l-2 p-5"
-          style={{
-            borderLeftColor:
-              s.priorityAction.severity === "critical"
-                ? "var(--verdict-critical)"
-                : s.priorityAction.severity === "high"
-                  ? "var(--verdict-caution)"
-                  : "var(--water)",
-          }}
-        >
-          <p className="science-label text-muted-foreground">
-            Do this first · {s.priorityAction.category}
-          </p>
-          <p className="mt-3 text-base font-semibold tracking-tight text-foreground">
-            {s.priorityAction.title}
-          </p>
-          <p className="mt-1 text-sm text-muted-foreground">{s.priorityAction.action}</p>
-        </div>
-      )}
+      <WelfareVerdictCard scorecard={s} />
 
       {/* Instrument panel */}
       <div className="fishtankr-panel px-5 py-2">

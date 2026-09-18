@@ -8,12 +8,14 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 import { useEffect, useState, type ReactNode } from "react";
+import { Menu } from "lucide-react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "@/components/ui/sonner";
 import { BrandLogo } from "@/components/BrandLogo";
 import { WorkInProgressBanner } from "@/components/WorkInProgressBanner";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { supabase } from "@/integrations/supabase/client";
 import { absoluteUrl, SUPPORT_URL } from "@/lib/site";
 import { initializePostHog } from "@/lib/posthog";
@@ -200,22 +202,22 @@ const NAV_ITEMS: Array<{ to: string; label: string; exact?: boolean }> = [
 function SiteHeader() {
   const [open, setOpen] = useState(false);
   return (
-    <header className="sticky top-0 z-30 border-b border-ink/10 bg-foam/88 shadow-[0_1px_0_rgba(255,255,255,.8)] backdrop-blur-xl">
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-5 px-4 py-3.5">
+    <header className="sticky top-0 z-30 border-b border-ink/10 bg-foam/95 shadow-panel">
+      <div className="mx-auto flex min-h-16 max-w-7xl items-center justify-between gap-4 px-4 pb-3 pt-[max(0.75rem,env(safe-area-inset-top))]">
         <Link to="/" aria-label="FishTankr home" className="rounded-lg">
           <BrandLogo />
         </Link>
         <nav
           aria-label="Primary"
-          className="hidden items-center gap-1 rounded-full border border-ink/10 bg-white/70 p-1 text-sm shadow-sm md:flex"
+          className="hidden items-center gap-1 rounded-full border border-ink/10 bg-surface-raised p-1 text-sm shadow-panel md:flex"
         >
           {NAV_ITEMS.map((item) => (
             <Link
               key={item.to}
               to={item.to}
-              className="rounded-full px-3 py-1.5 font-medium text-muted-foreground transition-all hover:bg-foam hover:text-foreground"
+              className="rounded-full px-3 py-2 font-medium text-muted-foreground transition-colors hover:bg-foam hover:text-foreground"
               activeProps={{
-                className: "rounded-full bg-ink px-3 py-1.5 font-semibold text-white shadow-sm",
+                className: "rounded-full bg-ink px-3 py-2 font-semibold text-on-ink shadow-panel",
               }}
               activeOptions={item.exact ? { exact: true } : undefined}
             >
@@ -223,58 +225,53 @@ function SiteHeader() {
             </Link>
           ))}
         </nav>
-        <button
-          type="button"
-          className="inline-flex items-center justify-center rounded-lg border p-2 md:hidden"
-          aria-label={open ? "Close menu" : "Open menu"}
-          aria-expanded={open}
-          onClick={() => setOpen((v) => !v)}
-        >
-          <svg
-            viewBox="0 0 24 24"
-            width="18"
-            height="18"
-            aria-hidden
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
+        <Sheet open={open} onOpenChange={setOpen}>
+          <SheetTrigger asChild>
+            <button
+              type="button"
+              className="inline-flex size-11 items-center justify-center rounded-xl border border-ink/15 bg-surface-raised text-foreground shadow-panel md:hidden"
+              aria-label="Open navigation"
+            >
+              <Menu className="size-5" aria-hidden />
+            </button>
+          </SheetTrigger>
+          <SheetContent
+            side="right"
+            className="flex h-full w-[min(22rem,calc(100%-1.5rem))] flex-col gap-0 border-l border-ink/10 bg-background p-0"
           >
-            {open ? (
-              <>
-                <path d="M6 6l12 12" />
-                <path d="M6 18L18 6" />
-              </>
-            ) : (
-              <>
-                <path d="M4 7h16" />
-                <path d="M4 12h16" />
-                <path d="M4 17h16" />
-              </>
-            )}
-          </svg>
-        </button>
-      </div>
-      {open && (
-        <nav aria-label="Mobile" className="border-t bg-background md:hidden">
-          <div className="mx-auto flex max-w-7xl flex-col px-2 py-2 text-sm">
-            {NAV_ITEMS.map((item) => (
+            <SheetHeader className="border-b border-ink/10 px-5 pb-5 pt-[max(1.5rem,calc(env(safe-area-inset-top)+1rem))] text-left">
+              <SheetTitle className="font-display text-ui-heading">Navigate FishTankr</SheetTitle>
+              <p className="text-ui-label text-muted-foreground">Plan a calmer, safer tank.</p>
+            </SheetHeader>
+            <nav aria-label="Mobile" className="flex flex-1 flex-col gap-1 overflow-y-auto p-3">
+              {NAV_ITEMS.map((item) => (
+                <Link
+                  key={item.to}
+                  to={item.to}
+                  onClick={() => setOpen(false)}
+                  className="flex min-h-11 items-center rounded-xl px-3 text-ui-label font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                  activeProps={{
+                    className:
+                      "flex min-h-11 items-center rounded-xl bg-muted px-3 text-ui-label font-semibold text-foreground",
+                  }}
+                  activeOptions={item.exact ? { exact: true } : undefined}
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </nav>
+            <div className="border-t border-ink/10 p-4 pb-[calc(env(safe-area-inset-bottom)+1rem)]">
               <Link
-                key={item.to}
-                to={item.to}
+                to="/"
                 onClick={() => setOpen(false)}
-                className="rounded-lg px-3 py-2 font-medium text-muted-foreground hover:bg-muted"
-                activeProps={{
-                  className: "rounded-lg px-3 py-2 font-semibold bg-muted text-foreground",
-                }}
-                activeOptions={item.exact ? { exact: true } : undefined}
+                className="flex min-h-12 w-full items-center justify-center rounded-xl bg-primary px-4 text-ui-label font-semibold text-primary-foreground shadow-panel transition-colors hover:bg-primary/90"
               >
-                {item.label}
+                Build your tank
               </Link>
-            ))}
-          </div>
-        </nav>
-      )}
+            </div>
+          </SheetContent>
+        </Sheet>
+      </div>
     </header>
   );
 }
