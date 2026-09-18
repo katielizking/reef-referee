@@ -2,74 +2,15 @@ import { useState } from "react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { ScorecardPanel } from "@/components/Scorecard";
 import type { Scorecard } from "@/lib/scoring";
-import { AlertCircle, AlertTriangle, CheckCircle2, ChevronUp } from "lucide-react";
-
-function toneFor(overall: number | null, capReason: string | null) {
-  if (overall === null)
-    return {
-      label: "No score yet",
-      sub: "Add fish to see your score",
-      bg: "bg-muted",
-      chip: "bg-background text-muted-foreground border",
-      Icon: AlertCircle,
-    };
-  if (overall < 45)
-    return {
-      label: "Do not stock",
-      sub: "Fix the serious risk first",
-      bg: "bg-coral/15",
-      chip: "bg-coral/20 text-foreground",
-      Icon: AlertTriangle,
-    };
-  if (overall < 75 || capReason)
-    return {
-      label: "Risky as planned",
-      sub: "Fix the welfare concerns first",
-      bg: "bg-warn/15",
-      chip: "bg-warn/20 text-foreground",
-      Icon: AlertCircle,
-    };
-  return {
-    label: "Looks suitable so far",
-    sub: "Keep watching the fish and water",
-    bg: "bg-lime/20",
-    chip: "bg-lime/30 text-foreground",
-    Icon: CheckCircle2,
-  };
-}
+import { WelfareVerdictCard } from "@/components/WelfareVerdictCard";
+import { welfareVerdictFor } from "@/lib/welfare-verdict";
+import { ChevronUp } from "lucide-react";
 
 export function MobileWelfareSummary({ scorecard }: { scorecard: Scorecard }) {
-  const tone = toneFor(scorecard.overall, scorecard.capReason);
-  const Icon = tone.Icon;
   return (
-    <section
-      className={`fishtankr-panel rounded-[1.5rem] border-l-4 p-4 lg:hidden ${scorecard.overall !== null && scorecard.overall < 45 ? "border-l-coral" : scorecard.capReason ? "border-l-warn" : "border-l-primary"}`}
-      aria-label="Current welfare verdict"
-    >
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <p className="science-label text-primary">Welfare verdict</p>
-          <p className="mt-1 flex items-center gap-2 font-display text-xl font-bold text-foreground">
-            <Icon className="h-5 w-5" aria-hidden />
-            {tone.label}
-          </p>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {scorecard.priorityAction?.action ?? tone.sub}
-          </p>
-        </div>
-        <span
-          className="rounded-full bg-muted px-3 py-2 font-display text-lg font-bold text-foreground"
-          aria-label={
-            scorecard.overall === null ? "No score yet" : `Score ${scorecard.overall} out of 100`
-          }
-        >
-          {scorecard.overall ?? "—"}
-        </span>
-      </div>
-      <p className="mt-3 text-xs font-semibold text-primary">
-        Open the score below to see what matters and what to do next.
-      </p>
-    </section>
+    <div className="lg:hidden">
+      <WelfareVerdictCard scorecard={scorecard} compact />
+    </div>
   );
 }
 
@@ -80,8 +21,8 @@ export function MobileWelfareSummary({ scorecard }: { scorecard: Scorecard }) {
  */
 export function MobileScoreBar({ scorecard }: { scorecard: Scorecard }) {
   const [open, setOpen] = useState(false);
-  const tone = toneFor(scorecard.overall, scorecard.capReason);
-  const Icon = tone.Icon;
+  const verdict = welfareVerdictFor(scorecard);
+  const { Icon } = verdict;
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -89,23 +30,26 @@ export function MobileScoreBar({ scorecard }: { scorecard: Scorecard }) {
         <button
           type="button"
           aria-label={`Overall score ${scorecard.overall ?? "not yet available"}. Tap to view full scorecard.`}
-          className={`fixed inset-x-3 bottom-[calc(env(safe-area-inset-bottom)+0.75rem)] z-40 flex items-center justify-between gap-3 rounded-2xl border bg-card px-4 py-3 shadow-[0_12px_35px_rgba(18,35,46,.18)] shadow-lg lg:hidden ${tone.bg}`}
+          className="fixed inset-x-3 bottom-[calc(env(safe-area-inset-bottom)+0.75rem)] z-40 flex items-center justify-between gap-3 rounded-2xl border border-ink/10 bg-card px-4 py-3 shadow-float lg:hidden"
         >
           <div className="flex items-center gap-3">
             <div
-              className="flex h-11 w-11 items-center justify-center rounded-full bg-card text-base font-semibold text-foreground shadow-sm"
+              className="data-mono flex size-11 items-center justify-center rounded-full bg-ink text-base font-semibold text-on-ink shadow-panel"
               aria-hidden
             >
               {scorecard.overall ?? "—"}
             </div>
             <div className="text-left">
               <div
-                className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold ${tone.chip}`}
+                className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold text-foreground"
+                style={{ background: `color-mix(in srgb, ${verdict.accent} 18%, transparent)` }}
               >
                 <Icon className="h-3 w-3" aria-hidden />
-                {tone.label}
+                {verdict.label}
               </div>
-              <p className="text-xs text-muted-foreground">{tone.sub}</p>
+              <p className="text-xs text-muted-foreground">
+                {scorecard.priorityAction?.title ?? verdict.summary}
+              </p>
             </div>
           </div>
           <ChevronUp className="h-4 w-4 text-muted-foreground" aria-hidden />

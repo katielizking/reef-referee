@@ -37,56 +37,60 @@ interface Props {
 export function BuilderSteps({ state, onJump }: Props) {
   const status = stepStatus(state);
   const completed = STEPS.filter((step) => status[step.id]).length;
-  const currentIdx = STEPS.findIndex((step) => !status[step.id]);
+  const currentIdx = Math.max(
+    0,
+    STEPS.findIndex((step) => !status[step.id]),
+  );
   const progress = Math.round((completed / STEPS.length) * 100);
 
   return (
     <nav
       aria-label="Builder progress"
-      className="mb-4 overflow-hidden rounded-[1.25rem] sm:mb-5 sm:rounded-[1.5rem] bg-ink text-white shadow-[0_16px_40px_rgba(18,35,46,.16)]"
+      className="mb-4 overflow-hidden rounded-2xl bg-ink text-on-ink shadow-float sm:mb-5"
     >
-      <div className="flex items-center justify-between gap-3 border-b border-white/10 px-4 py-3 sm:gap-4 sm:px-5">
+      <div className="flex items-center justify-between gap-3 border-b border-white/10 px-4 py-4 sm:px-6">
         <div>
-          <p className="science-label text-blue">Your progress</p>
-          <p className="mt-1 text-xs text-white/55">
-            {completed} of {STEPS.length} foundations set
+          <p className="science-label text-blue">Tank plan</p>
+          <p className="mt-1 text-ui-caption text-on-ink-muted">
+            Step {Math.min(currentIdx + 1, STEPS.length)} of {STEPS.length} · {completed} complete
           </p>
         </div>
-        <div className="flex items-center gap-3">
-          <div className="hidden h-1.5 w-28 overflow-hidden rounded-full bg-white/10 sm:block">
+        <div className="flex min-w-[5rem] items-center gap-2">
+          <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-white/10">
             <div
-              className="h-full rounded-full bg-lime transition-all duration-500"
+              className="h-full rounded-full bg-lime transition-[width] duration-200 ease-out"
               style={{ width: `${progress}%` }}
             />
           </div>
-          <span className="font-display text-sm font-bold text-lime">{progress}%</span>
+          <span className="data-mono text-ui-caption font-semibold text-lime">{progress}%</span>
         </div>
       </div>
-      <ol className="flex snap-x snap-mandatory overflow-x-auto overscroll-x-contain p-2 [scrollbar-width:none] sm:grid sm:grid-cols-4 sm:overflow-visible">
+      <ol className="grid grid-cols-4 gap-1 p-2 sm:gap-2 sm:p-3">
         {STEPS.map((step, index) => {
           const done = status[step.id];
           const current = index === currentIdx;
           return (
-            <li key={step.id} className="min-w-[9.25rem] flex-1 snap-start sm:min-w-0">
+            <li key={step.id}>
               <button
                 type="button"
                 onClick={() => onJump(step.id)}
                 aria-current={current ? "step" : undefined}
-                className={`group flex min-h-14 w-full items-center gap-3 rounded-2xl px-3 py-3 text-left transition-all ${
+                aria-label={`${step.label}. ${done ? "Complete" : current ? "Current step" : step.sub}`}
+                className={`group flex min-h-14 w-full flex-col items-center justify-center gap-1 rounded-xl px-1 py-2 text-center transition-[background-color,color,box-shadow,transform] duration-200 ease-out sm:flex-row sm:justify-start sm:gap-3 sm:px-3 sm:py-3 sm:text-left ${
                   current
-                    ? "bg-white text-ink shadow-sm"
+                    ? "bg-white text-ink shadow-panel"
                     : done
-                      ? "text-white hover:bg-white/10"
-                      : "text-white/55 hover:bg-white/5 hover:text-white"
+                      ? "text-on-ink hover:bg-white/10"
+                      : "text-on-ink-muted hover:bg-white/5 hover:text-on-ink"
                 }`}
               >
                 <span
-                  className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full border text-xs font-bold transition ${
+                  className={`flex size-7 shrink-0 items-center justify-center rounded-full border text-ui-caption font-bold transition-colors sm:size-8 ${
                     done
                       ? "border-lime bg-lime text-ink"
                       : current
                         ? "border-blue bg-blue text-white"
-                        : "border-white/20 text-white/50"
+                        : "border-white/20 text-on-ink-muted"
                   }`}
                   aria-hidden
                 >
@@ -97,7 +101,7 @@ export function BuilderSteps({ state, onJump }: Props) {
                     {step.label}
                   </span>
                   <span
-                    className={`block truncate text-[11px] ${current ? "text-ink/55" : "text-white/45"}`}
+                    className={`hidden truncate text-ui-caption sm:block ${current ? "text-ink/65" : "text-on-ink-muted"}`}
                   >
                     {done ? "Ready" : step.sub}
                   </span>
