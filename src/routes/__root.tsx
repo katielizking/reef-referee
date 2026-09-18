@@ -282,7 +282,7 @@ function SiteFooter() {
       <div className="mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:grid-cols-[1fr_auto] sm:items-start">
         <div>
           <div className="flex items-center gap-2">
-            <BrandLogo size={22} showWordmark={false} />
+            <BrandLogo size={22} />
             <span className="font-display font-semibold text-white">
               Smarter tanks. Happier fish.
             </span>

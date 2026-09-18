@@ -1,38 +1,20 @@
+import wordmarkAsset from "@/assets/fishtankr-compact.svg.asset.json";
+
 interface BrandLogoProps {
   size?: number;
-  showWordmark?: boolean;
   className?: string;
 }
 
-/**
- * FishTankr wordmark + mark. The mark is a rounded tank silhouette with a
- * waterline and a bubble — works as favicon, nav icon, or full wordmark.
- */
-export function BrandLogo({ size = 32, showWordmark = true, className }: BrandLogoProps) {
+/** FishTankr supplied wordmark artwork. */
+export function BrandLogo({ size = 32, className }: BrandLogoProps) {
   return (
-    <span className={`inline-flex items-center gap-2 ${className ?? ""}`}>
-      <svg width={size} height={size} viewBox="0 0 32 32" aria-hidden="true" className="shrink-0">
-        <rect x="3" y="3" width="26" height="26" rx="7" fill="var(--blue)" />
-        {/* waterline */}
-        <path
-          d="M6 15 Q10 13 14 15 T22 15 T28 15"
-          fill="none"
-          stroke="white"
-          strokeWidth="1.8"
-          strokeLinecap="round"
-        />
-        {/* bubble */}
-        <circle cx="22" cy="9" r="1.5" fill="white" />
-        {/* small fish body */}
-        <path d="M11 22 Q14 19 18 22 Q14 25 11 22 Z" fill="white" />
-        <path d="M18 22 L21 20 L21 24 Z" fill="white" />
-      </svg>
-      {showWordmark && (
-        <span className="font-display text-lg font-semibold tracking-tight text-foreground">
-          FishTankr
-        </span>
-      )}
-    </span>
+    <img
+      src={wordmarkAsset.url}
+      alt="FishTankr"
+      width={Math.round(size * (706 / 174))}
+      height={size}
+      className={`block h-auto shrink-0 ${className ?? ""}`}
+    />
   );
 }
 
