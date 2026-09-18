@@ -92,6 +92,22 @@ function MethodologyPage() {
         </div>
       </section>
 
+      <section className="mt-8 rounded-[1.75rem] border border-primary/25 bg-primary/5 p-5 sm:p-7">
+        <div className="flex items-start gap-3">
+          <ShieldCheck className="mt-1 h-5 w-5 shrink-0 text-primary" aria-hidden />
+          <div>
+            <h2 className="font-display text-xl font-bold text-foreground">
+              One big problem outweighs a good average
+            </h2>
+            <p className="mt-2 leading-relaxed text-muted-foreground">
+              Great water can't make up for a fish that gets eaten. Any critical problem, like
+              predation or a tank that's far too small, caps the score at 40. Any serious problem
+              caps it at 70, so the plan can't show as looking good until it's fixed.
+            </p>
+          </div>
+        </div>
+      </section>
+
       <section className="mt-8 rounded-[1.75rem] border border-warn/35 bg-warn/10 p-5 sm:p-7">
         <div className="flex items-start gap-3">
           <TriangleAlert className="mt-1 h-5 w-5 shrink-0 text-warn" aria-hidden />

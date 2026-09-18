@@ -167,6 +167,13 @@ function LegalBadge({ s }: { s: Species }) {
       </span>
     );
   }
+  if (s.legal_status === "not_importable") {
+    return (
+      <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2.5 py-1 text-xs font-semibold text-foreground">
+        <Info className="h-3.5 w-3.5" /> Australia: local stock only
+      </span>
+    );
+  }
   return (
     <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2.5 py-1 text-xs font-semibold text-muted-foreground">
       <Info className="h-3.5 w-3.5" /> Australia: listed
@@ -552,6 +559,9 @@ function biomeCopy(s: Species): string {
 function legalityCopy(s: Species): string {
   if (s.legal_status === "prohibited") {
     return "Our Australian reference data lists this fish as prohibited or restricted. Those rules may not apply where you live, so check local import and keeping laws before buying.";
+  }
+  if (s.legal_status === "not_importable") {
+    return "This fish is not on the federal permitted import list, so any sold in Australia must come from local breeding. Some of these are well established in the hobby and some are barely here at all. Ask the shop where the fish came from, and check your state or territory rules before buying.";
   }
   if (s.legal_status === "native") {
     return "This fish is native to Australia. Rules for collecting, importing and keeping it vary by region, so check your local guidance before buying.";
