@@ -16,6 +16,7 @@ import { BrandLogo } from "@/components/BrandLogo";
 import { WorkInProgressBanner } from "@/components/WorkInProgressBanner";
 import { supabase } from "@/integrations/supabase/client";
 import { absoluteUrl, SUPPORT_URL } from "@/lib/site";
+import { initializePostHog } from "@/lib/posthog";
 
 function NotFoundComponent() {
   return (
@@ -138,6 +139,10 @@ function RootShell({ children }: { children: ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const [authReady, setAuthReady] = useState(false);
+
+  useEffect(() => {
+    void initializePostHog();
+  }, []);
 
   useEffect(() => {
     let cancelled = false;

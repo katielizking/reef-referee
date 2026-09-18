@@ -24,7 +24,7 @@ function PrivacyPage() {
     <PolicyPage
       eyebrow="Privacy"
       title="Privacy and storage"
-      intro="Here’s what FishTankr stores, why we need it and what choices you have. Last updated 27 August 2026."
+      intro="Here’s what FishTankr stores, why we need it and what choices you have. Last updated 18 September 2026."
     >
       <PolicySection title="What we collect">
         <p>
@@ -38,6 +38,19 @@ function PrivacyPage() {
           problems appear most often or whether someone opens a shop link. We do not intentionally
           collect your name, precise location, card details or health information through the
           builder.
+        </p>
+      </PolicySection>
+      <PolicySection title="Usage analytics">
+        <p>
+          When enabled, we use PostHog to understand which pages people visit and which controls
+          they use. PostHog uses a browser identifier, cookies and local storage to connect visits.
+          These events include basic technical information such as browser and device type. We do
+          not link this identifier to your email address or saved-tank account.
+        </p>
+        <p>
+          Session recording is disabled. Text and element attributes are masked in automatic click
+          tracking, and query strings and fragments are removed from page and referrer URLs before
+          events are sent. We honour your browser’s Do Not Track setting.
         </p>
       </PolicySection>
       <PolicySection title="Browser storage">

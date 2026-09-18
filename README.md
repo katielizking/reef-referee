@@ -68,6 +68,24 @@ bun run test
 bun run build
 ```
 
+## PostHog analytics
+
+Set `VITE_POSTHOG_KEY` to the public project token from PostHog project settings and
+`VITE_POSTHOG_HOST` to that project's ingestion host (`https://us.i.posthog.com` or
+`https://eu.i.posthog.com`). Add both to the deployment's build environment and rebuild.
+Never use a personal API key. These `VITE_` values are public browser configuration.
+
+Analytics loads asynchronously in production builds only. Without both values, it does
+nothing. Page views include client-side navigation; click tracking masks text and element
+attributes. Session recording and person profiles are disabled, URL query strings and
+fragments are stripped, and Do Not Track is respected. No Supabase user IDs or emails are
+sent explicitly.
+
+To verify, build with the variables configured, run `bun run preview`, visit a few pages
+and click a navigation control. Check PostHog's live events for `$pageview` and
+`$autocapture`. Test with Do Not Track off and without an analytics blocker. Local `dev`
+mode intentionally sends no events. Removing either variable and rebuilding disables it.
+
 ## Database
 
 Supabase migrations live in `supabase/migrations`. Apply migrations in chronological order. Saved tanks belong to anonymous authenticated users, while shared tanks are exposed only through a sanitised read-only database function.
