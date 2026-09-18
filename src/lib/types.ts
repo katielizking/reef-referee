@@ -53,7 +53,7 @@ export interface Species {
   biotope_region: BiotopeRegion;
   native_habitat_type: string;
   legal_in_australia: boolean;
-  legal_status: "permitted" | "native" | "prohibited";
+  legal_status: "permitted" | "native" | "not_importable" | "prohibited";
   legal_note: string | null;
   legal_import_status:
     | "permitted_with_conditions"
