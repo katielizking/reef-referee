@@ -77,7 +77,7 @@ export const Route = createFileRoute("/shops/$slug")({
       scripts: [
         {
           type: "application/ld+json",
-          children: JSON.stringify({
+          children: safeJsonLd({
             "@context": "https://schema.org",
             "@type": "LocalBusiness",
             name: s.name,
