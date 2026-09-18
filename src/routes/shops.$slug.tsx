@@ -25,6 +25,17 @@ type Shop = {
   claimed_at: string | null;
 };
 
+// Shop records are database-supplied, so escape any characters that could break
+// out of the <script type="application/ld+json"> element.
+function safeJsonLd(value: unknown): string {
+  return JSON.stringify(value)
+    .replace(/</g, "\\u003c")
+    .replace(/>/g, "\\u003e")
+    .replace(/&/g, "\\u0026")
+    .replace(/\u2028/g, "\\u2028")
+    .replace(/\u2029/g, "\\u2029");
+}
+
 async function fetchShop(slug: string): Promise<Shop | null> {
   const { data, error } = await supabase
     .from("aquarium_shops")
