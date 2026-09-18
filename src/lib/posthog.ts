@@ -4,8 +4,12 @@ let initialization: Promise<void> | undefined;
 export function initializePostHog(): Promise<void> {
   if (typeof window === "undefined" || !import.meta.env.PROD) return Promise.resolve();
 
-  const key = import.meta.env.VITE_POSTHOG_KEY?.trim();
-  const host = import.meta.env.VITE_POSTHOG_HOST?.trim();
+  // Public browser project token, not a secret/personal API key.
+  // Explicit empty environment overrides disable analytics.
+  const key = (
+    import.meta.env.VITE_POSTHOG_KEY ?? "phc_yicKsESeQQ3k8GU4ADKuSg2CM2uhqzzLe672vEjcEoWh"
+  ).trim();
+  const host = (import.meta.env.VITE_POSTHOG_HOST ?? "https://us.i.posthog.com").trim();
   if (!key || !host) return Promise.resolve();
 
   initialization ??= import("posthog-js")

@@ -18,6 +18,18 @@ function configure() {
 }
 
 describe("PostHog initialization", () => {
+  it("uses the configured US Cloud project when no overrides are supplied", async () => {
+    configure();
+    vi.stubEnv("VITE_POSTHOG_KEY", undefined);
+    vi.stubEnv("VITE_POSTHOG_HOST", undefined);
+    const { initializePostHog } = await import("./posthog");
+    await initializePostHog();
+    expect(init).toHaveBeenCalledWith(
+      "phc_yicKsESeQQ3k8GU4ADKuSg2CM2uhqzzLe672vEjcEoWh",
+      expect.objectContaining({ api_host: "https://us.i.posthog.com" }),
+    );
+  });
+
   it("does nothing on the server", async () => {
     configure();
     vi.stubGlobal("window", undefined);
