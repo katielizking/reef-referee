@@ -17,9 +17,14 @@ export type Database = {
       aquarium_shops: {
         Row: {
           address: string | null
+          affiliate_url: string | null
+          claimed_at: string | null
+          country_code: string
           created_at: string
           description: string | null
+          featured: boolean
           id: string
+          is_affiliate: boolean
           lat: number | null
           lng: number | null
           name: string
@@ -34,9 +39,14 @@ export type Database = {
         }
         Insert: {
           address?: string | null
+          affiliate_url?: string | null
+          claimed_at?: string | null
+          country_code?: string
           created_at?: string
           description?: string | null
+          featured?: boolean
           id?: string
+          is_affiliate?: boolean
           lat?: number | null
           lng?: number | null
           name: string
@@ -51,9 +61,14 @@ export type Database = {
         }
         Update: {
           address?: string | null
+          affiliate_url?: string | null
+          claimed_at?: string | null
+          country_code?: string
           created_at?: string
           description?: string | null
+          featured?: boolean
           id?: string
+          is_affiliate?: boolean
           lat?: number | null
           lng?: number | null
           name?: string
@@ -116,6 +131,30 @@ export type Database = {
           tags?: string[]
           title?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      contact_requests: {
+        Row: {
+          created_at: string
+          email: string
+          id: number
+          message: string
+          topic: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: number
+          message: string
+          topic: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: number
+          message?: string
+          topic?: string
         }
         Relationships: []
       }
@@ -185,13 +224,70 @@ export type Database = {
         }
         Relationships: []
       }
+      score_events: {
+        Row: {
+          created_at: string
+          id: number
+          issue_codes: string[]
+          verdict: string
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          issue_codes?: string[]
+          verdict: string
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          issue_codes?: string[]
+          verdict?: string
+        }
+        Relationships: []
+      }
+      shop_outbound_events: {
+        Row: {
+          created_at: string
+          destination: string
+          id: number
+          shop_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          destination: string
+          id?: number
+          shop_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          destination?: string
+          id?: number
+          shop_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shop_outbound_events_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "aquarium_shops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       species: {
         Row: {
           active: boolean
           adult_size_cm: number
           bioload_factor: number
           biotope_region: string
+          care_confidence: string
+          care_reviewed_on: string | null
+          care_source_label: string | null
+          care_source_url: string | null
           common_name: string
+          conspecific_notes: string | null
+          conspecific_sex_ratio_note: string | null
+          conspecific_strategy: string
           fin_nipper: boolean
           id: string
           is_schooling: boolean
@@ -216,7 +312,14 @@ export type Database = {
           adult_size_cm: number
           bioload_factor: number
           biotope_region: string
+          care_confidence?: string
+          care_reviewed_on?: string | null
+          care_source_label?: string | null
+          care_source_url?: string | null
           common_name: string
+          conspecific_notes?: string | null
+          conspecific_sex_ratio_note?: string | null
+          conspecific_strategy?: string
           fin_nipper?: boolean
           id?: string
           is_schooling?: boolean
@@ -241,7 +344,14 @@ export type Database = {
           adult_size_cm?: number
           bioload_factor?: number
           biotope_region?: string
+          care_confidence?: string
+          care_reviewed_on?: string | null
+          care_source_label?: string | null
+          care_source_url?: string | null
           common_name?: string
+          conspecific_notes?: string | null
+          conspecific_sex_ratio_note?: string | null
+          conspecific_strategy?: string
           fin_nipper?: boolean
           id?: string
           is_schooling?: boolean
@@ -451,12 +561,43 @@ export type Database = {
           },
         ]
       }
+      waitlist_signups: {
+        Row: {
+          created_at: string
+          email: string
+          source: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          source?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          source?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
       get_shared_tank: { Args: { p_slug: string }; Returns: Json }
+      join_account_waitlist: { Args: { p_email: string }; Returns: undefined }
+      record_score_event: {
+        Args: { p_issue_codes: string[]; p_verdict: string }
+        Returns: undefined
+      }
+      record_shop_outbound: {
+        Args: { p_destination: string; p_shop_id: string }
+        Returns: undefined
+      }
+      submit_contact_request: {
+        Args: { p_email: string; p_message: string; p_topic: string }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
