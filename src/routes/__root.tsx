@@ -27,17 +27,17 @@ function NotFoundComponent() {
       <div className="max-w-md text-center">
         <h1 className="font-display text-6xl font-bold text-foreground">404</h1>
         <h2 className="mt-4 font-display text-xl font-semibold text-foreground">
-          Nothing swimming here
+          This page has swum off
         </h2>
         <p className="mt-2 text-sm text-muted-foreground">
-          The page you're after may have moved. Let's get you back to your tank.
+          The page may have moved. Head back to your tank plan.
         </p>
         <div className="mt-6">
           <Link
             to="/"
             className="inline-flex items-center justify-center rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:brightness-95"
           >
-            Back to the builder
+            Back to my tank
           </Link>
         </div>
       </div>
@@ -60,7 +60,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
           Something's not quite right
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Give it another go, or head back to the builder.
+          Try again, or head back to your tank plan.
         </p>
         <div className="mt-6 flex flex-wrap justify-center gap-2">
           <button
@@ -76,7 +76,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
             href="/"
             className="inline-flex items-center justify-center rounded-xl border bg-card px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted"
           >
-            Back to the builder
+            Back to my tank
           </a>
         </div>
       </div>
@@ -84,7 +84,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   );
 }
 
-const TITLE = "FishTankr — Smarter tanks. Happier fish.";
+const TITLE = "FishTankr | Smarter tanks. Happier fish.";
 const DESC =
   "Plan a freshwater tank, check whether the fish suit each other and understand what they need to thrive.";
 
@@ -240,8 +240,10 @@ function SiteHeader() {
             className="flex h-full w-[min(22rem,calc(100%-1.5rem))] flex-col gap-0 border-l border-ink/10 bg-background p-0"
           >
             <SheetHeader className="border-b border-ink/10 px-5 pb-5 pt-[max(1.5rem,calc(env(safe-area-inset-top)+1rem))] text-left">
-              <SheetTitle className="font-display text-ui-heading">Navigate FishTankr</SheetTitle>
-              <p className="text-ui-label text-muted-foreground">Plan a calmer, safer tank.</p>
+              <SheetTitle className="font-display text-ui-heading">FishTankr</SheetTitle>
+              <p className="text-ui-label text-muted-foreground">
+                Plan a tank that suits your fish.
+              </p>
             </SheetHeader>
             <nav aria-label="Mobile" className="flex flex-1 flex-col gap-1 overflow-y-auto p-3">
               {NAV_ITEMS.map((item) => (
@@ -282,14 +284,13 @@ function SiteFooter() {
       <div className="mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:grid-cols-[1fr_auto] sm:items-start">
         <div>
           <div className="flex items-center gap-2">
-            <BrandLogo size={22} />
+            <BrandLogo size={22} showWordmark={false} />
             <span className="font-display font-semibold text-white">
               Smarter tanks. Happier fish.
             </span>
           </div>
           <p className="mt-2 max-w-md text-xs leading-relaxed text-white/60">
-            A guide, not a guarantee. Always check the needs of each species and the rules where you
-            live.
+            Check each species’ needs and the local rules before you stock.
           </p>
         </div>
         <nav aria-label="Footer" className="flex flex-wrap gap-x-4 gap-y-2 text-xs text-white/60">

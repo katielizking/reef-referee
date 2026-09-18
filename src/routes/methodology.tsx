@@ -5,11 +5,11 @@ import { ExternalLink, ShieldCheck, TriangleAlert } from "lucide-react";
 export const Route = createFileRoute("/methodology")({
   head: () => ({
     meta: [
-      { title: "Scoring methodology — FishTankr" },
+      { title: "How FishTankr scores a tank | FishTankr" },
       {
         name: "description",
         content:
-          "How FishTankr checks compatibility, space, water and cycle status—and where the score has limits.",
+          "How FishTankr checks tank mates, space, water and cycle status, plus what the score cannot prove.",
       },
       { property: "og:url", content: absoluteUrl("/methodology") },
     ],
@@ -45,9 +45,9 @@ function MethodologyPage() {
           What the FishTankr score means
         </h1>
         <p className="mt-5 text-base leading-relaxed text-muted-foreground sm:text-lg">
-          FishTankr helps you spot problems in a stocking plan, but it cannot promise that a tank is
-          safe. The main score only uses checks we can explain clearly. Early-stage estimates stay
-          separate until there is enough evidence to rely on them.
+          The score helps you spot problems in a stocking plan. It cannot prove a tank is safe. It
+          uses checks we can explain clearly. Early estimates stay separate until the evidence is
+          stronger.
         </p>
       </div>
 
@@ -77,10 +77,10 @@ function MethodologyPage() {
               The cycle can limit the score
             </h2>
             <p className="mt-2 leading-relaxed text-muted-foreground">
-              A fast pump does not automatically mean strong biological filtration. FishTankr looks
-              at the filter type, amount and age of biological media, tank age, cycling method and
-              recent water tests. If the cycle is unfinished or unverified, the score is limited. If
-              ammonia or nitrite is present, the app tells you not to add fish.
+              A fast pump does not automatically mean strong biological filtration. We check the
+              filter, biological media, tank age, cycling method and recent water tests. If the
+              cycle is unfinished or unverified, the score is limited. If ammonia or nitrite is
+              present, do not add fish.
             </p>
             <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
               We ask for zero-ammonia and zero-nitrite results from the past seven days. That keeps
@@ -101,11 +101,10 @@ function MethodologyPage() {
               The waste-load screen is not a stocking-capacity calculator
             </h2>
             <p className="mt-2 leading-relaxed text-muted-foreground">
-              The current estimate is based on an older species-load formula that has not been
-              tested against enough real aquariums. We only show a broad low, moderate, high or very
-              high band. It does not affect the main score, and extra pump flow, plants or frequent
-              maintenance cannot make the number look better. Most importantly, it never tells you
-              how many more fish to add.
+              This estimate uses an older species-load formula that has not been tested against
+              enough real aquariums. It only shows a broad band. It does not affect the main score.
+              Extra flow, plants or maintenance cannot make the number look better. It never tells
+              you how many more fish to add.
             </p>
             <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
               It will stay in beta until we have a sourced model for fish waste and biological

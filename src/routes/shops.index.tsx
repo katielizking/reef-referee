@@ -89,16 +89,15 @@ function ShopsIndex() {
 
   return (
     <main className="mx-auto max-w-5xl px-3 py-6 sm:px-4 sm:py-10">
-      <h1 className="font-display text-4xl font-bold text-foreground">Aquarium shop directory</h1>
+      <h1 className="font-display text-4xl font-bold text-foreground">Aquarium shops</h1>
       <p className="mt-2 max-w-2xl text-muted-foreground">
-        Find specialist aquarium shops near you. We’re starting with Australian listings and adding
-        more countries over time.
+        Find specialist aquarium shops. Listings currently focus on Australia.
       </p>
 
       <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
         <input
           type="search"
-          placeholder="Search by name, suburb or specialty…"
+          placeholder="Search name, suburb or specialty"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="min-h-11 flex-1 rounded-xl border bg-background px-4 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none"
@@ -124,7 +123,7 @@ function ShopsIndex() {
       <div className="mt-8 grid gap-4">
         {isLoading && <p className="text-sm text-muted-foreground">Loading…</p>}
         {!isLoading && filtered.length === 0 && (
-          <p className="text-sm text-muted-foreground">No shops match those filters.</p>
+          <p className="text-sm text-muted-foreground">No shops match. Try clearing a filter.</p>
         )}
         {filtered.map((shop) => (
           <div key={shop.id} className="rounded-[1.25rem] border bg-card p-4 sm:rounded-2xl sm:p-5">
@@ -206,7 +205,7 @@ function ShopsIndex() {
           </Link>
         </p>
         <p className="mt-2">
-          Own one of these shops or know a missing retailer?{" "}
+          Own a shop, or know one that is missing?{" "}
           <Link to="/contact" className="font-semibold text-primary underline">
             Claim, correct or suggest a listing.
           </Link>
@@ -214,14 +213,14 @@ function ShopsIndex() {
       </div>
       <div className="mt-4 flex flex-col gap-3 rounded-2xl border bg-primary/5 p-4 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-sm text-muted-foreground">
-          <strong className="text-foreground">Before you shop:</strong> add the full fish community,
-          cycle details and water settings to your plan.
+          <strong className="text-foreground">Before you shop:</strong> add your full fish list,
+          cycle details and water settings to the plan.
         </p>
         <Link
           to="/"
           className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-xl bg-primary px-4 text-sm font-semibold text-primary-foreground"
         >
-          Check my tank plan
+          Check my tank
         </Link>
       </div>
     </main>

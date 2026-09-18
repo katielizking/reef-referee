@@ -98,11 +98,11 @@ export const Route = createFileRoute("/species/$id")({
   head: ({ loaderData }) => {
     if (!loaderData) {
       return {
-        meta: [{ title: "Species — FishTankr" }, { name: "robots", content: "noindex" }],
+        meta: [{ title: "Species | FishTankr" }, { name: "robots", content: "noindex" }],
       };
     }
     const s = loaderData;
-    const title = `${s.common_name} (${s.scientific_name}) — FishTankr`;
+    const title = `${s.common_name} (${s.scientific_name}) | FishTankr`;
     const desc = `Care guide for ${s.common_name}: adult size ${s.adult_size_cm} cm, minimum ${s.min_tank_litres} L, ${BIOTOPE_LABEL[s.biotope_region]}. See welfare notes and how FishTankr scores this fish.`;
     return {
       meta: [
@@ -124,13 +124,13 @@ export const Route = createFileRoute("/species/$id")({
 function SpeciesNotFound() {
   return (
     <div className="mx-auto max-w-3xl px-4 py-16 text-center">
-      <h1 className="font-display text-2xl font-semibold">We couldn't find that species</h1>
-      <p className="mt-2 text-sm text-muted-foreground">It may have been removed from the guide.</p>
+      <h1 className="font-display text-2xl font-semibold">Species not found</h1>
+      <p className="mt-2 text-sm text-muted-foreground">It may no longer be in this guide.</p>
       <Link
         to="/"
         className="mt-6 inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground"
       >
-        <ArrowLeft className="h-4 w-4" /> Back to the builder
+        <ArrowLeft className="h-4 w-4" /> Back to my tank
       </Link>
     </div>
   );
@@ -178,7 +178,7 @@ function LegalityEvidence({ s }: { s: Species }) {
   const importLabel = {
     permitted_with_conditions: "Permitted for import with conditions",
     not_permitted: "Not on the permitted import pathway",
-    not_applicable_native: "Not applicable — Australian native",
+    not_applicable_native: "Not applicable. Australian native.",
     unknown: "Import status not yet verified",
   }[s.legal_import_status ?? "unknown"];
 
@@ -193,7 +193,7 @@ function LegalityEvidence({ s }: { s: Species }) {
   const confidenceLabel = {
     verified: "Verified",
     medium: "Government source found; species details still need review",
-    incomplete: "Incomplete — check the current rules before relying on this",
+    incomplete: "Incomplete. Check the current rules before relying on this.",
   }[confidence];
 
   return (
@@ -318,7 +318,7 @@ function SpeciesGuide() {
         to="/"
         className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
       >
-        <ArrowLeft className="h-4 w-4" /> Back to the builder
+        <ArrowLeft className="h-4 w-4" /> Back to my tank
       </Link>
 
       <header className="fishtankr-panel mt-6 grid overflow-hidden rounded-[2rem] lg:grid-cols-[1.1fr_.9fr]">
@@ -343,8 +343,7 @@ function SpeciesGuide() {
             {s.scientific_name}
           </p>
           <p className="mt-6 max-w-md text-sm leading-relaxed text-muted-foreground">
-            A practical guide to this fish’s adult needs, natural habitat, social behaviour and care
-            sources.
+            Adult needs, habitat, social behaviour and care sources for this fish.
           </p>
           <AddToTankButton species={s} />
         </div>
@@ -436,9 +435,8 @@ function SpeciesGuide() {
           How FishTankr checks this fish
         </h2>
         <p className="mt-2 text-sm text-muted-foreground">
-          This fish affects the compatibility, swimming-space and water parts of your score. The
-          tank’s cycle can limit the final result. Waste load and biotope match are shown
-          separately.
+          This fish affects tank mates, swimming room and water. The cycle can limit the score.
+          Waste load and biotope match stay separate.
         </p>
         <div className="mt-4 space-y-3">
           <ScoreBlock title="Species compatibility" body={compatibilityCopy(s)} />
@@ -453,8 +451,8 @@ function SpeciesGuide() {
         <section className="mt-10">
           <h2 className="font-display text-xl font-semibold text-foreground">Related species</h2>
           <p className="mt-2 text-sm text-muted-foreground">
-            These fish have promising swim-zone, temperament and water-range matches. Add the whole
-            group to the builder before deciding whether they can live together.
+            These fish have promising swim-zone, temperament and water matches. Add the full group
+            to your tank plan before deciding whether they can live together.
           </p>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
             {related.map(({ s: r, reason }) => (
@@ -483,8 +481,7 @@ function SpeciesGuide() {
       )}
 
       <p className="mt-10 rounded-xl bg-muted/60 px-4 py-3 text-xs text-muted-foreground">
-        This is a guide, not a guarantee. Individual fish vary — always check the needs of each
-        species and your local regulations before you buy.
+        Individual fish vary. Check each species’ needs and local regulations before you buy.
       </p>
     </div>
   );
@@ -507,8 +504,8 @@ function AddToTankButton({ species }: { species: Species }) {
       </button>
       {prohibited && (
         <p className="mt-2 text-xs text-muted-foreground">
-          Heads up — our Australian reference data lists this fish as prohibited or restricted. This
-          does not affect the welfare score, but you should check the rules where you live.
+          Australian reference data lists this fish as prohibited or restricted. This does not
+          affect the welfare score. Check the rules where you live.
         </p>
       )}
     </div>

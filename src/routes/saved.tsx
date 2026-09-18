@@ -34,7 +34,7 @@ import { WaitlistSignup } from "@/components/WaitlistSignup";
 export const Route = createFileRoute("/saved")({
   head: () => ({
     meta: [
-      { title: "My tanks — FishTankr" },
+      { title: "My tanks | FishTankr" },
       { name: "description", content: "Tanks you've saved in this browser." },
       { name: "robots", content: "noindex" },
     ],
@@ -127,11 +127,11 @@ function SavedTanks() {
         My tanks
       </h1>
       <p className="mt-1 text-sm text-muted-foreground">
-        Reopen, edit, copy or share the tanks saved in this browser.
+        Reopen, edit, copy or share your saved tanks.
       </p>
       <div className="mt-4 rounded-xl border border-warn/40 bg-warn/10 p-3 text-sm text-foreground">
-        <strong>Saved in this browser:</strong> if you clear your browser data, you may lose access
-        to these tanks. Keep any important share links somewhere safe.
+        <strong>Saved in this browser:</strong> clearing browser data can remove these tanks. Keep
+        important share links somewhere safe.
       </div>
       <div className="mt-4">
         <WaitlistSignup />
@@ -150,14 +150,12 @@ function SavedTanks() {
             <p className="font-display text-base font-semibold text-foreground">
               No saved tanks yet
             </p>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Build a tank and save it. You’ll find it here next time.
-            </p>
+            <p className="mt-1 text-sm text-muted-foreground">Build a tank, then save it here.</p>
             <Link
               to="/"
               className="mt-5 inline-flex items-center justify-center rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:brightness-95"
             >
-              Open the builder
+              Build a tank
             </Link>
           </div>
         ) : (
@@ -232,11 +230,11 @@ function SavedTanks() {
           <div className="mb-3 flex items-center gap-2">
             <Sparkles className="h-4 w-4 text-primary" aria-hidden />
             <h2 className="font-display text-lg font-semibold text-foreground">
-              Start from a template
+              Start with a template
             </h2>
           </div>
           <p className="mb-4 text-sm text-muted-foreground">
-            Pick a starting point, then make it your own in the builder.
+            Pick a starting point, then adjust it in the builder.
           </p>
           <ul className="grid gap-3 sm:grid-cols-2">
             {TANK_PRESETS.map((preset) => {
@@ -326,8 +324,7 @@ function SavedTanks() {
           <AlertDialogHeader>
             <AlertDialogTitle>Delete {deleteTarget?.name}?</AlertDialogTitle>
             <AlertDialogDescription>
-              This will permanently delete the tank and stop its share link from working. You cannot
-              undo this.
+              This permanently deletes the tank and its share link. You cannot undo it.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

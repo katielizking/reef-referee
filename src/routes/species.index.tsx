@@ -9,13 +9,13 @@ import { BIOTOPE_LABEL, type BiotopeRegion, type Temperament } from "@/lib/types
 export const Route = createFileRoute("/species/")({
   head: () => ({
     meta: [
-      { title: "Freshwater fish species — FishTankr" },
+      { title: "Freshwater fish species | FishTankr" },
       {
         name: "description",
         content:
           "Browse freshwater fish care guides and filter by natural region, temperament and adult size.",
       },
-      { property: "og:title", content: "Freshwater fish species — FishTankr" },
+      { property: "og:title", content: "Freshwater fish species | FishTankr" },
       {
         property: "og:description",
         content:
@@ -62,13 +62,12 @@ function SpeciesIndex() {
       <header className="hero-grid fishtankr-panel relative overflow-hidden rounded-[1.5rem] px-5 py-8 sm:rounded-[2rem] sm:px-10 sm:py-14">
         <span className="science-label text-primary">Field guide · freshwater</span>
         <h1 className="mt-5 max-w-3xl font-display text-3xl font-bold sm:text-4xl leading-[.98] tracking-[-.045em] text-ink sm:text-6xl">
-          Meet the fish,
+          Check the fish,
           <br />
           before you bring them home.
         </h1>
         <p className="mt-5 max-w-2xl text-base leading-relaxed text-muted-foreground">
-          Explore {data?.length ?? 0} species and compare their care needs, behaviour, habitat and
-          regional notes before deciding what to bring home.
+          Compare care needs, behaviour, habitat and regional notes before you buy.
         </p>
         <div
           className="absolute -bottom-16 -right-12 h-52 w-52 rounded-full border-[34px] border-blue/10"
@@ -84,7 +83,7 @@ function SpeciesIndex() {
           />
           <input
             className="min-h-11 w-full rounded-xl border bg-background py-2 pl-9 pr-3 text-sm outline-none focus:ring-2 focus:ring-ring"
-            placeholder="Search common or scientific name…"
+            placeholder="Search common or scientific name"
             value={q}
             onChange={(e) => setQ(e.target.value)}
             aria-label="Search species"
@@ -133,7 +132,7 @@ function SpeciesIndex() {
         </div>
       ) : results.length === 0 ? (
         <p className="mt-8 rounded-2xl border bg-card p-8 text-center text-sm text-muted-foreground">
-          No species match those filters.
+          No fish match those filters. Try clearing one.
         </p>
       ) : (
         <ul className="mt-5 grid gap-3 sm:mt-7 sm:gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">

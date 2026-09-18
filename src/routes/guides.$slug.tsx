@@ -31,7 +31,7 @@ const guides: Record<string, Guide> = {
     faqs: [
       {
         q: "How long does cycling a fish tank take?",
-        a: "There is no reliable fixed duration. Temperature, water chemistry, microbial seeding, media and the ammonia source all matter. Use repeated ammonia and nitrite tests—not the calendar—to decide when the tank is ready.",
+        a: "There is no reliable fixed duration. Temperature, water chemistry, microbial seeding, media and the ammonia source all matter. Use repeated ammonia and nitrite tests, not the calendar, to decide when the tank is ready.",
       },
       {
         q: "Can I cycle a tank in a day using a bottled starter?",
@@ -66,15 +66,15 @@ const guides: Record<string, Guide> = {
           <h2>The nitrogen cycle</h2>
           <ol>
             <li>
-              <strong>Ammonia (NH₃)</strong> — comes from fish waste, uneaten food, decaying plants.
-              Toxic at any measurable level.
+              <strong>Ammonia (NH₃)</strong> comes from fish waste, uneaten food and decaying
+              plants. Toxic at any measurable level.
             </li>
             <li>
-              <strong>Nitrite (NO₂⁻)</strong> — produced as ammonia-oxidising microbes process
+              <strong>Nitrite (NO₂⁻)</strong> is produced as ammonia-oxidising microbes process
               ammonia. Also harmful to fish.
             </li>
             <li>
-              <strong>Nitrate (NO₃⁻)</strong> — produced when other microbes process nitrite.
+              <strong>Nitrate (NO₃⁻)</strong> is produced when other microbes process nitrite.
               Regular testing tells you when water changes and other maintenance are needed.
             </li>
           </ol>
@@ -150,19 +150,19 @@ const guides: Record<string, Guide> = {
           <h2>Common mistakes</h2>
           <ul>
             <li>
-              <strong>Rinsing filter media in tap water</strong> — the chlorine kills the colony.
-              Rinse in old tank water only.
+              <strong>Rinsing filter media in tap water.</strong> Chlorine kills the colony. Rinse
+              in old tank water only.
             </li>
             <li>
-              <strong>Skipping measurements</strong> — choose tests that measure ammonia and nitrite
+              <strong>Skipping measurements.</strong> Choose tests that measure ammonia and nitrite
               at a useful resolution, follow their instructions and record the results.
             </li>
             <li>
-              <strong>Cranking the filter on day one</strong> — bacteria need surface area, not
+              <strong>Cranking the filter on day one.</strong> Bacteria need surface area, not
               brute-force flow. Fill the media trays properly.
             </li>
             <li>
-              <strong>Improvised dosing</strong> — follow the cycling product's stated protocol
+              <strong>Improvised dosing.</strong> Follow the cycling product's stated protocol
               rather than assuming more ammonia will make the process faster.
             </li>
           </ul>
@@ -171,9 +171,9 @@ const guides: Record<string, Guide> = {
         <section id="next">
           <h2>Adding your first fish</h2>
           <p>
-            Once the tank is cycled, add fish gradually—a group at a time rather than the whole plan
-            at once. The biofilter needs time to grow with the added waste, and adding too much too
-            quickly can trigger another ammonia or nitrite spike.
+            Once the tank is cycled, add fish gradually. Add one group at a time, rather than the
+            whole plan at once. The biofilter needs time to grow with the added waste, and adding
+            too much too quickly can trigger another ammonia or nitrite spike.
           </p>
           <p>
             Not sure what to add? The{" "}

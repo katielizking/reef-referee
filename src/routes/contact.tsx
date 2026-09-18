@@ -36,7 +36,7 @@ function ContactPage() {
     try {
       await submitContactRequest(email, topic, message);
       setSent(true);
-      toast.success("Your message has been sent");
+      toast.success("Message sent");
     } catch (error) {
       toast.error("Couldn't send the message", {
         description: error instanceof Error ? error.message : "Try again.",
@@ -49,13 +49,13 @@ function ContactPage() {
   return (
     <PolicyPage
       eyebrow="Contact"
-      title="Talk to FishTankr"
-      intro="Found something that needs fixing? We’d love to hear from you, especially if you can share a primary or specialist source."
+      title="Contact FishTankr"
+      intro="Found something to fix? Send the detail and a primary or specialist source if you have one."
     >
       <PolicySection title="Send an enquiry">
         {sent ? (
           <p className="rounded-xl bg-lime/20 p-4 font-semibold text-foreground">
-            Thanks — we’ve received your message and will take a look.
+            Thanks. We’ve got your message.
           </p>
         ) : (
           <form onSubmit={submit} className="space-y-3 rounded-2xl border bg-card p-4">
@@ -113,9 +113,8 @@ function ContactPage() {
       <PolicySection title="Claim or correct a shop listing">
         <p className="flex gap-2">
           <Store className="mt-1 h-4 w-4 shrink-0 text-primary" aria-hidden />
-          Choose “Claim or correct a shop” above, then include the listing link, your role and a
-          business contact we can verify. Claiming a listing will not automatically make it
-          featured.
+          Choose “Claim or correct a shop”. Include the listing link, your role and a business
+          contact we can verify. Claiming a listing does not make it featured.
         </p>
       </PolicySection>
     </PolicyPage>

@@ -25,17 +25,6 @@ type Shop = {
   claimed_at: string | null;
 };
 
-// Shop records are database-supplied, so escape any characters that could break
-// out of the <script type="application/ld+json"> element.
-function safeJsonLd(value: unknown): string {
-  return JSON.stringify(value)
-    .replace(/</g, "\\u003c")
-    .replace(/>/g, "\\u003e")
-    .replace(/&/g, "\\u0026")
-    .replace(/\u2028/g, "\\u2028")
-    .replace(/\u2029/g, "\\u2029");
-}
-
 async function fetchShop(slug: string): Promise<Shop | null> {
   const { data, error } = await supabase
     .from("aquarium_shops")
@@ -60,7 +49,7 @@ export const Route = createFileRoute("/shops/$slug")({
     }
     const s = loaderData.shop;
     const loc = [s.suburb, s.state].filter(Boolean).join(", ");
-    const title = `${s.name}${loc ? ` — ${loc}` : ""} | FishTankr`;
+    const title = `${s.name}${loc ? `, ${loc}` : ""} | FishTankr`;
     const desc =
       s.description ?? (loc ? `Aquarium shop in ${loc}.` : "Aquarium shop listed in FishTankr.");
     const url = absoluteUrl(`/shops/${params.slug}`);
@@ -77,7 +66,7 @@ export const Route = createFileRoute("/shops/$slug")({
       scripts: [
         {
           type: "application/ld+json",
-          children: safeJsonLd({
+          children: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "LocalBusiness",
             name: s.name,
