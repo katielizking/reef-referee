@@ -12,6 +12,7 @@ import { DragGroup } from "./DragGroup";
 import { substrateColour } from "./palette";
 import { useEditorStore } from "./editorStore";
 import { detectDeviceTier } from "@/lib/fish3d/quality";
+import { useIsMobile } from "@/hooks/use-mobile";
 import {
   getPlacement,
   setPlacement,
@@ -32,6 +33,7 @@ interface Props {
 export default function TankScene({ state, setState, commit, interactive = true }: Props) {
   const select = useEditorStore((s) => s.select);
   const selected = useEditorStore((s) => s.selected);
+  const isMobile = useIsMobile();
 
   const dims = useMemo(() => {
     const x = Math.max(state.length_cm, 20) / CM_PER_UNIT;
@@ -79,7 +81,7 @@ export default function TankScene({ state, setState, commit, interactive = true 
   }
 
   return (
-    <div className="relative h-[56svh] min-h-[360px] max-h-[520px] w-full touch-none overflow-hidden rounded-[1.15rem] border border-white/20 bg-gradient-to-b from-[#e8f4f6] to-[#c9e5eb] sm:h-[540px] sm:max-h-none sm:rounded-[1.45rem] xl:h-[620px]">
+    <div className="relative h-[56svh] min-h-[360px] max-h-[520px] w-full touch-pan-y overflow-hidden rounded-[1.15rem] border border-white/20 bg-gradient-to-b from-[#e8f4f6] to-[#c9e5eb] sm:h-[540px] sm:max-h-none sm:rounded-[1.45rem] xl:h-[620px]">
       <Canvas
         shadows={richEffects}
         dpr={[1, quality === "high" ? 2 : 1.5]}
@@ -89,6 +91,7 @@ export default function TankScene({ state, setState, commit, interactive = true 
         }}
         frameloop={hasFish ? "always" : "demand"}
         onPointerMissed={() => select(null)}
+        style={{ touchAction: isMobile ? "pan-y" : "auto" }}
       >
         <color attach="background" args={["#b7dce2"]} />
         <fog attach="fog" args={["#8fc3cd", largest * 1.8, largest * 5.2]} />
@@ -251,6 +254,8 @@ export default function TankScene({ state, setState, commit, interactive = true 
         <CameraRig defaultDistance={camDistance} />
         <OrbitControls
           enablePan={false}
+          enableRotate={!isMobile}
+          enableZoom={!isMobile}
           minDistance={largest * 0.8}
           maxDistance={largest * 3}
           minPolarAngle={Math.PI * 0.15}
@@ -262,8 +267,12 @@ export default function TankScene({ state, setState, commit, interactive = true 
       <div className="pointer-events-none absolute inset-x-0 bottom-3 flex justify-center">
         <span className="rounded-full bg-card/85 px-3 py-1 text-[11px] text-muted-foreground shadow-sm backdrop-blur">
           {hasFish
-            ? "Tap an item to edit · drag to explore"
-            : "Drag to explore · tap an item to edit"}
+            ? isMobile
+              ? "Tap an item to edit · drag sideways to move"
+              : "Tap an item to edit · drag to explore"
+            : isMobile
+              ? "Scroll to keep reading · tap an item to edit"
+              : "Drag to explore · tap an item to edit"}
         </span>
       </div>
     </div>
