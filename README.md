@@ -29,6 +29,8 @@ FishTankr currently calculates three weighted welfare categories:
 
 Cycle and biological-filter readiness is a safety gate rather than a weighted category. An unverified cycle, a filter that is still maturing, stale test evidence, or detectable ammonia or nitrite can cap the overall result. Zero-ammonia and zero-nitrite evidence must be dated within the previous seven days; that is an operational freshness rule, not a guarantee of future water quality.
 
+Severity also caps the result. Any critical welfare issue, such as predation or a tank far too small for a fish, limits the overall score to 40. Any high-severity issue limits it to 70, so a plan with a serious problem is never shown as looking good.
+
 Biotope authenticity is optional and informational. The inherited `litres / 5` waste-load proxy is also isolated as a beta screening band: it does not affect the headline score, does not treat pump turnover as biological capacity, and never tells a user how many more fish to add. See the in-product methodology page for the current limitations and evidence policy.
 
 Scores are decision support, not a guarantee. Species needs, individual behaviour, aquarium maturity and local animal or biosecurity rules must still be checked.
