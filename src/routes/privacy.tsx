@@ -55,6 +55,11 @@ function PrivacyPage() {
       </PolicySection>
       <PolicySection title="Browser storage">
         <p>
+          When configured, Sentry helps us diagnose browser errors and slow page loads. It receives
+          error details and sampled performance information. We do not enable session recording or
+          deliberately attach your email address or saved-tank identity to error reports.
+        </p>
+        <p>
           We use browser storage to remember interface preferences, dismissed messages, quiz or fish
           selections and the anonymous ID linked to your saved tanks. We use it to make the site
           work, not for advertising. Clearing your browser data may remove your access to anonymous

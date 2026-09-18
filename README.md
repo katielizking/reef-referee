@@ -87,6 +87,21 @@ and click a navigation control. Check PostHog's live events for `$pageview` and
 mode intentionally sends no events. Set `VITE_POSTHOG_KEY` to an empty string and rebuild
 to disable tracking. Removing the overrides restores the configured US Cloud project.
 
+## Sentry monitoring
+
+Browser error monitoring is prepared for the `fishtankr` Sentry organisation. Set
+`VITE_SENTRY_DSN` to the project's public DSN and `VITE_SENTRY_RELEASE` to the deployed
+commit SHA or release version, then rebuild. The onboarding run code is not a DSN.
+Without a DSN, Sentry stays disabled. Do not put a Sentry auth token in a `VITE_` variable.
+
+The React SDK starts before the browser router, captures unhandled browser errors and
+root error-boundary failures, and samples browser performance at 10%. Session replay is
+not enabled. Server monitoring and authenticated source-map uploads are not configured;
+production stack traces may remain minified until source-map uploads are added.
+
+After deployment, verify with a controlled browser error and confirm its arrival in
+Sentry Issues. No live Sentry ingestion has been verified yet.
+
 ## Database
 
 Supabase migrations live in `supabase/migrations`. Apply migrations in chronological order. Saved tanks belong to anonymous authenticated users, while shared tanks are exposed only through a sanitised read-only database function.

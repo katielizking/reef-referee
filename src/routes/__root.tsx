@@ -17,6 +17,7 @@ import { WorkInProgressBanner } from "@/components/WorkInProgressBanner";
 import { supabase } from "@/integrations/supabase/client";
 import { absoluteUrl, SUPPORT_URL } from "@/lib/site";
 import { initializePostHog } from "@/lib/posthog";
+import { captureSentryError } from "@/lib/sentry";
 
 function NotFoundComponent() {
   return (
@@ -47,6 +48,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   const router = useRouter();
   useEffect(() => {
     reportLovableError(error, { boundary: "tanstack_root_error_component" });
+    captureSentryError(error);
   }, [error]);
 
   return (
