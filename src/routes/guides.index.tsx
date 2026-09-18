@@ -39,38 +39,37 @@ const guides: GuideItem[] = [
   {
     slug: "cycling",
     title: "Cycling your tank",
-    excerpt:
-      "The nitrogen cycle in plain English, plus a step-by-step fishless cycle you can actually follow.",
+    excerpt: "A fishless cycle, step by step.",
     minutes: 8,
     category: "Fishless cycle",
   },
   {
     title: "Water chemistry: pH, GH, KH",
-    excerpt: "What your water is really telling you, and when to leave it alone.",
+    excerpt: "What your water readings mean, and when to leave them alone.",
     category: "Water chemistry",
     soon: true,
   },
   {
     title: "Choosing a filter",
-    excerpt: "Sponge vs HOB vs canister — turnover, media and what actually matters.",
+    excerpt: "Sponge, HOB or canister. Start with flow and biological media.",
     category: "Filtration",
     soon: true,
   },
   {
     title: "Planted tank basics",
-    excerpt: "Light, CO₂, substrate and beginner-friendly plants that are easier to keep alive.",
+    excerpt: "Light, CO₂, substrate and hardy starter plants.",
     category: "Plants",
     soon: true,
   },
   {
     title: "Quarantine for new fish",
-    excerpt: "A simple quarantine routine that helps keep one sick fish from infecting the tank.",
+    excerpt: "A simple routine to keep a sick fish from spreading illness.",
     category: "Quarantine",
     soon: true,
   },
   {
     title: "Water changes done right",
-    excerpt: "How much to change, how often to do it and how to avoid shocking the fish.",
+    excerpt: "How much water to change and how to avoid shocking fish.",
     category: "Maintenance",
     soon: true,
   },
@@ -81,8 +80,8 @@ function GuidesIndex() {
     <main className="mx-auto max-w-4xl px-4 py-10">
       <h1 className="font-display text-4xl font-bold text-foreground">Guides</h1>
       <p className="mt-2 max-w-2xl text-muted-foreground">
-        Friendly, detailed guides to the biology and equipment behind a healthy freshwater tank.
-        They’re useful wherever you keep fish, but local water and wildlife rules may still apply.
+        Practical guides for building and looking after a freshwater tank. Check local wildlife
+        rules where you live.
       </p>
       <div className="mt-8 grid gap-4 sm:grid-cols-2">
         {guides.map((g) =>

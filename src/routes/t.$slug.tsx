@@ -27,15 +27,15 @@ export const Route = createFileRoute("/t/$slug")({
     const name = loaderData?.tank.name ?? "Shared tank";
     return {
       meta: [
-        { title: `${name} — FishTankr` },
+        { title: `${name} | FishTankr` },
         {
           name: "description",
-          content: `${name}: an aquarium designed with FishTankr.`,
+          content: `${name}: a tank plan shared from FishTankr.`,
         },
-        { property: "og:title", content: `${name} — FishTankr` },
+        { property: "og:title", content: `${name} | FishTankr` },
         {
           property: "og:description",
-          content: `An aquarium design shared from FishTankr — smarter tanks, happier fish.`,
+          content: "A tank plan shared from FishTankr.",
         },
         { property: "og:type", content: "article" },
         { property: "og:url", content: absoluteUrl(`/t/${params.slug}`) },
@@ -52,7 +52,7 @@ export const Route = createFileRoute("/t/$slug")({
         to="/"
         className="mt-6 inline-flex rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:brightness-95"
       >
-        Back to the builder
+        Back to my tank
       </Link>
     </main>
   ),
@@ -64,7 +64,7 @@ export const Route = createFileRoute("/t/$slug")({
         to="/"
         className="mt-6 inline-flex rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:brightness-95"
       >
-        Back to the builder
+        Back to my tank
       </Link>
     </main>
   ),
@@ -127,8 +127,8 @@ function SharedTankBody() {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: `${state.name} — FishTankr`,
-          text: `Check out ${state.name}, a ${litres} L aquarium planned in FishTankr.`,
+          title: `${state.name} | FishTankr`,
+          text: `Check out ${state.name}, a ${litres} L tank plan from FishTankr.`,
           url,
         });
         return;
@@ -192,7 +192,7 @@ function SharedTankBody() {
               to="/"
               className="inline-flex rounded-xl border bg-card px-4 py-2 text-sm font-semibold text-foreground hover:bg-muted"
             >
-              Start a blank tank
+              Start a tank
             </Link>
           </div>
         </div>

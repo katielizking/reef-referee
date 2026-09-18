@@ -202,7 +202,7 @@ export function TankSetupPanel({
             <option value="">Choose a filter…</option>
             {filters.map((f) => (
               <option key={f.id} value={f.id}>
-                {f.name} — {FILTER_TYPE_LABEL[f.filter_type]}, rated {f.rated_litres} L
+                {f.name}. {FILTER_TYPE_LABEL[f.filter_type]}, rated {f.rated_litres} L
               </option>
             ))}
           </select>
@@ -643,7 +643,7 @@ function SpeciesAdder({
 
       {state.species.length === 0 ? (
         <p className="rounded-lg border border-dashed bg-background px-3 py-2 text-xs text-muted-foreground">
-          No fish yet — search above to add some.
+          No fish yet. Search above to add some.
         </p>
       ) : (
         <ul className="space-y-2">
@@ -874,7 +874,7 @@ function ItemAdder<T extends { id: string }>(props: ItemAdderProps<T>) {
 
       {props.current.length === 0 ? (
         <p className="rounded-lg border border-dashed bg-background px-3 py-2 text-xs text-muted-foreground">
-          No {props.title.toLowerCase()} yet — search above to add some.
+          No {props.title.toLowerCase()} yet. Search above to add some.
         </p>
       ) : (
         <ul className="space-y-2">

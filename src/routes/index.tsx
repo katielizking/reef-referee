@@ -39,7 +39,7 @@ export const Route = createFileRoute("/")({
   }),
   head: () => ({
     meta: [
-      { title: "FishTankr — Smarter tanks. Happier fish." },
+      { title: "FishTankr | Smarter tanks. Happier fish." },
       {
         name: "description",
         content:
@@ -341,13 +341,12 @@ function Builder() {
           </div>
 
           <div className="absolute inset-0 z-10 flex flex-col justify-end p-5 sm:justify-center sm:p-10 lg:p-12">
-            <span className="science-label text-blue">Welfare-first tank planner</span>
+            <span className="science-label text-blue">Tank planner</span>
             <h1 className="mt-4 max-w-[18ch] font-display text-4xl font-bold leading-[.95] tracking-[-.045em] text-white sm:text-5xl lg:text-6xl">
-              A better tank starts before you buy the fish.
+              Plan the tank before you buy the fish.
             </h1>
             <p className="mt-4 max-w-md text-sm leading-relaxed text-white/75 sm:text-base">
-              Add your tank and the fish you’re considering. FishTankr checks whether they suit the
-              space, the water and each other.
+              Add the tank and the fish you’re considering. Check the space, water and tank mates.
             </p>
             <p className="data-mono mt-4 text-xs uppercase tracking-[0.14em] text-white/60">
               {state.length_cm} × {state.width_cm} × {state.height_cm} cm ·{" "}
@@ -361,13 +360,13 @@ function Builder() {
                 }}
                 className="inline-flex min-h-12 items-center justify-center border border-white bg-white px-6 py-3 text-sm font-semibold text-ink transition-colors hover:bg-transparent hover:text-white"
               >
-                Check my tank
+                Start my tank
               </button>
               <button
                 onClick={() => navigate({ to: "/species" })}
                 className="inline-flex min-h-12 items-center justify-center border border-white/40 px-6 py-3 text-sm font-semibold text-white transition-colors hover:border-white"
               >
-                Explore fish
+                Browse fish
               </button>
             </div>
           </div>
@@ -380,22 +379,22 @@ function Builder() {
           aria-labelledby="what-calculators-miss"
         >
           <div>
-            <p className="science-label text-primary">The welfare difference</p>
+            <p className="science-label text-primary">More than tank volume</p>
             <h2
               id="what-calculators-miss"
               className="mt-3 font-display text-2xl font-bold tracking-tight text-foreground"
             >
-              What basic stocking calculators miss
+              A litre count is not enough
             </h2>
             <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-              Tank volume alone cannot tell you whether fish will fight, need a larger group or suit
-              your water. FishTankr checks those risks and explains what to change.
+              Tank volume cannot show conflict, group needs or water fit. Check those before you
+              stock.
             </p>
             <Link
               to="/methodology"
               className="mt-4 inline-flex min-h-11 items-center font-semibold text-primary underline"
             >
-              See how the score works
+              How scoring works
             </Link>
           </div>
           <div className="grid gap-3 sm:grid-cols-2">
@@ -407,8 +406,7 @@ function Builder() {
                 Two male bettas · 40 L
               </p>
               <p className="mt-2 text-sm text-muted-foreground">
-                A litres-and-body-size formula can approve this while missing the territorial
-                conflict.
+                A litres-and-size formula can miss the territorial conflict.
               </p>
             </article>
             <article className="rounded-2xl border-l-4 border-l-coral bg-coral/10 p-4">
@@ -430,10 +428,10 @@ function Builder() {
       >
         <div>
           <h2 className="font-display text-3xl font-bold tracking-[-.035em] text-foreground">
-            Design your tank
+            Build your tank
           </h2>
           <p className="text-sm text-muted-foreground">
-            Add fish, plants and décor. You’ll see how each choice affects the plan.
+            Add the setup. Check each choice as you go.
           </p>
         </div>
         <div className="grid grid-cols-3 gap-2 sm:flex sm:flex-wrap">
@@ -542,11 +540,11 @@ function Builder() {
                     <div className="pointer-events-none absolute inset-x-4 top-1/2 z-10 -translate-y-1/2 rounded-2xl border border-white/20 bg-ink/75 p-4 text-center text-white backdrop-blur-sm sm:left-1/2 sm:max-w-sm sm:-translate-x-1/2">
                       <Fish className="mx-auto h-8 w-8 text-lime" aria-hidden />
                       <p className="mt-2 font-display text-base font-bold">
-                        Your tank is ready for a plan
+                        Start with your first fish
                       </p>
                       <p className="mt-1 text-xs leading-relaxed text-white/75">
-                        Add your first fish under Livestock. We’ll adjust the starting water
-                        settings to suit it and explain anything that needs attention.
+                        Add fish under Livestock. We’ll set a starting water range and flag what to
+                        check.
                       </p>
                     </div>
                   )}
@@ -575,11 +573,9 @@ function Builder() {
               ) : (
                 <div className="fishtankr-panel rounded-[1.75rem] p-4 text-sm text-muted-foreground">
                   <p>
-                    <span className="font-semibold text-foreground">
-                      Tap any fish, plant or décor to edit it.
-                    </span>{" "}
-                    Drag it to move it, then use the panel to rotate, resize, duplicate or remove
-                    it. You can undo from the toolbar or with ⌘Z.
+                    <span className="font-semibold text-foreground">Tap an item to edit it.</span>{" "}
+                    Drag to move it. Use the panel to rotate, resize, copy or remove it. Undo is in
+                    the toolbar.
                   </p>
                 </div>
               )}

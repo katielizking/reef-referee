@@ -122,28 +122,28 @@ export function ScorecardPanel({ scorecard }: { scorecard: Scorecard }) {
       {/* Instrument panel */}
       <div className="fishtankr-panel px-5 py-2">
         <ScoreRow
-          title="Cycle and biofilter"
+          title="Cycle and filter"
           statusLabel={s.readiness.status}
           tag="Safety gate"
           issues={s.readiness.issues}
           reasons={s.readiness.reasons}
         />
         <ScoreRow
-          title="Species compatibility"
+          title="Tank mates"
           score={s.compatibility.score}
           weightPct={Math.round(WEIGHTS.compatibility * 100)}
           issues={s.compatibility.issues}
           reasons={s.compatibility.reasons}
         />
         <ScoreRow
-          title="Space to swim"
+          title="Swimming room"
           score={s.space.score}
           weightPct={Math.round(WEIGHTS.space * 100)}
           issues={s.space.issues}
           reasons={s.space.reasons}
         />
         <ScoreRow
-          title="Water suitability"
+          title="Water match"
           score={s.water.score}
           weightPct={Math.round(WEIGHTS.water * 100)}
           issues={s.water.issues}
@@ -161,7 +161,7 @@ export function ScorecardPanel({ scorecard }: { scorecard: Scorecard }) {
 
       {/* Style goal, below the rule */}
       <div className="fishtankr-panel p-5">
-        <p className="science-label text-muted-foreground">Style goal · not part of the score</p>
+        <p className="science-label text-muted-foreground">Style only · not part of the score</p>
         <div className="mt-3 flex items-baseline justify-between gap-3">
           <p className="text-sm font-semibold text-foreground">
             Biotope match
@@ -192,13 +192,13 @@ export function ScorecardPanel({ scorecard }: { scorecard: Scorecard }) {
 
       {s.overall !== null && (
         <p className="text-sm text-muted-foreground">
-          Your score is based on compatibility, swimming space and water suitability. An unverified
-          cycle can limit the result. Waste load is still in beta and does not affect the score.{" "}
+          The score checks tank mates, swimming room and water. An unverified cycle can cap it.
+          Waste load is beta and does not affect it.{" "}
           <Link to="/methodology" className="font-semibold text-water underline">
-            See how the score works.
+            How scoring works.
           </Link>{" "}
           <Link to="/welfare-disclaimer" className="font-semibold text-water underline">
-            Know its limits.
+            Score limits.
           </Link>
         </p>
       )}

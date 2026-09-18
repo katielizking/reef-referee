@@ -93,20 +93,18 @@ export function buildChecklist(scorecard: Scorecard, state: TankState): Checklis
       id: "waste-load-very-high",
       severity: "worth-look",
       title: "Waste load looks very high",
-      why: "The beta estimate is high enough to take another look at this stocking plan. It is not a proven capacity limit.",
+      why: "This beta estimate flags a high waste load. It is not a stocking limit.",
       fix:
         scorecard.bioload.fixes[0] ??
-        "Check each fish's adult needs and your water-test trends before adding anything.",
+        "Check adult needs and recent water tests before you add fish.",
     });
   } else if (scorecard.bioload.loadBand === "high") {
     items.push({
       id: "waste-load-high",
       severity: "worth-look",
       title: "Waste load looks high",
-      why: "The beta estimate suggests taking another look at the plan. It cannot tell you how many fish are safe to add.",
-      fix:
-        scorecard.bioload.fixes[0] ??
-        "Check the plan against each fish's adult needs and your water-test results.",
+      why: "This beta estimate flags a higher waste load. It cannot set a safe fish count.",
+      fix: scorecard.bioload.fixes[0] ?? "Check adult needs and your water-test results.",
     });
   }
 
@@ -118,8 +116,8 @@ export function buildChecklist(scorecard: Scorecard, state: TankState): Checklis
       id: "maint-thin",
       severity: "worth-look",
       title: "Monthly water changes may not be enough",
-      why: "Nitrate and dissolved waste may build up faster than monthly water changes can remove them.",
-      fix: "Switch to fortnightly or weekly water changes.",
+      why: "Nitrate and waste may build up between monthly changes.",
+      fix: "Change water fortnightly or weekly.",
     });
   }
 
@@ -131,8 +129,8 @@ export function buildChecklist(scorecard: Scorecard, state: TankState): Checklis
       id: "filter-manufacturer-rating",
       severity: "worth-look",
       title: "This filter may be too small",
-      why: "The manufacturer rates it for a smaller tank. A high flow rate does not necessarily mean it can process more waste.",
-      fix: "Choose a filter rated for this tank or larger, then make sure its biological media is mature.",
+      why: "It is rated for a smaller tank. Fast flow does not mean more waste capacity.",
+      fix: "Choose a filter rated for this tank or larger. Make sure the biological media is mature.",
     });
   }
 
@@ -141,8 +139,8 @@ export function buildChecklist(scorecard: Scorecard, state: TankState): Checklis
       id: "mixed-biotope",
       severity: "info",
       title: "Mixed-region community",
-      why: "This is not a strict biotope, which is a style choice rather than a welfare failure.",
-      fix: "Leave it mixed, or choose one region if you want a more authentic biotope display.",
+      why: "This is a mixed-region tank. That is a style choice, not a welfare issue.",
+      fix: "Keep it mixed, or choose one region for a closer biotope match.",
     });
   }
 
@@ -214,13 +212,11 @@ export function PreStockChecklist({
           <CollapsibleContent className="mt-3 space-y-2">
             {items.length === 0 && noFish ? (
               <p className="rounded-xl bg-muted/50 px-3 py-2 text-sm text-muted-foreground">
-                Your cycle details are saved. Add fish to check compatibility, swimming space and
-                water needs.
+                Add fish to check tank mates, swimming room and water.
               </p>
             ) : items.length === 0 ? (
               <p className="rounded-xl bg-lime/20 px-3 py-2 text-sm text-foreground">
-                Looking good — nothing needs your attention right now. This is still a guide, not a
-                guarantee.
+                Looking good so far. Keep testing and watching the tank.
               </p>
             ) : (
               <>
@@ -238,16 +234,13 @@ export function PreStockChecklist({
 
             <div className="mt-3 flex items-start justify-between gap-3 rounded-xl bg-muted/40 px-3 py-2">
               <div className="min-w-0">
-                <p className="text-sm font-medium text-foreground">Save without a warning</p>
-                <p className="text-xs text-muted-foreground">
-                  Turn this on only if you do not want FishTankr to stop you before saving a risky
-                  plan.
-                </p>
+                <p className="text-sm font-medium text-foreground">Skip save warning</p>
+                <p className="text-xs text-muted-foreground">Save plans without this check.</p>
               </div>
               <Switch
                 checked={!guardOn}
                 onCheckedChange={(v) => setGuardOn(!v)}
-                aria-label="Skip pre-stock check"
+                aria-label="Skip the pre-stock warning when saving"
               />
             </div>
           </CollapsibleContent>
@@ -264,11 +257,10 @@ export function PreStockChecklist({
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2">
               <AlertTriangle className="h-5 w-5 text-coral" />
-              Check this plan before you save
+              Check this before saving
             </AlertDialogTitle>
             <AlertDialogDescription>
-              Some parts of this setup could harm your fish. You can adjust the tank now or save it
-              as a draft anyway.
+              This setup has welfare risks. Adjust it now or save it as a draft.
             </AlertDialogDescription>
           </AlertDialogHeader>
 
@@ -279,7 +271,7 @@ export function PreStockChecklist({
             {worthLook.length > 0 && (
               <>
                 <p className="pt-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                  Also worth a look
+                  Also check
                 </p>
                 {worthLook.map((it) => (
                   <ItemRow key={it.id} item={it} />

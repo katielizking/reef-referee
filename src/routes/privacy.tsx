@@ -34,7 +34,7 @@ function PrivacyPage() {
           your reply email, chosen topic and message.
         </p>
         <p>
-          We may collect basic technical and product events in aggregate—for example, which score
+          We may collect basic technical and product events in aggregate, for example which score
           problems appear most often or whether someone opens a shop link. We do not intentionally
           collect your name, precise location, card details or health information through the
           builder.
@@ -77,8 +77,8 @@ function PrivacyPage() {
       <PolicySection title="Choices, access and deletion">
         <p>
           You can use the main planning tools without a named account. Please do not put personal
-          information in a tank name. To ask us to access, correct or delete your information—or
-          remove you from an email list—use the contact form and include the relevant share link or
+          information in a tank name. To ask us to access, correct or delete your information, or
+          remove you from an email list, use the contact form and include the relevant share link or
           email address.
         </p>
         <p>

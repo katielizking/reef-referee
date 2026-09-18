@@ -52,7 +52,7 @@ export async function shareScoreCard(
   ctx.fillText(verdict(scorecard), 80, 205);
   ctx.fillStyle = "#ffffff";
   ctx.font = "700 190px Sora, sans-serif";
-  ctx.fillText(String(scorecard.overall ?? "—"), 72, 430);
+  ctx.fillText(String(scorecard.overall ?? "-"), 72, 430);
   ctx.font = "500 34px DM Sans, sans-serif";
   ctx.fillStyle = "rgba(255,255,255,.65)";
   ctx.fillText("welfare score / 100", 80, 480);
@@ -93,7 +93,7 @@ export async function shareScoreCard(
   const file = new File([blob], "fishtankr-score.png", { type: "image/png" });
   if (navigator.share && navigator.canShare?.({ files: [file] })) {
     await navigator.share({
-      title: `${state.name} — FishTankr score`,
+      title: `${state.name} | FishTankr score`,
       text: "My FishTankr welfare score",
       files: [file],
     });

@@ -17,7 +17,7 @@ type BlogListItem = {
 export const Route = createFileRoute("/blog/")({
   head: () => ({
     meta: [
-      { title: "FishTankr Blog — freshwater fishkeeping" },
+      { title: "FishTankr blog | Freshwater fishkeeping" },
       {
         name: "description",
         content:

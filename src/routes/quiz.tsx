@@ -8,17 +8,16 @@ import { Info } from "lucide-react";
 export const Route = createFileRoute("/quiz")({
   head: () => ({
     meta: [
-      { title: "What fish should I get? A 7-question quiz | FishTankr" },
+      { title: "Find fish for your tank | FishTankr" },
       {
         name: "description",
         content:
-          "Answer 7 quick questions and find freshwater fish that suit your tank size, experience and preferences.",
+          "Answer 7 quick questions to find freshwater fish that suit your tank and routine.",
       },
       { property: "og:title", content: "What fish should I get? | FishTankr" },
       {
         property: "og:description",
-        content:
-          "A 7-question quiz that suggests freshwater fish with care needs and compatibility in mind.",
+        content: "A quick quiz to find freshwater fish worth checking in your tank plan.",
       },
       { property: "og:url", content: absoluteUrl("/quiz") },
     ],
@@ -65,15 +64,15 @@ const questions: Array<{
     key: "vibe",
     q: "What kind of tank do you want?",
     options: [
-      { value: "peaceful", label: "Peaceful community — lots of small fish" },
+      { value: "peaceful", label: "Peaceful community with lots of small fish" },
       { value: "showpiece", label: "One or two colourful showpieces" },
-      { value: "biotope", label: "Biotope — one region done properly" },
+      { value: "biotope", label: "Biotope from one region" },
       { value: "oddballs", label: "Something unusual" },
     ],
   },
   {
     key: "hardness",
-    q: "What is your tap water like—or what would you prefer to match?",
+    q: "What is your tap water like, or what would you prefer to match?",
     options: [
       {
         value: "soft",
@@ -87,16 +86,16 @@ const questions: Array<{
     key: "maintenance",
     q: "How much weekly maintenance are you up for?",
     options: [
-      { value: "low", label: "Low — a bit every fortnight" },
-      { value: "medium", label: "Medium — weekly 20% water change" },
-      { value: "high", label: "High — I enjoy it" },
+      { value: "low", label: "Low. A bit every fortnight" },
+      { value: "medium", label: "Medium. Weekly 20% water change" },
+      { value: "high", label: "High. I enjoy it" },
     ],
   },
   {
     key: "solo",
     q: "Want a fish that can be kept alone?",
     options: [
-      { value: "solo", label: "Yes — a fish with solo potential" },
+      { value: "solo", label: "Yes. A fish that can live alone" },
       { value: "either", label: "No preference" },
     ],
   },
@@ -104,10 +103,10 @@ const questions: Array<{
     key: "style",
     q: "How do you want the tank to feel?",
     options: [
-      { value: "schooling", label: "Movement — schools of small fish" },
+      { value: "schooling", label: "Movement from schools of small fish" },
       {
         value: "centrepiece",
-        label: "Presence — a couple of larger characters",
+        label: "A couple of larger fish",
       },
       { value: "mixed", label: "A bit of both" },
     ],
@@ -233,10 +232,10 @@ function QuizPage() {
   return (
     <main className="mx-auto max-w-2xl px-3 py-6 sm:px-4 sm:py-10">
       <h1 className="font-display text-3xl font-bold tracking-[-.035em] sm:text-4xl text-foreground">
-        What fish should I get?
+        Find fish for your tank
       </h1>
       <p className="mt-2 text-muted-foreground">
-        Seven quick questions. We'll match you against 40+ freshwater species.
+        Seven quick questions. We’ll show fish to check in your tank plan.
       </p>
 
       <div className="mt-6 h-2 w-full rounded-full bg-muted">
@@ -260,7 +259,7 @@ function QuizPage() {
                 className="min-h-14 rounded-xl border bg-background px-4 py-3 text-left text-sm font-medium text-foreground transition-colors hover:border-primary hover:bg-muted"
               >
                 {o.label}
-                {o.hint && <span className="ml-1 text-xs text-muted-foreground">— {o.hint}</span>}
+                {o.hint && <span className="ml-1 text-xs text-muted-foreground">({o.hint})</span>}
               </button>
             ))}
           </div>
@@ -277,11 +276,10 @@ function QuizPage() {
 
       {showResults && (
         <div className="mt-8">
-          <h2 className="font-display text-2xl font-semibold">Your matches</h2>
+          <h2 className="font-display text-2xl font-semibold">Fish to check</h2>
           {results.length === 0 && (
             <p className="mt-2 text-muted-foreground">
-              We couldn’t find a confident match in our current list. Try a larger tank size or
-              change a few answers.
+              No close match in this list. Try a larger tank or change a few answers.
             </p>
           )}
           <div className="mt-4 grid gap-3">
@@ -314,7 +312,7 @@ function QuizPage() {
                 onClick={startBuilderWithPicks}
                 className="rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:brightness-95"
               >
-                Try the top 3 in the builder
+                Add the top 3 to my tank
               </button>
               <button
                 onClick={restart}
@@ -328,8 +326,8 @@ function QuizPage() {
           <p className="mt-6 flex items-start gap-2 rounded-xl border border-border/60 bg-muted/40 p-3 text-xs text-muted-foreground">
             <Info className="mt-0.5 h-4 w-4 flex-shrink-0" />
             <span>
-              These are ideas, not a finished stocking plan. Check them together in the builder
-              before deciding what to buy.
+              These are starting points, not a finished stocking plan. Check them together before
+              you buy.
             </span>
           </p>
         </div>

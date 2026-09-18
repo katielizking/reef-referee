@@ -5,7 +5,7 @@ export function welfareVerdictFor(scorecard: Scorecard) {
   if (scorecard.overall === null) {
     return {
       label: "No score yet",
-      summary: "Add fish to see how well this tank meets their needs.",
+      summary: "Add fish to check the plan.",
       accent: "var(--water)",
       Icon: AlertCircle,
     };
@@ -13,23 +13,22 @@ export function welfareVerdictFor(scorecard: Scorecard) {
   if (scorecard.overall < 45) {
     return {
       label: "Do not stock",
-      summary: "This plan has a serious welfare risk. Fix it before adding fish.",
+      summary: "Fix this setup before you add fish.",
       accent: "var(--status-critical)",
       Icon: AlertTriangle,
     };
   }
   if (scorecard.overall < 75 || scorecard.capReason) {
     return {
-      label: "Risky as planned",
-      summary: "There are welfare concerns to fix before you add fish.",
+      label: "Needs changes",
+      summary: "Fix these welfare issues before you stock.",
       accent: "var(--status-caution)",
       Icon: AlertCircle,
     };
   }
   return {
-    label: "Looks suitable so far",
-    summary:
-      "Nothing needs your attention right now. Keep watching the fish and testing the water.",
+    label: "Looking good so far",
+    summary: "Nothing urgent to fix. Keep testing and watching the tank.",
     accent: "var(--status-good)",
     Icon: CheckCircle2,
   };

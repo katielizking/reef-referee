@@ -15,11 +15,11 @@ export function WelfareVerdictCard({
     <section
       className={`fishtankr-panel overflow-hidden border-l-4 ${compact ? "p-4" : "p-5 sm:p-6"}`}
       style={{ borderLeftColor: verdict.accent }}
-      aria-label="Current welfare verdict"
+      aria-label="Welfare check"
     >
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
-          <p className="science-label text-primary">Live welfare verdict</p>
+          <p className="science-label text-primary">Welfare check</p>
           <div className="mt-3 flex items-center gap-2">
             <span
               className="flex size-8 shrink-0 items-center justify-center rounded-full"
@@ -48,7 +48,7 @@ export function WelfareVerdictCard({
           }
         >
           <span className="data-mono text-2xl font-semibold leading-none">
-            {scorecard.overall ?? "—"}
+            {scorecard.overall ?? "-"}
           </span>
           <span className="data-mono mt-1 text-[10px] uppercase tracking-[0.12em] text-on-ink-muted">
             /100
@@ -59,7 +59,7 @@ export function WelfareVerdictCard({
       {scorecard.priorityAction && (
         <div className="mt-4 border-t border-rule pt-4">
           <p className="data-mono text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-            Do this first · {scorecard.priorityAction.category}
+            Fix this first · {scorecard.priorityAction.category}
           </p>
           <p className="mt-1 font-display text-base font-semibold text-foreground">
             {scorecard.priorityAction.title}
