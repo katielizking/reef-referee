@@ -5,7 +5,10 @@ let initialized = false;
 /** Browser monitoring; the DSN is a public ingestion address, not an API token. */
 export function initializeSentry() {
   if (initialized || typeof window === "undefined" || !import.meta.env.PROD) return;
-  const dsn = import.meta.env.VITE_SENTRY_DSN?.trim();
+  const dsn = (
+    import.meta.env.VITE_SENTRY_DSN ??
+    "https://b2b2bb0500bdf160abdfb01be60cfae0@o4512105046016000.ingest.us.sentry.io/4512105149366272"
+  ).trim();
   if (!dsn) return;
 
   try {

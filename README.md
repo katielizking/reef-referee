@@ -89,10 +89,10 @@ to disable tracking. Removing the overrides restores the configured US Cloud pro
 
 ## Sentry monitoring
 
-Browser error monitoring is prepared for the `fishtankr` Sentry organisation. Set
-`VITE_SENTRY_DSN` to the project's public DSN and `VITE_SENTRY_RELEASE` to the deployed
-commit SHA or release version, then rebuild. The onboarding run code is not a DSN.
-Without a DSN, Sentry stays disabled. Do not put a Sentry auth token in a `VITE_` variable.
+Browser error monitoring is configured with the public DSN for the `fishtankr` Sentry
+organisation. No additional DSN setup is needed. `VITE_SENTRY_DSN` overrides the default;
+an explicitly empty value disables monitoring. Set `VITE_SENTRY_RELEASE` to the deployed
+commit SHA or release version, then rebuild. Never put a Sentry auth token in a `VITE_` variable.
 
 The React SDK starts before the browser router, captures unhandled browser errors and
 root error-boundary failures, and samples browser performance at 10%. Session replay is

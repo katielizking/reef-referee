@@ -15,6 +15,19 @@ afterEach(() => {
 });
 
 describe("Sentry browser monitoring", () => {
+  it("uses FishTankr's configured DSN when no override is supplied", async () => {
+    vi.stubEnv("PROD", true);
+    vi.stubEnv("VITE_SENTRY_DSN", undefined);
+    vi.stubGlobal("window", {});
+    const { initializeSentry } = await import("./sentry");
+    initializeSentry();
+    expect(sdk.init).toHaveBeenCalledWith(
+      expect.objectContaining({
+        dsn: "https://b2b2bb0500bdf160abdfb01be60cfae0@o4512105046016000.ingest.us.sentry.io/4512105149366272",
+      }),
+    );
+  });
+
   it("does not initialize or capture without a DSN or on the server", async () => {
     vi.stubEnv("PROD", true);
     vi.stubEnv("VITE_SENTRY_DSN", "");
