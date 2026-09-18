@@ -42,6 +42,38 @@
   --color-verdict-good: var(--verdict-good);
   --color-verdict-caution: var(--verdict-caution);
   --color-verdict-critical: var(--verdict-critical);
+  --color-surface-raised: var(--surface-raised);
+  --color-ink-muted: var(--ink-muted);
+  --color-ink-subtle: var(--ink-subtle);
+  --color-on-ink: var(--on-ink);
+  --color-on-ink-muted: var(--on-ink-muted);
+  --color-status-good: var(--status-good);
+  --color-status-caution: var(--status-caution);
+  --color-status-critical: var(--status-critical);
+  --spacing-grid-1: var(--space-1);
+  --spacing-grid-2: var(--space-2);
+  --spacing-grid-3: var(--space-3);
+  --spacing-grid-4: var(--space-4);
+  --spacing-grid-5: var(--space-5);
+  --spacing-grid-6: var(--space-6);
+  --spacing-grid-8: var(--space-8);
+  --text-ui-caption: 0.75rem;
+  --text-ui-caption--line-height: 1rem;
+  --text-ui-label: 0.875rem;
+  --text-ui-label--line-height: 1.25rem;
+  --text-ui-body: 1rem;
+  --text-ui-body--line-height: 1.5rem;
+  --text-ui-title: 1.25rem;
+  --text-ui-title--line-height: 1.75rem;
+  --text-ui-heading: 1.5rem;
+  --text-ui-heading--line-height: 2rem;
+  --text-ui-display: 2rem;
+  --text-ui-display--line-height: 2.5rem;
+  --text-ui-hero: 2.5rem;
+  --text-ui-hero--line-height: 3rem;
+  --shadow-panel: 0 10px 28px rgb(15 29 38 / 8%);
+  --shadow-float: 0 18px 42px rgb(15 29 38 / 12%);
+  --ease-aquatic: cubic-bezier(0.2, 0.7, 0.2, 1);
   --font-sans: "DM Sans", "Manrope", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Sora", "DM Sans", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, monospace;
@@ -49,39 +81,54 @@
 }
 
 :root {
-  --radius: 0.25rem;
+  --radius: 0.75rem;
 
-  /* FishTankr: field notebook meets water */
+  /* FishTankr: aquatic-modern field notebook. */
   --ink: #0f1d26;
   --paper: #f2f0ea;
-  --water: #1f7f8c;
-  --blue: #1f7f8c;
+  --water: #176d79;
+  --blue: #43adbb;
   --lime: #c9e86a;
-  --coral: #a83a2c;
+  --coral: #b94639;
   --foam: #eae7df;
-  --warn: #b4761f;
+  --warn: #945d16;
   --rule: rgba(15, 29, 38, 0.12);
-  --verdict-good: #4e7a3a;
-  --verdict-caution: #b4761f;
-  --verdict-critical: #a83a2c;
+  --surface-raised: #fffdf9;
+  --ink-muted: #46555d;
+  --ink-subtle: #64737a;
+  --on-ink: #f8faf6;
+  --on-ink-muted: #c4d3d5;
+  --status-good: #3f733f;
+  --status-caution: #945d16;
+  --status-critical: #b94639;
+  --verdict-good: var(--status-good);
+  --verdict-caution: var(--status-caution);
+  --verdict-critical: var(--status-critical);
+  --space-1: 0.5rem;
+  --space-2: 1rem;
+  --space-3: 1.5rem;
+  --space-4: 2rem;
+  --space-5: 2.5rem;
+  --space-6: 3rem;
+  --space-8: 4rem;
 
   /* Mapped shadcn tokens */
   --background: #f2f0ea;
   --foreground: #0f1d26;
-  --card: #fbfaf6;
+  --card: var(--surface-raised);
   --card-foreground: #0f1d26;
   --popover: #fbfaf6;
   --popover-foreground: #0f1d26;
-  --primary: #1f7f8c;
-  --primary-foreground: #f7f6f1;
+  --primary: #176d79;
+  --primary-foreground: #f8faf6;
   --secondary: #eae7df;
   --secondary-foreground: #0f1d26;
   --muted: #e6e3da;
   --muted-foreground: #55636b;
   --accent: #c9e86a;
   --accent-foreground: #0f1d26;
-  --destructive: #a83a2c;
-  --destructive-foreground: #f7f6f1;
+  --destructive: #b94639;
+  --destructive-foreground: #f8faf6;
   --border: rgba(15, 29, 38, 0.12);
   --input: rgba(15, 29, 38, 0.18);
   --ring: #1f7f8c;
@@ -92,13 +139,21 @@
   --paper: #101a1f;
   --rule: rgba(233, 229, 219, 0.14);
   --foam: #17232a;
+  --surface-raised: #16232a;
+  --ink-muted: #b9c5c8;
+  --ink-subtle: #9aa9ad;
+  --on-ink: #f8faf6;
+  --on-ink-muted: #c4d3d5;
+  --status-good: #91c47c;
+  --status-caution: #efbf66;
+  --status-critical: #ff9a8c;
   --background: #101a1f;
   --foreground: #e9e5db;
   --card: #16232a;
   --card-foreground: #e9e5db;
   --popover: #16232a;
   --popover-foreground: #e9e5db;
-  --primary: #2e9aa8;
+  --primary: #43adbb;
   --primary-foreground: #0b1418;
   --secondary: #17232a;
   --secondary-foreground: #e9e5db;
@@ -132,9 +187,9 @@
     letter-spacing: -0.01em;
   }
   :focus-visible {
-    outline: 2px solid var(--color-ring);
-    outline-offset: 2px;
-    border-radius: 6px;
+    outline: 3px solid var(--color-ring);
+    outline-offset: 3px;
+    border-radius: var(--radius-sm);
   }
 }
 
@@ -185,8 +240,8 @@
   .fishtankr-panel {
     border: 1px solid var(--rule);
     background: var(--card);
-    border-radius: 4px;
-    box-shadow: none;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-panel);
   }
   .science-label {
     display: inline-flex;
@@ -234,14 +289,17 @@
     background-image: none;
   }
   .depth-card {
-    box-shadow: none;
-    border-radius: 4px;
+    box-shadow: var(--shadow-panel);
+    border-radius: var(--radius-lg);
     transition:
-      border-color 140ms ease,
-      background-color 140ms ease;
+      border-color 180ms var(--ease-aquatic),
+      background-color 180ms var(--ease-aquatic),
+      box-shadow 180ms var(--ease-aquatic),
+      transform 180ms var(--ease-aquatic);
   }
   .depth-card:hover {
     border-color: color-mix(in srgb, var(--ink) 35%, transparent);
+    box-shadow: var(--shadow-float);
   }
   .water-rule {
     height: 1px;
@@ -250,10 +308,27 @@
   }
   /* Wet things only: soft water light behind the tank. */
   .water-glow {
-    box-shadow: 0 18px 60px color-mix(in srgb, var(--water) 22%, transparent);
+    box-shadow: 0 14px 36px color-mix(in srgb, var(--water) 18%, transparent);
+  }
+  .tap-target {
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+  }
+  .motion-enter {
+    animation: motion-enter 220ms var(--ease-aquatic) both;
   }
 }
 @media (prefers-reduced-motion: no-preference) {
+  @keyframes motion-enter {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 8px, 0);
+    }
+    to {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
+    }
+  }
   @keyframes gentle-float {
     0%,
     100% {
@@ -265,6 +340,16 @@
   }
   .hero-float {
     animation: gentle-float 7s ease-in-out infinite;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }
 
@@ -281,6 +366,11 @@
     -webkit-tap-highlight-color: transparent;
     touch-action: manipulation;
   }
+  button,
+  [role="button"] {
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+  }
 }
 @media (max-width: 639px) {
   html {
@@ -291,9 +381,6 @@
   }
   .site-shell::before {
     opacity: 0.14;
-  }
-  .fishtankr-panel {
-    backdrop-filter: blur(12px);
   }
 }
 @media (min-width: 640px) {
