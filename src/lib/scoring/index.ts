@@ -92,6 +92,9 @@ export interface Scorecard {
 
 /** Welfare weights. Biotope and the experimental waste-load screen are
  * deliberately absent from the headline result. */
+/** Highest overall score a plan can reach while any high-severity welfare issue remains. */
+export const HIGH_SEVERITY_CAP = 70;
+
 export const WEIGHTS = {
   compatibility: 0.45,
   space: 0.35,
@@ -182,6 +185,28 @@ export function scoreTank(state: TankState): Scorecard {
     caps.push({
       cap: 40,
       reason: "The score is limited because this mix could seriously injure or kill fish.",
+    });
+  }
+  // A weighted average lets one severe problem hide behind two healthy categories.
+  // Severity caps stop that: a critical problem anywhere means "do not stock", and a
+  // high-severity problem can never be reported as "looking good".
+  const welfareIssues = [...compatibility.issues, ...(space.issues ?? []), ...(water.issues ?? [])];
+  if ((space.issues ?? []).some((i) => i.severity === "critical")) {
+    caps.push({
+      cap: 40,
+      reason: "The score is limited because the tank is far too small for at least one fish.",
+    });
+  }
+  if ((water.issues ?? []).some((i) => i.severity === "critical")) {
+    caps.push({
+      cap: 40,
+      reason: "The score is limited because the water settings are unsafe for at least one fish.",
+    });
+  }
+  if (welfareIssues.some((i) => i.severity === "high")) {
+    caps.push({
+      cap: HIGH_SEVERITY_CAP,
+      reason: "The score is limited by a serious welfare problem. Fix the top issue first.",
     });
   }
   if (readiness.status === "unsafe") {
@@ -462,10 +487,13 @@ function scoreCompatibility(state: TankState): CompatibilitySubScore {
             `Keep at least ${n.min_group_size} ${n.common_name}, or choose a tank mate without long fins.`,
           );
         } else {
+          // Slow, long-finned fish such as bettas and fancy goldfish cannot get away
+          // from nippers, so even a full group of nippers is a serious risk to them.
+          const slowTarget = !f.active;
           add(
             "fin-nipping",
-            "medium",
-            10,
+            slowTarget ? "high" : "medium",
+            slowTarget ? 22 : 10,
             `${n.common_name} may nip ${f.common_name}'s long fins. Watch for chasing or frayed fin edges.`,
             `Keep ${n.common_name} in a full group and give ${f.common_name} plenty of cover.`,
           );

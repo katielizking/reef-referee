@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { isWaterTestCurrent, scoreTank, WATER_TEST_MAX_AGE_DAYS, WEIGHTS } from "./index";
+import {
+  HIGH_SEVERITY_CAP,
+  isWaterTestCurrent,
+  scoreTank,
+  WATER_TEST_MAX_AGE_DAYS,
+  WEIGHTS,
+} from "./index";
 import type { BiotopeRegion, Filter, Species, TankState } from "../types";
 
 function species(
@@ -269,5 +275,81 @@ describe("scoreTank", () => {
         score.water.score * WEIGHTS.water,
     );
     expect(score.overall).toBe(expected);
+  });
+
+  describe("severity caps", () => {
+    it("treats a far-too-small tank as do-not-stock even when everything else is fine", () => {
+      const bigShoal = species({
+        id: "bala",
+        common_name: "Big shoaler",
+        min_tank_litres: 1000,
+        adult_size_cm: 30,
+        active: true,
+        is_schooling: true,
+        min_group_size: 3,
+      });
+      const score = scoreTank(tank({ species: [{ species: bigShoal, quantity: 3 }] }));
+      expect(score.space.issues?.some((i) => i.severity === "critical")).toBe(true);
+      expect(score.overall!).toBeLessThanOrEqual(40);
+      expect(score.capReason).toMatch(/far too small/i);
+    });
+
+    it("never reports a plan with a high-severity issue as looking good", () => {
+      const loner = species({
+        id: "loner",
+        common_name: "Lonely tetra",
+        is_schooling: true,
+        min_group_size: 6,
+      });
+      const score = scoreTank(tank({ species: [{ species: loner, quantity: 1 }] }));
+      expect(score.compatibility.issues.some((i) => i.severity === "high")).toBe(true);
+      expect(score.overall!).toBeLessThanOrEqual(HIGH_SEVERITY_CAP);
+      expect(score.capReason).not.toBeNull();
+    });
+
+    it("treats nippers with a slow long-finned fish as high risk, even in a full group", () => {
+      const nipper = species({
+        id: "nipper",
+        common_name: "Nippy tetra",
+        fin_nipper: true,
+        is_schooling: true,
+        min_group_size: 6,
+        active: true,
+      });
+      const slow = species({
+        id: "slow",
+        common_name: "Slow long fin",
+        long_finned: true,
+        active: false,
+      });
+      const fast = species({
+        id: "fast",
+        common_name: "Fast long fin",
+        long_finned: true,
+        active: true,
+      });
+
+      const withSlow = scoreTank(
+        tank({
+          species: [
+            { species: nipper, quantity: 8 },
+            { species: slow, quantity: 1 },
+          ],
+        }),
+      );
+      const withFast = scoreTank(
+        tank({
+          species: [
+            { species: nipper, quantity: 8 },
+            { species: fast, quantity: 1 },
+          ],
+        }),
+      );
+      const nip = (s: typeof withSlow) =>
+        s.compatibility.issues.find((i) => i.code === "fin-nipping");
+      expect(nip(withSlow)?.severity).toBe("high");
+      expect(nip(withFast)?.severity).toBe("medium");
+      expect(withSlow.overall!).toBeLessThanOrEqual(HIGH_SEVERITY_CAP);
+    });
   });
 });
