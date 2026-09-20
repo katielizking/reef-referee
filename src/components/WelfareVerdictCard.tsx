@@ -16,6 +16,8 @@ export function WelfareVerdictCard({
       className={`fishtankr-panel overflow-hidden border-l-4 ${compact ? "p-4" : "p-5 sm:p-6"}`}
       style={{ borderLeftColor: verdict.accent }}
       aria-label="Welfare check"
+      aria-live="polite"
+      aria-atomic="true"
     >
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">

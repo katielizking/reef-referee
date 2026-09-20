@@ -13,5 +13,5 @@
 ## Themes and accessibility
 
 - [x] Add a persistent light/dark toggle outside the home page
-- [ ] Audit WCAG 2.2 AA issues and fix confirmed critical and warning findings
+- [x] Audit WCAG 2.2 AA issues and fix confirmed critical and warning findings
 - [ ] Verify contrast, keyboard access, desktop and mobile layouts

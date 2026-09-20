@@ -53,6 +53,9 @@ export function MobileScoreBar({ scorecard }: { scorecard: Scorecard }) {
             </div>
           </div>
           <ChevronUp className="h-4 w-4 text-muted-foreground" aria-hidden />
+          <span className="sr-only" aria-live="polite" aria-atomic="true">
+            Tank score {scorecard.overall ?? "not ready"}. {verdict.label}.
+          </span>
         </button>
       </SheetTrigger>
       <SheetContent

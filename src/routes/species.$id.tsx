@@ -321,7 +321,7 @@ function SpeciesGuide() {
   if (s.legal_note) welfare.push(s.legal_note);
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-8 md:py-12">
+    <main className="mx-auto max-w-6xl px-4 py-8 md:py-12">
       <Link
         to="/calculator"
         className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
@@ -493,7 +493,7 @@ function SpeciesGuide() {
       <p className="mt-10 rounded-xl bg-muted/60 px-4 py-3 text-xs text-muted-foreground">
         Individual fish vary. Check each species’ needs and local regulations before you buy.
       </p>
-    </div>
+    </main>
   );
 }
 

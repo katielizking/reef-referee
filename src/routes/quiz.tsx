@@ -1,6 +1,6 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { absoluteUrl } from "@/lib/site";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useSpecies } from "@/lib/data";
 import type { Species } from "@/lib/types";
 import { Info } from "lucide-react";
@@ -171,6 +171,7 @@ function scoreSpecies(sp: Species, a: Answers): number {
 }
 
 function QuizPage() {
+  const questionHeadingRef = useRef<HTMLHeadingElement>(null);
   const { data: species } = useSpecies();
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<Partial<Answers>>({});
@@ -229,6 +230,10 @@ function QuizPage() {
     window.location.href = "/";
   };
 
+  useEffect(() => {
+    if (step > 0 && !showResults) questionHeadingRef.current?.focus();
+  }, [step, showResults]);
+
   return (
     <main className="mx-auto max-w-2xl px-3 py-6 sm:px-4 sm:py-10">
       <h1 className="font-display text-3xl font-bold tracking-[-.035em] sm:text-4xl text-foreground">
@@ -238,7 +243,15 @@ function QuizPage() {
         Seven quick questions. We’ll show fish to check in your tank plan.
       </p>
 
-      <div className="mt-6 h-2 w-full rounded-full bg-muted">
+      <div
+        className="mt-6 h-2 w-full rounded-full bg-muted"
+        role="progressbar"
+        aria-label="Quiz progress"
+        aria-valuemin={1}
+        aria-valuemax={total}
+        aria-valuenow={showResults ? total : step + 1}
+        aria-valuetext={showResults ? "Quiz complete" : `Question ${step + 1} of ${total}`}
+      >
         <div
           className="h-full rounded-full bg-primary transition-all duration-300"
           style={{ width: `${progress}%` }}
@@ -250,7 +263,13 @@ function QuizPage() {
           <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
             Question {step + 1} of {total}
           </p>
-          <h2 className="mt-2 font-display text-xl font-semibold text-foreground">{currentQ.q}</h2>
+          <h2
+            ref={questionHeadingRef}
+            tabIndex={-1}
+            className="mt-2 font-display text-xl font-semibold text-foreground"
+          >
+            {currentQ.q}
+          </h2>
           <div className="mt-4 grid gap-2">
             {currentQ.options.map((o) => (
               <button
