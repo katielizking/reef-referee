@@ -141,9 +141,26 @@ function RootShell({ children }: { children: ReactNode }) {
   );
 }
 
+function SupabaseConfigError() {
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-background px-4">
+      <div className="max-w-md text-center">
+        <h1 className="font-display text-xl font-semibold tracking-tight text-foreground">
+          Configuration error
+        </h1>
+        <p className="mt-2 text-sm text-muted-foreground">
+          The app is missing its database configuration. Please connect Supabase in Lovable Cloud
+          and redeploy.
+        </p>
+      </div>
+    </div>
+  );
+}
+
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const [authReady, setAuthReady] = useState(false);
+  const [configError, setConfigError] = useState(false);
 
   useEffect(() => {
     void initializePostHog();
@@ -152,16 +169,32 @@ function RootComponent() {
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const { data } = await supabase.auth.getSession();
-      if (!data.session) {
-        await supabase.auth.signInAnonymously();
+      try {
+        const { data } = await supabase.auth.getSession();
+        if (!data.session) {
+          await supabase.auth.signInAnonymously();
+        }
+        if (!cancelled) setAuthReady(true);
+      } catch (err) {
+        if (!cancelled) {
+          const message = err instanceof Error ? err.message : String(err);
+          if (message.includes("Missing Supabase environment variable")) {
+            setConfigError(true);
+          } else {
+            // Re-throw unexpected errors so Sentry and the route error boundary can handle them
+            throw err;
+          }
+        }
       }
-      if (!cancelled) setAuthReady(true);
     })();
     return () => {
       cancelled = true;
     };
   }, []);
+
+  if (configError) {
+    return <SupabaseConfigError />;
+  }
 
   if (!authReady) {
     return (
