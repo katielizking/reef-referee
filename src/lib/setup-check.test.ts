@@ -115,7 +115,7 @@ describe("setup checks", () => {
 
   it("says nothing about substrate with no bottom dwellers", () => {
     const issues = checkSetup(
-      tank({ substrate: "bare", species: [{ species: fish({ swim_zone: "middle" }), quantity: 6 }] }),
+      tank({ substrate: "bare", species: [{ species: fish({ swim_zone: "mid" }), quantity: 6 }] }),
     );
     expect(issues).toHaveLength(0);
   });
