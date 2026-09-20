@@ -114,8 +114,16 @@ function ScoreRow({ title, score, statusLabel, weightPct, note, tag, issues, rea
   );
 }
 
-export function ScorecardPanel({ scorecard }: { scorecard: Scorecard }) {
+export function ScorecardPanel({
+  scorecard,
+  state,
+}: {
+  scorecard: Scorecard;
+  state?: TankState;
+}) {
   const s = scorecard;
+  const [units] = useUnitSystem();
+  const water = state ? waterChangeGuidance(state, s) : null;
 
   return (
     <div className="space-y-4">
