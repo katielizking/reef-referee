@@ -186,6 +186,7 @@ const NAV_ITEMS: Array<{ to: string; label: string; exact?: boolean; hash?: stri
   { to: "/calculator", label: "Calculator" },
   { to: "/visualiser", label: "Visualiser" },
   { to: "/species", label: "Fish library" },
+  { to: "/tracker", label: "Tracker" },
   { to: "/saved", label: "My tanks" },
 ];
 
