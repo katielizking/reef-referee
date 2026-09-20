@@ -85,6 +85,35 @@ export interface Species {
   conspecific_notes?: string | null;
 }
 
+export type InvertGroup = "shrimp" | "snail" | "crayfish" | "crab";
+
+/** Shrimp, snails, crayfish and freshwater crabs. Kept separate from fish:
+ * their care rules, risks and bioload behave differently. */
+export interface Invertebrate {
+  id: string;
+  common_name: string;
+  scientific_name: string;
+  invert_group: InvertGroup;
+  min_tank_litres: number;
+  adult_size_cm: number;
+  bioload_factor: number;
+  temperament: Temperament;
+  min_group_size: number;
+  predatory: boolean;
+  fish_risk_note: string | null;
+  native_ph_min: number;
+  native_ph_max: number;
+  native_temp_min_c: number;
+  native_temp_max_c: number;
+  biotope_region: BiotopeRegion;
+  algae_role: string | null;
+  care_notes: string | null;
+  care_source_label: string | null;
+  care_source_url: string | null;
+  care_reviewed_on: string | null;
+  care_confidence: "unreviewed" | "low" | "medium" | "high";
+}
+
 export interface Plant {
   id: string;
   common_name: string;
@@ -169,6 +198,8 @@ export interface TankState {
   target_temp_c: number;
   plant_density: PlantDensity;
   species: Array<{ species: Species; quantity: number }>;
+  /** Shrimp, snails, crayfish and crabs. Checked separately from the fish score. */
+  invertebrates?: Array<{ invertebrate: Invertebrate; quantity: number }>;
   plants: Array<{ plant: Plant; quantity: number }>;
   hardscape: Array<{ hardscape: Hardscape; quantity: number }>;
   /** Per-group anchor / rotation / scale overrides, keyed as "kind:refId". */

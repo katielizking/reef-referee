@@ -11,6 +11,7 @@ import { displayLength, formatVolume, lengthLabel, useUnitSystem } from "@/lib/u
 import type { TankState } from "@/lib/types";
 import { ClientOnlyTankScene } from "@/components/tank3d/ClientOnlyTankScene";
 import { ScorecardPanel } from "@/components/Scorecard";
+import { InvertebrateChecks } from "@/components/InvertebratePanel";
 import { TankReport } from "@/components/TankReport";
 
 const tankQuery = (slug: string) =>
@@ -113,6 +114,7 @@ function SharedTankBody() {
     target_temp_c: data.tank.target_temp_c,
     plant_density: data.tank.plant_density,
     species: data.species,
+    invertebrates: data.invertebrates,
     plants: data.plants,
     hardscape: data.hardscape,
   };
@@ -200,6 +202,7 @@ function SharedTankBody() {
         </div>
         <div>
           <ScorecardPanel scorecard={scorecard} state={state} />
+          <InvertebrateChecks state={state} />
           <div className="mt-4">
             <Link
               to="/calculator"

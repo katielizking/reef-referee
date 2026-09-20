@@ -22,6 +22,7 @@ export const DEFAULT_STATE: TankState = {
   target_temp_c: 25,
   plant_density: "medium",
   species: [],
+  invertebrates: [],
   plants: [],
   hardscape: [],
 };
@@ -36,10 +37,11 @@ export function parseDraft(raw: string | null): TankDraft | null {
     if (draft.version !== 1 || !s || typeof s.name !== "string" ||
       ![s.length_cm,s.width_cm,s.height_cm,s.target_ph,s.target_temp_c].every(v => typeof v === "number" && Number.isFinite(v)) ||
       ![s.species,s.plants,s.hardscape].every(Array.isArray)) return null;
-    for (const [rows, key] of [[s.species,"species"],[s.plants,"plant"],[s.hardscape,"hardscape"]] as const) {
+    if (s.invertebrates !== undefined && !Array.isArray(s.invertebrates)) return null;
+    for (const [rows, key] of [[s.species,"species"],[s.invertebrates ?? [],"invertebrate"],[s.plants,"plant"],[s.hardscape,"hardscape"]] as const) {
       if (!rows.every((row: any) => row?.[key]?.id && typeof row[key].id === "string" && Number.isInteger(row.quantity) && row.quantity > 0)) return null;
     }
-    return {version: 1, state: {...DEFAULT_STATE, ...s},
+    return {version: 1, state: {...DEFAULT_STATE, ...s, invertebrates: s.invertebrates ?? []},
       savedId: typeof draft.savedId === "string" ? draft.savedId : undefined,
       source: typeof draft.source === "string" ? draft.source : undefined};
   } catch { return null; }

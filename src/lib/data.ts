@@ -1,7 +1,15 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { getSharedTank } from "./tanks.functions";
-import type { Filter, Hardscape, Plant, Species, TankFilterSlot, TankRow } from "./types";
+import type {
+  Filter,
+  Hardscape,
+  Invertebrate,
+  Plant,
+  Species,
+  TankFilterSlot,
+  TankRow,
+} from "./types";
 
 async function currentUserId(): Promise<string | null> {
   const { data } = await supabase.auth.getUser();
@@ -15,6 +23,21 @@ export function useSpecies() {
       const { data, error } = await supabase.from("species").select("*").order("common_name");
       if (error) throw error;
       return data as unknown as Species[];
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+}
+
+export function useInvertebrates() {
+  return useQuery({
+    queryKey: ["invertebrates"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("invertebrates")
+        .select("*")
+        .order("common_name");
+      if (error) throw error;
+      return data as unknown as Invertebrate[];
     },
     staleTime: 5 * 60 * 1000,
   });
@@ -79,6 +102,7 @@ export interface FullTank {
   /** Extra filters beyond the main one. */
   filters: TankFilterSlot[];
   species: Array<{ species: Species; quantity: number }>;
+  invertebrates: Array<{ invertebrate: Invertebrate; quantity: number }>;
   plants: Array<{ plant: Plant; quantity: number }>;
   hardscape: Array<{ hardscape: Hardscape; quantity: number }>;
 }
@@ -91,6 +115,7 @@ export async function loadTankBySlug(slug: string): Promise<FullTank | null> {
     filter: payload.filter ?? null,
     filters: payload.filters ?? [],
     species: payload.species ?? [],
+    invertebrates: payload.invertebrates ?? [],
     plants: payload.plants ?? [],
     hardscape: payload.hardscape ?? [],
   };
@@ -147,6 +172,7 @@ export async function saveTank(
   await Promise.all([
     supabase.from("tank_filters").delete().eq("tank_id", tank.id),
     supabase.from("tank_species").delete().eq("tank_id", tank.id),
+    supabase.from("tank_invertebrates").delete().eq("tank_id", tank.id),
     supabase.from("tank_plants").delete().eq("tank_id", tank.id),
     supabase.from("tank_hardscape").delete().eq("tank_id", tank.id),
   ]);
@@ -163,6 +189,11 @@ export async function saveTank(
     species_id: row.species.id,
     quantity: row.quantity,
   }));
+  const invertRows = (state.invertebrates ?? []).map((row) => ({
+    tank_id: tank.id,
+    invertebrate_id: row.invertebrate.id,
+    quantity: row.quantity,
+  }));
   const plantRows = state.plants.map((row) => ({
     tank_id: tank.id,
     plant_id: row.plant.id,
@@ -177,6 +208,7 @@ export async function saveTank(
   const results = await Promise.all([
     filterRows.length ? supabase.from("tank_filters").insert(filterRows) : null,
     speciesRows.length ? supabase.from("tank_species").insert(speciesRows) : null,
+    invertRows.length ? supabase.from("tank_invertebrates").insert(invertRows) : null,
     plantRows.length ? supabase.from("tank_plants").insert(plantRows) : null,
     hardscapeRows.length ? supabase.from("tank_hardscape").insert(hardscapeRows) : null,
   ]);
@@ -234,6 +266,7 @@ export async function duplicateTank(slug: string): Promise<TankRow> {
     target_temp_c: source.tank.target_temp_c,
     plant_density: source.tank.plant_density,
     species: source.species,
+    invertebrates: source.invertebrates,
     plants: source.plants,
     hardscape: source.hardscape,
   });
