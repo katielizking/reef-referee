@@ -1,0 +1,13 @@
+{
+  "asset_id": "betta-splendens-bluemesh",
+  "common_name": "Betta",
+  "scientific_name": "Betta splendens",
+  "adult_length_cm": 6,
+  "source_url": "https://sketchfab.com/3d-models/betta-splendens-f4eeb7f50ad24873842bd954ad27d23b",
+  "creator": "BlueMesh",
+  "creator_url": "https://sketchfab.com/VapTor",
+  "license": "CC-BY-4.0",
+  "source_archive_sha256": "c20b1d5fb832fd3e096f5c03e5c45d7bc566867c2f175596e020ce8df3694d71",
+  "authored_animation": "Take 01",
+  "notes": "Original authored glTF package retained with textures, 53-joint skin, and animation. Inspect before normalization or runtime export."
+}

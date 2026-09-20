@@ -1,0 +1,14 @@
+node_modules
+dist
+.output
+.vinxi
+.wrangler
+.tanstack
+pnpm-lock.yaml
+package-lock.json
+bun.lock
+routeTree.gen.ts
+AGENTS.md
+assets/3d/source
+src/integrations/supabase/types.ts
+src/integrations/supabase/previewAuthStorage.ts
