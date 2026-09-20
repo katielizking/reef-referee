@@ -11,7 +11,10 @@ import type { Plugin } from "vite";
 function validateSupabaseEnv(): Plugin {
   return {
     name: "validate-supabase-env",
+    apply: "build",
     buildStart() {
+      // Skip during test runs (vitest) where env vars are not expected
+      if (process.env.VITEST || process.env.NODE_ENV === "test") return;
       const required = ["VITE_SUPABASE_URL", "VITE_SUPABASE_PUBLISHABLE_KEY"];
       const missing = required.filter((key) => !process.env[key]);
       if (missing.length > 0) {
