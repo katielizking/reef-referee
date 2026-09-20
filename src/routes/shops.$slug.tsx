@@ -1,28 +1,16 @@
 import { Link, createFileRoute, notFound } from "@tanstack/react-router";
 import { absoluteUrl } from "@/lib/site";
 import { supabase } from "@/integrations/supabase/client";
-import { ExternalLink, MapPin, Phone } from "lucide-react";
+import { ExternalLink, MapPin, Phone, Store, Truck } from "lucide-react";
 import { recordShopOutbound } from "@/lib/commercial";
+import { countryName, deliveryLabel, type ShopDirectoryEntry } from "@/lib/shop-search";
 
-type Shop = {
-  id: string;
-  slug: string;
-  name: string;
+type Shop = ShopDirectoryEntry & {
   address: string | null;
   suburb: string | null;
   state: string | null;
   postcode: string | null;
-  lat: number | null;
-  lng: number | null;
-  website: string | null;
   phone: string | null;
-  specialties: string[];
-  description: string | null;
-  country_code: string;
-  featured: boolean;
-  affiliate_url: string | null;
-  is_affiliate: boolean;
-  claimed_at: string | null;
 };
 
 async function fetchShop(slug: string): Promise<Shop | null> {
@@ -32,7 +20,7 @@ async function fetchShop(slug: string): Promise<Shop | null> {
     .eq("slug", slug)
     .maybeSingle();
   if (error) throw error;
-  return (data as Shop | null) ?? null;
+  return (data as unknown as Shop | null) ?? null;
 }
 
 export const Route = createFileRoute("/shops/$slug")({
@@ -48,10 +36,13 @@ export const Route = createFileRoute("/shops/$slug")({
       };
     }
     const s = loaderData.shop;
-    const loc = [s.suburb, s.state].filter(Boolean).join(", ");
+    const loc = [s.city ?? s.suburb, s.region ?? s.state, countryName(s.country_code)]
+      .filter(Boolean)
+      .join(", ");
     const title = `${s.name}${loc ? `, ${loc}` : ""} | FishTankr`;
     const desc =
-      s.description ?? (loc ? `Aquarium shop in ${loc}.` : "Aquarium shop listed in FishTankr.");
+      s.description ??
+      (loc ? `Independent aquarium shop in ${loc}.` : "Independent aquarium shop listing.");
     const url = absoluteUrl(`/shops/${params.slug}`);
     return {
       meta: [
@@ -61,6 +52,7 @@ export const Route = createFileRoute("/shops/$slug")({
         { property: "og:description", content: desc },
         { property: "og:type", content: "website" },
         { property: "og:url", content: url },
+        { name: "twitter:card", content: "summary_large_image" },
       ],
       links: [{ rel: "canonical", href: url }],
       scripts: [
@@ -76,9 +68,10 @@ export const Route = createFileRoute("/shops/$slug")({
             address: {
               "@type": "PostalAddress",
               streetAddress: s.address ?? undefined,
-              addressLocality: s.suburb ?? undefined,
-              addressRegion: s.state ?? undefined,
+              addressLocality: s.city ?? s.suburb ?? undefined,
+              addressRegion: s.region ?? s.state ?? undefined,
               postalCode: s.postcode ?? undefined,
+              addressCountry: s.country_code,
             },
             geo:
               s.lat && s.lng
@@ -108,7 +101,9 @@ export const Route = createFileRoute("/shops/$slug")({
 
 function ShopPage() {
   const { shop } = Route.useLoaderData();
-  const loc = [shop.suburb, shop.state, shop.postcode].filter(Boolean).join(" ");
+  const loc = [shop.address, shop.city ?? shop.suburb, shop.region ?? shop.state, shop.postcode]
+    .filter(Boolean)
+    .join(" ");
 
   return (
     <main className="mx-auto max-w-3xl px-4 py-10">
@@ -119,26 +114,44 @@ function ShopPage() {
         ← All shops
       </Link>
       <h1 className="font-display text-4xl font-bold text-foreground">{shop.name}</h1>
-      {shop.featured && (
-        <p className="mt-3 inline-flex rounded-full bg-lime/30 px-3 py-1 text-xs font-bold uppercase tracking-wide text-foreground">
-          Featured · paid
-        </p>
-      )}
+      <p className="mt-1 font-mono text-xs uppercase tracking-wide text-muted-foreground">
+        {countryName(shop.country_code)}
+      </p>
       {loc && <p className="mt-1 text-muted-foreground">{loc}</p>}
 
       {shop.description && <p className="mt-6 text-base text-foreground">{shop.description}</p>}
 
+      <div className="mt-6 grid gap-3 border-4 border-ink bg-paper p-4 text-sm">
+        <p className="flex items-start gap-2 text-foreground">
+          <Store className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
+          <span>
+            <strong>Independently owned.</strong>{" "}
+            {shop.independent_note ?? "Not part of a chain or franchise group."}
+          </span>
+        </p>
+        <p className="flex items-start gap-2 text-foreground">
+          <Truck className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
+          <span>
+            <strong>{deliveryLabel(shop)}.</strong>{" "}
+            {shop.ships_to_regions.length > 0 && (
+              <>States: {shop.ships_to_regions.join(", ")}. </>
+            )}
+            {shop.shipping_note ? `${shop.shipping_note} ` : ""}
+            {shop.delivery_reviewed_on
+              ? `Delivery details last checked ${shop.delivery_reviewed_on}.`
+              : "We have not confirmed their delivery details yet, so check with the shop."}
+          </span>
+        </p>
+      </div>
+
       {shop.specialties.length > 0 && (
         <div className="mt-6">
-          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+          <p className="font-mono text-xs font-bold uppercase tracking-wide text-muted-foreground">
             Known for
           </p>
           <div className="mt-2 flex flex-wrap gap-1.5">
             {shop.specialties.map((s: string) => (
-              <span
-                key={s}
-                className="rounded-full bg-muted px-2.5 py-1 text-xs text-muted-foreground"
-              >
+              <span key={s} className="border border-rule px-2.5 py-1 text-xs text-muted-foreground">
                 {s}
               </span>
             ))}
@@ -146,32 +159,22 @@ function ShopPage() {
         </div>
       )}
 
-      <div className="mt-8 grid gap-3 rounded-2xl border bg-card p-5 text-sm">
+      <div className="mt-8 grid gap-3 border-4 border-ink bg-paper p-5 text-sm">
         {shop.website && (
           <a
-            href={shop.affiliate_url ?? shop.website}
+            href={shop.website}
             target="_blank"
-            rel={
-              shop.is_affiliate || shop.affiliate_url
-                ? "noopener noreferrer sponsored nofollow"
-                : "noopener noreferrer"
-            }
-            onClick={() =>
-              recordShopOutbound(
-                shop.id,
-                shop.is_affiliate || shop.affiliate_url ? "affiliate" : "website",
-              )
-            }
+            rel="noopener noreferrer"
+            onClick={() => recordShopOutbound(shop.id, "website")}
             className="inline-flex items-center gap-2 text-primary hover:underline"
           >
-            <ExternalLink className="h-4 w-4" />{" "}
-            {(shop.affiliate_url ?? shop.website).replace(/^https?:\/\//, "")}
-            {shop.is_affiliate || shop.affiliate_url ? " · affiliate link" : ""}
+            <ExternalLink className="h-4 w-4" aria-hidden />{" "}
+            {shop.website.replace(/^https?:\/\//, "")}
           </a>
         )}
         {shop.phone && (
           <a href={`tel:${shop.phone}`} className="inline-flex items-center gap-2 text-foreground">
-            <Phone className="h-4 w-4" /> {shop.phone}
+            <Phone className="h-4 w-4" aria-hidden /> {shop.phone}
           </a>
         )}
         {shop.lat && shop.lng && (
@@ -182,7 +185,7 @@ function ShopPage() {
             onClick={() => recordShopOutbound(shop.id, "map")}
             className="inline-flex items-center gap-2 text-primary hover:underline"
           >
-            <MapPin className="h-4 w-4" /> Open in Google Maps
+            <MapPin className="h-4 w-4" aria-hidden /> Open in Google Maps
           </a>
         )}
       </div>
@@ -190,29 +193,24 @@ function ShopPage() {
       {shop.lat && shop.lng && (
         <iframe
           title={`Map of ${shop.name}`}
-          className="mt-6 aspect-video w-full rounded-2xl border"
+          className="mt-6 aspect-video w-full border-4 border-ink"
           loading="lazy"
           referrerPolicy="no-referrer-when-downgrade"
           src={`https://www.google.com/maps?q=${shop.lat},${shop.lng}&z=14&output=embed`}
         />
       )}
-      <section className="mt-8 rounded-2xl border bg-muted/40 p-4 text-sm text-muted-foreground">
+      <section className="mt-8 border-4 border-ink bg-muted/40 p-4 text-sm text-muted-foreground">
         <p>
-          {shop.featured
-            ? "This shop has paid for featured placement. That is not an endorsement of its animal care."
-            : "A directory listing is not an endorsement of a shop’s animal care."}{" "}
-          FishTankr may earn a commission from affiliate links.
+          This is a free listing. No shop pays to be here, and a listing is not an endorsement of a
+          shop's animal care.
         </p>
         <div className="mt-3 flex flex-wrap gap-3">
-          <Link to="/affiliate-disclosure" className="font-semibold text-primary underline">
-            How paid links work
-          </Link>
           <Link
             to="/contact"
             onClick={() => recordShopOutbound(shop.id, "claim")}
             className="font-semibold text-primary underline"
           >
-            {shop.claimed_at ? "Correct this listing" : "Claim this shop"}
+            Correct this listing
           </Link>
         </div>
       </section>

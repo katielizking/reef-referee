@@ -1,224 +1,260 @@
-import { Link, createFileRoute } from "@tanstack/react-router";
+import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
 import { absoluteUrl } from "@/lib/site";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { ExternalLink, MapPin } from "lucide-react";
+import { ExternalLink, MapPin, Search, Store, Truck } from "lucide-react";
 import { recordShopOutbound } from "@/lib/commercial";
+import { shopsQuery } from "@/lib/shops";
+import { useLocation } from "@/lib/location";
+import { LocationPicker } from "@/components/LocationPicker";
+import {
+  buildShopSearchUrl,
+  countryName,
+  deliveryLabel,
+  hasShopSearch,
+  isNearby,
+  shipsTo,
+  type ShopDirectoryEntry,
+} from "@/lib/shop-search";
 
-type Shop = {
-  id: string;
-  slug: string;
-  name: string;
-  suburb: string | null;
-  state: string | null;
-  postcode: string | null;
-  address: string | null;
-  lat: number | null;
-  lng: number | null;
-  website: string | null;
-  specialties: string[];
-  description: string | null;
-  country_code: string;
-  featured: boolean;
-  affiliate_url: string | null;
-  is_affiliate: boolean;
-};
+const title = "Independent aquarium shops, worldwide | FishTankr";
+const description =
+  "A free directory of independently owned aquarium shops around the world, with delivery areas for live fish and a search for the fish you are after.";
 
 export const Route = createFileRoute("/shops/")({
+  validateSearch: (search: Record<string, unknown>): { fish?: string } => ({
+    fish: typeof search.fish === "string" ? search.fish : undefined,
+  }),
   head: () => ({
     meta: [
-      { title: "Aquarium shops directory | FishTankr" },
-      {
-        name: "description",
-        content:
-          "A growing directory of freshwater and marine aquarium shops, with local specialties and contact details.",
-      },
-      { property: "og:title", content: "Aquarium shops directory | FishTankr" },
-      {
-        property: "og:description",
-        content: "Freshwater and marine aquarium shops, with specialties and location details.",
-      },
+      { title },
+      { name: "description", content: description },
+      { property: "og:title", content: title },
+      { property: "og:description", content: description },
+      { property: "og:type", content: "website" },
       { property: "og:url", content: absoluteUrl("/shops") },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [{ rel: "canonical", href: absoluteUrl("/shops") }],
   }),
   component: ShopsIndex,
 });
 
-function ShopsIndex() {
-  const [locationFilter, setLocationFilter] = useState<string>("All");
-  const [search, setSearch] = useState("");
+function SearchLink({ shop, fish }: { shop: ShopDirectoryEntry; fish: string }) {
+  const url = buildShopSearchUrl(shop, fish);
+  if (!url) return null;
+  return (
+    <a
+      href={url}
+      target="_blank"
+      rel="noopener noreferrer"
+      onClick={() => recordShopOutbound(shop.id, fish && hasShopSearch(shop) ? "search" : "website")}
+      className="inline-flex items-center gap-1 font-semibold text-primary hover:underline"
+    >
+      {fish && hasShopSearch(shop) ? `Search for ${fish}` : "Website"}
+      <ExternalLink className="h-3 w-3" aria-hidden />
+    </a>
+  );
+}
 
-  const { data, isLoading } = useQuery({
-    queryKey: ["shops"],
-    queryFn: async () => {
-      const { data, error } = await supabase.from("aquarium_shops").select("*").order("name");
-      if (error) throw error;
-      return data as Shop[];
-    },
-  });
+function ShopCard({ shop, fish }: { shop: ShopDirectoryEntry; fish: string }) {
+  const place = [shop.city, shop.region].filter(Boolean).join(", ");
+  return (
+    <article className="border-4 border-ink bg-paper p-4">
+      <div className="flex flex-wrap items-baseline justify-between gap-2">
+        <Link
+          to="/shops/$slug"
+          params={{ slug: shop.slug }}
+          className="font-display text-lg font-semibold text-foreground hover:underline"
+        >
+          {shop.name}
+        </Link>
+        <span className="font-mono text-xs uppercase tracking-wide text-muted-foreground">
+          {place ? `${place}, ` : ""}
+          {countryName(shop.country_code)}
+        </span>
+      </div>
+      {shop.description && <p className="mt-2 text-sm text-muted-foreground">{shop.description}</p>}
+      {shop.independent_note && (
+        <p className="mt-2 flex items-start gap-1.5 text-xs text-muted-foreground">
+          <Store className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden />
+          {shop.independent_note}
+        </p>
+      )}
+      <p className="mt-2 flex items-start gap-1.5 text-xs text-muted-foreground">
+        <Truck className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden />
+        {deliveryLabel(shop)}
+        {shop.shipping_note ? `. ${shop.shipping_note}` : ""}
+        {shop.delivery_reviewed_on ? ` Checked ${shop.delivery_reviewed_on}.` : ""}
+      </p>
+      <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs">
+        {shop.specialties.map((sp) => (
+          <span key={sp} className="border border-rule px-2 py-0.5 text-muted-foreground">
+            {sp}
+          </span>
+        ))}
+        <SearchLink shop={shop} fish={fish} />
+        {shop.lat && shop.lng && (
+          <a
+            href={`https://www.google.com/maps/search/?api=1&query=${shop.lat},${shop.lng}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => recordShopOutbound(shop.id, "map")}
+            className="inline-flex items-center gap-1 font-semibold text-primary hover:underline"
+          >
+            <MapPin className="h-3 w-3" aria-hidden /> Map
+          </a>
+        )}
+      </div>
+    </article>
+  );
+}
+
+function ShopsIndex() {
+  const navigate = useNavigate({ from: "/shops/" });
+  const { fish = "" } = Route.useSearch();
+  const [text, setText] = useState("");
+  const [onlyMine, setOnlyMine] = useState(false);
+  const location = useLocation();
+  const { data, isLoading } = useQuery(shopsQuery);
+
+  const shops = data ?? [];
 
   const filtered = useMemo(() => {
-    if (!data) return [];
-    return data
-      .filter((s) => {
-        const locationKey = `${s.country_code}:${s.state ?? "All"}`;
-        if (locationFilter !== "All" && locationKey !== locationFilter) return false;
-        if (search) {
-          const q = search.toLowerCase();
-          const hay = `${s.name} ${s.suburb ?? ""} ${s.specialties.join(" ")}`.toLowerCase();
-          if (!hay.includes(q)) return false;
-        }
-        return true;
-      })
-      .sort((a, b) => Number(b.featured) - Number(a.featured) || a.name.localeCompare(b.name));
-  }, [data, locationFilter, search]);
+    const q = text.trim().toLowerCase();
+    return shops.filter((s) => {
+      if (onlyMine && location.place) {
+        if (!isNearby(s, location.place) && !shipsTo(s, location.place)) return false;
+      }
+      if (q) {
+        const hay = `${s.name} ${s.city ?? ""} ${s.region ?? ""} ${countryName(s.country_code)} ${s.specialties.join(" ")}`.toLowerCase();
+        if (!hay.includes(q)) return false;
+      }
+      return true;
+    });
+  }, [shops, text, onlyMine, location.place]);
 
-  const locations = useMemo(() => {
-    const values = new Map<string, string>();
-    for (const shop of data ?? []) {
-      const key = `${shop.country_code}:${shop.state ?? "All"}`;
-      values.set(key, shop.state ? `${shop.state}, ${shop.country_code}` : shop.country_code);
+  const grouped = useMemo(() => {
+    const map = new Map<string, ShopDirectoryEntry[]>();
+    for (const shop of filtered) {
+      const key = shop.country_code.toUpperCase();
+      map.set(key, [...(map.get(key) ?? []), shop]);
     }
-    return [
-      ["All", "All regions"] as const,
-      ...[...values.entries()].sort((a, b) => a[1].localeCompare(b[1])),
-    ];
-  }, [data]);
+    return [...map.entries()].sort((a, b) => countryName(a[0]).localeCompare(countryName(b[0])));
+  }, [filtered]);
 
   return (
     <main className="mx-auto max-w-5xl px-3 py-6 sm:px-4 sm:py-10">
-      <h1 className="font-display text-4xl font-bold text-foreground">Aquarium shops</h1>
+      <h1 className="font-display text-4xl font-bold text-foreground">Independent aquarium shops</h1>
       <p className="mt-2 max-w-2xl text-muted-foreground">
-        Find specialist aquarium shops. Listings currently focus on Australia.
+        A free directory of independently owned shops around the world. No chains, no paid
+        placements, nobody pays to be listed.
       </p>
 
-      <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
-        <input
-          type="search"
-          placeholder="Search name, suburb or specialty"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="min-h-11 flex-1 rounded-xl border bg-background px-4 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none"
-        />
-        <div className="flex gap-1.5 overflow-x-auto overscroll-x-contain pb-1 [scrollbar-width:none] sm:flex-wrap sm:overflow-visible">
-          {locations.map(([value, label]) => (
-            <button
-              key={value}
-              onClick={() => setLocationFilter(value)}
-              className={
-                "min-h-9 shrink-0 rounded-full px-3 py-1 text-xs font-medium transition-colors " +
-                (locationFilter === value
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-muted text-muted-foreground hover:bg-muted/70")
-              }
-            >
-              {label}
-            </button>
-          ))}
+      <div className="mt-6 border-4 border-ink bg-paper p-4">
+        <label
+          htmlFor="fish-search"
+          className="font-mono text-xs font-bold uppercase tracking-wide text-foreground"
+        >
+          Looking for a particular fish?
+        </label>
+        <div className="mt-2 flex flex-col gap-2 sm:flex-row">
+          <input
+            id="fish-search"
+            type="search"
+            placeholder="Try Paracheirodon innesi or bristlenose"
+            defaultValue={fish}
+            onChange={(e) =>
+              void navigate({
+                search: () => ({ fish: e.target.value || undefined }),
+                replace: true,
+              })
+            }
+            className="min-h-11 flex-1 border-2 border-ink bg-paper px-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
+          />
         </div>
+        <p className="mt-2 flex items-start gap-1.5 text-xs text-muted-foreground">
+          <Search className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden />
+          We do not track shop stock. Each shop's link runs your search on their own website, so you
+          see what they actually have today.
+        </p>
       </div>
 
-      <div className="mt-8 grid gap-4">
-        {isLoading && <p className="text-sm text-muted-foreground">Loading…</p>}
-        {!isLoading && filtered.length === 0 && (
-          <p className="text-sm text-muted-foreground">No shops match. Try clearing a filter.</p>
-        )}
-        {filtered.map((shop) => (
-          <div key={shop.id} className="rounded-[1.25rem] border bg-card p-4 sm:rounded-2xl sm:p-5">
-            <div className="flex flex-wrap items-baseline justify-between gap-2">
-              <div className="flex flex-wrap items-center gap-2">
-                <Link
-                  to="/shops/$slug"
-                  params={{ slug: shop.slug }}
-                  className="font-display text-lg font-semibold text-foreground hover:text-primary"
-                >
-                  {shop.name}
-                </Link>
-                {shop.featured && (
-                  <span className="rounded-full bg-lime/30 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-foreground">
-                    Featured · paid
-                  </span>
-                )}
-              </div>
-              {shop.state && (
-                <span className="text-xs text-muted-foreground">
-                  {shop.suburb ? `${shop.suburb}, ` : ""}
-                  {shop.state}
-                </span>
-              )}
-            </div>
-            {shop.description && (
-              <p className="mt-2 text-sm text-muted-foreground">{shop.description}</p>
-            )}
-            <div className="mt-3 flex flex-wrap items-center gap-3 text-xs">
-              {shop.specialties.map((sp) => (
-                <span key={sp} className="rounded-full bg-muted px-2 py-0.5 text-muted-foreground">
-                  {sp}
-                </span>
+      <div className="mt-4">
+        <LocationPicker location={location} shops={shops} />
+      </div>
+
+      <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center">
+        <input
+          type="search"
+          placeholder="Search shop name, city or specialty"
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          className="min-h-11 flex-1 border-2 border-ink bg-paper px-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
+        />
+        <label className="inline-flex items-center gap-2 text-sm text-foreground">
+          <input
+            type="checkbox"
+            checked={onlyMine}
+            disabled={!location.place}
+            onChange={(e) => setOnlyMine(e.target.checked)}
+          />
+          Only shops I can reach
+        </label>
+      </div>
+
+      {isLoading && <p className="mt-8 text-sm text-muted-foreground">Loading…</p>}
+      {!isLoading && filtered.length === 0 && (
+        <p className="mt-8 text-sm text-muted-foreground">
+          No shops match. Try clearing a filter, or{" "}
+          <Link to="/contact" className="font-semibold text-primary underline">
+            suggest a shop
+          </Link>
+          .
+        </p>
+      )}
+
+      <div className="mt-8 space-y-8">
+        {grouped.map(([code, list]) => (
+          <section key={code}>
+            <h2 className="border-b-2 border-ink pb-1 font-display text-xl font-bold text-foreground">
+              {countryName(code)}{" "}
+              <span className="font-mono text-xs font-normal text-muted-foreground">
+                {list.length} {list.length === 1 ? "shop" : "shops"}
+              </span>
+            </h2>
+            <div className="mt-3 grid gap-3">
+              {list.map((shop) => (
+                <ShopCard key={shop.id} shop={shop} fish={fish.trim()} />
               ))}
-              {shop.website && (
-                <a
-                  href={shop.affiliate_url ?? shop.website}
-                  target="_blank"
-                  rel={
-                    shop.is_affiliate || shop.affiliate_url
-                      ? "noopener noreferrer sponsored nofollow"
-                      : "noopener noreferrer"
-                  }
-                  onClick={() =>
-                    recordShopOutbound(
-                      shop.id,
-                      shop.is_affiliate || shop.affiliate_url ? "affiliate" : "website",
-                    )
-                  }
-                  className="inline-flex items-center gap-1 text-primary hover:underline"
-                >
-                  Website
-                  {shop.is_affiliate || shop.affiliate_url ? " · affiliate" : ""}{" "}
-                  <ExternalLink className="h-3 w-3" />
-                </a>
-              )}
-              {shop.lat && shop.lng && (
-                <a
-                  href={`https://www.google.com/maps/search/?api=1&query=${shop.lat},${shop.lng}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={() => recordShopOutbound(shop.id, "map")}
-                  className="inline-flex items-center gap-1 text-primary hover:underline"
-                >
-                  <MapPin className="h-3 w-3" /> Map
-                </a>
-              )}
             </div>
-          </div>
+          </section>
         ))}
       </div>
 
-      <div className="mt-10 rounded-2xl border bg-muted/40 p-4 text-xs leading-relaxed text-muted-foreground">
+      <div className="mt-10 border-4 border-ink bg-muted/40 p-4 text-xs leading-relaxed text-muted-foreground">
         <p>
-          Featured shops have paid for placement; it is not an endorsement of their animal care.
-          FishTankr may earn a commission from affiliate links.{" "}
-          <Link to="/affiliate-disclosure" className="font-semibold text-primary underline">
-            Read the disclosure.
-          </Link>
+          <strong className="text-foreground">How this list works.</strong> We list independently
+          owned shops only: single stores, family businesses and small groups, not chains or
+          franchise pet superstores. A listing is not an endorsement of a shop's animal care, and no
+          shop can pay to be listed or to rank higher.
         </p>
         <p className="mt-2">
-          Own a shop, or know one that is missing?{" "}
+          Shop missing, or a detail wrong?{" "}
           <Link to="/contact" className="font-semibold text-primary underline">
-            Claim, correct or suggest a listing.
+            Tell us and we will check it.
           </Link>
         </p>
       </div>
-      <div className="mt-4 flex flex-col gap-3 rounded-2xl border bg-primary/5 p-4 sm:flex-row sm:items-center sm:justify-between">
+
+      <div className="mt-4 flex flex-col gap-3 border-4 border-ink bg-paper p-4 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-sm text-muted-foreground">
-          <strong className="text-foreground">Before you shop:</strong> add your full fish list,
-          cycle details and water settings to the plan.
+          <strong className="text-foreground">Before you buy:</strong> check the fish suits your tank
+          and the fish already in it.
         </p>
         <Link
           to="/calculator"
-          className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-xl bg-primary px-4 text-sm font-semibold text-primary-foreground"
+          className="inline-flex min-h-11 shrink-0 items-center justify-center border-4 border-ink bg-ink px-4 text-sm font-semibold text-on-ink"
         >
           Check my tank
         </Link>
