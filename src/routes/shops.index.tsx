@@ -111,7 +111,7 @@ function ShopCard({ shop, fish }: { shop: ShopDirectoryEntry; fish: string }) {
 }
 
 function ShopsIndex() {
-  const navigate = useNavigate({ from: "/shops" });
+  const navigate = useNavigate({ from: "/shops/" });
   const { fish = "" } = Route.useSearch();
   const [text, setText] = useState("");
   const [onlyMine, setOnlyMine] = useState(false);
@@ -165,7 +165,10 @@ function ShopsIndex() {
             placeholder="Try Paracheirodon innesi or bristlenose"
             defaultValue={fish}
             onChange={(e) =>
-              void navigate({ search: { fish: e.target.value || undefined }, replace: true })
+              void navigate({
+                search: () => ({ fish: e.target.value || undefined }),
+                replace: true,
+              })
             }
             className="min-h-11 flex-1 border-2 border-ink bg-paper px-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
           />
