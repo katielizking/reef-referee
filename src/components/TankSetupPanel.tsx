@@ -3,6 +3,7 @@ import { AlertTriangle, Search, Plus, Minus, X, Info, Fish, Sprout } from "lucid
 import { Link } from "@tanstack/react-router";
 import type {
   BiologicalMediaLevel,
+  TankFilterSlot,
   CycleMethod,
   CycleStatus,
   Filter,
@@ -17,6 +18,14 @@ import type {
 } from "@/lib/types";
 import { BIOTOPE_LABEL } from "@/lib/types";
 import { litresOf } from "@/lib/scoring";
+import {
+  displayLength,
+  formatVolume,
+  lengthLabel,
+  lengthToCm,
+  useUnitSystem,
+} from "@/lib/units";
+import { submitSpeciesRequest } from "@/lib/requests";
 import { useOutsideClick } from "@/hooks/useOutsideClick";
 
 import {
@@ -63,7 +72,9 @@ export function TankSetupPanel({
   setOpenSteps,
   sections = ["tank","filter","livestock","aquascape"],
 }: Props) {
+  const [units, setUnits] = useUnitSystem();
   const litres = Math.round(litresOf(state));
+  const volume = formatVolume(litres, units);
   const dimInvalid =
     state.length_cm < MIN_DIM || state.width_cm < MIN_DIM || state.height_cm < MIN_DIM;
   const filterUndersized = state.filter && litres > 0 && state.filter.rated_litres < litres;
@@ -89,8 +100,8 @@ export function TankSetupPanel({
             title="Tank & water"
             summary={
               dimInvalid
-                ? "Set each side ≥ 10 cm"
-                : `${litres} L · pH ${state.target_ph.toFixed(1)} · ${state.target_temp_c}°C`
+                ? `Set each side ≥ ${displayLength(MIN_DIM, units)} ${lengthLabel(units)}`
+                : `${volume} · pH ${state.target_ph.toFixed(1)} · ${state.target_temp_c}°C`
             }
           />
         </AccordionTrigger>
@@ -104,32 +115,55 @@ export function TankSetupPanel({
               placeholder="Living room 60"
             />
           </label>
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-xs text-muted-foreground">Units</span>
+            <div className="flex rounded-lg bg-muted p-0.5">
+              {(["metric", "us"] as const).map((u) => (
+                <button
+                  key={u}
+                  type="button"
+                  aria-pressed={units === u}
+                  onClick={() => setUnits(u)}
+                  className={`min-h-9 rounded-md px-2.5 text-xs transition ${
+                    units === u
+                      ? "bg-card font-medium text-foreground shadow-sm"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {u === "metric" ? "cm / L" : "in / gal"}
+                </button>
+              ))}
+            </div>
+          </div>
           <div className="grid grid-cols-3 gap-2">
             <DimField
-              label="Length (cm)"
-              value={state.length_cm}
-              onChange={(v) => setState((s) => ({ ...s, length_cm: v }))}
+              label={`Length (${lengthLabel(units)})`}
+              value={displayLength(state.length_cm, units)}
+              min={displayLength(MIN_DIM, units)}
+              onChange={(v) => setState((s) => ({ ...s, length_cm: lengthToCm(v, units) }))}
             />
             <DimField
-              label="Width (cm)"
-              value={state.width_cm}
-              onChange={(v) => setState((s) => ({ ...s, width_cm: v }))}
+              label={`Width (${lengthLabel(units)})`}
+              value={displayLength(state.width_cm, units)}
+              min={displayLength(MIN_DIM, units)}
+              onChange={(v) => setState((s) => ({ ...s, width_cm: lengthToCm(v, units) }))}
             />
             <DimField
-              label="Height (cm)"
-              value={state.height_cm}
-              onChange={(v) => setState((s) => ({ ...s, height_cm: v }))}
+              label={`Height (${lengthLabel(units)})`}
+              value={displayLength(state.height_cm, units)}
+              min={displayLength(MIN_DIM, units)}
+              onChange={(v) => setState((s) => ({ ...s, height_cm: lengthToCm(v, units) }))}
             />
           </div>
           {dimInvalid && (
             <p className="flex items-center gap-1.5 text-xs font-medium text-coral">
               <AlertTriangle className="h-3.5 w-3.5" aria-hidden />
-              Each side needs to be at least {MIN_DIM} cm.
+              Each side needs to be at least {displayLength(MIN_DIM, units)} {lengthLabel(units)}.
             </p>
           )}
           <div className="rounded-xl bg-muted px-3 py-2 text-sm">
             <span className="text-muted-foreground">Volume</span>{" "}
-            <span className="font-semibold">{litres} L</span>
+            <span className="font-semibold">{volume}</span>
           </div>
           <label className="block text-sm">
             <div className="mb-1 flex items-center justify-between text-foreground/80">
@@ -212,8 +246,8 @@ export function TankSetupPanel({
             <p className="flex items-start gap-1.5 rounded-lg bg-warn/15 px-2.5 py-1.5 text-xs font-medium text-foreground">
               <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-warn" aria-hidden />
               <span>
-                This filter is rated for {state.filter!.rated_litres} L but your tank is {litres} L.
-                Consider a larger filter.
+                This filter is rated for {formatVolume(state.filter!.rated_litres, units)} but your
+                tank is {volume}. Consider a larger filter, or run a second one.
               </span>
             </p>
           )}
@@ -263,6 +297,8 @@ export function TankSetupPanel({
               className="h-5 w-5 accent-[var(--color-teal)]"
             />
           </label>
+
+          <ExtraFilters state={state} setState={setState} filters={filters} />
 
           <div className="border-t pt-3">
             <Segmented<CycleStatus>
@@ -445,19 +481,21 @@ function StepHeader({
 function DimField({
   label,
   value,
+  min = MIN_DIM,
   onChange,
 }: {
   label: string;
   value: number;
+  min?: number;
   onChange: (v: number) => void;
 }) {
-  const invalid = value < MIN_DIM;
+  const invalid = value < min;
   return (
     <label className="block text-sm">
       <span className="mb-1 block text-xs text-muted-foreground">{label}</span>
       <input
         type="number"
-        min={MIN_DIM}
+        min={min}
         aria-invalid={invalid || undefined}
         className={`w-full rounded-xl border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring ${
           invalid ? "border-coral" : ""
