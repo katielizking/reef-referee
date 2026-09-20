@@ -114,25 +114,24 @@ function ShopsIndex() {
   const navigate = useNavigate({ from: "/shops/" });
   const { fish = "" } = Route.useSearch();
   const [text, setText] = useState("");
-  const [onlyMine, setOnlyMine] = useState(false);
   const location = useLocation();
   const { data, isLoading } = useQuery(shopsQuery);
 
   const shops = data ?? [];
+  const place = location.place;
 
   const filtered = useMemo(() => {
+    if (!place) return [];
     const q = text.trim().toLowerCase();
     return shops.filter((s) => {
-      if (onlyMine && location.place) {
-        if (!isNearby(s, location.place) && !shipsTo(s, location.place)) return false;
-      }
+      if (!isNearby(s, place) && !shipsTo(s, place)) return false;
       if (q) {
         const hay = `${s.name} ${s.city ?? ""} ${s.region ?? ""} ${countryName(s.country_code)} ${s.specialties.join(" ")}`.toLowerCase();
         if (!hay.includes(q)) return false;
       }
       return true;
     });
-  }, [shops, text, onlyMine, location.place]);
+  }, [shops, text, place]);
 
   const grouped = useMemo(() => {
     const map = new Map<string, ShopDirectoryEntry[]>();
@@ -184,32 +183,33 @@ function ShopsIndex() {
         <LocationPicker location={location} shops={shops} />
       </div>
 
-      <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center">
-        <label htmlFor="shop-search" className="sr-only">Search shop name, city or specialty</label>
-        <input
-          id="shop-search"
-          type="search"
-          placeholder="Search shop name, city or specialty"
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          className="min-h-11 flex-1 border-2 border-ink bg-paper px-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
-        />
-        <label className="inline-flex min-h-11 items-center gap-2 text-sm text-foreground">
+      {place && (
+        <div className="mt-4">
+          <label htmlFor="shop-search" className="sr-only">
+            Search shop name, suburb or specialty
+          </label>
           <input
-            type="checkbox"
-            checked={onlyMine}
-            disabled={!location.place}
-            onChange={(e) => setOnlyMine(e.target.checked)}
-            className="size-5"
+            id="shop-search"
+            type="search"
+            placeholder="Search shop name, suburb or specialty"
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            className="min-h-11 w-full border-2 border-ink bg-paper px-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
           />
-          Only shops I can reach
-        </label>
-      </div>
+        </div>
+      )}
 
-      {isLoading && <p className="mt-8 text-sm text-muted-foreground">Loading…</p>}
-      {!isLoading && filtered.length === 0 && (
+      {!place && location.ready && (
+        <p className="mt-6 text-sm text-muted-foreground">
+          Pick your country, state and suburb above to see the shops you can walk into and the ones
+          that deliver live fish to you.
+        </p>
+      )}
+
+      {place && isLoading && <p className="mt-8 text-sm text-muted-foreground">Loading…</p>}
+      {place && !isLoading && filtered.length === 0 && (
         <p className="mt-8 text-sm text-muted-foreground">
-          No shops match. Try clearing a filter, or{" "}
+          No shops listed for that area yet. Try a wider state or suburb setting, or{" "}
           <Link to="/contact" className="font-semibold text-primary underline">
             suggest a shop
           </Link>
