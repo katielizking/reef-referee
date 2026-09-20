@@ -162,6 +162,28 @@ describe("checkInvertebrates", () => {
     );
   });
 
+  it("treats a prohibited species as critical", () => {
+    const issues = checkInvertebrates(
+      tank({
+        invertebrates: [
+          {
+            invertebrate: invert({
+              id: "inv-4",
+              common_name: "Red swamp crayfish",
+              min_group_size: 1,
+              legal_status: "prohibited",
+              legal_note: "Prohibited in Queensland.",
+            }),
+            quantity: 1,
+          },
+        ],
+      }),
+    );
+    const legal = issues.find((i) => i.code === "check_local_rules");
+    expect(legal?.severity).toBe("critical");
+    expect(legal?.reason).toContain("Prohibited");
+  });
+
   it("notes species that need dry land", () => {
     const issues = checkInvertebrates(
       tank({
@@ -175,14 +197,14 @@ describe("checkInvertebrates", () => {
               adult_size_cm: 3,
               min_group_size: 1,
               predatory: false,
-              care_notes: "Semi-terrestrial and needs land access with a secure lid.",
+              needs_land: true,
             }),
             quantity: 2,
           },
         ],
       }),
     );
-    expect(issues.some((i) => i.code === "needs_land" && i.severity === "note")).toBe(true);
+    expect(issues.some((i) => i.code === "needs_land" && i.severity === "critical")).toBe(true);
   });
 
   it("lists critical issues first", () => {
