@@ -331,103 +331,15 @@ export function TankSetupPanel({
             ]}
             onChange={(v) => setState((s) => ({ ...s, biological_media_level: v }))}
           />
-          <Segmented<FilterMaturity>
-            label="Filter-media maturity"
-            value={state.filter_maturity}
-            options={[
-              { value: "new", label: "New" },
-              { value: "maturing", label: "Maturing" },
-              { value: "established", label: "Established" },
-              { value: "unknown", label: "Not sure" },
-            ]}
-            onChange={(v) => setState((s) => ({ ...s, filter_maturity: v }))}
-          />
-          <label className="flex min-h-11 items-center justify-between gap-3 rounded-xl border bg-background px-3 py-2 text-sm">
-            <span>
-              <span className="block font-medium text-foreground">Seeded media used</span>
-              <span className="block text-xs text-muted-foreground">
-                Media transferred from an established healthy filter
-              </span>
-            </span>
-            <input
-              type="checkbox"
-              checked={state.seeded_media}
-              onChange={(e) => setState((s) => ({ ...s, seeded_media: e.target.checked }))}
-              className="h-5 w-5 accent-[var(--color-teal)]"
-            />
-          </label>
-
           <ExtraFilters state={state} setState={setState} filters={filters} />
 
-          <div className="border-t pt-3">
-            <Segmented<CycleStatus>
-              label="Nitrogen-cycle status"
-              value={state.cycle_status}
-              options={[
-                { value: "not_started", label: "Not started" },
-                { value: "cycling", label: "Cycling" },
-                { value: "verified", label: "Verified by tests" },
-                { value: "unknown", label: "Not sure" },
-              ]}
-              onChange={(v) => setState((s) => ({ ...s, cycle_status: v }))}
-            />
+          <div className="rounded-xl border bg-background px-3 py-2 text-xs text-muted-foreground">
+            Cycling and water tests moved to the{" "}
+            <Link to="/tracker" className="font-semibold text-foreground underline">
+              tank tracker
+            </Link>
+            , where you can log each test for every tank you keep.
           </div>
-          <Segmented<CycleMethod>
-            label="Cycling method"
-            value={state.cycle_method}
-            options={[
-              { value: "fishless", label: "Fishless" },
-              { value: "fish_in", label: "Fish-in" },
-              { value: "unknown", label: "Not sure" },
-            ]}
-            onChange={(v) => setState((s) => ({ ...s, cycle_method: v }))}
-          />
-          <WaterTestField
-            label="Tank age (weeks)"
-            value={state.tank_age_weeks}
-            step={1}
-            onChange={(v) => setState((s) => ({ ...s, tank_age_weeks: v }))}
-          />
-          <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
-            <WaterTestField
-              label="Ammonia (mg/L)"
-              value={state.ammonia_mg_l}
-              onChange={(v) => setState((s) => ({ ...s, ammonia_mg_l: v }))}
-            />
-            <WaterTestField
-              label="Nitrite (mg/L)"
-              value={state.nitrite_mg_l}
-              onChange={(v) => setState((s) => ({ ...s, nitrite_mg_l: v }))}
-            />
-            <WaterTestField
-              label="Nitrate (mg/L)"
-              value={state.nitrate_mg_l}
-              onChange={(v) => setState((s) => ({ ...s, nitrate_mg_l: v }))}
-            />
-          </div>
-          <label className="block text-sm">
-            <span className="mb-1 block text-xs text-muted-foreground">
-              Water tested on (within the last 7 days)
-            </span>
-            <input
-              type="date"
-              value={state.water_tested_on ?? ""}
-              onChange={(e) =>
-                setState((s) => ({
-                  ...s,
-                  water_tested_on: e.target.value || null,
-                }))
-              }
-              className="min-h-11 w-full rounded-xl border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
-            />
-          </label>
-          {((state.ammonia_mg_l ?? 0) > 0 || (state.nitrite_mg_l ?? 0) > 0) && (
-            <p className="flex items-start gap-1.5 rounded-lg bg-coral/10 px-2.5 py-2 text-xs font-semibold text-foreground">
-              <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-coral" aria-hidden />
-              Detectable ammonia or nitrite is a stop signal. Do not add fish until the cause is
-              resolved and both remain at 0 mg/L.
-            </p>
-          )}
           <Segmented<MaintenanceFrequency>
             label="Maintenance"
             value={state.maintenance_frequency}
@@ -609,24 +521,12 @@ function ExtraFilters({
             ]}
             onChange={(v) => update(i, { biological_media_level: v })}
           />
-          <Segmented<FilterMaturity>
-            label="Media maturity"
-            value={slot.filter_maturity}
-            options={[
-              { value: "new", label: "New" },
-              { value: "maturing", label: "Maturing" },
-              { value: "established", label: "Established" },
-              { value: "unknown", label: "Not sure" },
-            ]}
-            onChange={(v) => update(i, { filter_maturity: v })}
-          />
         </div>
       ))}
 
       {extras.length > 0 && (
         <p className="text-xs text-muted-foreground">
-          Media adds up, maturity does not. The cycle check uses the least mature media, because a
-          new filter cannot carry the load on its own.
+          Media adds up across filters. How mature that media is belongs in the tank tracker.
         </p>
       )}
     </div>
