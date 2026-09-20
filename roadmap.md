@@ -14,4 +14,4 @@
 
 - [x] Add a persistent light/dark toggle outside the home page
 - [x] Audit WCAG 2.2 AA issues and fix confirmed critical and warning findings
-- [ ] Verify contrast, keyboard access, desktop and mobile layouts
+- [x] Verify contrast, keyboard access, desktop and mobile layouts

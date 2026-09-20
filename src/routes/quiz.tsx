@@ -179,7 +179,7 @@ function QuizPage() {
 
   const currentQ = questions[step];
   const total = questions.length;
-  const progress = showResults ? 100 : Math.round((step / total) * 100);
+  const progress = showResults ? 100 : Math.round(((step + 1) / total) * 100);
 
   const results = useMemo(() => {
     if (!showResults || !species) return [];

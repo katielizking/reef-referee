@@ -201,7 +201,7 @@ function Filter<T extends string>({
             type="button"
             aria-pressed={value === key}
             onClick={() => onChange(key)}
-            className={`min-h-9 shrink-0 snap-start rounded-full border px-3 py-1 text-xs transition ${
+            className={`min-h-11 shrink-0 snap-start rounded-full border px-3 py-1 text-xs transition ${
               value === key
                 ? "border-primary bg-primary text-primary-foreground"
                 : "bg-background text-muted-foreground hover:bg-muted"

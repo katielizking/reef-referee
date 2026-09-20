@@ -75,7 +75,7 @@ export function SelectedObjectPanel({ state, setState, interior, commit, onClose
             clearSelection(null);
             onClose?.();
           }}
-          className="rounded-lg border p-1 text-muted-foreground hover:bg-muted"
+          className="inline-flex size-11 items-center justify-center rounded-lg border text-muted-foreground hover:bg-muted"
           aria-label="Close selection"
         >
           <X className="h-4 w-4" />
@@ -180,7 +180,7 @@ export function SelectedObjectPanel({ state, setState, interior, commit, onClose
           <button
             type="button"
             onClick={duplicate}
-            className="inline-flex items-center gap-1.5 rounded-xl border bg-card px-3 py-1.5 text-xs font-semibold text-foreground hover:bg-muted"
+            className="inline-flex min-h-11 items-center gap-1.5 rounded-xl border bg-card px-3 py-1.5 text-xs font-semibold text-foreground hover:bg-muted"
           >
             <Copy className="h-3.5 w-3.5" /> Duplicate
           </button>
@@ -193,7 +193,7 @@ export function SelectedObjectPanel({ state, setState, interior, commit, onClose
                 updateOverride({ rotY: placement.rotY - Math.PI / 12 });
                 commit();
               }}
-              className="inline-flex items-center gap-1 rounded-xl border bg-card px-2 py-1.5 text-xs font-semibold hover:bg-muted"
+              className="inline-flex size-11 items-center justify-center rounded-xl border bg-card text-xs font-semibold hover:bg-muted"
               aria-label="Rotate left"
             >
               <RotateCcw className="h-3.5 w-3.5" />
@@ -204,7 +204,7 @@ export function SelectedObjectPanel({ state, setState, interior, commit, onClose
                 updateOverride({ rotY: placement.rotY + Math.PI / 12 });
                 commit();
               }}
-              className="inline-flex items-center gap-1 rounded-xl border bg-card px-2 py-1.5 text-xs font-semibold hover:bg-muted"
+              className="inline-flex size-11 items-center justify-center rounded-xl border bg-card text-xs font-semibold hover:bg-muted"
               aria-label="Rotate right"
             >
               <RotateCw className="h-3.5 w-3.5" />
@@ -214,7 +214,7 @@ export function SelectedObjectPanel({ state, setState, interior, commit, onClose
         <button
           type="button"
           onClick={remove}
-          className="ml-auto inline-flex items-center gap-1.5 rounded-xl border border-coral/40 bg-card px-3 py-1.5 text-xs font-semibold text-coral hover:bg-coral/10"
+          className="ml-auto inline-flex min-h-11 items-center gap-1.5 rounded-xl border border-coral/40 bg-card px-3 py-1.5 text-xs font-semibold text-coral hover:bg-coral/10"
         >
           <Trash2 className="h-3.5 w-3.5" /> Remove
         </button>

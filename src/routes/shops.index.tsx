@@ -194,12 +194,13 @@ function ShopsIndex() {
           onChange={(e) => setText(e.target.value)}
           className="min-h-11 flex-1 border-2 border-ink bg-paper px-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
         />
-        <label className="inline-flex items-center gap-2 text-sm text-foreground">
+        <label className="inline-flex min-h-11 items-center gap-2 text-sm text-foreground">
           <input
             type="checkbox"
             checked={onlyMine}
             disabled={!location.place}
             onChange={(e) => setOnlyMine(e.target.checked)}
+            className="size-5"
           />
           Only shops I can reach
         </label>
