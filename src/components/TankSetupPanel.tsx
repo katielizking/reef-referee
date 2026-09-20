@@ -39,6 +39,7 @@ import type { StepId } from "@/components/BuilderSteps";
 
 interface Props {
   sections?: StepId[];
+  visualOnly?: boolean;
   state: TankState;
   setState: (updater: (prev: TankState) => TankState) => void;
   species: Species[];
@@ -71,6 +72,7 @@ export function TankSetupPanel({
   openSteps,
   setOpenSteps,
   sections = ["tank","filter","livestock","aquascape"],
+  visualOnly = false,
 }: Props) {
   const [units, setUnits] = useUnitSystem();
   const litres = Math.round(waterLitres(state));
@@ -222,43 +224,45 @@ export function TankSetupPanel({
               </label>
             ))}
           </fieldset>
-          <label className="block text-sm">
-            <div className="mb-1 flex items-center justify-between text-foreground/80">
-              <span>Target pH</span>
-              <span className="font-medium">{state.target_ph.toFixed(1)}</span>
-            </div>
-            <input
-              type="range"
-              min={4}
-              max={9}
-              step={0.1}
-              value={state.target_ph}
-              onChange={(e) => setState((s) => ({ ...s, target_ph: Number(e.target.value) }))}
-              className="w-full accent-[var(--color-teal)]"
-              aria-label="Target pH"
-            />
-          </label>
-          <label className="block text-sm">
-            <div className="mb-1 flex items-center justify-between text-foreground/80">
-              <span>Target temp</span>
-              <span className="font-medium">{state.target_temp_c}°C</span>
-            </div>
-            <input
-              type="range"
-              min={15}
-              max={32}
-              step={1}
-              value={state.target_temp_c}
-              onChange={(e) =>
-                setState((s) => ({
-                  ...s,
-                  target_temp_c: Number(e.target.value),
-                }))
-              }
-              className="w-full accent-[var(--color-teal)]"
-              aria-label="Target temperature"
-            />
-          </label>
+          {!visualOnly && <>
+            <label className="block text-sm">
+              <div className="mb-1 flex items-center justify-between text-foreground/80">
+                <span>Target pH</span>
+                <span className="font-medium">{state.target_ph.toFixed(1)}</span>
+              </div>
+              <input
+                type="range"
+                min={4}
+                max={9}
+                step={0.1}
+                value={state.target_ph}
+                onChange={(e) => setState((s) => ({ ...s, target_ph: Number(e.target.value) }))}
+                className="w-full accent-[var(--color-teal)]"
+                aria-label="Target pH"
+              />
+            </label>
+            <label className="block text-sm">
+              <div className="mb-1 flex items-center justify-between text-foreground/80">
+                <span>Target temp</span>
+                <span className="font-medium">{state.target_temp_c}°C</span>
+              </div>
+              <input
+                type="range"
+                min={15}
+                max={32}
+                step={1}
+                value={state.target_temp_c}
+                onChange={(e) =>
+                  setState((s) => ({
+                    ...s,
+                    target_temp_c: Number(e.target.value),
+                  }))
+                }
+                className="w-full accent-[var(--color-teal)]"
+                aria-label="Target temperature"
+              />
+            </label>
+          </>}
         </AccordionContent>
       </AccordionItem>}
 
@@ -270,7 +274,7 @@ export function TankSetupPanel({
         <AccordionTrigger className="min-h-14 py-3 hover:no-underline">
           <StepHeader
             n={2}
-            title="Filter and maintenance"
+            title={visualOnly ? "Filter" : "Filter and maintenance"}
             summary={state.filter ? state.filter.name : "Pick a filter"}
           />
         </AccordionTrigger>
@@ -295,7 +299,7 @@ export function TankSetupPanel({
               </option>
             ))}
           </select>
-          {filterUndersized && (
+          {!visualOnly && filterUndersized && (
             <p className="flex items-start gap-1.5 rounded-lg bg-warn/15 px-2.5 py-1.5 text-xs font-medium text-foreground">
               <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-warn" aria-hidden />
               <span>
@@ -304,7 +308,7 @@ export function TankSetupPanel({
               </span>
             </p>
           )}
-          {state.filter && (
+          {!visualOnly && state.filter && (
             <div className="rounded-xl border border-primary/20 bg-primary/5 px-3 py-2 text-xs text-foreground/80">
               <p className="font-semibold text-foreground">
                 {FILTER_TYPE_LABEL[state.filter.filter_type]} · {state.filter.turnover_lph} L/h flow
@@ -315,35 +319,37 @@ export function TankSetupPanel({
               </p>
             </div>
           )}
-          <Segmented<BiologicalMediaLevel>
-            label="Biological media"
-            value={state.biological_media_level}
-            options={[
-              { value: "minimal", label: "Minimal" },
-              { value: "standard", label: "Standard" },
-              { value: "substantial", label: "Substantial" },
-            ]}
-            onChange={(v) => setState((s) => ({ ...s, biological_media_level: v }))}
-          />
-          <ExtraFilters state={state} setState={setState} filters={filters} />
+          {!visualOnly && <>
+            <Segmented<BiologicalMediaLevel>
+              label="Biological media"
+              value={state.biological_media_level}
+              options={[
+                { value: "minimal", label: "Minimal" },
+                { value: "standard", label: "Standard" },
+                { value: "substantial", label: "Substantial" },
+              ]}
+              onChange={(v) => setState((s) => ({ ...s, biological_media_level: v }))}
+            />
+            <ExtraFilters state={state} setState={setState} filters={filters} />
 
-          <div className="rounded-xl border bg-background px-3 py-2 text-xs text-muted-foreground">
-            Cycling and water tests moved to the{" "}
-            <Link to="/tracker" className="font-semibold text-foreground underline">
-              tank tracker
-            </Link>
-            , where you can log each test for every tank you keep.
-          </div>
-          <Segmented<MaintenanceFrequency>
-            label="Maintenance"
-            value={state.maintenance_frequency}
-            options={[
-              { value: "weekly", label: "Weekly" },
-              { value: "fortnightly", label: "Fortnightly" },
-              { value: "monthly", label: "Monthly" },
-            ]}
-            onChange={(v) => setState((s) => ({ ...s, maintenance_frequency: v }))}
-          />
+            <div className="rounded-xl border bg-background px-3 py-2 text-xs text-muted-foreground">
+              Cycling and water tests moved to the{" "}
+              <Link to="/tracker" className="font-semibold text-foreground underline">
+                tank tracker
+              </Link>
+              , where you can log each test for every tank you keep.
+            </div>
+            <Segmented<MaintenanceFrequency>
+              label="Maintenance"
+              value={state.maintenance_frequency}
+              options={[
+                { value: "weekly", label: "Weekly" },
+                { value: "fortnightly", label: "Fortnightly" },
+                { value: "monthly", label: "Monthly" },
+              ]}
+              onChange={(v) => setState((s) => ({ ...s, maintenance_frequency: v }))}
+            />
+          </>}
         </AccordionContent>
       </AccordionItem>}
 
