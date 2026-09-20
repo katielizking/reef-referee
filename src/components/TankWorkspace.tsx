@@ -257,6 +257,35 @@ export function TankWorkspace({ visualiser = false }: { visualiser?: boolean }) 
           </div>
           <div className="grid grid-cols-3 gap-2 sm:flex sm:flex-wrap">
             <button
+              onClick={() => history.undo()}
+              disabled={!history.canUndo}
+              title="Undo your last change"
+              aria-label="Undo last change"
+              className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-xl border bg-card px-3 py-2 text-sm font-semibold text-foreground transition-colors hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <Undo2 className="h-4 w-4" />
+              Undo
+            </button>
+            <button
+              onClick={() => history.redo()}
+              disabled={!history.canRedo}
+              title="Redo a change you undid"
+              aria-label="Redo change"
+              className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-xl border bg-card px-3 py-2 text-sm font-semibold text-foreground transition-colors hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <Redo2 className="h-4 w-4" />
+              Redo
+            </button>
+            <button
+              onClick={handleReset}
+              onBlur={() => setConfirmingReset(false)}
+              title={confirmingReset ? "Click again to clear the whole plan" : "Start again with a blank tank"}
+              className={`inline-flex min-h-11 items-center justify-center gap-1.5 rounded-xl border px-3 py-2 text-sm font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${confirmingReset ? "border-destructive bg-destructive text-destructive-foreground hover:brightness-95" : "bg-card text-foreground hover:bg-muted"}`}
+            >
+              <RotateCcw className="h-4 w-4" />
+              {confirmingReset ? "Sure?" : "Reset"}
+            </button>
+            <button
               onClick={() => handleSave(false)}
               disabled={saving || state.species.length === 0}
               title={state.species.length === 0 ? "Add fish to save" : undefined}
