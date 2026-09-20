@@ -101,7 +101,6 @@ WITH new_species (common_name, scientific_name, min_tank_litres, adult_size_cm, 
 )
 INSERT INTO public.species (common_name, scientific_name, min_tank_litres, adult_size_cm, bioload_factor, swim_zone, temperament, is_schooling, min_group_size, fin_nipper, predatory, long_finned, active, native_ph_min, native_ph_max, native_temp_min_c, native_temp_max_c, biotope_region, native_habitat_type, conspecific_strategy, conspecific_notes,
   legal_in_australia, legal_status, legal_note,
-  legal_source_label, legal_source_url, legal_reviewed_on, legal_confidence,
   care_source_label, care_source_url, care_reviewed_on, care_confidence)
 SELECT n.common_name, n.scientific_name, n.min_tank_litres, n.adult_size_cm, n.bioload_factor, n.swim_zone, n.temperament, n.is_schooling, n.min_group_size, n.fin_nipper, n.predatory, n.long_finned, n.active, n.native_ph_min, n.native_ph_max, n.native_temp_min_c, n.native_temp_max_c, n.biotope_region, n.native_habitat_type, n.conspecific_strategy, n.conspecific_notes,
   true,
@@ -109,13 +108,6 @@ SELECT n.common_name, n.scientific_name, n.min_tank_litres, n.adult_size_cm, n.b
   CASE WHEN n.daff_listing = 'NATIVE'
     THEN 'Australian native. Collection and keeping rules vary by state and territory.'
     ELSE 'Listed on the DAFF permitted freshwater ornamental fish list as ' || n.daff_listing || '.' END,
-  CASE WHEN n.daff_listing = 'NATIVE'
-    THEN 'Check the relevant state or territory fisheries authority'
-    ELSE 'Australian Government (DAFF) permitted live freshwater ornamental fish list, effective 17 May 2024' END,
-  CASE WHEN n.daff_listing = 'NATIVE' THEN NULL
-    ELSE 'https://www.agriculture.gov.au/sites/default/files/documents/list-permitted-live-freshwater-ornamental-fish-suitable-for-import.pdf' END,
-  DATE '2026-09-20',
-  CASE WHEN n.daff_listing = 'NATIVE' THEN 'incomplete' ELSE 'medium' END,
   n.care_source_label, n.care_source_url, DATE '2026-09-20', 'low'
 FROM new_species n
 WHERE NOT EXISTS (
