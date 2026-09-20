@@ -181,6 +181,14 @@ function SharedTankBody() {
             <WandSparkles className="h-4 w-4" aria-hidden />
             Remix this tank
           </Link>
+          <button
+            type="button"
+            onClick={() => window.print()}
+            className="inline-flex items-center gap-1.5 rounded-xl border bg-card px-4 py-2 text-sm font-semibold text-foreground hover:bg-muted"
+          >
+            <Printer className="h-4 w-4" aria-hidden />
+            Print plan
+          </button>
         </div>
       </div>
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,340px)]">
