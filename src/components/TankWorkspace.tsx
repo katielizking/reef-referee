@@ -343,11 +343,7 @@ export function TankWorkspace({ visualiser = false }: { visualiser?: boolean }) 
               <CompatibleSuggestions state={state} setState={setState} species={species.data!} />
               <Link to="/visualiser" search={linkSearch} className="planner-primary">Plan this tank in 3D <span aria-hidden>→</span></Link>
               <p className="data-mono text-xs text-muted-foreground">
-                Want a second opinion?{" "}
-                <Link to="/blog/$slug" params={{ slug: "aqadvisor-alternatives" }} className="text-primary hover:underline">
-                  We compared nine stocking calculators
-                </Link>
-                .
+                {"\n"}
               </p>
             </section>}
           </div>
