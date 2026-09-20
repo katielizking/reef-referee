@@ -661,6 +661,9 @@ export type Database = {
           cycle_status: string | null
           filter_id: string | null
           filter_maturity: string | null
+          has_co2: boolean
+          has_heater: boolean
+          has_light: boolean
           height_cm: number
           id: string
           length_cm: number
@@ -672,7 +675,9 @@ export type Database = {
           seeded_media: boolean | null
           session_id: string | null
           share_slug: string
+          substrate: string
           tank_age_weeks: number | null
+          tank_shape: string
           target_ph: number
           target_temp_c: number
           user_id: string | null
@@ -687,6 +692,9 @@ export type Database = {
           cycle_status?: string | null
           filter_id?: string | null
           filter_maturity?: string | null
+          has_co2?: boolean
+          has_heater?: boolean
+          has_light?: boolean
           height_cm: number
           id?: string
           length_cm: number
@@ -698,7 +706,9 @@ export type Database = {
           seeded_media?: boolean | null
           session_id?: string | null
           share_slug?: string
+          substrate?: string
           tank_age_weeks?: number | null
+          tank_shape?: string
           target_ph?: number
           target_temp_c?: number
           user_id?: string | null
@@ -713,6 +723,9 @@ export type Database = {
           cycle_status?: string | null
           filter_id?: string | null
           filter_maturity?: string | null
+          has_co2?: boolean
+          has_heater?: boolean
+          has_light?: boolean
           height_cm?: number
           id?: string
           length_cm?: number
@@ -724,7 +737,9 @@ export type Database = {
           seeded_media?: boolean | null
           session_id?: string | null
           share_slug?: string
+          substrate?: string
           tank_age_weeks?: number | null
+          tank_shape?: string
           target_ph?: number
           target_temp_c?: number
           user_id?: string | null
