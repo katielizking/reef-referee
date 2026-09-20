@@ -21,21 +21,21 @@ export default function VisualiserCanvas({state,setState,history}: {state: TankS
 
 return (              <div className="min-w-0 space-y-4">
                 <section className="overflow-hidden rounded-[1.5rem] border border-foreground/15 bg-ink p-2 sm:rounded-[2rem] shadow-[0_28px_70px_rgba(18,35,46,.18)] sm:p-3">
-                  <header className="flex flex-col items-stretch gap-2 px-2 pb-3 pt-1 text-white sm:flex-row sm:items-center sm:justify-between sm:gap-3 sm:px-3">
+                  <header className="flex flex-col items-stretch gap-2 px-2 pb-3 pt-1 text-on-ink sm:flex-row sm:items-center sm:justify-between sm:gap-3 sm:px-3">
                     <div>
                       <p className="science-label text-blue">Live aquarium</p>
                       <p className="mt-1 font-display text-sm font-semibold">{state.name}</p>
                     </div>
-                    <div className="grid grid-cols-3 gap-1.5 text-[10px] sm:flex sm:flex-wrap font-semibold uppercase tracking-wide text-white/65">
-                      <span className="inline-flex min-w-0 items-center justify-center gap-1 rounded-full bg-white/10 px-2 py-1.5 text-center">
+                    <div className="grid grid-cols-3 gap-1.5 text-[10px] font-semibold uppercase text-on-ink-muted sm:flex sm:flex-wrap">
+                      <span className="inline-flex min-w-0 items-center justify-center gap-1 rounded-full bg-on-ink/10 px-2 py-1.5 text-center">
                         <Ruler className="h-3 w-3 text-blue" /> {state.length_cm} × {state.width_cm}{" "}
                         × {state.height_cm} cm
                       </span>
-                      <span className="inline-flex items-center gap-1 rounded-full bg-white/10 px-2.5 py-1.5">
+                      <span className="inline-flex items-center gap-1 rounded-full bg-on-ink/10 px-2.5 py-1.5">
                         <Waves className="h-3 w-3 text-blue" />{" "}
                         {Math.round((state.length_cm * state.width_cm * state.height_cm) / 1000)} L
                       </span>
-                      <span className="inline-flex items-center gap-1 rounded-full bg-white/10 px-2.5 py-1.5">
+                      <span className="inline-flex items-center gap-1 rounded-full bg-on-ink/10 px-2.5 py-1.5">
                         <Fish className="h-3 w-3 text-lime" />{" "}
                         {state.species.reduce((total, row) => total + row.quantity, 0)} fish
                       </span>

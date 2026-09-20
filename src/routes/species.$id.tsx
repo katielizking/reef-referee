@@ -339,7 +339,7 @@ function SpeciesGuide() {
         <div className="hero-grid flex flex-col justify-center p-6 sm:p-9">
           <span className="science-label text-primary">Species guide</span>
           <div className="mt-5 flex flex-wrap items-center gap-2">
-            <span className="inline-flex items-center gap-1 rounded-full bg-white/80 px-2.5 py-1 text-xs font-semibold text-muted-foreground shadow-sm">
+            <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2.5 py-1 text-xs font-semibold text-foreground shadow-sm">
               <Fish className="h-3.5 w-3.5" /> {BIOTOPE_LABEL[s.biotope_region]}
             </span>
             <LegalBadge s={s} />
