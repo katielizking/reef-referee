@@ -59,7 +59,7 @@ export function TankReport({ scorecard, state }: { scorecard: Scorecard; state: 
         <li>
           Filters: {filtration.count || "none chosen"}
           {filtration.count > 0 &&
-            ` · ${filtration.biological_media_level} media · ${filtration.filter_maturity} · ${Math.round(filtration.turnover_lph)} L/h total flow`}
+            ` · ${filtration.biological_media_level} media · ${Math.round(filtration.turnover_lph)} L/h total flow`}
         </li>
         <li>
           Planned water: pH {state.target_ph} · {state.target_temp_c} °C
