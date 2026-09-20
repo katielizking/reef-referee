@@ -10,9 +10,9 @@ function allIssues(s: Scorecard): Issue[] {
   return [
     ...s.readiness.issues,
     ...s.compatibility.issues,
-    ...s.space.issues,
-    ...s.water.issues,
-    ...s.bioload.issues,
+    ...(s.space.issues ?? []),
+    ...(s.water.issues ?? []),
+    ...(s.bioload.issues ?? []),
   ].sort(
     (a, b) =>
       SEVERITY_ORDER.indexOf(a.severity) - SEVERITY_ORDER.indexOf(b.severity) || b.weight - a.weight,
