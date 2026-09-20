@@ -1,7 +1,9 @@
-import { BIOTOPE_LABEL } from "@/lib/types";
+import { BIOTOPE_LABEL, type TankState } from "@/lib/types";
 import { WEIGHTS, type Issue, type Scorecard } from "@/lib/scoring";
 import { Link } from "@tanstack/react-router";
 import { WelfareVerdictCard } from "@/components/WelfareVerdictCard";
+import { waterChangeGuidance } from "@/lib/water-change";
+import { formatVolume, useUnitSystem } from "@/lib/units";
 
 const SEVERITY_ORDER: Issue["severity"][] = ["critical", "high", "medium", "low"];
 
