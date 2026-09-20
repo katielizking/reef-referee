@@ -18,7 +18,8 @@ export interface InvertIssue {
     | "temp_outside_range"
     | "eaten_by_fish"
     | "hunts_tank_mates"
-    | "needs_land";
+    | "needs_land"
+    | "check_local_rules";
   severity: InvertSeverity;
   subject: string;
   reason: string;
