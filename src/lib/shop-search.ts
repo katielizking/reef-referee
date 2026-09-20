@@ -109,7 +109,8 @@ export function countryName(code: string): string {
   if (!regionCode) return code;
 
   try {
-    return new Intl.DisplayNames(["en-AU"], { type: "region" }).of(regionCode) ?? code;
+    const name = new Intl.DisplayNames(["en-AU"], { type: "region" }).of(regionCode);
+    return !name || name === "Unknown Region" ? code : name;
   } catch {
     return code;
   }
