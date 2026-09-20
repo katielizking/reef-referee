@@ -125,13 +125,35 @@ export function checkInvertebrates(state: TankState): InvertIssue[] {
       }
     }
 
-    if (inv.care_notes && /land access|semi-terrestrial/i.test(inv.care_notes)) {
+    const landFromNotes = Boolean(
+      inv.care_notes && /land access|semi-terrestrial/i.test(inv.care_notes),
+    );
+    if (inv.needs_land || landFromNotes) {
       issues.push({
         code: "needs_land",
+        severity: "critical",
+        subject: name,
+        reason: `${name} is semi-terrestrial. It will drown in a tank that is all water.`,
+        fix: "Plan a land area it can climb out onto, plus a secure lid.",
+      });
+    }
+
+    if (inv.legal_status === "prohibited") {
+      issues.push({
+        code: "check_local_rules",
+        severity: "critical",
+        subject: name,
+        reason:
+          inv.legal_note ?? `${name} is prohibited in parts of Australia. Local reference only.`,
+        fix: "Leave it out unless your own state rules allow it.",
+      });
+    } else if (inv.legal_status === "permit_may_be_required") {
+      issues.push({
+        code: "check_local_rules",
         severity: "note",
         subject: name,
-        reason: `${name} needs dry land to climb out onto, not a full tank of water.`,
-        fix: "Plan a setup with a land area and a secure lid.",
+        reason: inv.legal_note ?? `${name} may need a licence where you live. Local reference only.`,
+        fix: "Check your state fisheries rules before buying.",
       });
     }
   }

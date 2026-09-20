@@ -101,6 +101,11 @@ export interface Invertebrate {
   min_group_size: number;
   predatory: boolean;
   fish_risk_note: string | null;
+  /** Semi-terrestrial species that will drown in a full tank of water. */
+  needs_land?: boolean;
+  /** Local reference material only, never scored. */
+  legal_status?: string;
+  legal_note?: string | null;
   native_ph_min: number;
   native_ph_max: number;
   native_temp_min_c: number;
