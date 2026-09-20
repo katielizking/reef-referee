@@ -451,6 +451,129 @@ export function TankSetupPanel({
   );
 }
 
+function ExtraFilters({
+  state,
+  setState,
+  filters,
+}: {
+  state: TankState;
+  setState: Props["setState"];
+  filters: Filter[];
+}) {
+  const [units] = useUnitSystem();
+  const extras = state.extra_filters ?? [];
+
+  function update(i: number, patch: Partial<TankFilterSlot>) {
+    setState((s) => ({
+      ...s,
+      extra_filters: (s.extra_filters ?? []).map((slot, idx) =>
+        idx === i ? { ...slot, ...patch } : slot,
+      ),
+    }));
+  }
+
+  function addSlot() {
+    const first = filters[0];
+    if (!first) return;
+    setState((s) => ({
+      ...s,
+      extra_filters: [
+        ...(s.extra_filters ?? []),
+        {
+          filter: first,
+          biological_media_level: first.biological_media_level,
+          filter_maturity: "unknown" as FilterMaturity,
+        },
+      ],
+    }));
+  }
+
+  return (
+    <div className="space-y-2 border-t pt-3">
+      <div className="flex items-center justify-between gap-2">
+        <div>
+          <p className="text-sm font-medium text-foreground">Other filters</p>
+          <p className="text-xs text-muted-foreground">
+            Running a second filter or a sponge? Add it here.
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={addSlot}
+          disabled={!state.filter || filters.length === 0}
+          className="min-h-9 rounded-lg border px-2.5 text-xs font-medium hover:bg-muted disabled:opacity-50"
+        >
+          Add filter
+        </button>
+      </div>
+
+      {extras.map((slot, i) => (
+        <div key={i} className="space-y-2 rounded-xl border bg-background px-3 py-2">
+          <div className="flex items-center gap-2">
+            <select
+              className="min-h-11 flex-1 rounded-lg border bg-background px-2 py-1.5 text-sm outline-none focus:ring-2 focus:ring-ring"
+              value={slot.filter.id}
+              onChange={(e) => {
+                const f = filters.find((x) => x.id === e.target.value);
+                if (f) update(i, { filter: f, biological_media_level: f.biological_media_level });
+              }}
+              aria-label={`Filter ${i + 2}`}
+            >
+              {filters.map((f) => (
+                <option key={f.id} value={f.id}>
+                  {f.name}. {FILTER_TYPE_LABEL[f.filter_type]}, rated{" "}
+                  {formatVolume(f.rated_litres, units)}
+                </option>
+              ))}
+            </select>
+            <button
+              type="button"
+              onClick={() =>
+                setState((s) => ({
+                  ...s,
+                  extra_filters: (s.extra_filters ?? []).filter((_, idx) => idx !== i),
+                }))
+              }
+              aria-label={`Remove filter ${i + 2}`}
+              className="rounded-lg p-2 text-muted-foreground hover:bg-muted hover:text-foreground"
+            >
+              <X className="h-4 w-4" aria-hidden />
+            </button>
+          </div>
+          <Segmented<BiologicalMediaLevel>
+            label="Biological media"
+            value={slot.biological_media_level}
+            options={[
+              { value: "minimal", label: "Minimal" },
+              { value: "standard", label: "Standard" },
+              { value: "substantial", label: "Substantial" },
+            ]}
+            onChange={(v) => update(i, { biological_media_level: v })}
+          />
+          <Segmented<FilterMaturity>
+            label="Media maturity"
+            value={slot.filter_maturity}
+            options={[
+              { value: "new", label: "New" },
+              { value: "maturing", label: "Maturing" },
+              { value: "established", label: "Established" },
+              { value: "unknown", label: "Not sure" },
+            ]}
+            onChange={(v) => update(i, { filter_maturity: v })}
+          />
+        </div>
+      ))}
+
+      {extras.length > 0 && (
+        <p className="text-xs text-muted-foreground">
+          Media adds up, maturity does not. The cycle check uses the least mature media, because a
+          new filter cannot carry the load on its own.
+        </p>
+      )}
+    </div>
+  );
+}
+
 function StepHeader({
   n,
   title,
