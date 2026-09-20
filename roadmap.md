@@ -9,3 +9,9 @@
 
 - [x] Move invertebrate selection and checks beneath the fish area
 - [x] Make compatible fish suggestions user-requested rather than automatic
+
+## Themes and accessibility
+
+- [x] Add a persistent light/dark toggle outside the home page
+- [x] Audit WCAG 2.2 AA issues and fix confirmed critical and warning findings
+- [x] Verify contrast, keyboard access, desktop and mobile layouts

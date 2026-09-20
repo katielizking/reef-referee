@@ -232,7 +232,7 @@ export function TankWorkspace({ visualiser = false }: { visualiser?: boolean }) 
           <div>
             {visualiser && <Link to="/calculator" search={linkSearch} className="planner-back">← Back to calculator</Link>}
             <p className="planner-eyebrow">{visualiser ? "YOUR AQUARIUM" : "THE STOCKING CALCULATOR"}</p>
-            <h2>{visualiser ? "See your tank take shape." : "Your stocking plan"}</h2>
+            <h1>{visualiser ? "See your tank take shape." : "Your stocking plan"}</h1>
             <p className="text-sm text-muted-foreground" role="status">{storageStatus}</p>
           </div>
           <div className="grid grid-cols-3 gap-2 sm:flex sm:flex-wrap">
@@ -302,12 +302,12 @@ export function TankWorkspace({ visualiser = false }: { visualiser?: boolean }) 
           <div className={visualiser ? "visualiser-workspace" : "calculator-workspace"}>
             {visualiser && <Suspense fallback={<p role="status">Loading visualiser…</p>}><VisualiserCanvas state={state} setState={setState} history={history} /></Suspense>}
             <section className="planner-column" aria-labelledby="tank-heading">
-              <h3 id="tank-heading">Your tank</h3>
+              <h2 id="tank-heading">Your tank</h2>
               <p className="planner-help">Dimensions, equipment and water.</p>
               <TankSetupPanel state={state} setState={setState} species={species.data!} plants={plants.data ?? []} hardscape={hardscape.data ?? []} filters={filters.data!} openSteps={openSteps} setOpenSteps={setOpenSteps} sections={visualiser ? ["tank","filter","livestock","aquascape"] : ["tank","filter"]} />
             </section>
             {!visualiser && <section id="your-fish" className="planner-column" aria-labelledby="fish-heading">
-              <h3 id="fish-heading">Your fish</h3>
+              <h2 id="fish-heading">Your fish</h2>
               <p className="planner-help">Search a species, then adjust its group.</p>
               <SpeciesAdder state={state} setState={setState} species={species.data!} />
               <p className="mt-5 text-sm text-muted-foreground">{state.species.length} species · {state.species.reduce((n,row) => n + row.quantity,0)} fish</p>
@@ -323,7 +323,7 @@ export function TankWorkspace({ visualiser = false }: { visualiser?: boolean }) 
               </div>
             </section>}
             <section id="your-results" tabIndex={-1} className="planner-column planner-results" aria-labelledby="results-heading">
-              <h3 id="results-heading">Your results</h3>
+              <h2 id="results-heading">Your results</h2>
               <p className="planner-help">What fits, and what needs attention.</p>
               {!state.filter && <p className="planner-notice">Filter details missing. Choose your filter to complete the equipment check.</p>}
               <PreStockChecklist scorecard={scorecard} state={state} pendingSave={gate.pendingSave} onCancelSave={gate.cancel} onConfirmSave={() => gate.confirm(doSave)} />

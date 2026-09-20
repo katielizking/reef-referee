@@ -29,7 +29,7 @@ export function BrandLogo({ size = 32, className }: BrandLogoProps) {
       <text
         x="0"
         y="28"
-        fill="#F5FAFF"
+        fill="var(--foreground)"
         fontFamily="Arial, Helvetica, sans-serif"
         fontSize="32"
         fontWeight="700"
@@ -40,7 +40,7 @@ export function BrandLogo({ size = 32, className }: BrandLogoProps) {
       <text
         x="0"
         y="28"
-        fill="#8EC4FF"
+        fill="var(--blue)"
         clipPath={`url(#${clipId})`}
         fontFamily="Arial, Helvetica, sans-serif"
         fontSize="32"

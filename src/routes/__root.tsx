@@ -3,6 +3,7 @@ import {
   Outlet,
   Link,
   createRootRouteWithContext,
+  useLocation,
   useRouter,
   HeadContent,
   Scripts,
@@ -14,6 +15,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "@/components/ui/sonner";
 import { BrandLogo } from "@/components/BrandLogo";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { TankDraftProvider } from "@/components/TankDraftProvider";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { supabase } from "@/integrations/supabase/client";
@@ -23,7 +25,7 @@ import { captureSentryError } from "@/lib/sentry";
 
 function NotFoundComponent() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
+    <div className="flex min-h-dvh items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
         <h1 className="font-display text-6xl font-bold text-foreground">404</h1>
         <h2 className="mt-4 font-display text-xl font-semibold text-foreground">
@@ -54,7 +56,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   }, [error]);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
+    <div className="flex min-h-dvh items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
         <h1 className="font-display text-xl font-semibold tracking-tight text-foreground">
           Something's not quite right
@@ -131,6 +133,11 @@ function RootShell({ children }: { children: ReactNode }) {
   return (
     <html lang="en-AU">
       <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var home=location.pathname==='/';var saved=localStorage.getItem('fishtankr:theme');var theme=home?'dark':(saved==='light'||saved==='dark'?saved:(matchMedia('(prefers-color-scheme: light)').matches?'light':'dark'));document.documentElement.classList.add(theme);document.documentElement.style.colorScheme=theme}catch(e){document.documentElement.classList.add('dark')}})();`,
+          }}
+        />
         <HeadContent />
       </head>
       <body>
@@ -166,7 +173,7 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <div className="site-shell flex min-h-screen flex-col bg-background/80">
+      <div className="site-shell flex min-h-dvh flex-col bg-background/80">
         <SiteHeader />
 
 
@@ -192,14 +199,26 @@ const NAV_ITEMS: Array<{ to: string; label: string; exact?: boolean; hash?: stri
 
 function SiteHeader() {
   const [open, setOpen] = useState(false);
+  const location = useLocation();
+  const showThemeToggle = location.pathname !== "/";
+
+  useEffect(() => {
+    if (location.pathname !== "/") return;
+    document.documentElement.classList.remove("light");
+    document.documentElement.classList.add("dark");
+    document.documentElement.style.colorScheme = "dark";
+    document.querySelector('meta[name="theme-color"]')?.setAttribute("content", "#0B1530");
+  }, [location.pathname]);
+
   return (
     <header className="sticky top-0 z-30 border-b border-foreground/10 bg-background/90 backdrop-blur-md">
       <div className="mx-auto w-full max-w-[1440px] px-[clamp(24px,5.8vw,88px)] flex min-h-16 items-center justify-between gap-4 pb-3 pt-[max(0.75rem,env(safe-area-inset-top))]">
         <Link to="/" aria-label="FishTankr home" className="rounded-lg">
           <BrandLogo size={30} />
         </Link>
-        <nav aria-label="Primary" className="hidden items-center gap-1 text-sm md:flex">
-          {NAV_ITEMS.map((item) => (
+        <div className="hidden items-center gap-2 md:flex">
+          <nav aria-label="Primary" className="flex items-center gap-1 text-sm">
+            {NAV_ITEMS.map((item) => (
             <Link
               key={item.to}
               to={item.to}
@@ -213,9 +232,13 @@ function SiteHeader() {
             >
               {item.label}
             </Link>
-          ))}
-        </nav>
-        <Sheet open={open} onOpenChange={setOpen}>
+            ))}
+          </nav>
+          {showThemeToggle && <ThemeToggle />}
+        </div>
+        <div className="flex items-center gap-2 md:hidden">
+          {showThemeToggle && <ThemeToggle />}
+          <Sheet open={open} onOpenChange={setOpen}>
           <SheetTrigger asChild>
             <button
               type="button"
@@ -263,7 +286,8 @@ function SiteHeader() {
               </Link>
             </div>
           </SheetContent>
-        </Sheet>
+          </Sheet>
+        </div>
       </div>
     </header>
   );

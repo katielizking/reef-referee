@@ -28,5 +28,9 @@ export const Route = createFileRoute("/")({
     ],
     links: [{ rel: "canonical", href: absoluteUrl("/") }],
   }),
-  component: () => <HomeHero />,
+  component: () => (
+    <main>
+      <HomeHero />
+    </main>
+  ),
 });

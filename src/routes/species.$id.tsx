@@ -321,7 +321,7 @@ function SpeciesGuide() {
   if (s.legal_note) welfare.push(s.legal_note);
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-8 md:py-12">
+    <main className="mx-auto max-w-6xl px-4 py-8 md:py-12">
       <Link
         to="/calculator"
         className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
@@ -339,7 +339,7 @@ function SpeciesGuide() {
         <div className="hero-grid flex flex-col justify-center p-6 sm:p-9">
           <span className="science-label text-primary">Species guide</span>
           <div className="mt-5 flex flex-wrap items-center gap-2">
-            <span className="inline-flex items-center gap-1 rounded-full bg-white/80 px-2.5 py-1 text-xs font-semibold text-muted-foreground shadow-sm">
+            <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2.5 py-1 text-xs font-semibold text-foreground shadow-sm">
               <Fish className="h-3.5 w-3.5" /> {BIOTOPE_LABEL[s.biotope_region]}
             </span>
             <LegalBadge s={s} />
@@ -493,7 +493,7 @@ function SpeciesGuide() {
       <p className="mt-10 rounded-xl bg-muted/60 px-4 py-3 text-xs text-muted-foreground">
         Individual fish vary. Check each species’ needs and local regulations before you buy.
       </p>
-    </div>
+    </main>
   );
 }
 
