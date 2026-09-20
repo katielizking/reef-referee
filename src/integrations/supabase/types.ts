@@ -373,6 +373,66 @@ export type Database = {
         }
         Relationships: []
       }
+      species_requests: {
+        Row: {
+          common_name: string
+          created_at: string
+          id: number
+          note: string | null
+        }
+        Insert: {
+          common_name: string
+          created_at?: string
+          id?: number
+          note?: string | null
+        }
+        Update: {
+          common_name?: string
+          created_at?: string
+          id?: number
+          note?: string | null
+        }
+        Relationships: []
+      }
+      tank_filters: {
+        Row: {
+          biological_media_level: string
+          filter_id: string
+          filter_maturity: string
+          position: number
+          tank_id: string
+        }
+        Insert: {
+          biological_media_level?: string
+          filter_id: string
+          filter_maturity?: string
+          position?: number
+          tank_id: string
+        }
+        Update: {
+          biological_media_level?: string
+          filter_id?: string
+          filter_maturity?: string
+          position?: number
+          tank_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tank_filters_filter_id_fkey"
+            columns: ["filter_id"]
+            isOneToOne: false
+            referencedRelation: "filters"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tank_filters_tank_id_fkey"
+            columns: ["tank_id"]
+            isOneToOne: false
+            referencedRelation: "tanks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tank_hardscape: {
         Row: {
           hardscape_id: string
@@ -596,6 +656,10 @@ export type Database = {
       }
       submit_contact_request: {
         Args: { p_email: string; p_message: string; p_topic: string }
+        Returns: undefined
+      }
+      submit_species_request: {
+        Args: { p_common_name: string; p_note: string }
         Returns: undefined
       }
     }
