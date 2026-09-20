@@ -2,7 +2,7 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { absoluteUrl } from "@/lib/site";
 import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
 import { Suspense } from "react";
-import { Copy, Loader2, Share2, WandSparkles } from "lucide-react";
+import { Copy, Loader2, Printer, Share2, WandSparkles } from "lucide-react";
 import { toast } from "sonner";
 
 import { loadTankBySlug } from "@/lib/data";
@@ -11,6 +11,7 @@ import { displayLength, formatVolume, lengthLabel, useUnitSystem } from "@/lib/u
 import type { TankState } from "@/lib/types";
 import { ClientOnlyTankScene } from "@/components/tank3d/ClientOnlyTankScene";
 import { ScorecardPanel } from "@/components/Scorecard";
+import { TankReport } from "@/components/TankReport";
 
 const tankQuery = (slug: string) =>
   queryOptions({
@@ -181,6 +182,14 @@ function SharedTankBody() {
             <WandSparkles className="h-4 w-4" aria-hidden />
             Remix this tank
           </Link>
+          <button
+            type="button"
+            onClick={() => window.print()}
+            className="inline-flex items-center gap-1.5 rounded-xl border bg-card px-4 py-2 text-sm font-semibold text-foreground hover:bg-muted"
+          >
+            <Printer className="h-4 w-4" aria-hidden />
+            Print plan
+          </button>
         </div>
       </div>
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,340px)]">
@@ -190,7 +199,7 @@ function SharedTankBody() {
           <ContentsList state={state} />
         </div>
         <div>
-          <ScorecardPanel scorecard={scorecard} />
+          <ScorecardPanel scorecard={scorecard} state={state} />
           <div className="mt-4">
             <Link
               to="/calculator"
@@ -201,6 +210,7 @@ function SharedTankBody() {
           </div>
         </div>
       </div>
+      <TankReport scorecard={scorecard} state={state} />
     </main>
   );
 }

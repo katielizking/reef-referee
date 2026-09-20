@@ -1,7 +1,9 @@
-import { BIOTOPE_LABEL } from "@/lib/types";
+import { BIOTOPE_LABEL, type TankState } from "@/lib/types";
 import { WEIGHTS, type Issue, type Scorecard } from "@/lib/scoring";
 import { Link } from "@tanstack/react-router";
 import { WelfareVerdictCard } from "@/components/WelfareVerdictCard";
+import { waterChangeGuidance } from "@/lib/water-change";
+import { formatVolume, useUnitSystem } from "@/lib/units";
 
 const SEVERITY_ORDER: Issue["severity"][] = ["critical", "high", "medium", "low"];
 
@@ -112,8 +114,16 @@ function ScoreRow({ title, score, statusLabel, weightPct, note, tag, issues, rea
   );
 }
 
-export function ScorecardPanel({ scorecard }: { scorecard: Scorecard }) {
+export function ScorecardPanel({
+  scorecard,
+  state,
+}: {
+  scorecard: Scorecard;
+  state?: TankState;
+}) {
   const s = scorecard;
+  const [units] = useUnitSystem();
+  const water = state ? waterChangeGuidance(state, s) : null;
 
   return (
     <div className="space-y-4">
@@ -158,6 +168,54 @@ export function ScorecardPanel({ scorecard }: { scorecard: Scorecard }) {
           reasons={[]}
         />
       </div>
+
+      {/* Stocking level: a rough screen, never a verdict */}
+      {s.bioload.loadPercent > 0 && (
+        <div className="fishtankr-panel p-5">
+          <p className="science-label text-muted-foreground">
+            Rough stocking level · a screen, not a verdict
+          </p>
+          <div className="mt-3 flex items-baseline justify-between gap-3">
+            <p className="text-sm font-semibold text-foreground">Stocking level</p>
+            <span className="data-mono shrink-0 text-sm text-foreground">
+              {s.bioload.loadPercent}%
+            </span>
+          </div>
+          <div className="mt-2 h-[3px] w-full" style={{ background: "var(--rule)" }} aria-hidden>
+            <div
+              className="h-full"
+              style={{
+                width: `${Math.min(100, s.bioload.loadPercent)}%`,
+                background: barColour(s.bioload.score),
+              }}
+            />
+          </div>
+          <p className="mt-2 text-sm text-muted-foreground">
+            This comes from a rough volume rule we have never calibrated. Read it as a prompt to
+            check the plan, not as a limit or permission to add more fish.
+          </p>
+        </div>
+      )}
+
+      {/* Water changes: derived guidance, not a prescription */}
+      {water && (
+        <div className="fishtankr-panel p-5">
+          <p className="science-label text-muted-foreground">Water changes · starting point</p>
+          <div className="mt-3 flex items-baseline justify-between gap-3">
+            <p className="text-sm font-semibold text-foreground">
+              About {water.weeklyPercent}% a week
+            </p>
+            <span className="data-mono shrink-0 text-sm text-foreground">
+              {formatVolume(water.litres, units)}
+            </span>
+          </div>
+          <p className="mt-2 text-sm text-muted-foreground">{water.sentence}</p>
+          {water.frequencyNote && (
+            <p className="mt-2 text-sm text-foreground">{water.frequencyNote}</p>
+          )}
+        </div>
+      )}
+
 
       {/* Style goal, below the rule */}
       <div className="fishtankr-panel p-5">
