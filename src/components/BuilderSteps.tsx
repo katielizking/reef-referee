@@ -1,12 +1,11 @@
 import { Check } from "lucide-react";
 import type { TankState } from "@/lib/types";
-import { isWaterTestCurrent } from "@/lib/scoring";
 
 export type StepId = "tank" | "filter" | "livestock" | "aquascape";
 
 const STEPS: Array<{ id: StepId; label: string; sub: string }> = [
   { id: "tank", label: "Tank", sub: "Size & water" },
-  { id: "filter", label: "Cycle", sub: "Filter & tests" },
+  { id: "filter", label: "Filter", sub: "Filter & upkeep" },
   { id: "livestock", label: "Fish", sub: "Build a community" },
   { id: "aquascape", label: "Aquascape", sub: "Plants & habitat" },
 ];
@@ -16,14 +15,7 @@ const MIN_DIM = 10;
 export function stepStatus(state: TankState): Record<StepId, boolean> {
   return {
     tank: state.length_cm >= MIN_DIM && state.width_cm >= MIN_DIM && state.height_cm >= MIN_DIM,
-    filter:
-      state.filter !== null &&
-      state.biological_media_level !== "minimal" &&
-      state.filter_maturity === "established" &&
-      state.cycle_status === "verified" &&
-      isWaterTestCurrent(state.water_tested_on) &&
-      state.ammonia_mg_l === 0 &&
-      state.nitrite_mg_l === 0,
+    filter: state.filter !== null && state.biological_media_level !== "minimal",
     livestock: state.species.length > 0,
     aquascape: state.plants.length + state.hardscape.length > 0,
   };

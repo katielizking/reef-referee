@@ -12,7 +12,6 @@ const SEVERITY_ORDER: Issue["severity"][] = ["critical", "high", "medium", "low"
 
 function allIssues(s: Scorecard): Issue[] {
   return [
-    ...s.readiness.issues,
     ...s.compatibility.issues,
     ...(s.space.issues ?? []),
     ...(s.water.issues ?? []),
@@ -68,7 +67,6 @@ export function TankReport({ scorecard, state }: { scorecard: Scorecard; state: 
         <li>
           Planting: {state.plant_density} · maintenance {state.maintenance_frequency}
         </li>
-        <li>Cycle: {scorecard.readiness.status.replace("-", " ")}</li>
         <li>
           Substrate: {SUBSTRATE_LABEL[state.substrate ?? "gravel"]} · heater{" "}
           {(state.has_heater ?? true) ? "yes" : "no"} · light{" "}

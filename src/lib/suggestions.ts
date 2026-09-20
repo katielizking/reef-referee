@@ -27,7 +27,6 @@ function worstNewSeverity(before: Issue[], after: Issue[]): Issue["severity"] | 
 function allIssues(state: TankState): Issue[] {
   const s = scoreTank(state);
   return [
-    ...s.readiness.issues,
     ...s.compatibility.issues,
     ...(s.space.issues ?? []),
     ...(s.water.issues ?? []),
