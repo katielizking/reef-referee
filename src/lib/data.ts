@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { getSharedTank } from "./tanks.functions";
-import type { Filter, Hardscape, Plant, Species, TankRow } from "./types";
+import type { Filter, Hardscape, Plant, Species, TankFilterSlot, TankRow } from "./types";
 
 async function currentUserId(): Promise<string | null> {
   const { data } = await supabase.auth.getUser();
@@ -76,6 +76,8 @@ export function useSessionTanks() {
 export interface FullTank {
   tank: TankRow;
   filter: Filter | null;
+  /** Extra filters beyond the main one. */
+  filters: TankFilterSlot[];
   species: Array<{ species: Species; quantity: number }>;
   plants: Array<{ plant: Plant; quantity: number }>;
   hardscape: Array<{ hardscape: Hardscape; quantity: number }>;
@@ -87,6 +89,7 @@ export async function loadTankBySlug(slug: string): Promise<FullTank | null> {
   return {
     tank: payload.tank,
     filter: payload.filter ?? null,
+    filters: payload.filters ?? [],
     species: payload.species ?? [],
     plants: payload.plants ?? [],
     hardscape: payload.hardscape ?? [],
@@ -142,11 +145,19 @@ export async function saveTank(
 
   // Replace join rows (RLS scopes every statement to the owner's tanks).
   await Promise.all([
+    supabase.from("tank_filters").delete().eq("tank_id", tank.id),
     supabase.from("tank_species").delete().eq("tank_id", tank.id),
     supabase.from("tank_plants").delete().eq("tank_id", tank.id),
     supabase.from("tank_hardscape").delete().eq("tank_id", tank.id),
   ]);
 
+  const filterRows = (state.extra_filters ?? []).map((slot, i) => ({
+    tank_id: tank.id,
+    filter_id: slot.filter.id,
+    position: i + 1,
+    biological_media_level: slot.biological_media_level,
+    filter_maturity: slot.filter_maturity,
+  }));
   const speciesRows = state.species.map((row) => ({
     tank_id: tank.id,
     species_id: row.species.id,
@@ -164,6 +175,7 @@ export async function saveTank(
   }));
 
   const results = await Promise.all([
+    filterRows.length ? supabase.from("tank_filters").insert(filterRows) : null,
     speciesRows.length ? supabase.from("tank_species").insert(speciesRows) : null,
     plantRows.length ? supabase.from("tank_plants").insert(plantRows) : null,
     hardscapeRows.length ? supabase.from("tank_hardscape").insert(hardscapeRows) : null,
@@ -205,6 +217,7 @@ export async function duplicateTank(slug: string): Promise<TankRow> {
     width_cm: source.tank.width_cm,
     height_cm: source.tank.height_cm,
     filter: source.filter,
+    extra_filters: source.filters,
     maintenance_frequency: source.tank.maintenance_frequency,
     biological_media_level:
       source.tank.biological_media_level ?? source.filter?.biological_media_level ?? "standard",
