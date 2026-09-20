@@ -139,12 +139,12 @@ function SpeciesNotFound() {
   );
 }
 
-function SpeciesError({ error }: { error: Error }) {
+function SpeciesError({ error }: { error: unknown }) {
   const router = useRouter();
   return (
     <div className="mx-auto max-w-3xl px-4 py-16 text-center">
       <h1 className="font-display text-2xl font-semibold">Something went wrong</h1>
-      <p className="mt-2 text-sm text-muted-foreground">{error.message}</p>
+      <p className="mt-2 text-sm text-muted-foreground">{error instanceof Error ? error.message : "Please try again."}</p>
       <button
         onClick={() => router.invalidate()}
         className="mt-6 inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground"

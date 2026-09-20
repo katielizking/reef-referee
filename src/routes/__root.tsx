@@ -47,7 +47,7 @@ function NotFoundComponent() {
   );
 }
 
-function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
+function ErrorComponent({ error, reset }: { error: unknown; reset: () => void }) {
   console.error(error);
   const router = useRouter();
   useEffect(() => {
@@ -194,6 +194,8 @@ const NAV_ITEMS: Array<{ to: string; label: string; exact?: boolean; hash?: stri
   { to: "/visualiser", label: "Visualiser" },
   { to: "/species", label: "Fish library" },
   { to: "/tracker", label: "Tracker" },
+  { to: "/tank-ideas", label: "Tank Ideas" },
+  { to: "/community", label: "Community" },
   { to: "/saved", label: "My tanks" },
 ];
 
@@ -216,7 +218,7 @@ function SiteHeader() {
         <Link to="/" aria-label="FishTankr home" className="rounded-lg">
           <BrandLogo size={30} />
         </Link>
-        <div className="hidden items-center gap-2 md:flex">
+        <div className="hidden items-center gap-2 xl:flex">
           <nav aria-label="Primary" className="flex items-center gap-1 text-sm">
             {NAV_ITEMS.map((item) => (
             <Link
@@ -236,7 +238,7 @@ function SiteHeader() {
           </nav>
           {showThemeToggle && <ThemeToggle />}
         </div>
-        <div className="flex items-center gap-2 md:hidden">
+        <div className="flex items-center gap-2 xl:hidden">
           {showThemeToggle && <ThemeToggle />}
           <Sheet open={open} onOpenChange={setOpen}>
           <SheetTrigger asChild>
@@ -306,6 +308,8 @@ const footerGroups: Array<{
       { to: "/visualiser", label: "3D planner" },
       { to: "/species", label: "Species library" },
       { to: "/tracker", label: "Tank tracker" },
+      { to: "/tank-ideas", label: "Tank Ideas" },
+      { to: "/community", label: "Community" },
       { to: "/quiz", label: "Fish quiz" },
     ],
   },

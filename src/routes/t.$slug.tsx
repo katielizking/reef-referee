@@ -52,7 +52,7 @@ export const Route = createFileRoute("/t/$slug")({
   errorComponent: ({ error }) => (
     <main className="mx-auto max-w-3xl px-4 py-12 text-center">
       <h1 className="font-display text-xl font-semibold">Couldn't load this tank</h1>
-      <p className="mt-2 text-sm text-muted-foreground">{error.message}</p>
+      <p className="mt-2 text-sm text-muted-foreground">{error instanceof Error ? error.message : "Please try again."}</p>
       <Link
         to="/calculator"
         className="mt-6 inline-flex rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:brightness-95"

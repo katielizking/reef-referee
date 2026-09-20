@@ -16,7 +16,6 @@ import { scoreTank } from "@/lib/scoring";
 import { scoringState } from "@/lib/tank-shape";
 import { SetupChecks } from "@/components/SetupChecks";
 
-import { PRESET_KEY, TANK_PRESETS } from "@/lib/presets";
 import { DEFAULT_STATE } from "@/lib/tank-draft";
 import type { TankState } from "@/lib/types";
 import { absoluteUrl } from "@/lib/site";
@@ -52,6 +51,21 @@ export function TankWorkspace({ visualiser = false }: { visualiser?: boolean }) 
   const plants = usePlants();
   const hardscape = useHardscape();
   const filters = useFilters();
+
+  // Refresh saved species snapshots when the catalogue receives a care correction.
+  useEffect(() => {
+    if (!hydrated || !species.data) return;
+    setState(previous => {
+      let changed = false;
+      const rows = previous.species.map(row => {
+        const current = species.data!.find(s => s.id === row.species.id);
+        if (!current || JSON.stringify(current) === JSON.stringify(row.species)) return row;
+        changed = true;
+        return {...row, species: current};
+      });
+      return changed ? {...previous, species: rows} : previous;
+    });
+  }, [hydrated, species.data, state.species, setState]);
 
   const scorecard = useMemo(() => scoreTank(scoringState(state)), [state]);
   const gate = useSaveGate(scorecard, state);
@@ -170,28 +184,6 @@ export function TankWorkspace({ visualiser = false }: { visualiser?: boolean }) 
     });
   }, [species.data, sourceSlug, hydrated]);
 
-  // Load a preset (from /saved starter templates)
-  useEffect(() => {
-    if (!hydrated || !species.data || sourceSlug) return;
-    const raw = sessionStorage.getItem(PRESET_KEY);
-    if (!raw) return;
-    sessionStorage.removeItem(PRESET_KEY);
-    const preset = TANK_PRESETS.find((p) => p.id === raw);
-    if (!preset) return;
-    const matches = preset.suggested
-      .map((sci) => species.data!.find((s) => s.scientific_name === sci))
-      .filter((s): s is NonNullable<typeof s> => !!s);
-    setState((prev) => ({
-      ...prev,
-      ...preset.base,
-      species: matches.map((s) => ({
-        species: s,
-        quantity: s.is_schooling ? s.min_group_size : 1,
-      })),
-    }));
-    toast.success(`Loaded ${preset.name}`);
-  }, [species.data, sourceSlug, hydrated]);
-
   // Capture a history snapshot when the state has settled after any edit
   // (drag commits itself synchronously on pointer-up).
   useEffect(() => {
@@ -255,6 +247,7 @@ export function TankWorkspace({ visualiser = false }: { visualiser?: boolean }) 
             {visualiser && <Link to="/calculator" search={linkSearch} className="planner-back">← Back to calculator</Link>}
             <p className="planner-eyebrow">{visualiser ? "YOUR AQUARIUM" : "THE STOCKING CALCULATOR"}</p>
             <h1>{visualiser ? "See your tank take shape." : "Your stocking plan"}</h1>
+            <Link to="/tank-ideas" className="text-sm text-primary underline">Need a starting point? Explore Tank Ideas</Link>
             <p className="text-sm text-muted-foreground" role="status">{storageStatus}</p>
           </div>
           <div className="grid grid-cols-3 gap-2 sm:flex sm:flex-wrap">

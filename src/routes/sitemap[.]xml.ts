@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import type {} from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { absoluteUrl } from "@/lib/site";
+import { TANK_IDEAS } from "@/lib/tank-ideas";
 
 interface Entry {
   path: string;
@@ -16,6 +17,10 @@ export const Route = createFileRoute("/sitemap.xml")({
       GET: async () => {
         const entries: Entry[] = [
           { path: "/", changefreq: "weekly", priority: "1.0" },
+          { path: "/calculator", changefreq: "monthly", priority: "0.8" },
+          { path: "/tank-ideas", changefreq: "weekly", priority: "0.8" },
+          { path: "/community", changefreq: "daily", priority: "0.7" },
+          ...TANK_IDEAS.map(idea => ({path: `/tank-ideas/${idea.slug}`, changefreq: "monthly", priority: "0.7"})),
           { path: "/quiz", changefreq: "monthly", priority: "0.8" },
           { path: "/guides", changefreq: "monthly", priority: "0.7" },
           { path: "/methodology", changefreq: "monthly", priority: "0.8" },
