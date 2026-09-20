@@ -73,7 +73,7 @@ export function SpeciesPortrait({
   eager = false,
 }: SpeciesPortraitProps) {
   const { data, isLoading } = useQuery({
-    queryKey: ["species-photo", scientificName],
+    queryKey: ["species-photo-captive", scientificName],
     queryFn: () => fetchSpeciesPhoto(scientificName),
     staleTime: 24 * 60 * 60 * 1000,
     gcTime: 7 * 24 * 60 * 60 * 1000,
