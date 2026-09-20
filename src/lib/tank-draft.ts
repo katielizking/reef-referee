@@ -44,7 +44,10 @@ export function parseDraft(raw: string | null): TankDraft | null {
       ![s.species,s.plants,s.hardscape].every(Array.isArray)) return null;
     if (s.invertebrates !== undefined && !Array.isArray(s.invertebrates)) return null;
     for (const [rows, key] of [[s.species,"species"],[s.invertebrates ?? [],"invertebrate"],[s.plants,"plant"],[s.hardscape,"hardscape"]] as const) {
-      if (!rows.every((row: any) => row?.[key]?.id && typeof row[key].id === "string" && Number.isInteger(row.quantity) && row.quantity > 0)) return null;
+      if (!rows.every((row: Record<string, unknown>) => {
+        const entry = row?.[key] as { id?: unknown } | undefined;
+        return typeof entry?.id === "string" && Number.isInteger(row?.quantity) && (row.quantity as number) > 0;
+      })) return null;
     }
     return {version: 1, state: {...DEFAULT_STATE, ...s, invertebrates: s.invertebrates ?? []},
       savedId: typeof draft.savedId === "string" ? draft.savedId : undefined,
