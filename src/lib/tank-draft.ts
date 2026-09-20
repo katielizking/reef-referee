@@ -6,6 +6,7 @@ export const DEFAULT_STATE: TankState = {
   width_cm: 40,
   height_cm: 45,
   filter: null,
+  extra_filters: [],
   maintenance_frequency: "weekly",
   biological_media_level: "standard",
   filter_maturity: "unknown",

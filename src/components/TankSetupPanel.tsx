@@ -3,6 +3,7 @@ import { AlertTriangle, Search, Plus, Minus, X, Info, Fish, Sprout } from "lucid
 import { Link } from "@tanstack/react-router";
 import type {
   BiologicalMediaLevel,
+  TankFilterSlot,
   CycleMethod,
   CycleStatus,
   Filter,
@@ -17,6 +18,14 @@ import type {
 } from "@/lib/types";
 import { BIOTOPE_LABEL } from "@/lib/types";
 import { litresOf } from "@/lib/scoring";
+import {
+  displayLength,
+  formatVolume,
+  lengthLabel,
+  lengthToCm,
+  useUnitSystem,
+} from "@/lib/units";
+import { submitSpeciesRequest } from "@/lib/requests";
 import { useOutsideClick } from "@/hooks/useOutsideClick";
 
 import {
@@ -63,7 +72,9 @@ export function TankSetupPanel({
   setOpenSteps,
   sections = ["tank","filter","livestock","aquascape"],
 }: Props) {
+  const [units, setUnits] = useUnitSystem();
   const litres = Math.round(litresOf(state));
+  const volume = formatVolume(litres, units);
   const dimInvalid =
     state.length_cm < MIN_DIM || state.width_cm < MIN_DIM || state.height_cm < MIN_DIM;
   const filterUndersized = state.filter && litres > 0 && state.filter.rated_litres < litres;
@@ -89,8 +100,8 @@ export function TankSetupPanel({
             title="Tank & water"
             summary={
               dimInvalid
-                ? "Set each side ≥ 10 cm"
-                : `${litres} L · pH ${state.target_ph.toFixed(1)} · ${state.target_temp_c}°C`
+                ? `Set each side ≥ ${displayLength(MIN_DIM, units)} ${lengthLabel(units)}`
+                : `${volume} · pH ${state.target_ph.toFixed(1)} · ${state.target_temp_c}°C`
             }
           />
         </AccordionTrigger>
@@ -104,32 +115,55 @@ export function TankSetupPanel({
               placeholder="Living room 60"
             />
           </label>
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-xs text-muted-foreground">Units</span>
+            <div className="flex rounded-lg bg-muted p-0.5">
+              {(["metric", "us"] as const).map((u) => (
+                <button
+                  key={u}
+                  type="button"
+                  aria-pressed={units === u}
+                  onClick={() => setUnits(u)}
+                  className={`min-h-9 rounded-md px-2.5 text-xs transition ${
+                    units === u
+                      ? "bg-card font-medium text-foreground shadow-sm"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {u === "metric" ? "cm / L" : "in / gal"}
+                </button>
+              ))}
+            </div>
+          </div>
           <div className="grid grid-cols-3 gap-2">
             <DimField
-              label="Length (cm)"
-              value={state.length_cm}
-              onChange={(v) => setState((s) => ({ ...s, length_cm: v }))}
+              label={`Length (${lengthLabel(units)})`}
+              value={displayLength(state.length_cm, units)}
+              min={displayLength(MIN_DIM, units)}
+              onChange={(v) => setState((s) => ({ ...s, length_cm: lengthToCm(v, units) }))}
             />
             <DimField
-              label="Width (cm)"
-              value={state.width_cm}
-              onChange={(v) => setState((s) => ({ ...s, width_cm: v }))}
+              label={`Width (${lengthLabel(units)})`}
+              value={displayLength(state.width_cm, units)}
+              min={displayLength(MIN_DIM, units)}
+              onChange={(v) => setState((s) => ({ ...s, width_cm: lengthToCm(v, units) }))}
             />
             <DimField
-              label="Height (cm)"
-              value={state.height_cm}
-              onChange={(v) => setState((s) => ({ ...s, height_cm: v }))}
+              label={`Height (${lengthLabel(units)})`}
+              value={displayLength(state.height_cm, units)}
+              min={displayLength(MIN_DIM, units)}
+              onChange={(v) => setState((s) => ({ ...s, height_cm: lengthToCm(v, units) }))}
             />
           </div>
           {dimInvalid && (
             <p className="flex items-center gap-1.5 text-xs font-medium text-coral">
               <AlertTriangle className="h-3.5 w-3.5" aria-hidden />
-              Each side needs to be at least {MIN_DIM} cm.
+              Each side needs to be at least {displayLength(MIN_DIM, units)} {lengthLabel(units)}.
             </p>
           )}
           <div className="rounded-xl bg-muted px-3 py-2 text-sm">
             <span className="text-muted-foreground">Volume</span>{" "}
-            <span className="font-semibold">{litres} L</span>
+            <span className="font-semibold">{volume}</span>
           </div>
           <label className="block text-sm">
             <div className="mb-1 flex items-center justify-between text-foreground/80">
@@ -212,8 +246,8 @@ export function TankSetupPanel({
             <p className="flex items-start gap-1.5 rounded-lg bg-warn/15 px-2.5 py-1.5 text-xs font-medium text-foreground">
               <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-warn" aria-hidden />
               <span>
-                This filter is rated for {state.filter!.rated_litres} L but your tank is {litres} L.
-                Consider a larger filter.
+                This filter is rated for {formatVolume(state.filter!.rated_litres, units)} but your
+                tank is {volume}. Consider a larger filter, or run a second one.
               </span>
             </p>
           )}
@@ -263,6 +297,8 @@ export function TankSetupPanel({
               className="h-5 w-5 accent-[var(--color-teal)]"
             />
           </label>
+
+          <ExtraFilters state={state} setState={setState} filters={filters} />
 
           <div className="border-t pt-3">
             <Segmented<CycleStatus>
@@ -415,6 +451,129 @@ export function TankSetupPanel({
   );
 }
 
+function ExtraFilters({
+  state,
+  setState,
+  filters,
+}: {
+  state: TankState;
+  setState: Props["setState"];
+  filters: Filter[];
+}) {
+  const [units] = useUnitSystem();
+  const extras = state.extra_filters ?? [];
+
+  function update(i: number, patch: Partial<TankFilterSlot>) {
+    setState((s) => ({
+      ...s,
+      extra_filters: (s.extra_filters ?? []).map((slot, idx) =>
+        idx === i ? { ...slot, ...patch } : slot,
+      ),
+    }));
+  }
+
+  function addSlot() {
+    const first = filters[0];
+    if (!first) return;
+    setState((s) => ({
+      ...s,
+      extra_filters: [
+        ...(s.extra_filters ?? []),
+        {
+          filter: first,
+          biological_media_level: first.biological_media_level,
+          filter_maturity: "unknown" as FilterMaturity,
+        },
+      ],
+    }));
+  }
+
+  return (
+    <div className="space-y-2 border-t pt-3">
+      <div className="flex items-center justify-between gap-2">
+        <div>
+          <p className="text-sm font-medium text-foreground">Other filters</p>
+          <p className="text-xs text-muted-foreground">
+            Running a second filter or a sponge? Add it here.
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={addSlot}
+          disabled={!state.filter || filters.length === 0}
+          className="min-h-9 rounded-lg border px-2.5 text-xs font-medium hover:bg-muted disabled:opacity-50"
+        >
+          Add filter
+        </button>
+      </div>
+
+      {extras.map((slot, i) => (
+        <div key={i} className="space-y-2 rounded-xl border bg-background px-3 py-2">
+          <div className="flex items-center gap-2">
+            <select
+              className="min-h-11 flex-1 rounded-lg border bg-background px-2 py-1.5 text-sm outline-none focus:ring-2 focus:ring-ring"
+              value={slot.filter.id}
+              onChange={(e) => {
+                const f = filters.find((x) => x.id === e.target.value);
+                if (f) update(i, { filter: f, biological_media_level: f.biological_media_level });
+              }}
+              aria-label={`Filter ${i + 2}`}
+            >
+              {filters.map((f) => (
+                <option key={f.id} value={f.id}>
+                  {f.name}. {FILTER_TYPE_LABEL[f.filter_type]}, rated{" "}
+                  {formatVolume(f.rated_litres, units)}
+                </option>
+              ))}
+            </select>
+            <button
+              type="button"
+              onClick={() =>
+                setState((s) => ({
+                  ...s,
+                  extra_filters: (s.extra_filters ?? []).filter((_, idx) => idx !== i),
+                }))
+              }
+              aria-label={`Remove filter ${i + 2}`}
+              className="rounded-lg p-2 text-muted-foreground hover:bg-muted hover:text-foreground"
+            >
+              <X className="h-4 w-4" aria-hidden />
+            </button>
+          </div>
+          <Segmented<BiologicalMediaLevel>
+            label="Biological media"
+            value={slot.biological_media_level}
+            options={[
+              { value: "minimal", label: "Minimal" },
+              { value: "standard", label: "Standard" },
+              { value: "substantial", label: "Substantial" },
+            ]}
+            onChange={(v) => update(i, { biological_media_level: v })}
+          />
+          <Segmented<FilterMaturity>
+            label="Media maturity"
+            value={slot.filter_maturity}
+            options={[
+              { value: "new", label: "New" },
+              { value: "maturing", label: "Maturing" },
+              { value: "established", label: "Established" },
+              { value: "unknown", label: "Not sure" },
+            ]}
+            onChange={(v) => update(i, { filter_maturity: v })}
+          />
+        </div>
+      ))}
+
+      {extras.length > 0 && (
+        <p className="text-xs text-muted-foreground">
+          Media adds up, maturity does not. The cycle check uses the least mature media, because a
+          new filter cannot carry the load on its own.
+        </p>
+      )}
+    </div>
+  );
+}
+
 function StepHeader({
   n,
   title,
@@ -445,19 +604,21 @@ function StepHeader({
 function DimField({
   label,
   value,
+  min = MIN_DIM,
   onChange,
 }: {
   label: string;
   value: number;
+  min?: number;
   onChange: (v: number) => void;
 }) {
-  const invalid = value < MIN_DIM;
+  const invalid = value < min;
   return (
     <label className="block text-sm">
       <span className="mb-1 block text-xs text-muted-foreground">{label}</span>
       <input
         type="number"
-        min={MIN_DIM}
+        min={min}
         aria-invalid={invalid || undefined}
         className={`w-full rounded-xl border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring ${
           invalid ? "border-coral" : ""
@@ -604,9 +765,7 @@ export function SpeciesAdder({
         />
         {showResults && (
           <div className="absolute z-10 mt-1 max-h-72 w-full overflow-auto rounded-xl border bg-popover shadow-lg">
-            {results.length === 0 && (
-              <div className="p-3 text-sm text-muted-foreground">No species match.</div>
-            )}
+            {results.length === 0 && <MissingSpecies query={q} />}
             {results.map((sp) => (
               <div
                 key={sp.id}
@@ -695,6 +854,56 @@ export function SpeciesAdder({
         </ul>
       )}
     </section>
+  );
+}
+
+/** Shown when a search finds nothing. Queues the fish for research. */
+function MissingSpecies({ query }: { query: string }) {
+  const [sent, setSent] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const name = query.trim();
+
+  if (sent) {
+    return (
+      <div className="p-3 text-sm">
+        <p className="font-medium text-foreground">Thanks, that one is on the list.</p>
+        <p className="mt-1 text-xs text-muted-foreground">
+          We only add a fish once we have a source for its size, water range and behaviour.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="p-3 text-sm">
+      <p className="text-muted-foreground">No fish match that search.</p>
+      {name.length >= 2 && (
+        <>
+          <button
+            type="button"
+            disabled={busy}
+            className="mt-2 min-h-10 w-full rounded-lg border px-3 text-xs font-medium hover:bg-muted disabled:opacity-60"
+            onClick={async (e) => {
+              e.preventDefault();
+              setBusy(true);
+              setError(null);
+              try {
+                await submitSpeciesRequest(name);
+                setSent(true);
+              } catch (err) {
+                setError(err instanceof Error ? err.message : "That did not send. Try again.");
+              } finally {
+                setBusy(false);
+              }
+            }}
+          >
+            {busy ? "Sending…" : `Ask us to add "${name}"`}
+          </button>
+          {error && <p className="mt-1.5 text-xs font-medium text-coral">{error}</p>}
+        </>
+      )}
+    </div>
   );
 }
 

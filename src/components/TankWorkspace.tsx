@@ -74,6 +74,7 @@ export function TankWorkspace({ visualiser = false }: { visualiser?: boolean }) 
           width_cm: data.tank.width_cm,
           height_cm: data.tank.height_cm,
           filter: data.filter,
+          extra_filters: data.filters,
           maintenance_frequency: data.tank.maintenance_frequency,
           biological_media_level:
             data.tank.biological_media_level ?? data.filter?.biological_media_level ?? "standard",

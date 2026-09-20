@@ -7,6 +7,7 @@ import { toast } from "sonner";
 
 import { loadTankBySlug } from "@/lib/data";
 import { scoreTank, litresOf } from "@/lib/scoring";
+import { displayLength, formatVolume, lengthLabel, useUnitSystem } from "@/lib/units";
 import type { TankState } from "@/lib/types";
 import { ClientOnlyTankScene } from "@/components/tank3d/ClientOnlyTankScene";
 import { ScorecardPanel } from "@/components/Scorecard";
@@ -94,6 +95,7 @@ function SharedTankBody() {
     width_cm: data.tank.width_cm,
     height_cm: data.tank.height_cm,
     filter: data.filter,
+    extra_filters: data.filters,
     maintenance_frequency: data.tank.maintenance_frequency,
     biological_media_level:
       data.tank.biological_media_level ?? data.filter?.biological_media_level ?? "standard",
@@ -114,6 +116,7 @@ function SharedTankBody() {
     hardscape: data.hardscape,
   };
   const scorecard = scoreTank(state);
+  const [units] = useUnitSystem();
   const litres = Math.round(litresOf(state));
 
   async function copyLink() {
@@ -128,7 +131,7 @@ function SharedTankBody() {
       try {
         await navigator.share({
           title: `${state.name} | FishTankr`,
-          text: `Check out ${state.name}, a ${litres} L tank plan from FishTankr.`,
+          text: `Check out ${state.name}, a ${formatVolume(litres, units)} tank plan from FishTankr.`,
           url,
         });
         return;
@@ -149,7 +152,8 @@ function SharedTankBody() {
           {state.name}
         </h1>
         <p className="text-sm text-muted-foreground">
-          {state.length_cm}×{state.width_cm}×{state.height_cm} cm · {litres} L ·{" "}
+          {displayLength(state.length_cm, units)}×{displayLength(state.width_cm, units)}×
+          {displayLength(state.height_cm, units)} {lengthLabel(units)} · {formatVolume(litres, units)} ·{" "}
           {state.filter ? state.filter.name : "no filter set"}
         </p>
         <div className="mt-4 flex flex-wrap gap-2">
