@@ -252,20 +252,6 @@ function choosePriorityAction(
       action: critical.fix,
     };
   }
-  if (scores.readiness.status !== "ready") {
-    const issue = scores.readiness.issues[0];
-    return {
-      severity: "critical",
-      category: "readiness",
-      title:
-        scores.readiness.status === "cycling"
-          ? "Finish cycling before adding fish"
-          : "Check the cycle before adding fish",
-      action:
-        issue?.fix ??
-        "Use current ammonia and nitrite tests to confirm that the biofilter is ready.",
-    };
-  }
   if (scores.water.score < 70 && scores.water.fixes.length > 0) {
     return {
       severity: "high",
