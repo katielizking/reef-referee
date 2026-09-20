@@ -3,6 +3,7 @@ import { combinedFiltration } from "@/lib/scoring";
 import type { TankState } from "@/lib/types";
 import { welfareVerdictFor } from "@/lib/welfare-verdict";
 import { waterChangeGuidance } from "@/lib/water-change";
+import { checkInvertebrates } from "@/lib/invert-check";
 
 const SEVERITY_ORDER: Issue["severity"][] = ["critical", "high", "medium", "low"];
 
