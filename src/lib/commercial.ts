@@ -10,7 +10,7 @@ export async function joinAccountWaitlist(email: string): Promise<void> {
 
 export function recordShopOutbound(
   shopId: string,
-  destination: "website" | "affiliate" | "map" | "claim",
+  destination: "website" | "map" | "claim" | "search",
 ) {
   void supabase.rpc("record_shop_outbound", {
     p_shop_id: shopId,
