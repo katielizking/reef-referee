@@ -230,6 +230,20 @@ export function TankWorkspace({ visualiser = false }: { visualiser?: boolean }) 
     gate.requestSave(share, doSave);
   }
 
+  function handleReset() {
+    if (!confirmingReset) {
+      setConfirmingReset(true);
+      return;
+    }
+    setConfirmingReset(false);
+    setState({ ...DEFAULT_STATE });
+    setSavedId(undefined);
+    setSource(undefined);
+    toast.success("Plan reset to a blank tank", {
+      description: "Use undo if you want your previous plan back.",
+    });
+  }
+
   const linkSearch = {tank: tankSlug, remix: remixSlug};
   return <>
     <main id="calculator" tabIndex={-1} className="planner-surface">
