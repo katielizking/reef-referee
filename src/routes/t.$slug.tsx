@@ -11,6 +11,7 @@ import { displayLength, formatVolume, lengthLabel, useUnitSystem } from "@/lib/u
 import type { TankState } from "@/lib/types";
 import { ClientOnlyTankScene } from "@/components/tank3d/ClientOnlyTankScene";
 import { ScorecardPanel } from "@/components/Scorecard";
+import { InvertebrateChecks } from "@/components/InvertebratePanel";
 import { TankReport } from "@/components/TankReport";
 
 const tankQuery = (slug: string) =>
