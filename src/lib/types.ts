@@ -137,6 +137,13 @@ export interface TankRow {
   created_at: string;
 }
 
+/** One filter running on a tank, with the media actually in it. */
+export interface TankFilterSlot {
+  filter: Filter;
+  biological_media_level: BiologicalMediaLevel;
+  filter_maturity: FilterMaturity;
+}
+
 /** In-progress tank state held in the builder. */
 export interface TankState {
   name: string;
