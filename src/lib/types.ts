@@ -228,6 +228,12 @@ export interface TankState {
   target_ph: number;
   target_temp_c: number;
   plant_density: PlantDensity;
+  /** Shape of the glass. Dimensions stay the bounding box; water volume is derived. */
+  tank_shape?: TankShape;
+  substrate?: Substrate;
+  has_heater?: boolean;
+  has_light?: boolean;
+  has_co2?: boolean;
   species: Array<{ species: Species; quantity: number }>;
   /** Shrimp, snails, crayfish and crabs. Checked separately from the fish score. */
   invertebrates?: Array<{ invertebrate: Invertebrate; quantity: number }>;
