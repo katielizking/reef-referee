@@ -331,6 +331,13 @@ export function TankWorkspace({ visualiser = false }: { visualiser?: boolean }) 
               <SetupChecks state={state} />
               <CompatibleSuggestions state={state} setState={setState} species={species.data!} />
               {!visualiser && <Link to="/visualiser" search={linkSearch} className="planner-primary">View this tank <span aria-hidden>→</span></Link>}
+              <p className="data-mono text-xs text-muted-foreground">
+                Want a second opinion?{" "}
+                <Link to="/blog/$slug" params={{ slug: "aqadvisor-alternatives" }} className="text-primary hover:underline">
+                  We compared nine stocking calculators
+                </Link>
+                .
+              </p>
             </section>
           </div>
           {!visualiser && <a className="planner-mobile-results" href="#your-results">View your results <span aria-hidden>↑</span></a>}
