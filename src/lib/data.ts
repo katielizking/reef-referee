@@ -148,6 +148,11 @@ export async function saveTank(
     target_ph: state.target_ph,
     target_temp_c: state.target_temp_c,
     plant_density: state.plant_density,
+    tank_shape: state.tank_shape ?? "rectangle",
+    substrate: state.substrate ?? "gravel",
+    has_heater: state.has_heater ?? true,
+    has_light: state.has_light ?? true,
+    has_co2: state.has_co2 ?? false,
     user_id: uid,
   };
 
@@ -265,6 +270,11 @@ export async function duplicateTank(slug: string): Promise<TankRow> {
     target_ph: source.tank.target_ph,
     target_temp_c: source.tank.target_temp_c,
     plant_density: source.tank.plant_density,
+    tank_shape: source.tank.tank_shape ?? "rectangle",
+    substrate: source.tank.substrate ?? "gravel",
+    has_heater: source.tank.has_heater ?? true,
+    has_light: source.tank.has_light ?? true,
+    has_co2: source.tank.has_co2 ?? false,
     species: source.species,
     invertebrates: source.invertebrates,
     plants: source.plants,

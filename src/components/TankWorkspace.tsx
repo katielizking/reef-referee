@@ -13,6 +13,8 @@ import { CompatibleSuggestions } from "@/components/CompatibleSuggestions";
 import { InvertebrateAdder, InvertebrateChecks } from "@/components/InvertebratePanel";
 import { PreStockChecklist, useSaveGate } from "@/components/PreStockChecklist";
 import { scoreTank } from "@/lib/scoring";
+import { scoringState } from "@/lib/tank-shape";
+import { SetupChecks } from "@/components/SetupChecks";
 
 import { PRESET_KEY, TANK_PRESETS } from "@/lib/presets";
 import type { TankState } from "@/lib/types";
@@ -49,7 +51,7 @@ export function TankWorkspace({ visualiser = false }: { visualiser?: boolean }) 
   const hardscape = useHardscape();
   const filters = useFilters();
 
-  const scorecard = useMemo(() => scoreTank(state), [state]);
+  const scorecard = useMemo(() => scoreTank(scoringState(state)), [state]);
   const gate = useSaveGate(scorecard, state);
   const history = useTankHistory(state, setState);
   const selected = useEditorStore((s) => s.selected);
@@ -95,6 +97,11 @@ export function TankWorkspace({ visualiser = false }: { visualiser?: boolean }) 
           target_ph: data.tank.target_ph,
           target_temp_c: data.tank.target_temp_c,
           plant_density: data.tank.plant_density,
+          tank_shape: data.tank.tank_shape ?? "rectangle",
+          substrate: data.tank.substrate ?? "gravel",
+          has_heater: data.tank.has_heater ?? true,
+          has_light: data.tank.has_light ?? true,
+          has_co2: data.tank.has_co2 ?? false,
           species: data.species,
           invertebrates: data.invertebrates,
           plants: data.plants,
@@ -321,6 +328,7 @@ export function TankWorkspace({ visualiser = false }: { visualiser?: boolean }) 
                 </div>
               </div>
               <InvertebrateChecks state={state} />
+              <SetupChecks state={state} />
               <CompatibleSuggestions state={state} setState={setState} species={species.data!} />
               {!visualiser && <Link to="/visualiser" search={linkSearch} className="planner-primary">View this tank <span aria-hidden>→</span></Link>}
             </section>
