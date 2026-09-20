@@ -14,10 +14,12 @@ import type {
   Plant,
   PlantDensity,
   Species,
+  Substrate,
+  TankShape,
   TankState,
 } from "@/lib/types";
-import { BIOTOPE_LABEL } from "@/lib/types";
-import { litresOf } from "@/lib/scoring";
+import { BIOTOPE_LABEL, SUBSTRATE_LABEL, TANK_SHAPE_LABEL } from "@/lib/types";
+import { waterLitres } from "@/lib/tank-shape";
 import {
   displayLength,
   formatVolume,
@@ -73,7 +75,7 @@ export function TankSetupPanel({
   sections = ["tank","filter","livestock","aquascape"],
 }: Props) {
   const [units, setUnits] = useUnitSystem();
-  const litres = Math.round(litresOf(state));
+  const litres = Math.round(waterLitres(state));
   const volume = formatVolume(litres, units);
   const dimInvalid =
     state.length_cm < MIN_DIM || state.width_cm < MIN_DIM || state.height_cm < MIN_DIM;
@@ -161,10 +163,67 @@ export function TankSetupPanel({
               Each side needs to be at least {displayLength(MIN_DIM, units)} {lengthLabel(units)}.
             </p>
           )}
+          <label className="block text-sm">
+            <span className="mb-1 block text-foreground/80">Shape</span>
+            <select
+              className="min-h-11 w-full rounded-xl border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
+              value={state.tank_shape ?? "rectangle"}
+              onChange={(e) =>
+                setState((st) => ({ ...st, tank_shape: e.target.value as TankShape }))
+              }
+            >
+              {(Object.keys(TANK_SHAPE_LABEL) as TankShape[]).map((k) => (
+                <option key={k} value={k}>
+                  {TANK_SHAPE_LABEL[k]}
+                </option>
+              ))}
+            </select>
+          </label>
           <div className="rounded-xl bg-muted px-3 py-2 text-sm">
-            <span className="text-muted-foreground">Volume</span>{" "}
+            <span className="text-muted-foreground">Water volume</span>{" "}
             <span className="font-semibold">{volume}</span>
+            {(state.tank_shape ?? "rectangle") !== "rectangle" && (
+              <span className="ml-1 text-xs text-muted-foreground">
+                for the shape, not the full box
+              </span>
+            )}
           </div>
+          <label className="block text-sm">
+            <span className="mb-1 block text-foreground/80">Substrate</span>
+            <select
+              className="min-h-11 w-full rounded-xl border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
+              value={state.substrate ?? "gravel"}
+              onChange={(e) =>
+                setState((st) => ({ ...st, substrate: e.target.value as Substrate }))
+              }
+            >
+              {(Object.keys(SUBSTRATE_LABEL) as Substrate[]).map((k) => (
+                <option key={k} value={k}>
+                  {SUBSTRATE_LABEL[k]}
+                </option>
+              ))}
+            </select>
+          </label>
+          <fieldset className="space-y-1.5">
+            <legend className="mb-1 text-sm text-foreground/80">Equipment</legend>
+            {(
+              [
+                ["has_heater", "Heater", true],
+                ["has_light", "Light", true],
+                ["has_co2", "CO2", false],
+              ] as const
+            ).map(([key, label, fallback]) => (
+              <label key={key} className="flex min-h-9 items-center gap-2 text-sm">
+                <input
+                  type="checkbox"
+                  checked={state[key] ?? fallback}
+                  onChange={(e) => setState((st) => ({ ...st, [key]: e.target.checked }))}
+                  className="h-4 w-4 accent-[var(--color-teal)]"
+                />
+                {label}
+              </label>
+            ))}
+          </fieldset>
           <label className="block text-sm">
             <div className="mb-1 flex items-center justify-between text-foreground/80">
               <span>Target pH</span>
