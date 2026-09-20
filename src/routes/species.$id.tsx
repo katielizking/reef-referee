@@ -343,7 +343,7 @@ function SpeciesGuide() {
             </span>
             <LegalBadge s={s} />
           </div>
-          <h1 className="mt-5 font-display text-4xl font-bold leading-none tracking-[-.045em] text-ink md:text-5xl">
+          <h1 className="mt-5 font-display text-4xl font-bold leading-none tracking-[-.045em] text-foreground md:text-5xl">
             {s.common_name}
           </h1>
           <p className="mt-2 font-display text-sm italic text-muted-foreground">

@@ -93,8 +93,8 @@ export default function TankScene({ state, setState, commit, interactive = true 
         onPointerMissed={() => select(null)}
         style={{ touchAction: isMobile ? "pan-y" : "auto" }}
       >
-        <color attach="background" args={["#b7dce2"]} />
-        <fog attach="fog" args={["#8fc3cd", largest * 1.8, largest * 5.2]} />
+        <color attach="background" args={["#13244a"]} />
+        <fog attach="fog" args={["#13244a", largest * 1.8, largest * 5.2]} />
         <hemisphereLight args={["#f7ffff", "#5d8790", 1.05]} />
         <ambientLight intensity={0.48} />
         <directionalLight

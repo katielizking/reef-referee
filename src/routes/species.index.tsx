@@ -61,7 +61,7 @@ function SpeciesIndex() {
     <main className="mx-auto max-w-7xl px-3 py-5 sm:px-4 sm:py-8 md:py-12">
       <header className="hero-grid fishtankr-panel relative overflow-hidden rounded-[1.5rem] px-5 py-8 sm:rounded-[2rem] sm:px-10 sm:py-14">
         <span className="science-label text-primary">Field guide · freshwater</span>
-        <h1 className="mt-5 max-w-3xl font-display text-3xl font-bold sm:text-4xl leading-[.98] tracking-[-.045em] text-ink sm:text-6xl">
+        <h1 className="mt-5 max-w-3xl font-display text-3xl font-bold sm:text-4xl leading-[.98] tracking-[-.045em] text-foreground sm:text-6xl">
           Check the fish,
           <br />
           before you bring them home.
@@ -147,7 +147,7 @@ function SpeciesIndex() {
                   commonName={s.common_name}
                   scientificName={s.scientific_name}
                   compact
-                  className="aspect-[4/3] border-b border-ink/10"
+                  className="aspect-[4/3] border-b border-foreground/10"
                 />
                 <div className="p-4">
                   <div className="flex items-start justify-between gap-2">

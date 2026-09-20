@@ -75,7 +75,7 @@ function ToolbarButton({
       disabled={disabled}
       aria-label={label}
       title={label}
-      className="pointer-events-auto flex size-11 items-center justify-center rounded-xl border border-ink/10 bg-surface-raised p-2 text-foreground shadow-panel transition-colors hover:bg-muted disabled:cursor-not-allowed disabled:opacity-40"
+      className="pointer-events-auto flex size-11 items-center justify-center rounded-xl border border-foreground/10 bg-surface-raised p-2 text-foreground shadow-panel transition-colors hover:bg-muted disabled:cursor-not-allowed disabled:opacity-40"
     >
       {children}
     </button>

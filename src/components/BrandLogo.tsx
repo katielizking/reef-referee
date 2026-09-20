@@ -1,20 +1,56 @@
-import wordmarkAsset from "@/assets/fishtankr-compact.svg.asset.json";
+import { useId } from "react";
 
 interface BrandLogoProps {
+  /** Rendered height in pixels. */
   size?: number;
   className?: string;
 }
 
-/** FishTankr supplied wordmark artwork. */
+/**
+ * FishTankr wordmark: the lower half of the letters sits below a waterline and takes
+ * the glow blue, as if the name is half submerged.
+ */
 export function BrandLogo({ size = 32, className }: BrandLogoProps) {
+  const clipId = `ft-water-${useId().replace(/[^a-zA-Z0-9_-]/g, "")}`;
   return (
-    <img
-      src={wordmarkAsset.url}
-      alt="FishTankr"
-      width={Math.round(size * (706 / 174))}
+    <svg
+      viewBox="0 0 132 36"
+      width={Math.round(size * (132 / 36))}
       height={size}
-      className={`block h-auto shrink-0 ${className ?? ""}`}
-    />
+      role="img"
+      aria-label="FishTankr"
+      className={`block shrink-0 ${className ?? ""}`}
+    >
+      <defs>
+        <clipPath id={clipId}>
+          <path d="M0 17.5 C32 15.5 52 19.5 82 17.5 S132 15.5 158 17.5 S180 19 190 17.5 V36 H0Z" />
+        </clipPath>
+      </defs>
+      <text
+        x="0"
+        y="28"
+        fill="#F5FAFF"
+        fontFamily="Arial, Helvetica, sans-serif"
+        fontSize="32"
+        fontWeight="700"
+        letterSpacing="-1.4"
+      >
+        fishtankr
+      </text>
+      <text
+        x="0"
+        y="28"
+        fill="#8EC4FF"
+        clipPath={`url(#${clipId})`}
+        fontFamily="Arial, Helvetica, sans-serif"
+        fontSize="32"
+        fontWeight="700"
+        letterSpacing="-1.4"
+        aria-hidden="true"
+      >
+        fishtankr
+      </text>
+    </svg>
   );
 }
 

@@ -30,7 +30,7 @@ export function MobileScoreBar({ scorecard }: { scorecard: Scorecard }) {
         <button
           type="button"
           aria-label={`Tank score ${scorecard.overall ?? "not ready"}. Open scorecard.`}
-          className="fixed inset-x-3 bottom-[calc(env(safe-area-inset-bottom)+0.75rem)] z-40 flex items-center justify-between gap-3 rounded-2xl border border-ink/10 bg-card px-4 py-3 shadow-float lg:hidden"
+          className="fixed inset-x-3 bottom-[calc(env(safe-area-inset-bottom)+0.75rem)] z-40 flex items-center justify-between gap-3 rounded-2xl border border-foreground/10 bg-card px-4 py-3 shadow-float lg:hidden"
         >
           <div className="flex items-center gap-3">
             <div

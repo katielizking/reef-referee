@@ -96,7 +96,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "google-site-verification", content: "jPSg_1jpCEpOJfh9XNRo7MiLf-mR8TPcI28PxQLJBW8" },
       { title: TITLE },
       { name: "description", content: DESC },
-      { name: "theme-color", content: "#37B8C6" },
+      { name: "theme-color", content: "#0B1530" },
       { property: "og:title", content: TITLE },
       { property: "og:description", content: DESC },
       { property: "og:type", content: "website" },
@@ -116,7 +116,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Spectral:ital,wght@1,400;1,500&display=swap",
+        href: "https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap",
       },
       { rel: "icon", href: "/favicon.png", type: "image/png" },
     ],
@@ -129,7 +129,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en-AU">
       <head>
         <HeadContent />
       </head>
@@ -203,22 +203,20 @@ const NAV_ITEMS: Array<{ to: string; label: string; exact?: boolean }> = [
 function SiteHeader() {
   const [open, setOpen] = useState(false);
   return (
-    <header className="sticky top-0 z-30 border-b border-ink/10 bg-foam/95 shadow-panel">
-      <div className="mx-auto flex min-h-16 max-w-7xl items-center justify-between gap-4 px-4 pb-3 pt-[max(0.75rem,env(safe-area-inset-top))]">
+    <header className="sticky top-0 z-30 border-b border-foreground/10 bg-background/90 backdrop-blur-md">
+      <div className="mx-auto w-full max-w-[1440px] px-[clamp(24px,5.8vw,88px)] flex min-h-16 items-center justify-between gap-4 pb-3 pt-[max(0.75rem,env(safe-area-inset-top))]">
         <Link to="/" aria-label="FishTankr home" className="rounded-lg">
-          <BrandLogo />
+          <BrandLogo size={30} />
         </Link>
-        <nav
-          aria-label="Primary"
-          className="hidden items-center gap-1 rounded-full border border-ink/10 bg-surface-raised p-1 text-sm shadow-panel md:flex"
-        >
+        <nav aria-label="Primary" className="hidden items-center gap-1 text-sm md:flex">
           {NAV_ITEMS.map((item) => (
             <Link
               key={item.to}
               to={item.to}
-              className="rounded-full px-3 py-2 font-medium text-muted-foreground transition-colors hover:bg-foam hover:text-foreground"
+              className="rounded-md px-3 py-2 text-muted-foreground transition-colors hover:text-foreground"
               activeProps={{
-                className: "rounded-full bg-ink px-3 py-2 font-semibold text-on-ink shadow-panel",
+                className:
+                  "rounded-md px-3 py-2 text-foreground underline decoration-blue decoration-1 underline-offset-8",
               }}
               activeOptions={item.exact ? { exact: true } : undefined}
             >
@@ -230,7 +228,7 @@ function SiteHeader() {
           <SheetTrigger asChild>
             <button
               type="button"
-              className="inline-flex size-11 items-center justify-center rounded-xl border border-ink/15 bg-surface-raised text-foreground shadow-panel md:hidden"
+              className="inline-flex size-11 items-center justify-center rounded-md border border-foreground/20 bg-transparent text-foreground md:hidden"
               aria-label="Open navigation"
             >
               <Menu className="size-5" aria-hidden />
@@ -238,9 +236,9 @@ function SiteHeader() {
           </SheetTrigger>
           <SheetContent
             side="right"
-            className="flex h-full w-[min(22rem,calc(100%-1.5rem))] flex-col gap-0 border-l border-ink/10 bg-background p-0"
+            className="flex h-full w-[min(22rem,calc(100%-1.5rem))] flex-col gap-0 border-l border-foreground/10 bg-background p-0"
           >
-            <SheetHeader className="border-b border-ink/10 px-5 pb-5 pt-[max(1.5rem,calc(env(safe-area-inset-top)+1rem))] text-left">
+            <SheetHeader className="border-b border-foreground/10 px-5 pb-5 pt-[max(1.5rem,calc(env(safe-area-inset-top)+1rem))] text-left">
               <SheetTitle className="font-display text-ui-heading">FishTankr</SheetTitle>
               <p className="text-ui-label text-muted-foreground">
                 Plan a tank that suits your fish.
@@ -263,7 +261,7 @@ function SiteHeader() {
                 </Link>
               ))}
             </nav>
-            <div className="border-t border-ink/10 p-4 pb-[calc(env(safe-area-inset-bottom)+1rem)]">
+            <div className="border-t border-foreground/10 p-4 pb-[calc(env(safe-area-inset-bottom)+1rem)]">
               <Link
                 to="/"
                 onClick={() => setOpen(false)}
@@ -281,14 +279,12 @@ function SiteHeader() {
 
 function SiteFooter() {
   return (
-    <footer className="relative mt-20 overflow-hidden border-t border-ink/10 bg-ink text-white">
-      <div className="mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:grid-cols-[1fr_auto] sm:items-start">
+    <footer className="relative mt-20 overflow-hidden border-t border-foreground/10 bg-ink text-white">
+      <div className="mx-auto w-full max-w-[1440px] px-[clamp(24px,5.8vw,88px)] grid gap-8 py-10 sm:grid-cols-[1fr_auto] sm:items-start">
         <div>
           <div className="flex items-center gap-2">
             <BrandLogo size={22} />
-            <span className="font-display font-semibold text-white">
-              Smarter tanks. Happier fish.
-            </span>
+            <span className="font-display text-base text-white">Smarter tanks. Happier fish.</span>
           </div>
           <p className="mt-2 max-w-md text-xs leading-relaxed text-white/60">
             Check each species’ needs and the local rules before you stock.
@@ -332,7 +328,7 @@ function SiteFooter() {
             href={SUPPORT_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="font-semibold text-lime transition-colors hover:text-white"
+            className="font-semibold text-blue transition-colors hover:text-white"
           >
             Support FishTankr
           </a>

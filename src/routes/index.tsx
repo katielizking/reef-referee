@@ -1,6 +1,6 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { Fish, ImageDown, Loader2, Ruler, Save, Share2, Waves, X } from "lucide-react";
+import { Fish, ImageDown, Loader2, Ruler, Save, Share2, Waves } from "lucide-react";
 import { toast } from "sonner";
 
 import { TankSetupPanel } from "@/components/TankSetupPanel";
@@ -14,6 +14,7 @@ import { ScorecardPanel } from "@/components/Scorecard";
 import { MobileScoreBar, MobileWelfareSummary } from "@/components/MobileScoreBar";
 import { PreStockChecklist, useSaveGate } from "@/components/PreStockChecklist";
 import { EditorOnboarding } from "@/components/EditorOnboarding";
+import { HomeHero } from "@/components/HomeHero";
 import { scoreTank } from "@/lib/scoring";
 import { adaptWaterToFirstSpecies, pickDefaultFilter } from "@/lib/defaults";
 import { PRESET_KEY, TANK_PRESETS } from "@/lib/presets";
@@ -29,8 +30,6 @@ import {
   usePlants,
   useSpecies,
 } from "@/lib/data";
-
-const HERO_DISMISS_KEY = "fishtankr:hero-dismissed";
 
 export const Route = createFileRoute("/")({
   validateSearch: (search: Record<string, unknown>): { tank?: string; remix?: string } => ({
@@ -94,20 +93,6 @@ function Builder() {
   const [savedId, setSavedId] = useState<string | undefined>(undefined);
   const [loadingTank, setLoadingTank] = useState(Boolean(sourceSlug));
   const [openSteps, setOpenSteps] = useState<StepId[]>(["tank"]);
-  const [heroDismissed, setHeroDismissed] = useState(true); // start true to avoid SSR flash
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    setHeroDismissed(window.localStorage.getItem(HERO_DISMISS_KEY) === "1");
-  }, []);
-
-  function dismissHero() {
-    setHeroDismissed(true);
-    if (typeof window !== "undefined") {
-      window.localStorage.setItem(HERO_DISMISS_KEY, "1");
-    }
-  }
 
   const species = useSpecies();
   const plants = usePlants();
@@ -120,7 +105,7 @@ function Builder() {
   const selected = useEditorStore((s) => s.selected);
 
   const ready = species.data && plants.data && hardscape.data && filters.data;
-  const showHero = !sourceSlug && !heroDismissed && state.species.length === 0;
+  const showHero = !sourceSlug;
 
   useEffect(() => {
     if (!sourceSlug) {
@@ -162,7 +147,6 @@ function Builder() {
           hardscape: data.hardscape,
         });
         setSavedId(remixSlug ? undefined : data.tank.id);
-        setHeroDismissed(true);
         toast.success(remixSlug ? `Ready to remix ${data.tank.name}` : `Loaded ${data.tank.name}`);
       })
       .catch((error) => {
@@ -315,295 +299,236 @@ function Builder() {
     gate.requestSave(share, doSave);
   }
 
-  function scrollToBuilder() {
-    const el = document.getElementById("builder");
-    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
-  }
-
   return (
-    <main className="mx-auto max-w-[1500px] px-3 py-4 pb-28 sm:px-4 sm:py-6 lg:pb-6">
-      {showHero && (
-        <section className="relative mb-7 overflow-hidden border border-rule bg-ink sm:mb-10">
-          <button
-            type="button"
-            onClick={dismissHero}
-            aria-label="Dismiss welcome"
-            className="absolute right-3 top-3 z-20 p-1.5 text-white/60 transition-colors hover:text-white"
+    <>
+      {showHero && <HomeHero />}
+      <main className="mx-auto w-full max-w-[1440px] px-3 py-4 pb-28 sm:px-4 sm:py-6 lg:px-[clamp(24px,5.8vw,88px)] lg:pb-6">
+        {showHero && (
+          <section
+            className="mb-8 grid gap-4 rounded-[1.75rem] border bg-card p-5 sm:p-7 lg:grid-cols-[.8fr_1.2fr]"
+            aria-labelledby="what-calculators-miss"
           >
-            <X className="h-4 w-4" aria-hidden />
-          </button>
-
-          <div
-            className="pointer-events-none relative h-[52svh] min-h-[320px] max-h-[520px] overflow-hidden [&_canvas]:!h-full"
-            aria-hidden
-          >
-            <div className="absolute inset-0 scale-110">
-              <ClientOnlyTankScene state={state} interactive={false} />
-            </div>
-            <div
-              className="absolute inset-0"
-              style={{
-                background:
-                  "linear-gradient(to right, color-mix(in srgb, var(--ink) 88%, transparent) 0%, color-mix(in srgb, var(--ink) 55%, transparent) 55%, transparent 100%)",
-              }}
-            />
-          </div>
-
-          <div className="absolute inset-0 z-10 flex flex-col justify-end p-5 sm:justify-center sm:p-10 lg:p-12">
-            <span className="science-label text-blue">Tank planner</span>
-            <h1 className="mt-4 max-w-[18ch] font-display text-4xl font-bold leading-[.95] tracking-[-.045em] text-white sm:text-5xl lg:text-6xl">
-              Plan the tank before you buy the fish.
-            </h1>
-            <p className="mt-4 max-w-md text-sm leading-relaxed text-white/75 sm:text-base">
-              Add the tank and the fish you’re considering. Check the space, water and tank mates.
-            </p>
-            <p className="data-mono mt-4 text-xs uppercase tracking-[0.14em] text-white/60">
-              {state.length_cm} × {state.width_cm} × {state.height_cm} cm ·{" "}
-              {Math.round((state.length_cm * state.width_cm * state.height_cm) / 1000)} L
-            </p>
-            <div className="mt-6 flex flex-wrap gap-3">
-              <button
-                onClick={() => {
-                  dismissHero();
-                  scrollToBuilder();
-                }}
-                className="inline-flex min-h-12 items-center justify-center border border-white bg-white px-6 py-3 text-sm font-semibold text-ink transition-colors hover:bg-transparent hover:text-white"
+            <div>
+              <p className="science-label text-primary">More than tank volume</p>
+              <h2
+                id="what-calculators-miss"
+                className="mt-3 font-display text-2xl font-bold tracking-tight text-foreground"
               >
-                Start my tank
-              </button>
-              <button
-                onClick={() => navigate({ to: "/species" })}
-                className="inline-flex min-h-12 items-center justify-center border border-white/40 px-6 py-3 text-sm font-semibold text-white transition-colors hover:border-white"
+                A litre count is not enough
+              </h2>
+              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+                Tank volume cannot show conflict, group needs or water fit. Check those before you
+                stock.
+              </p>
+              <Link
+                to="/methodology"
+                className="mt-4 inline-flex min-h-11 items-center font-semibold text-primary underline"
               >
-                Browse fish
-              </button>
+                How scoring works
+              </Link>
             </div>
-          </div>
-        </section>
-      )}
+            <div className="grid gap-3 sm:grid-cols-2">
+              <article className="rounded-2xl bg-muted/60 p-4">
+                <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
+                  Volume-only view
+                </p>
+                <p className="mt-2 font-display text-lg font-bold text-foreground">
+                  Two male bettas · 40 L
+                </p>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  A litres-and-size formula can miss the territorial conflict.
+                </p>
+              </article>
+              <article className="rounded-2xl border-l-4 border-l-coral bg-coral/10 p-4">
+                <p className="text-xs font-bold uppercase tracking-wide text-coral">
+                  FishTankr verdict
+                </p>
+                <p className="mt-2 font-display text-lg font-bold text-foreground">Do not stock</p>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  Two male bettas are likely to fight. Keep one betta or house them in separate
+                  tanks.
+                </p>
+              </article>
+            </div>
+          </section>
+        )}
 
-      {showHero && (
-        <section
-          className="mb-8 grid gap-4 rounded-[1.75rem] border bg-card p-5 sm:p-7 lg:grid-cols-[.8fr_1.2fr]"
-          aria-labelledby="what-calculators-miss"
+        <div
+          id="builder"
+          className="mb-5 flex flex-col justify-between gap-3 border-b border-foreground/10 pb-4 sm:mb-6 sm:gap-4 sm:pb-5 sm:flex-row sm:items-end"
         >
           <div>
-            <p className="science-label text-primary">More than tank volume</p>
-            <h2
-              id="what-calculators-miss"
-              className="mt-3 font-display text-2xl font-bold tracking-tight text-foreground"
-            >
-              A litre count is not enough
+            <h2 className="font-display text-3xl font-bold tracking-[-.035em] text-foreground">
+              Build your tank
             </h2>
-            <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-              Tank volume cannot show conflict, group needs or water fit. Check those before you
-              stock.
+            <p className="text-sm text-muted-foreground">
+              Add the setup. Check each choice as you go.
             </p>
-            <Link
-              to="/methodology"
-              className="mt-4 inline-flex min-h-11 items-center font-semibold text-primary underline"
+          </div>
+          <div className="grid grid-cols-3 gap-2 sm:flex sm:flex-wrap">
+            <button
+              onClick={() => handleSave(false)}
+              disabled={saving || state.species.length === 0}
+              title={state.species.length === 0 ? "Add fish to save" : undefined}
+              className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-xl border bg-card px-3 py-2 text-sm font-semibold text-foreground transition-colors hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              How scoring works
-            </Link>
+              {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+              Save
+            </button>
+            <button
+              onClick={() => handleSave(true)}
+              disabled={saving || state.species.length === 0}
+              title={state.species.length === 0 ? "Add fish to share" : undefined}
+              className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-xl bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:brightness-95 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <Share2 className="h-4 w-4" />
+              Share
+            </button>
+            <button
+              onClick={() =>
+                void shareScoreCard(scorecard, state)
+                  .then((result) =>
+                    toast.success(
+                      result === "shared" ? "Score card shared" : "Score card downloaded",
+                    ),
+                  )
+                  .catch((error) =>
+                    toast.error("Couldn't create score card", {
+                      description: error instanceof Error ? error.message : "Try again.",
+                    }),
+                  )
+              }
+              disabled={scorecard.overall === null}
+              title={
+                scorecard.overall === null
+                  ? "Add fish to create a score card"
+                  : "Share your score as an image"
+              }
+              className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-xl border bg-card px-3 py-2 text-sm font-semibold text-foreground transition-colors hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <ImageDown className="h-4 w-4" />
+              Card
+            </button>
           </div>
-          <div className="grid gap-3 sm:grid-cols-2">
-            <article className="rounded-2xl bg-muted/60 p-4">
-              <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
-                Volume-only view
-              </p>
-              <p className="mt-2 font-display text-lg font-bold text-foreground">
-                Two male bettas · 40 L
-              </p>
-              <p className="mt-2 text-sm text-muted-foreground">
-                A litres-and-size formula can miss the territorial conflict.
-              </p>
-            </article>
-            <article className="rounded-2xl border-l-4 border-l-coral bg-coral/10 p-4">
-              <p className="text-xs font-bold uppercase tracking-wide text-coral">
-                FishTankr verdict
-              </p>
-              <p className="mt-2 font-display text-lg font-bold text-foreground">Do not stock</p>
-              <p className="mt-2 text-sm text-muted-foreground">
-                Two male bettas are likely to fight. Keep one betta or house them in separate tanks.
-              </p>
-            </article>
+        </div>
+
+        {!ready || loadingTank ? (
+          <div className="flex min-h-[40vh] items-center justify-center text-muted-foreground">
+            <Loader2 className="h-6 w-6 animate-spin" />
           </div>
-        </section>
-      )}
-
-      <div
-        id="builder"
-        className="mb-5 flex flex-col justify-between gap-3 border-b border-ink/10 pb-4 sm:mb-6 sm:gap-4 sm:pb-5 sm:flex-row sm:items-end"
-      >
-        <div>
-          <h2 className="font-display text-3xl font-bold tracking-[-.035em] text-foreground">
-            Build your tank
-          </h2>
-          <p className="text-sm text-muted-foreground">
-            Add the setup. Check each choice as you go.
-          </p>
-        </div>
-        <div className="grid grid-cols-3 gap-2 sm:flex sm:flex-wrap">
-          <button
-            onClick={() => handleSave(false)}
-            disabled={saving || state.species.length === 0}
-            title={state.species.length === 0 ? "Add fish to save" : undefined}
-            className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-xl border bg-card px-3 py-2 text-sm font-semibold text-foreground transition-colors hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-            Save
-          </button>
-          <button
-            onClick={() => handleSave(true)}
-            disabled={saving || state.species.length === 0}
-            title={state.species.length === 0 ? "Add fish to share" : undefined}
-            className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-xl bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:brightness-95 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <Share2 className="h-4 w-4" />
-            Share
-          </button>
-          <button
-            onClick={() =>
-              void shareScoreCard(scorecard, state)
-                .then((result) =>
-                  toast.success(
-                    result === "shared" ? "Score card shared" : "Score card downloaded",
-                  ),
-                )
-                .catch((error) =>
-                  toast.error("Couldn't create score card", {
-                    description: error instanceof Error ? error.message : "Try again.",
-                  }),
-                )
-            }
-            disabled={scorecard.overall === null}
-            title={
-              scorecard.overall === null
-                ? "Add fish to create a score card"
-                : "Share your score as an image"
-            }
-            className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-xl border bg-card px-3 py-2 text-sm font-semibold text-foreground transition-colors hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            <ImageDown className="h-4 w-4" />
-            Card
-          </button>
-        </div>
-      </div>
-
-      {!ready || loadingTank ? (
-        <div className="flex min-h-[40vh] items-center justify-center text-muted-foreground">
-          <Loader2 className="h-6 w-6 animate-spin" />
-        </div>
-      ) : (
-        <>
-          <BuilderSteps state={state} onJump={jumpToStep} />
-          <MobileWelfareSummary scorecard={scorecard} />
-          <div className="grid items-start gap-4 sm:gap-5 xl:grid-cols-[minmax(280px,320px)_minmax(520px,1fr)_minmax(300px,340px)]">
-            <aside className="order-2 fishtankr-panel rounded-[1.5rem] p-3 sm:rounded-[1.75rem] sm:p-4 xl:order-1 xl:sticky xl:top-24">
-              <TankSetupPanel
-                state={state}
-                setState={setState}
-                species={species.data!}
-                plants={plants.data!}
-                hardscape={hardscape.data!}
-                filters={filters.data!}
-                openSteps={openSteps}
-                setOpenSteps={setOpenSteps}
-              />
-            </aside>
-            <div className="order-1 space-y-4 xl:order-2">
-              <section className="overflow-hidden rounded-[1.5rem] border border-ink/15 bg-ink p-2 sm:rounded-[2rem] shadow-[0_28px_70px_rgba(18,35,46,.18)] sm:p-3">
-                <header className="flex flex-col items-stretch gap-2 px-2 pb-3 pt-1 text-white sm:flex-row sm:items-center sm:justify-between sm:gap-3 sm:px-3">
-                  <div>
-                    <p className="science-label text-blue">Live aquarium</p>
-                    <p className="mt-1 font-display text-sm font-semibold">{state.name}</p>
-                  </div>
-                  <div className="grid grid-cols-3 gap-1.5 text-[10px] sm:flex sm:flex-wrap font-semibold uppercase tracking-wide text-white/65">
-                    <span className="inline-flex min-w-0 items-center justify-center gap-1 rounded-full bg-white/10 px-2 py-1.5 text-center">
-                      <Ruler className="h-3 w-3 text-blue" /> {state.length_cm} × {state.width_cm} ×{" "}
-                      {state.height_cm} cm
-                    </span>
-                    <span className="inline-flex items-center gap-1 rounded-full bg-white/10 px-2.5 py-1.5">
-                      <Waves className="h-3 w-3 text-blue" />{" "}
-                      {Math.round((state.length_cm * state.width_cm * state.height_cm) / 1000)} L
-                    </span>
-                    <span className="inline-flex items-center gap-1 rounded-full bg-white/10 px-2.5 py-1.5">
-                      <Fish className="h-3 w-3 text-lime" />{" "}
-                      {state.species.reduce((total, row) => total + row.quantity, 0)} fish
-                    </span>
-                  </div>
-                </header>
-                <div className="relative">
-                  <ClientOnlyTankScene
-                    state={state}
-                    setState={setState}
-                    commit={history.commit}
-                    onRemoveSpecies={(id) =>
-                      setState((s) => ({
-                        ...s,
-                        species: s.species.filter((x) => x.species.id !== id),
-                      }))
-                    }
-                  />
-                  {state.species.length === 0 && (
-                    <div className="pointer-events-none absolute inset-x-4 top-1/2 z-10 -translate-y-1/2 rounded-2xl border border-white/20 bg-ink/75 p-4 text-center text-white backdrop-blur-sm sm:left-1/2 sm:max-w-sm sm:-translate-x-1/2">
-                      <Fish className="mx-auto h-8 w-8 text-lime" aria-hidden />
-                      <p className="mt-2 font-display text-base font-bold">
-                        Start with your first fish
-                      </p>
-                      <p className="mt-1 text-xs leading-relaxed text-white/75">
-                        Add fish under Livestock. We’ll set a starting water range and flag what to
-                        check.
-                      </p>
-                    </div>
-                  )}
-                  <SceneToolbar
-                    canUndo={history.canUndo}
-                    canRedo={history.canRedo}
-                    onUndo={history.undo}
-                    onRedo={history.redo}
-                    onResetLayout={() => {
-                      setState((s) => ({ ...s, overrides: {} }));
-                      history.commit();
-                    }}
-                  />
-                </div>
-              </section>
-
-              <EditorOnboarding />
-
-              {selected ? (
-                <SelectedObjectPanel
+        ) : (
+          <>
+            <BuilderSteps state={state} onJump={jumpToStep} />
+            <MobileWelfareSummary scorecard={scorecard} />
+            <div className="grid items-start gap-4 sm:gap-5 xl:grid-cols-[minmax(280px,320px)_minmax(520px,1fr)_minmax(300px,340px)]">
+              <aside className="order-2 fishtankr-panel rounded-[1.5rem] p-3 sm:rounded-[1.75rem] sm:p-4 xl:order-1 xl:sticky xl:top-24">
+                <TankSetupPanel
                   state={state}
                   setState={setState}
-                  interior={dims}
-                  commit={history.commit}
+                  species={species.data!}
+                  plants={plants.data!}
+                  hardscape={hardscape.data!}
+                  filters={filters.data!}
+                  openSteps={openSteps}
+                  setOpenSteps={setOpenSteps}
                 />
-              ) : (
-                <div className="fishtankr-panel rounded-[1.75rem] p-4 text-sm text-muted-foreground">
-                  <p>
-                    <span className="font-semibold text-foreground">Tap an item to edit it.</span>{" "}
-                    Drag to move it. Use the panel to rotate, resize, copy or remove it. Undo is in
-                    the toolbar.
-                  </p>
-                </div>
-              )}
-            </div>
+              </aside>
+              <div className="order-1 space-y-4 xl:order-2">
+                <section className="overflow-hidden rounded-[1.5rem] border border-foreground/15 bg-ink p-2 sm:rounded-[2rem] shadow-[0_28px_70px_rgba(18,35,46,.18)] sm:p-3">
+                  <header className="flex flex-col items-stretch gap-2 px-2 pb-3 pt-1 text-white sm:flex-row sm:items-center sm:justify-between sm:gap-3 sm:px-3">
+                    <div>
+                      <p className="science-label text-blue">Live aquarium</p>
+                      <p className="mt-1 font-display text-sm font-semibold">{state.name}</p>
+                    </div>
+                    <div className="grid grid-cols-3 gap-1.5 text-[10px] sm:flex sm:flex-wrap font-semibold uppercase tracking-wide text-white/65">
+                      <span className="inline-flex min-w-0 items-center justify-center gap-1 rounded-full bg-white/10 px-2 py-1.5 text-center">
+                        <Ruler className="h-3 w-3 text-blue" /> {state.length_cm} × {state.width_cm}{" "}
+                        × {state.height_cm} cm
+                      </span>
+                      <span className="inline-flex items-center gap-1 rounded-full bg-white/10 px-2.5 py-1.5">
+                        <Waves className="h-3 w-3 text-blue" />{" "}
+                        {Math.round((state.length_cm * state.width_cm * state.height_cm) / 1000)} L
+                      </span>
+                      <span className="inline-flex items-center gap-1 rounded-full bg-white/10 px-2.5 py-1.5">
+                        <Fish className="h-3 w-3 text-lime" />{" "}
+                        {state.species.reduce((total, row) => total + row.quantity, 0)} fish
+                      </span>
+                    </div>
+                  </header>
+                  <div className="relative">
+                    <ClientOnlyTankScene
+                      state={state}
+                      setState={setState}
+                      commit={history.commit}
+                      onRemoveSpecies={(id) =>
+                        setState((s) => ({
+                          ...s,
+                          species: s.species.filter((x) => x.species.id !== id),
+                        }))
+                      }
+                    />
+                    {state.species.length === 0 && (
+                      <div className="pointer-events-none absolute inset-x-4 top-1/2 z-10 -translate-y-1/2 rounded-2xl border border-white/20 bg-ink/75 p-4 text-center text-white backdrop-blur-sm sm:left-1/2 sm:max-w-sm sm:-translate-x-1/2">
+                        <Fish className="mx-auto h-8 w-8 text-lime" aria-hidden />
+                        <p className="mt-2 font-display text-base font-bold">
+                          Start with your first fish
+                        </p>
+                        <p className="mt-1 text-xs leading-relaxed text-white/75">
+                          Add fish under Livestock. We’ll set a starting water range and flag what
+                          to check.
+                        </p>
+                      </div>
+                    )}
+                    <SceneToolbar
+                      canUndo={history.canUndo}
+                      canRedo={history.canRedo}
+                      onUndo={history.undo}
+                      onRedo={history.redo}
+                      onResetLayout={() => {
+                        setState((s) => ({ ...s, overrides: {} }));
+                        history.commit();
+                      }}
+                    />
+                  </div>
+                </section>
 
-            <aside className="order-3 space-y-4 xl:sticky xl:top-24 xl:self-start">
-              <PreStockChecklist
-                scorecard={scorecard}
-                state={state}
-                pendingSave={gate.pendingSave}
-                onCancelSave={gate.cancel}
-                onConfirmSave={() => gate.confirm(doSave)}
-              />
-              <ScorecardPanel scorecard={scorecard} />
-            </aside>
-          </div>
-        </>
-      )}
-      {ready && <MobileScoreBar scorecard={scorecard} />}
-    </main>
+                <EditorOnboarding />
+
+                {selected ? (
+                  <SelectedObjectPanel
+                    state={state}
+                    setState={setState}
+                    interior={dims}
+                    commit={history.commit}
+                  />
+                ) : (
+                  <div className="fishtankr-panel rounded-[1.75rem] p-4 text-sm text-muted-foreground">
+                    <p>
+                      <span className="font-semibold text-foreground">Tap an item to edit it.</span>{" "}
+                      Drag to move it. Use the panel to rotate, resize, copy or remove it. Undo is
+                      in the toolbar.
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              <aside className="order-3 space-y-4 xl:sticky xl:top-24 xl:self-start">
+                <PreStockChecklist
+                  scorecard={scorecard}
+                  state={state}
+                  pendingSave={gate.pendingSave}
+                  onCancelSave={gate.cancel}
+                  onConfirmSave={() => gate.confirm(doSave)}
+                />
+                <ScorecardPanel scorecard={scorecard} />
+              </aside>
+            </div>
+          </>
+        )}
+        {ready && (state.species.length > 0 || !showHero) && (
+          <MobileScoreBar scorecard={scorecard} />
+        )}
+      </main>
+    </>
   );
 }
