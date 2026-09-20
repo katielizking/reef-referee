@@ -658,6 +658,7 @@ h3.font-display {
   .tank-report table { width: 100%; border-collapse: collapse; margin-top: 4pt; }
   .tank-report th, .tank-report td { border-bottom: 1px solid #999; padding: 3pt 2pt; text-align: left; font-size: 10pt; }
   .tank-report footer { margin-top: 14pt; border-top: 1px solid #999; padding-top: 4pt; font-size: 8.5pt; }
-  body > *:not(.tank-report-host), .planner-mobile-results, nav, footer:not(.tank-report footer) { display: none !important; }
-  .tank-report-host { display: block !important; }
+  body * { visibility: hidden; }
+  .tank-report, .tank-report * { visibility: visible; }
+  .tank-report { position: absolute; inset: 0 auto auto 0; width: 100%; padding: 0; }
 }
