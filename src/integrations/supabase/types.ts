@@ -216,12 +216,15 @@ export type Database = {
           fish_risk_note: string | null
           id: string
           invert_group: string
+          legal_note: string | null
+          legal_status: string
           min_group_size: number
           min_tank_litres: number
           native_ph_max: number
           native_ph_min: number
           native_temp_max_c: number
           native_temp_min_c: number
+          needs_land: boolean
           predatory: boolean
           scientific_name: string
           temperament: string
@@ -241,12 +244,15 @@ export type Database = {
           fish_risk_note?: string | null
           id?: string
           invert_group?: string
+          legal_note?: string | null
+          legal_status?: string
           min_group_size?: number
           min_tank_litres: number
           native_ph_max: number
           native_ph_min: number
           native_temp_max_c: number
           native_temp_min_c: number
+          needs_land?: boolean
           predatory?: boolean
           scientific_name: string
           temperament?: string
@@ -266,12 +272,15 @@ export type Database = {
           fish_risk_note?: string | null
           id?: string
           invert_group?: string
+          legal_note?: string | null
+          legal_status?: string
           min_group_size?: number
           min_tank_litres?: number
           native_ph_max?: number
           native_ph_min?: number
           native_temp_max_c?: number
           native_temp_min_c?: number
+          needs_land?: boolean
           predatory?: boolean
           scientific_name?: string
           temperament?: string

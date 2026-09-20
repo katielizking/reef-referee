@@ -29,6 +29,13 @@
       "when": 1789870811046,
       "tag": "0003_shared_tank_invertebrates",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1789871472944,
+      "tag": "0004_invertebrate_land_and_legal_flags",
+      "breakpoints": true
     }
   ]
 }
