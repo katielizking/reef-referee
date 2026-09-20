@@ -9,70 +9,32 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as WelfareDisclaimerRouteImport } from './routes/welfare-disclaimer'
-import { Route as TermsRouteImport } from './routes/terms'
-import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
-import { Route as SavedRouteImport } from './routes/saved'
-import { Route as QuizRouteImport } from './routes/quiz'
-import { Route as PrivacyRouteImport } from './routes/privacy'
-import { Route as MethodologyRouteImport } from './routes/methodology'
-import { Route as ContactRouteImport } from './routes/contact'
-import { Route as AttributionRouteImport } from './routes/attribution'
-import { Route as AffiliateDisclosureRouteImport } from './routes/affiliate-disclosure'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as SpeciesIndexRouteImport } from './routes/species.index'
-import { Route as ShopsIndexRouteImport } from './routes/shops.index'
-import { Route as GuidesIndexRouteImport } from './routes/guides.index'
+import { Route as AffiliateDisclosureRouteImport } from './routes/affiliate-disclosure'
+import { Route as AttributionRouteImport } from './routes/attribution'
+import { Route as CalculatorRouteImport } from './routes/calculator'
+import { Route as ContactRouteImport } from './routes/contact'
+import { Route as MethodologyRouteImport } from './routes/methodology'
+import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as QuizRouteImport } from './routes/quiz'
+import { Route as SavedRouteImport } from './routes/saved'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as TermsRouteImport } from './routes/terms'
+import { Route as VisualiserRouteImport } from './routes/visualiser'
+import { Route as WelfareDisclaimerRouteImport } from './routes/welfare-disclaimer'
 import { Route as BlogIndexRouteImport } from './routes/blog.index'
-import { Route as TSlugRouteImport } from './routes/t.$slug'
-import { Route as SpeciesIdRouteImport } from './routes/species.$id'
-import { Route as ShopsSlugRouteImport } from './routes/shops.$slug'
-import { Route as GuidesSlugRouteImport } from './routes/guides.$slug'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
+import { Route as GuidesIndexRouteImport } from './routes/guides.index'
+import { Route as GuidesSlugRouteImport } from './routes/guides.$slug'
+import { Route as ShopsIndexRouteImport } from './routes/shops.index'
+import { Route as ShopsSlugRouteImport } from './routes/shops.$slug'
+import { Route as SpeciesIndexRouteImport } from './routes/species.index'
+import { Route as SpeciesIdRouteImport } from './routes/species.$id'
+import { Route as TSlugRouteImport } from './routes/t.$slug'
 
-const WelfareDisclaimerRoute = WelfareDisclaimerRouteImport.update({
-  id: '/welfare-disclaimer',
-  path: '/welfare-disclaimer',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const TermsRoute = TermsRouteImport.update({
-  id: '/terms',
-  path: '/terms',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
-  id: '/sitemap.xml',
-  path: '/sitemap.xml',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SavedRoute = SavedRouteImport.update({
-  id: '/saved',
-  path: '/saved',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const QuizRoute = QuizRouteImport.update({
-  id: '/quiz',
-  path: '/quiz',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PrivacyRoute = PrivacyRouteImport.update({
-  id: '/privacy',
-  path: '/privacy',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MethodologyRoute = MethodologyRouteImport.update({
-  id: '/methodology',
-  path: '/methodology',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ContactRoute = ContactRouteImport.update({
-  id: '/contact',
-  path: '/contact',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AttributionRoute = AttributionRouteImport.update({
-  id: '/attribution',
-  path: '/attribution',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AffiliateDisclosureRoute = AffiliateDisclosureRouteImport.update({
@@ -80,24 +42,59 @@ const AffiliateDisclosureRoute = AffiliateDisclosureRouteImport.update({
   path: '/affiliate-disclosure',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const AttributionRoute = AttributionRouteImport.update({
+  id: '/attribution',
+  path: '/attribution',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SpeciesIndexRoute = SpeciesIndexRouteImport.update({
-  id: '/species/',
-  path: '/species/',
+const CalculatorRoute = CalculatorRouteImport.update({
+  id: '/calculator',
+  path: '/calculator',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ShopsIndexRoute = ShopsIndexRouteImport.update({
-  id: '/shops/',
-  path: '/shops/',
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
-const GuidesIndexRoute = GuidesIndexRouteImport.update({
-  id: '/guides/',
-  path: '/guides/',
+const MethodologyRoute = MethodologyRouteImport.update({
+  id: '/methodology',
+  path: '/methodology',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const QuizRoute = QuizRouteImport.update({
+  id: '/quiz',
+  path: '/quiz',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SavedRoute = SavedRouteImport.update({
+  id: '/saved',
+  path: '/saved',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VisualiserRoute = VisualiserRouteImport.update({
+  id: '/visualiser',
+  path: '/visualiser',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WelfareDisclaimerRoute = WelfareDisclaimerRouteImport.update({
+  id: '/welfare-disclaimer',
+  path: '/welfare-disclaimer',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BlogIndexRoute = BlogIndexRouteImport.update({
@@ -105,19 +102,14 @@ const BlogIndexRoute = BlogIndexRouteImport.update({
   path: '/blog/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const TSlugRoute = TSlugRouteImport.update({
-  id: '/t/$slug',
-  path: '/t/$slug',
+const BlogSlugRoute = BlogSlugRouteImport.update({
+  id: '/blog/$slug',
+  path: '/blog/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SpeciesIdRoute = SpeciesIdRouteImport.update({
-  id: '/species/$id',
-  path: '/species/$id',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ShopsSlugRoute = ShopsSlugRouteImport.update({
-  id: '/shops/$slug',
-  path: '/shops/$slug',
+const GuidesIndexRoute = GuidesIndexRouteImport.update({
+  id: '/guides/',
+  path: '/guides/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const GuidesSlugRoute = GuidesSlugRouteImport.update({
@@ -125,9 +117,29 @@ const GuidesSlugRoute = GuidesSlugRouteImport.update({
   path: '/guides/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
-const BlogSlugRoute = BlogSlugRouteImport.update({
-  id: '/blog/$slug',
-  path: '/blog/$slug',
+const ShopsIndexRoute = ShopsIndexRouteImport.update({
+  id: '/shops/',
+  path: '/shops/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ShopsSlugRoute = ShopsSlugRouteImport.update({
+  id: '/shops/$slug',
+  path: '/shops/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SpeciesIndexRoute = SpeciesIndexRouteImport.update({
+  id: '/species/',
+  path: '/species/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SpeciesIdRoute = SpeciesIdRouteImport.update({
+  id: '/species/$id',
+  path: '/species/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TSlugRoute = TSlugRouteImport.update({
+  id: '/t/$slug',
+  path: '/t/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -135,6 +147,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/affiliate-disclosure': typeof AffiliateDisclosureRoute
   '/attribution': typeof AttributionRoute
+  '/calculator': typeof CalculatorRoute
   '/contact': typeof ContactRoute
   '/methodology': typeof MethodologyRoute
   '/privacy': typeof PrivacyRoute
@@ -142,6 +155,7 @@ export interface FileRoutesByFullPath {
   '/saved': typeof SavedRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
+  '/visualiser': typeof VisualiserRoute
   '/welfare-disclaimer': typeof WelfareDisclaimerRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/guides/$slug': typeof GuidesSlugRoute
@@ -157,6 +171,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/affiliate-disclosure': typeof AffiliateDisclosureRoute
   '/attribution': typeof AttributionRoute
+  '/calculator': typeof CalculatorRoute
   '/contact': typeof ContactRoute
   '/methodology': typeof MethodologyRoute
   '/privacy': typeof PrivacyRoute
@@ -164,6 +179,7 @@ export interface FileRoutesByTo {
   '/saved': typeof SavedRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
+  '/visualiser': typeof VisualiserRoute
   '/welfare-disclaimer': typeof WelfareDisclaimerRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/guides/$slug': typeof GuidesSlugRoute
@@ -180,6 +196,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/affiliate-disclosure': typeof AffiliateDisclosureRoute
   '/attribution': typeof AttributionRoute
+  '/calculator': typeof CalculatorRoute
   '/contact': typeof ContactRoute
   '/methodology': typeof MethodologyRoute
   '/privacy': typeof PrivacyRoute
@@ -187,6 +204,7 @@ export interface FileRoutesById {
   '/saved': typeof SavedRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
+  '/visualiser': typeof VisualiserRoute
   '/welfare-disclaimer': typeof WelfareDisclaimerRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/guides/$slug': typeof GuidesSlugRoute
@@ -204,6 +222,7 @@ export interface FileRouteTypes {
     | '/'
     | '/affiliate-disclosure'
     | '/attribution'
+    | '/calculator'
     | '/contact'
     | '/methodology'
     | '/privacy'
@@ -211,6 +230,7 @@ export interface FileRouteTypes {
     | '/saved'
     | '/sitemap.xml'
     | '/terms'
+    | '/visualiser'
     | '/welfare-disclaimer'
     | '/blog/$slug'
     | '/guides/$slug'
@@ -226,6 +246,7 @@ export interface FileRouteTypes {
     | '/'
     | '/affiliate-disclosure'
     | '/attribution'
+    | '/calculator'
     | '/contact'
     | '/methodology'
     | '/privacy'
@@ -233,6 +254,7 @@ export interface FileRouteTypes {
     | '/saved'
     | '/sitemap.xml'
     | '/terms'
+    | '/visualiser'
     | '/welfare-disclaimer'
     | '/blog/$slug'
     | '/guides/$slug'
@@ -248,6 +270,7 @@ export interface FileRouteTypes {
     | '/'
     | '/affiliate-disclosure'
     | '/attribution'
+    | '/calculator'
     | '/contact'
     | '/methodology'
     | '/privacy'
@@ -255,6 +278,7 @@ export interface FileRouteTypes {
     | '/saved'
     | '/sitemap.xml'
     | '/terms'
+    | '/visualiser'
     | '/welfare-disclaimer'
     | '/blog/$slug'
     | '/guides/$slug'
@@ -271,6 +295,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AffiliateDisclosureRoute: typeof AffiliateDisclosureRoute
   AttributionRoute: typeof AttributionRoute
+  CalculatorRoute: typeof CalculatorRoute
   ContactRoute: typeof ContactRoute
   MethodologyRoute: typeof MethodologyRoute
   PrivacyRoute: typeof PrivacyRoute
@@ -278,6 +303,7 @@ export interface RootRouteChildren {
   SavedRoute: typeof SavedRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
+  VisualiserRoute: typeof VisualiserRoute
   WelfareDisclaimerRoute: typeof WelfareDisclaimerRoute
   BlogSlugRoute: typeof BlogSlugRoute
   GuidesSlugRoute: typeof GuidesSlugRoute
@@ -292,67 +318,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/welfare-disclaimer': {
-      id: '/welfare-disclaimer'
-      path: '/welfare-disclaimer'
-      fullPath: '/welfare-disclaimer'
-      preLoaderRoute: typeof WelfareDisclaimerRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/terms': {
-      id: '/terms'
-      path: '/terms'
-      fullPath: '/terms'
-      preLoaderRoute: typeof TermsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/sitemap.xml': {
-      id: '/sitemap.xml'
-      path: '/sitemap.xml'
-      fullPath: '/sitemap.xml'
-      preLoaderRoute: typeof SitemapDotxmlRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/saved': {
-      id: '/saved'
-      path: '/saved'
-      fullPath: '/saved'
-      preLoaderRoute: typeof SavedRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/quiz': {
-      id: '/quiz'
-      path: '/quiz'
-      fullPath: '/quiz'
-      preLoaderRoute: typeof QuizRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/privacy': {
-      id: '/privacy'
-      path: '/privacy'
-      fullPath: '/privacy'
-      preLoaderRoute: typeof PrivacyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/methodology': {
-      id: '/methodology'
-      path: '/methodology'
-      fullPath: '/methodology'
-      preLoaderRoute: typeof MethodologyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/contact': {
-      id: '/contact'
-      path: '/contact'
-      fullPath: '/contact'
-      preLoaderRoute: typeof ContactRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/attribution': {
-      id: '/attribution'
-      path: '/attribution'
-      fullPath: '/attribution'
-      preLoaderRoute: typeof AttributionRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/affiliate-disclosure': {
@@ -362,32 +332,81 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AffiliateDisclosureRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/attribution': {
+      id: '/attribution'
+      path: '/attribution'
+      fullPath: '/attribution'
+      preLoaderRoute: typeof AttributionRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/species/': {
-      id: '/species/'
-      path: '/species'
-      fullPath: '/species/'
-      preLoaderRoute: typeof SpeciesIndexRouteImport
+    '/calculator': {
+      id: '/calculator'
+      path: '/calculator'
+      fullPath: '/calculator'
+      preLoaderRoute: typeof CalculatorRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/shops/': {
-      id: '/shops/'
-      path: '/shops'
-      fullPath: '/shops/'
-      preLoaderRoute: typeof ShopsIndexRouteImport
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/guides/': {
-      id: '/guides/'
-      path: '/guides'
-      fullPath: '/guides/'
-      preLoaderRoute: typeof GuidesIndexRouteImport
+    '/methodology': {
+      id: '/methodology'
+      path: '/methodology'
+      fullPath: '/methodology'
+      preLoaderRoute: typeof MethodologyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/quiz': {
+      id: '/quiz'
+      path: '/quiz'
+      fullPath: '/quiz'
+      preLoaderRoute: typeof QuizRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/saved': {
+      id: '/saved'
+      path: '/saved'
+      fullPath: '/saved'
+      preLoaderRoute: typeof SavedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/visualiser': {
+      id: '/visualiser'
+      path: '/visualiser'
+      fullPath: '/visualiser'
+      preLoaderRoute: typeof VisualiserRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/welfare-disclaimer': {
+      id: '/welfare-disclaimer'
+      path: '/welfare-disclaimer'
+      fullPath: '/welfare-disclaimer'
+      preLoaderRoute: typeof WelfareDisclaimerRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/blog/': {
@@ -397,25 +416,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BlogIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/t/$slug': {
-      id: '/t/$slug'
-      path: '/t/$slug'
-      fullPath: '/t/$slug'
-      preLoaderRoute: typeof TSlugRouteImport
+    '/blog/$slug': {
+      id: '/blog/$slug'
+      path: '/blog/$slug'
+      fullPath: '/blog/$slug'
+      preLoaderRoute: typeof BlogSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/species/$id': {
-      id: '/species/$id'
-      path: '/species/$id'
-      fullPath: '/species/$id'
-      preLoaderRoute: typeof SpeciesIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/shops/$slug': {
-      id: '/shops/$slug'
-      path: '/shops/$slug'
-      fullPath: '/shops/$slug'
-      preLoaderRoute: typeof ShopsSlugRouteImport
+    '/guides/': {
+      id: '/guides/'
+      path: '/guides'
+      fullPath: '/guides/'
+      preLoaderRoute: typeof GuidesIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/guides/$slug': {
@@ -425,11 +437,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GuidesSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/blog/$slug': {
-      id: '/blog/$slug'
-      path: '/blog/$slug'
-      fullPath: '/blog/$slug'
-      preLoaderRoute: typeof BlogSlugRouteImport
+    '/shops/': {
+      id: '/shops/'
+      path: '/shops'
+      fullPath: '/shops/'
+      preLoaderRoute: typeof ShopsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/shops/$slug': {
+      id: '/shops/$slug'
+      path: '/shops/$slug'
+      fullPath: '/shops/$slug'
+      preLoaderRoute: typeof ShopsSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/species/': {
+      id: '/species/'
+      path: '/species'
+      fullPath: '/species/'
+      preLoaderRoute: typeof SpeciesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/species/$id': {
+      id: '/species/$id'
+      path: '/species/$id'
+      fullPath: '/species/$id'
+      preLoaderRoute: typeof SpeciesIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/t/$slug': {
+      id: '/t/$slug'
+      path: '/t/$slug'
+      fullPath: '/t/$slug'
+      preLoaderRoute: typeof TSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -439,6 +479,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AffiliateDisclosureRoute: AffiliateDisclosureRoute,
   AttributionRoute: AttributionRoute,
+  CalculatorRoute: CalculatorRoute,
   ContactRoute: ContactRoute,
   MethodologyRoute: MethodologyRoute,
   PrivacyRoute: PrivacyRoute,
@@ -446,6 +487,7 @@ const rootRouteChildren: RootRouteChildren = {
   SavedRoute: SavedRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,
+  VisualiserRoute: VisualiserRoute,
   WelfareDisclaimerRoute: WelfareDisclaimerRoute,
   BlogSlugRoute: BlogSlugRoute,
   GuidesSlugRoute: GuidesSlugRoute,

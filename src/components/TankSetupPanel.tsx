@@ -18,7 +18,7 @@ import type {
 import { BIOTOPE_LABEL } from "@/lib/types";
 import { litresOf } from "@/lib/scoring";
 import { useOutsideClick } from "@/hooks/useOutsideClick";
-import { adaptWaterToFirstSpecies } from "@/lib/defaults";
+
 import {
   Accordion,
   AccordionContent,
@@ -29,6 +29,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { StepId } from "@/components/BuilderSteps";
 
 interface Props {
+  sections?: StepId[];
   state: TankState;
   setState: (updater: (prev: TankState) => TankState) => void;
   species: Species[];
@@ -60,6 +61,7 @@ export function TankSetupPanel({
   filters,
   openSteps,
   setOpenSteps,
+  sections = ["tank","filter","livestock","aquascape"],
 }: Props) {
   const litres = Math.round(litresOf(state));
   const dimInvalid =
@@ -76,7 +78,7 @@ export function TankSetupPanel({
       onValueChange={(v) => setOpenSteps(v as StepId[])}
       className="space-y-2"
     >
-      <AccordionItem
+      {sections.includes("tank") && <AccordionItem
         value="tank"
         id="step-tank"
         className="rounded-2xl border bg-background/60 px-3 scroll-mt-20"
@@ -167,9 +169,9 @@ export function TankSetupPanel({
             />
           </label>
         </AccordionContent>
-      </AccordionItem>
+      </AccordionItem>}
 
-      <AccordionItem
+      {sections.includes("filter") && <AccordionItem
         value="filter"
         id="step-filter"
         className="rounded-2xl border bg-background/60 px-3"
@@ -342,9 +344,9 @@ export function TankSetupPanel({
             onChange={(v) => setState((s) => ({ ...s, maintenance_frequency: v }))}
           />
         </AccordionContent>
-      </AccordionItem>
+      </AccordionItem>}
 
-      <AccordionItem
+      {sections.includes("livestock") && <AccordionItem
         value="livestock"
         id="step-livestock"
         className="rounded-2xl border bg-background/60 px-3"
@@ -364,9 +366,9 @@ export function TankSetupPanel({
         <AccordionContent className="pb-3">
           <SpeciesAdder state={state} setState={setState} species={species} />
         </AccordionContent>
-      </AccordionItem>
+      </AccordionItem>}
 
-      <AccordionItem
+      {sections.includes("aquascape") && <AccordionItem
         value="aquascape"
         id="step-aquascape"
         className="rounded-2xl border bg-background/60 px-3"
@@ -408,7 +410,7 @@ export function TankSetupPanel({
             </TabsContent>
           </Tabs>
         </AccordionContent>
-      </AccordionItem>
+      </AccordionItem>}
     </Accordion>
   );
 }
@@ -533,7 +535,7 @@ function Segmented<T extends string>({
   );
 }
 
-function SpeciesAdder({
+export function SpeciesAdder({
   state,
   setState,
   species,
@@ -570,10 +572,10 @@ function SpeciesAdder({
           ),
         };
       }
-      const adaptedWater = adaptWaterToFirstSpecies(s, sp);
+
       return {
         ...s,
-        ...adaptedWater,
+
         species: [...s.species, { species: sp, quantity: sp.is_schooling ? sp.min_group_size : 1 }],
       };
     });
@@ -583,7 +585,7 @@ function SpeciesAdder({
 
   return (
     <section className="space-y-2">
-      <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Fish</h3>
+
       <div className="relative" ref={containerRef}>
         <Search
           className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
@@ -918,7 +920,7 @@ function QtyStepper({
         type="button"
         onClick={() => onChange(Math.max(0, value - 1))}
         aria-label={`Decrease quantity of ${itemLabel}`}
-        className="flex h-9 w-9 items-center justify-center rounded-lg border p-1 text-muted-foreground hover:bg-muted"
+        className="flex h-11 w-11 items-center justify-center rounded-lg border p-1 text-muted-foreground hover:bg-muted"
       >
         <Minus className="h-3.5 w-3.5" aria-hidden />
       </button>
@@ -929,7 +931,7 @@ function QtyStepper({
         type="button"
         onClick={() => onChange(value + 1)}
         aria-label={`Increase quantity of ${itemLabel}`}
-        className="rounded-lg border p-1 text-muted-foreground hover:bg-muted"
+        className="flex h-11 w-11 items-center justify-center rounded-lg border p-1 text-muted-foreground hover:bg-muted"
       >
         <Plus className="h-3.5 w-3.5" aria-hidden />
       </button>
@@ -937,7 +939,7 @@ function QtyStepper({
         type="button"
         onClick={onRemove}
         aria-label={`Remove ${itemLabel}`}
-        className="ml-1 flex h-9 w-9 items-center justify-center rounded-lg p-1 text-muted-foreground hover:bg-coral/15 hover:text-coral"
+        className="ml-1 flex h-11 w-11 items-center justify-center rounded-lg p-1 text-muted-foreground hover:bg-coral/15 hover:text-coral"
       >
         <X className="h-3.5 w-3.5" aria-hidden />
       </button>

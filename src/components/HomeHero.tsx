@@ -381,9 +381,9 @@ export function HomeHero() {
               Find fish that suit your tank, check who gets along and make room for them to thrive.
             </p>
             <div className="ft-hero-actions">
-              <a className="ft-hero-primary" href="#builder">
-                Plan my tank <span aria-hidden="true">↓</span>
-              </a>
+              <Link className="ft-hero-primary" to="/calculator">
+                Plan my tank <span aria-hidden="true">→</span>
+              </Link>
               <Link className="ft-hero-secondary" to="/species">
                 Explore the fish
               </Link>

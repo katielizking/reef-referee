@@ -14,7 +14,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "@/components/ui/sonner";
 import { BrandLogo } from "@/components/BrandLogo";
-import { WorkInProgressBanner } from "@/components/WorkInProgressBanner";
+import { TankDraftProvider } from "@/components/TankDraftProvider";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { supabase } from "@/integrations/supabase/client";
 import { absoluteUrl, SUPPORT_URL } from "@/lib/site";
@@ -157,28 +157,21 @@ function RootComponent() {
         await supabase.auth.signInAnonymously();
       }
       if (!cancelled) setAuthReady(true);
-    })();
+    })().catch(console.error);
     return () => {
       cancelled = true;
     };
   }, []);
 
-  if (!authReady) {
-    return (
-      <QueryClientProvider client={queryClient}>
-        <div className="min-h-screen" />
-      </QueryClientProvider>
-    );
-  }
 
   return (
     <QueryClientProvider client={queryClient}>
       <div className="site-shell flex min-h-screen flex-col bg-background/80">
         <SiteHeader />
-        <WorkInProgressBanner />
+
 
         <div className="flex-1">
-          <Outlet />
+          <TankDraftProvider><Outlet /></TankDraftProvider>
         </div>
 
         <SiteFooter />
@@ -189,14 +182,10 @@ function RootComponent() {
   );
 }
 
-const NAV_ITEMS: Array<{ to: string; label: string; exact?: boolean }> = [
-  { to: "/", label: "Builder", exact: true },
-  { to: "/quiz", label: "Quiz" },
-  { to: "/species", label: "Species" },
-  { to: "/guides", label: "Guides" },
-  { to: "/methodology", label: "How it works" },
-  { to: "/shops", label: "Shops" },
-  { to: "/blog", label: "Blog" },
+const NAV_ITEMS: Array<{ to: string; label: string; exact?: boolean; hash?: string }> = [
+  { to: "/calculator", label: "Calculator" },
+  { to: "/visualiser", label: "Visualiser" },
+  { to: "/species", label: "Fish library" },
   { to: "/saved", label: "My tanks" },
 ];
 
@@ -213,6 +202,7 @@ function SiteHeader() {
             <Link
               key={item.to}
               to={item.to}
+              hash={item.hash}
               className="rounded-md px-3 py-2 text-muted-foreground transition-colors hover:text-foreground"
               activeProps={{
                 className:
@@ -249,6 +239,7 @@ function SiteHeader() {
                 <Link
                   key={item.to}
                   to={item.to}
+              hash={item.hash}
                   onClick={() => setOpen(false)}
                   className="flex min-h-11 items-center rounded-xl px-3 text-ui-label font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                   activeProps={{
@@ -263,7 +254,7 @@ function SiteHeader() {
             </nav>
             <div className="border-t border-foreground/10 p-4 pb-[calc(env(safe-area-inset-bottom)+1rem)]">
               <Link
-                to="/"
+                to="/calculator"
                 onClick={() => setOpen(false)}
                 className="flex min-h-12 w-full items-center justify-center rounded-xl bg-primary px-4 text-ui-label font-semibold text-primary-foreground shadow-panel transition-colors hover:bg-primary/90"
               >
@@ -291,6 +282,7 @@ function SiteFooter() {
           </p>
         </div>
         <nav aria-label="Footer" className="flex flex-wrap gap-x-4 gap-y-2 text-xs text-white/60">
+          <Link to="/quiz">Fish quiz</Link><Link to="/guides">Guides</Link><Link to="/shops">Shops</Link><Link to="/blog">Blog</Link>
           <Link to="/species" className="transition-colors hover:text-white">
             Species
           </Link>
