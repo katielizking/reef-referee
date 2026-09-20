@@ -19,6 +19,7 @@ export type IssueCode =
   | "fin-nipping"
   | "fin-nipping-understocked"
   | "predation"
+  | "predation-risk"
   | "ph-no-overlap"
   | "ph-marginal"
   | "temp-no-overlap"
@@ -465,12 +466,19 @@ function scoreCompatibility(state: TankState): CompatibilitySubScore {
       nipPair(b, qb, a);
 
       // Predation. Judged on the smaller fish's adult size, which is the size it
-      // has to survive to reach.
-      const eats = (p: typeof a, prey: typeof a) =>
-        p.predatory && prey.adult_size_cm * 2.5 <= p.adult_size_cm;
-      if (eats(a, b) || eats(b, a)) {
-        const p = eats(a, b) ? a : b;
-        const prey = eats(a, b) ? b : a;
+      // has to survive to reach. Length alone overstates the risk: a fish can only
+      // swallow prey that fits its mouth, and many predatory fish are
+      // micropredators with small mouths. A critical "can swallow" warning needs
+      // an overwhelming size gap; a moderate gap is a caution, because young or
+      // newly introduced fish are the ones at real risk.
+      const gapRatio = (p: typeof a, prey: typeof a) =>
+        p.predatory ? p.adult_size_cm / prey.adult_size_cm : 0;
+      const ratioAB = gapRatio(a, b);
+      const ratioBA = gapRatio(b, a);
+      const maxRatio = Math.max(ratioAB, ratioBA);
+      if (maxRatio >= 4) {
+        const p = ratioAB >= ratioBA ? a : b;
+        const prey = ratioAB >= ratioBA ? b : a;
         add(
           "predation",
           "critical",
@@ -479,6 +487,16 @@ function scoreCompatibility(state: TankState): CompatibilitySubScore {
           `Remove ${prey.common_name}, or rehome ${p.common_name}.`,
         );
         criticalConflicts.push(`${p.common_name} → ${prey.common_name}`);
+      } else if (maxRatio >= 2.5) {
+        const p = ratioAB >= ratioBA ? a : b;
+        const prey = ratioAB >= ratioBA ? b : a;
+        add(
+          "predation-risk",
+          "medium",
+          15,
+          `${p.common_name} may see ${prey.common_name} as food, especially young or newly introduced fish.`,
+          `Watch the pair closely and give ${prey.common_name} plenty of dense cover to retreat into.`,
+        );
       }
 
       // Parameter overlap, with a margin. A single degree or a tenth of a pH

@@ -156,6 +156,63 @@ describe("scoreTank", () => {
     expect(score.capReason).not.toBeNull();
   });
 
+  it("does not accuse a small-mouthed predator of swallowing fish near its own size", () => {
+    // A betta is predatory but a micropredator: it cannot swallow a deep-bodied
+    // adult danio at a 2.8 length ratio. That gap is a caution, not a critical.
+    const micropredator = species({
+      id: "micropredator",
+      common_name: "Small-mouthed predator",
+      adult_size_cm: 7,
+      predatory: true,
+      temperament: "semi-aggressive",
+    });
+    const smallFish = species({
+      id: "small-fish",
+      common_name: "Small danio",
+      adult_size_cm: 2.5,
+      is_schooling: true,
+      min_group_size: 6,
+    });
+    const score = scoreTank(
+      tank({
+        species: [
+          { species: micropredator, quantity: 1 },
+          { species: smallFish, quantity: 6 },
+        ],
+      }),
+    );
+    expect(score.compatibility.issues.some((issue) => issue.code === "predation")).toBe(false);
+    expect(score.compatibility.criticalConflicts).toHaveLength(0);
+    expect(score.compatibility.issues.some((issue) => issue.code === "predation-risk")).toBe(true);
+  });
+
+  it("does not flag predation below the 2.5 length ratio", () => {
+    const predator = species({
+      id: "mild-predator",
+      common_name: "Mild predator",
+      adult_size_cm: 8,
+      predatory: true,
+    });
+    const tankMate = species({
+      id: "tank-mate",
+      common_name: "Similar-sized fish",
+      adult_size_cm: 4,
+    });
+    const score = scoreTank(
+      tank({
+        species: [
+          { species: predator, quantity: 1 },
+          { species: tankMate, quantity: 1 },
+        ],
+      }),
+    );
+    expect(
+      score.compatibility.issues.some(
+        (issue) => issue.code === "predation" || issue.code === "predation-risk",
+      ),
+    ).toBe(false);
+  });
+
   it("scores the selected water against every fish", () => {
     const softWaterFish = species({
       id: "soft",
