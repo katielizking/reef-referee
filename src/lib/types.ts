@@ -145,6 +145,27 @@ export interface Filter {
   biological_media_level: BiologicalMediaLevel;
 }
 
+/** Tank outline. Dimensions are always the bounding box of the glass. */
+export type TankShape = "rectangle" | "cube" | "bowfront" | "corner" | "column";
+
+export type Substrate = "bare" | "sand" | "fine_gravel" | "gravel" | "planted_soil";
+
+export const TANK_SHAPE_LABEL: Record<TankShape, string> = {
+  rectangle: "Rectangle",
+  cube: "Cube",
+  bowfront: "Bowfront",
+  corner: "Corner",
+  column: "Column",
+};
+
+export const SUBSTRATE_LABEL: Record<Substrate, string> = {
+  bare: "Bare glass",
+  sand: "Sand",
+  fine_gravel: "Fine gravel",
+  gravel: "Gravel",
+  planted_soil: "Planted soil",
+};
+
 export interface TankRow {
   id: string;
   session_id: string;
@@ -168,6 +189,11 @@ export interface TankRow {
   target_ph: number;
   target_temp_c: number;
   plant_density: PlantDensity;
+  tank_shape: TankShape;
+  substrate: Substrate;
+  has_heater: boolean;
+  has_light: boolean;
+  has_co2: boolean;
   created_at: string;
 }
 
