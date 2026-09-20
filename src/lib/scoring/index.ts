@@ -574,7 +574,58 @@ function scoreCompatibility(state: TankState): CompatibilitySubScore {
 
 // ============== 2. CYCLE & BIOFILTER READINESS ==============
 
+/**
+ * A tank can run more than one filter. Media adds up, maturity does not: the
+ * biofilter is only as ready as the least mature media carrying the load, and
+ * the best media level present is the one bacteria can actually colonise.
+ */
+export function combinedFiltration(state: TankState): {
+  hasFilter: boolean;
+  biological_media_level: TankState["biological_media_level"];
+  filter_maturity: TankState["filter_maturity"];
+  turnover_lph: number;
+  count: number;
+} {
+  const slots = [
+    ...(state.filter
+      ? [
+          {
+            filter: state.filter,
+            biological_media_level: state.biological_media_level,
+            filter_maturity: state.filter_maturity,
+          },
+        ]
+      : []),
+    ...(state.extra_filters ?? []),
+  ];
+  if (slots.length === 0) {
+    return {
+      hasFilter: false,
+      biological_media_level: state.biological_media_level,
+      filter_maturity: state.filter_maturity,
+      turnover_lph: 0,
+      count: 0,
+    };
+  }
+  const mediaRank = { minimal: 0, standard: 1, substantial: 2 } as const;
+  const maturityRank = { new: 0, maturing: 1, unknown: 2, established: 3 } as const;
+  const media = slots.reduce((best, s) =>
+    mediaRank[s.biological_media_level] > mediaRank[best.biological_media_level] ? s : best,
+  );
+  const maturity = slots.reduce((worst, s) =>
+    maturityRank[s.filter_maturity] < maturityRank[worst.filter_maturity] ? s : worst,
+  );
+  return {
+    hasFilter: true,
+    biological_media_level: media.biological_media_level,
+    filter_maturity: maturity.filter_maturity,
+    turnover_lph: slots.reduce((n, s) => n + s.filter.turnover_lph, 0),
+    count: slots.length,
+  };
+}
+
 function scoreReadiness(state: TankState): Scorecard["readiness"] {
+  const filtration = combinedFiltration(state);
   const issues: Issue[] = [];
   const add = (
     code: IssueCode,
@@ -603,7 +654,7 @@ function scoreReadiness(state: TankState): Scorecard["readiness"] {
     );
   }
 
-  if (!state.filter) {
+  if (!filtration.hasFilter) {
     add(
       "no-filter",
       "critical",
@@ -612,26 +663,26 @@ function scoreReadiness(state: TankState): Scorecard["readiness"] {
       "Choose a filter and let its biological media mature before adding fish.",
     );
   }
-  if (state.biological_media_level === "minimal") {
+  if (filtration.biological_media_level === "minimal") {
     add(
       "no-biological-media",
       "high",
       35,
-      "This filter has very little biological media for beneficial bacteria to live on.",
+      "Your filtration has very little biological media for beneficial bacteria to live on.",
       "Add suitable biological media and give it time to mature before adding fish.",
     );
   }
-  if (state.filter_maturity === "new" || state.filter_maturity === "maturing") {
+  if (filtration.filter_maturity === "new" || filtration.filter_maturity === "maturing") {
     add(
       "filter-not-mature",
       "critical",
       55,
-      state.filter_maturity === "new"
+      filtration.filter_maturity === "new"
         ? "The filter media is new, so its biofilter is not established yet."
         : "The biofilter is still maturing.",
       "Keep cycling and use water tests, rather than time alone, to decide when it is ready.",
     );
-  } else if (state.filter_maturity === "unknown") {
+  } else if (filtration.filter_maturity === "unknown") {
     add(
       "filter-not-mature",
       "high",
@@ -696,8 +747,8 @@ function scoreReadiness(state: TankState): Scorecard["readiness"] {
   } else if (
     state.cycle_status === "not_started" ||
     state.cycle_status === "cycling" ||
-    state.filter_maturity === "new" ||
-    state.filter_maturity === "maturing"
+    filtration.filter_maturity === "new" ||
+    filtration.filter_maturity === "maturing"
   ) {
     status = "cycling";
   } else if (issues.length > 0) {
