@@ -1,6 +1,6 @@
 import { Link, useSearch } from "@tanstack/react-router";
 import { lazy, Suspense, useEffect, useMemo, useState } from "react";
-import { Fish, ImageDown, Loader2, Ruler, Save, Share2, Waves } from "lucide-react";
+import { Fish, ImageDown, Loader2, Printer, Ruler, Save, Share2, Waves } from "lucide-react";
 import { toast } from "sonner";
 
 import { TankSetupPanel, SpeciesAdder } from "@/components/TankSetupPanel";
@@ -8,6 +8,7 @@ import { type StepId } from "@/components/BuilderSteps";
 import { useTankHistory } from "@/components/tank3d/useTankHistory";
 import { useEditorStore } from "@/components/tank3d/editorStore";
 import { ScorecardPanel } from "@/components/Scorecard";
+import { TankReport } from "@/components/TankReport";
 import { PreStockChecklist, useSaveGate } from "@/components/PreStockChecklist";
 import { scoreTank } from "@/lib/scoring";
 
