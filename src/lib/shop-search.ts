@@ -89,7 +89,11 @@ export function shipsTo(shop: ShopDirectoryEntry, place: Place | null): boolean 
 
 export function deliveryLabel(shop: ShopDirectoryEntry): string {
   if (shop.pickup_only || !shop.sells_online) return "In store only";
-  if (!shop.ships_live_fish) return "Ships dry goods only";
+  if (!shop.ships_live_fish) {
+    return shop.delivery_reviewed_on
+      ? "Ships dry goods only"
+      : "Live fish delivery not confirmed";
+  }
   const countries = shop.ships_to_countries;
   if (countries.length === 0) return "Ships live fish";
   if (countries.length === 1) return `Ships live fish within ${countries[0]}`;
