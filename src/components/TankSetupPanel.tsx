@@ -103,7 +103,9 @@ export function TankSetupPanel({
             summary={
               dimInvalid
                 ? `Set each side ≥ ${displayLength(MIN_DIM, units)} ${lengthLabel(units)}`
-                : `${volume} · pH ${state.target_ph.toFixed(1)} · ${state.target_temp_c}°C`
+                : visualOnly
+                  ? volume
+                  : `${volume} · pH ${state.target_ph.toFixed(1)} · ${state.target_temp_c}°C`
             }
           />
         </AccordionTrigger>

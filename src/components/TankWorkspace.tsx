@@ -240,7 +240,7 @@ export function TankWorkspace({ visualiser = false }: { visualiser?: boolean }) 
             <p className="text-sm text-muted-foreground" role="status">{storageStatus}</p>
           </div>
           <div className="grid grid-cols-3 gap-2 sm:flex sm:flex-wrap">
-            {!visualiser && <button
+            <button
               onClick={() => handleSave(false)}
               disabled={saving || state.species.length === 0}
               title={state.species.length === 0 ? "Add fish to save" : undefined}
@@ -248,8 +248,8 @@ export function TankWorkspace({ visualiser = false }: { visualiser?: boolean }) 
             >
               {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
               Save
-            </button>}
-            {!visualiser && <button
+            </button>
+            <button
               onClick={() => handleSave(true)}
               disabled={saving || state.species.length === 0}
               title={state.species.length === 0 ? "Add fish to share" : undefined}
@@ -257,8 +257,8 @@ export function TankWorkspace({ visualiser = false }: { visualiser?: boolean }) 
             >
               <Share2 className="h-4 w-4" />
               Share
-            </button>}
-            <button
+            </button>
+            {!visualiser && <button
               onClick={() =>
                 void shareScoreCard(scorecard, state)
                   .then((result) =>
@@ -282,8 +282,8 @@ export function TankWorkspace({ visualiser = false }: { visualiser?: boolean }) 
             >
               <ImageDown className="h-4 w-4" />
               Card
-            </button>
-            <button
+            </button>}
+            {!visualiser && <button
               onClick={() => window.print()}
               disabled={state.species.length === 0}
               title={
@@ -295,7 +295,7 @@ export function TankWorkspace({ visualiser = false }: { visualiser?: boolean }) 
             >
               <Printer className="h-4 w-4" />
               Print
-            </button>
+            </button>}
           </div>
         </div>
         {loadError || catalogError ? <div role="alert" className="planner-error">
