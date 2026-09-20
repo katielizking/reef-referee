@@ -132,13 +132,6 @@ export function ScorecardPanel({
       {/* Instrument panel */}
       <div className="fishtankr-panel px-5 py-2">
         <ScoreRow
-          title="Cycle and filter"
-          statusLabel={s.readiness.status}
-          tag="Safety gate"
-          issues={s.readiness.issues}
-          reasons={s.readiness.reasons}
-        />
-        <ScoreRow
           title="Tank mates"
           score={s.compatibility.score}
           weightPct={Math.round(WEIGHTS.compatibility * 100)}
@@ -248,10 +241,22 @@ export function ScorecardPanel({
         )}
       </div>
 
+      <div className="fishtankr-panel p-5">
+        <p className="science-label text-muted-foreground">Cycling · tracked separately</p>
+        <p className="mt-2 text-sm text-muted-foreground">
+          This score assumes the tank is already cycled. Log your ammonia, nitrite and nitrate
+          results in the{" "}
+          <Link to="/tracker" className="font-semibold text-water underline">
+            tank tracker
+          </Link>{" "}
+          to check that before you buy fish.
+        </p>
+      </div>
+
       {s.overall !== null && (
         <p className="text-sm text-muted-foreground">
-          The score checks tank mates, swimming room and water. An unverified cycle can cap it.
-          Waste load is beta and does not affect it.{" "}
+          The score checks tank mates, swimming room and water. Waste load is beta and does not
+          affect it.{" "}
           <Link to="/methodology" className="font-semibold text-water underline">
             How scoring works.
           </Link>{" "}

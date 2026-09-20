@@ -27,7 +27,6 @@ export function recordScoreEvent(scorecard: Scorecard) {
         ? "risky"
         : "safe";
   const issueCodes = [
-    ...scorecard.readiness.issues,
     ...scorecard.compatibility.issues,
     ...(scorecard.space.issues ?? []),
     ...(scorecard.water.issues ?? []),

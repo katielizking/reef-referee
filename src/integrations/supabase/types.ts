@@ -756,6 +756,54 @@ export type Database = {
           },
         ]
       }
+      tracked_tanks: {
+        Row: {
+          biological_media_level: string
+          created_at: string
+          cycle_method: string
+          cycle_status: string
+          filter_maturity: string
+          id: string
+          litres: number | null
+          name: string
+          notes: string | null
+          seeded_media: boolean
+          tank_age_weeks: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          biological_media_level?: string
+          created_at?: string
+          cycle_method?: string
+          cycle_status?: string
+          filter_maturity?: string
+          id?: string
+          litres?: number | null
+          name: string
+          notes?: string | null
+          seeded_media?: boolean
+          tank_age_weeks?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          biological_media_level?: string
+          created_at?: string
+          cycle_method?: string
+          cycle_status?: string
+          filter_maturity?: string
+          id?: string
+          litres?: number | null
+          name?: string
+          notes?: string | null
+          seeded_media?: boolean
+          tank_age_weeks?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       waitlist_signups: {
         Row: {
           created_at: string
@@ -773,6 +821,56 @@ export type Database = {
           source?: string
         }
         Relationships: []
+      }
+      water_tests: {
+        Row: {
+          ammonia_mg_l: number | null
+          created_at: string
+          id: string
+          nitrate_mg_l: number | null
+          nitrite_mg_l: number | null
+          note: string | null
+          ph: number | null
+          tank_id: string
+          temp_c: number | null
+          tested_on: string
+          user_id: string
+        }
+        Insert: {
+          ammonia_mg_l?: number | null
+          created_at?: string
+          id?: string
+          nitrate_mg_l?: number | null
+          nitrite_mg_l?: number | null
+          note?: string | null
+          ph?: number | null
+          tank_id: string
+          temp_c?: number | null
+          tested_on?: string
+          user_id: string
+        }
+        Update: {
+          ammonia_mg_l?: number | null
+          created_at?: string
+          id?: string
+          nitrate_mg_l?: number | null
+          nitrite_mg_l?: number | null
+          note?: string | null
+          ph?: number | null
+          tank_id?: string
+          temp_c?: number | null
+          tested_on?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "water_tests_tank_id_fkey"
+            columns: ["tank_id"]
+            isOneToOne: false
+            referencedRelation: "tracked_tanks"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {

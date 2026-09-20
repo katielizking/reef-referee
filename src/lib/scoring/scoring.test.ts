@@ -210,7 +210,10 @@ describe("scoreTank", () => {
     expect(b.bioload.loadPercent).toBe(a.bioload.loadPercent);
   });
 
-  it("caps an unverified cycle even when the species plan is otherwise healthy", () => {
+  // Cycling moved to the tank tracker, which scores the water in a real tank.
+  // The stocking plan still reports readiness, but no longer caps its own score
+  // on it: a plan is judged on the fish, the room and the water targets.
+  it("still reports an unverified cycle without capping the plan", () => {
     const score = scoreTank(
       tank({
         cycle_status: "unknown",
@@ -221,8 +224,8 @@ describe("scoreTank", () => {
       }),
     );
     expect(score.readiness.status).toBe("unverified");
-    expect(score.overall!).toBeLessThanOrEqual(60);
-    expect(score.priorityAction?.category).toBe("readiness");
+    expect(score.capReason).toBeNull();
+    expect(score.priorityAction?.category).not.toBe("readiness");
   });
 
   it("does not accept old zero readings as current cycle evidence", () => {
@@ -234,7 +237,6 @@ describe("scoreTank", () => {
     );
     expect(score.readiness.status).toBe("unverified");
     expect(score.readiness.issues.some((issue) => issue.code === "water-test-stale")).toBe(true);
-    expect(score.overall!).toBeLessThanOrEqual(60);
   });
 
   it("uses a bounded, explicit water-test freshness window", () => {
@@ -244,14 +246,14 @@ describe("scoreTank", () => {
     expect(WATER_TEST_MAX_AGE_DAYS).toBe(7);
   });
 
-  it("treats detectable ammonia as an immediate stop signal", () => {
+  it("still flags detectable ammonia as a stop signal, reported not scored", () => {
     const score = scoreTank(
       tank({ ammonia_mg_l: 0.25, species: [{ species: tetra, quantity: 8 }] }),
     );
     expect(score.readiness.status).toBe("unsafe");
     expect(score.readiness.issues.some((issue) => issue.code === "ammonia-detected")).toBe(true);
-    expect(score.overall!).toBeLessThanOrEqual(25);
-    expect(score.capReason).toMatch(/ammonia or nitrite/i);
+    // The plan is not capped for it; the tank tracker owns the stop signal now.
+    expect(score.capReason).toBeNull();
   });
 
   it("keeps regional catalogue status out of welfare scoring", () => {

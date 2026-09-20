@@ -12,7 +12,6 @@ const SEVERITY_ORDER: Issue["severity"][] = ["critical", "high", "medium", "low"
 
 function allIssues(s: Scorecard): Issue[] {
   return [
-    ...s.readiness.issues,
     ...s.compatibility.issues,
     ...(s.space.issues ?? []),
     ...(s.water.issues ?? []),
@@ -60,7 +59,7 @@ export function TankReport({ scorecard, state }: { scorecard: Scorecard; state: 
         <li>
           Filters: {filtration.count || "none chosen"}
           {filtration.count > 0 &&
-            ` · ${filtration.biological_media_level} media · ${filtration.filter_maturity} · ${Math.round(filtration.turnover_lph)} L/h total flow`}
+            ` · ${filtration.biological_media_level} media · ${Math.round(filtration.turnover_lph)} L/h total flow`}
         </li>
         <li>
           Planned water: pH {state.target_ph} · {state.target_temp_c} °C
@@ -68,7 +67,6 @@ export function TankReport({ scorecard, state }: { scorecard: Scorecard; state: 
         <li>
           Planting: {state.plant_density} · maintenance {state.maintenance_frequency}
         </li>
-        <li>Cycle: {scorecard.readiness.status.replace("-", " ")}</li>
         <li>
           Substrate: {SUBSTRATE_LABEL[state.substrate ?? "gravel"]} · heater{" "}
           {(state.has_heater ?? true) ? "yes" : "no"} · light{" "}

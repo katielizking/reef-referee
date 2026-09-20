@@ -209,22 +209,8 @@ export function scoreTank(state: TankState): Scorecard {
       reason: "The score is limited by a serious welfare problem. Fix the top issue first.",
     });
   }
-  if (readiness.status === "unsafe") {
-    caps.push({
-      cap: 25,
-      reason: "The score is limited because ammonia or nitrite is present. Do not add fish.",
-    });
-  } else if (readiness.status === "cycling") {
-    caps.push({
-      cap: 35,
-      reason: "The score is limited because the tank or filter is still cycling.",
-    });
-  } else if (readiness.status === "unverified") {
-    caps.push({
-      cap: 60,
-      reason: "The score is limited until current water tests confirm that the biofilter is ready.",
-    });
-  }
+  // Cycling and biofilter readiness are tracked per real tank in the parameter
+  // tracker, not in the stocking plan, so they no longer cap the plan's score.
 
   let overall = weighted;
   let capReason: string | null = null;
@@ -257,16 +243,6 @@ export function scoreTank(state: TankState): Scorecard {
 function choosePriorityAction(
   scores: Pick<Scorecard, "readiness" | "compatibility" | "bioload" | "space" | "water" | "biome">,
 ): PriorityAction | null {
-  if (scores.readiness.status === "unsafe") {
-    const issue = scores.readiness.issues[0];
-    return {
-      severity: "critical",
-      category: "readiness",
-      title: "Do not add fish to this water",
-      action:
-        issue?.fix ?? "Find the cause of the ammonia or nitrite, then retest before adding fish.",
-    };
-  }
   const critical = scores.compatibility.issues.find((i) => i.severity === "critical");
   if (critical) {
     return {
@@ -274,20 +250,6 @@ function choosePriorityAction(
       category: "compatibility",
       title: "Fix this before you buy anything",
       action: critical.fix,
-    };
-  }
-  if (scores.readiness.status !== "ready") {
-    const issue = scores.readiness.issues[0];
-    return {
-      severity: "critical",
-      category: "readiness",
-      title:
-        scores.readiness.status === "cycling"
-          ? "Finish cycling before adding fish"
-          : "Check the cycle before adding fish",
-      action:
-        issue?.fix ??
-        "Use current ammonia and nitrite tests to confirm that the biofilter is ready.",
     };
   }
   if (scores.water.score < 70 && scores.water.fixes.length > 0) {
