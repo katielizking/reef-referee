@@ -83,7 +83,7 @@ function TrackerPage() {
         <header className="planner-heading">
           <div>
             <p className="planner-eyebrow">TANK TRACKER</p>
-            <h2>Keep an eye on your water.</h2>
+            <h1>Keep an eye on your water.</h1>
             <p className="mt-2 max-w-prose text-sm text-muted-foreground">
               Cycling and water tests live here, not in the stocking calculator. Add a tank, log
               each test, and see whether it is safe to add fish.

@@ -32,7 +32,7 @@ export function LocationPicker({ location, shops }: Props) {
         <button
           type="button"
           onClick={askBrowser}
-          className="inline-flex min-h-9 items-center gap-1.5 border-2 border-ink px-2.5 text-xs font-semibold text-foreground hover:bg-muted"
+          className="inline-flex min-h-11 items-center gap-1.5 border-2 border-ink px-3 text-xs font-semibold text-foreground hover:bg-muted"
         >
           <Crosshair className="h-3.5 w-3.5" aria-hidden />
           {status === "asking" ? "Checking…" : "Use my location"}
@@ -57,7 +57,7 @@ export function LocationPicker({ location, shops }: Props) {
             onChange={(e) =>
               setPlace(e.target.value ? { country: e.target.value, region: null } : null)
             }
-            className="min-h-10 border-2 border-ink bg-paper px-2 text-sm text-foreground"
+            className="min-h-11 border-2 border-ink bg-paper px-2 text-sm text-foreground"
           >
             <option value="">Choose a country</option>
             {countries.map((c) => (
@@ -75,7 +75,7 @@ export function LocationPicker({ location, shops }: Props) {
               onChange={(e) =>
                 setPlace({ country: place.country, region: e.target.value || null })
               }
-              className="min-h-10 border-2 border-ink bg-paper px-2 text-sm text-foreground"
+              className="min-h-11 border-2 border-ink bg-paper px-2 text-sm text-foreground"
             >
               <option value="">Anywhere in {countryName(place.country)}</option>
               {regions.map((r) => (

@@ -146,7 +146,7 @@ function TrackedTankPage() {
         <header className="planner-heading">
           <div>
             <p className="planner-eyebrow">TANK PARAMETERS</p>
-            <h2>{tank.data.name}</h2>
+            <h1>{tank.data.name}</h1>
             <p className="data-mono mt-1 text-xs uppercase tracking-[0.14em] text-muted-foreground">
               {tank.data.litres ? `${tank.data.litres} L · ` : ""}
               {rows.length} {rows.length === 1 ? "test" : "tests"} logged
@@ -300,7 +300,7 @@ function TrackedTankPage() {
                           type="button"
                           aria-label={`Remove the test from ${row.tested_on}`}
                           onClick={() => removeTest.mutate(row.id)}
-                          className="text-muted-foreground hover:text-foreground"
+                          className="inline-flex size-11 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground"
                         >
                           <Trash2 className="h-4 w-4" />
                         </button>

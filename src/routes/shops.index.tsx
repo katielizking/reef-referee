@@ -185,7 +185,9 @@ function ShopsIndex() {
       </div>
 
       <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center">
+        <label htmlFor="shop-search" className="sr-only">Search shop name, city or specialty</label>
         <input
+          id="shop-search"
           type="search"
           placeholder="Search shop name, city or specialty"
           value={text}
