@@ -1,6 +1,7 @@
 import type { Issue, Scorecard } from "@/lib/scoring";
 import { combinedFiltration } from "@/lib/scoring";
 import type { TankState } from "@/lib/types";
+import { SUBSTRATE_LABEL, TANK_SHAPE_LABEL } from "@/lib/types";
 import { welfareVerdictFor } from "@/lib/welfare-verdict";
 import { waterChangeGuidance } from "@/lib/water-change";
 import { checkInvertebrates } from "@/lib/invert-check";
