@@ -48,7 +48,9 @@ function SearchLink({ shop, fish }: { shop: ShopDirectoryEntry; fish: string }) 
       href={url}
       target="_blank"
       rel="noopener noreferrer"
-      onClick={() => recordShopOutbound(shop.id, fish && hasShopSearch(shop) ? "search" : "website")}
+      onClick={() =>
+        recordShopOutbound(shop.id, fish && hasShopSearch(shop) ? "search" : "website")
+      }
       className="inline-flex items-center gap-1 font-semibold text-primary hover:underline"
     >
       {fish && hasShopSearch(shop) ? `Search for ${fish}` : "Website"}
@@ -126,7 +128,8 @@ function ShopsIndex() {
     return shops.filter((s) => {
       if (!isNearby(s, place) && !shipsTo(s, place)) return false;
       if (q) {
-        const hay = `${s.name} ${s.city ?? ""} ${s.region ?? ""} ${countryName(s.country_code)} ${s.specialties.join(" ")}`.toLowerCase();
+        const hay =
+          `${s.name} ${s.city ?? ""} ${s.region ?? ""} ${countryName(s.country_code)} ${s.specialties.join(" ")}`.toLowerCase();
         if (!hay.includes(q)) return false;
       }
       return true;
@@ -144,7 +147,9 @@ function ShopsIndex() {
 
   return (
     <main className="mx-auto max-w-5xl px-3 py-6 sm:px-4 sm:py-10">
-      <h1 className="font-display text-4xl font-bold text-foreground">Independent aquarium shops</h1>
+      <h1 className="font-display text-4xl font-bold text-foreground">
+        Independent aquarium shops
+      </h1>
       <p className="mt-2 max-w-2xl text-muted-foreground">
         A free directory of independently owned shops around the world. No chains, no paid
         placements, nobody pays to be listed.
@@ -252,8 +257,8 @@ function ShopsIndex() {
 
       <div className="mt-4 flex flex-col gap-3 border-4 border-ink bg-paper p-4 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-sm text-muted-foreground">
-          <strong className="text-foreground">Before you buy:</strong> check the fish suits your tank
-          and the fish already in it.
+          <strong className="text-foreground">Before you buy:</strong> check the fish suits your
+          tank and the fish already in it.
         </p>
         <Link
           to="/calculator"

@@ -166,7 +166,8 @@ export function cycleVerdict(
 export function nitrateNote(latest: WaterTest | null): string | null {
   const nitrate = latest?.nitrate_mg_l ?? null;
   if (nitrate === null) return null;
-  if (nitrate >= 80) return "Nitrate is very high. Do a water change now, then again in a few days.";
+  if (nitrate >= 80)
+    return "Nitrate is very high. Do a water change now, then again in a few days.";
   if (nitrate >= 40) return "Nitrate is climbing. Change more water, or change it more often.";
   return "Nitrate is in a normal range for a stocked tank.";
 }

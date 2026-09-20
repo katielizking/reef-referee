@@ -86,17 +86,17 @@ Best for: a quick second read on a simple community.
 
 ## The short version
 
-| Tool | Water | Species listed | Inverts | Units | Cost |
-|---|---|---|---|---|---|
-| FishTankr | Fresh | 201 fish, 31 inverts | Yes | Metric or US | Free |
-| Aquapacity | Fresh and salt | Not published | Yes | Both | Free |
-| App-aquatic | Fresh | 763 | Not stated | Metric or US | Free |
-| Fish That Fit | Fresh and salt | Not published | Yes | Both | Free |
-| AquaStream | Fresh | 600 plus | Not stated | Metric or US | Free |
-| aquariumstocking.com | Fresh | 209 | Not stated | Gallons led | Free |
-| FishComfort | Fresh and salt | Not published | Yes | Both | Free |
-| aquariumcalculator.app | Fresh and salt | 50 profiles | Some snails | Metric and both gallons | Free |
-| Tankstocker | Fresh | Not published | Not stated | Not stated | Free |
+| Tool                   | Water          | Species listed       | Inverts     | Units                   | Cost |
+| ---------------------- | -------------- | -------------------- | ----------- | ----------------------- | ---- |
+| FishTankr              | Fresh          | 201 fish, 31 inverts | Yes         | Metric or US            | Free |
+| Aquapacity             | Fresh and salt | Not published        | Yes         | Both                    | Free |
+| App-aquatic            | Fresh          | 763                  | Not stated  | Metric or US            | Free |
+| Fish That Fit          | Fresh and salt | Not published        | Yes         | Both                    | Free |
+| AquaStream             | Fresh          | 600 plus             | Not stated  | Metric or US            | Free |
+| aquariumstocking.com   | Fresh          | 209                  | Not stated  | Gallons led             | Free |
+| FishComfort            | Fresh and salt | Not published        | Yes         | Both                    | Free |
+| aquariumcalculator.app | Fresh and salt | 50 profiles          | Some snails | Metric and both gallons | Free |
+| Tankstocker            | Fresh          | Not published        | Not stated  | Not stated              | Free |
 
 ## What none of them can do for you
 

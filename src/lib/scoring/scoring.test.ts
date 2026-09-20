@@ -8,6 +8,44 @@ import {
 } from "./index";
 import type { BiotopeRegion, Filter, Species, TankState } from "../types";
 
+describe("pea puffer group care", () => {
+  const puffer = () =>
+    species({
+      id: "pea",
+      common_name: "Pea puffer",
+      scientific_name: "Carinotetraodon travancoricus",
+      temperament: "aggressive",
+      is_schooling: false,
+      min_group_size: 1,
+    });
+  it("recognises group care even in an old saved species snapshot", () => {
+    const s = scoreTank(
+      tank({ plant_density: "heavy", species: [{ species: puffer(), quantity: 6 }] }),
+    );
+    expect(s.compatibility.issues.some((i) => i.code === "conspecific-aggression")).toBe(false);
+    expect(s.compatibility.issues.some((i) => i.code === "aggression-standing")).toBe(true);
+    expect(s.compatibility.fixes.join(" ")).not.toMatch(/keep a single/i);
+  });
+  it("warns for a solitary fish and partial groups without recommending isolation", () => {
+    for (const quantity of [1, 2, 3, 5]) {
+      const s = scoreTank(tank({ species: [{ species: puffer(), quantity }] }));
+      expect(s.compatibility.issues.some((i) => i.code === "shoal-shortfall")).toBe(true);
+      expect(s.compatibility.fixes.join(" ")).not.toMatch(/keep a single/i);
+    }
+  });
+  it("does not approve a full group in an undersized tank", () => {
+    const s = scoreTank(
+      tank({
+        length_cm: 40,
+        width_cm: 25,
+        height_cm: 30,
+        species: [{ species: puffer(), quantity: 6 }],
+      }),
+    );
+    expect(s.compatibility.issues.some((i) => i.code === "tank-too-small")).toBe(true);
+  });
+});
+
 function species(
   overrides: Partial<Species> & {
     id: string;

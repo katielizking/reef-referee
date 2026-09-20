@@ -82,31 +82,31 @@ export function CompatibleSuggestions({
       ) : (
         <ul className="mt-3 space-y-3">
           {suggestions.map(({ species: sp, reason, groupNote }) => (
-          <li key={sp.id} className="border-t border-rule pt-3 first:border-t-0 first:pt-0">
-            <div className="flex items-baseline justify-between gap-3">
-              <p className="text-sm font-semibold text-foreground">
-                {sp.common_name}{" "}
-                <span className="sci-name font-normal text-muted-foreground">
-                  {sp.scientific_name}
-                </span>
-              </p>
-              <Button
-                type="button"
-                onClick={() => add(sp)}
-                variant="outline"
-                size="sm"
-                className="shrink-0"
-              >
-                <Plus className="h-3.5 w-3.5" aria-hidden />
-                Add
-              </Button>
-            </div>
-            <p className="mt-1 text-sm text-muted-foreground">{reason}</p>
-            {groupNote && <p className="text-sm text-muted-foreground">{groupNote}</p>}
-            <Link to="/species/$id" params={{ id: sp.id }} className="planner-text-link">
-              Read its care notes →
-            </Link>
-          </li>
+            <li key={sp.id} className="border-t border-rule pt-3 first:border-t-0 first:pt-0">
+              <div className="flex items-baseline justify-between gap-3">
+                <p className="text-sm font-semibold text-foreground">
+                  {sp.common_name}{" "}
+                  <span className="sci-name font-normal text-muted-foreground">
+                    {sp.scientific_name}
+                  </span>
+                </p>
+                <Button
+                  type="button"
+                  onClick={() => add(sp)}
+                  variant="outline"
+                  size="sm"
+                  className="shrink-0"
+                >
+                  <Plus className="h-3.5 w-3.5" aria-hidden />
+                  Add
+                </Button>
+              </div>
+              <p className="mt-1 text-sm text-muted-foreground">{reason}</p>
+              {groupNote && <p className="text-sm text-muted-foreground">{groupNote}</p>}
+              <Link to="/species/$id" params={{ id: sp.id }} className="planner-text-link">
+                Read its care notes →
+              </Link>
+            </li>
           ))}
         </ul>
       )}

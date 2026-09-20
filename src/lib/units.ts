@@ -50,9 +50,7 @@ export function formatLength(cm: number, system: UnitSystem) {
 }
 
 export function formatVolume(litres: number, system: UnitSystem) {
-  return system === "us"
-    ? `${Math.round(litresToGallons(litres))} gal`
-    : `${Math.round(litres)} L`;
+  return system === "us" ? `${Math.round(litresToGallons(litres))} gal` : `${Math.round(litres)} L`;
 }
 
 // ---- shared preference, no provider needed ----
@@ -95,10 +93,6 @@ function subscribe(fn: () => void) {
 
 /** Current display units. Server render and first paint are always metric. */
 export function useUnitSystem(): [UnitSystem, (next: UnitSystem) => void] {
-  const system = useSyncExternalStore(
-    subscribe,
-    snapshot,
-    () => "metric" as UnitSystem,
-  );
+  const system = useSyncExternalStore(subscribe, snapshot, () => "metric" as UnitSystem);
   return [system, setUnitSystem];
 }

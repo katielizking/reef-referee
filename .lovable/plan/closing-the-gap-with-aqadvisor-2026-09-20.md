@@ -26,21 +26,25 @@ Confirmed by reading the current data model and scoring engine.
 ## Plan, in order of what wins the most users per unit of work
 
 ### Phase 1 — Stop losing people at the front door
+
 - **Units toggle.** Litres and centimetres, or gallons and inches, remembered per person. Conversion at the display layer only; scoring stays metric.
 - **Multiple filters.** Tanks hold a list of filters rather than one, each with its own media level and maturity. Readiness reads the combined media; flow is reported, never treated as filtration.
 - **"Fish not listed" capture.** A short form on the livestock search when a search returns nothing, so we learn which species to research next. Never auto-creates a species row.
 
 ### Phase 2 — Give people the numbers they came for
+
 - **Water change guidance.** A recommended weekly percentage and a plain sentence, derived from stocking level, plant density and filtration, shown beside maintenance frequency.
 - **Stocking level, surfaced honestly.** Show the load percentage and band in the scorecard with a clear "screen, not a verdict" label, still excluded from the overall score.
 - **Print and share report.** A print stylesheet plus a one-page summary of tank, stock list, verdict, issues and shopping actions, reachable from the scorecard and from a shared link.
 
 ### Phase 3 — Coverage
+
 - **Invertebrates.** Shrimp, snails and crayfish added as their own catalogue with their own compatibility rules: fish that eat shrimp, crayfish that eat fish, copper and temperature limits. Sourced and cited like every other row.
 - **Species expansion in reviewed batches.** Target the fish beginners actually search for, in batches of roughly 25, each batch shipping FishBase size and range plus Seriously Fish husbandry, with source, review date and confidence, and shipping as a migration.
 - **Compatible-species suggestions.** For the current plan, a short list of species that clear every compatibility, space and water rule, with the reason each fits. No quantities suggested.
 
 ### Phase 4 — Physical accuracy
+
 - **Tank shapes.** Bowfront, cube, corner and column, each with its own volume and footprint maths feeding the space score.
 - **Substrate preference.** A per-species substrate requirement, checked against the chosen substrate.
 - **Heater, light and CO2.** Recorded, used for temperature and plant feasibility rather than shown as equipment badges.

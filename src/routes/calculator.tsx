@@ -12,10 +12,15 @@ export const Route = createFileRoute("/calculator")({
       { title: "Stocking calculator | FishTankr" },
       {
         name: "description",
-        content: "Enter your tank size, add the fish you want, and see what needs to change before you buy.",
+        content:
+          "Enter your tank size, add the fish you want, and see what needs to change before you buy.",
       },
       { property: "og:title", content: "Stocking calculator | FishTankr" },
-      { property: "og:description", content: "Enter your tank size, add the fish you want, and see what needs to change before you buy." },
+      {
+        property: "og:description",
+        content:
+          "Enter your tank size, add the fish you want, and see what needs to change before you buy.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],

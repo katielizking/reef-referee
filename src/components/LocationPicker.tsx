@@ -35,9 +35,7 @@ export function LocationPicker({ location, shops }: Props) {
   ].sort();
 
   // A located suburb we have no shops in would hide everything, so drop it.
-  const cityKnown = place?.city
-    ? cities.some((c) => norm(c) === norm(place.city))
-    : true;
+  const cityKnown = place?.city ? cities.some((c) => norm(c) === norm(place.city)) : true;
   useEffect(() => {
     if (place?.city && cities.length > 0 && !cityKnown) {
       setPlace({ country: place.country, region: place.region, city: null });

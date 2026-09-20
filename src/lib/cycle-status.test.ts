@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { cycleVerdict, isTestCurrent, nitrateNote, testAgeDays, type WaterTest } from "./cycle-status";
+import {
+  cycleVerdict,
+  isTestCurrent,
+  nitrateNote,
+  testAgeDays,
+  type WaterTest,
+} from "./cycle-status";
 
 const NOW = new Date("2026-09-20T00:00:00Z");
 
@@ -56,7 +62,9 @@ describe("cycle verdict", () => {
   });
 
   it("stays cautious while the media is new", () => {
-    expect(cycleVerdict({ ...cycled, filter_maturity: "new" }, test({}), NOW).stage).toBe("cycling");
+    expect(cycleVerdict({ ...cycled, filter_maturity: "new" }, test({}), NOW).stage).toBe(
+      "cycling",
+    );
   });
 
   it("calls it cycled on current zero results", () => {

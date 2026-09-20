@@ -10,7 +10,7 @@ import {
   renameTank as renameTankRecord,
   useSessionTanks,
 } from "@/lib/data";
-import { PRESET_KEY, TANK_PRESETS } from "@/lib/presets";
+import { TANK_IDEAS } from "@/lib/tank-ideas";
 import type { TankRow } from "@/lib/types";
 import {
   AlertDialog,
@@ -50,11 +50,6 @@ function SavedTanks() {
   const [renameTarget, setRenameTarget] = useState<TankRow | null>(null);
   const [renameValue, setRenameValue] = useState("");
   const [deleteTarget, setDeleteTarget] = useState<TankRow | null>(null);
-
-  function loadPreset(id: string) {
-    sessionStorage.setItem(PRESET_KEY, id);
-    navigate({ to: "/calculator" });
-  }
 
   async function refreshTanks() {
     await queryClient.invalidateQueries({ queryKey: ["tanks", "session"] });
@@ -237,36 +232,19 @@ function SavedTanks() {
             Pick a starting point, then adjust it in the builder.
           </p>
           <ul className="grid gap-3 sm:grid-cols-2">
-            {TANK_PRESETS.map((preset) => {
-              const litres =
-                ((preset.base.length_cm ?? 0) *
-                  (preset.base.width_cm ?? 0) *
-                  (preset.base.height_cm ?? 0)) /
-                1000;
-              return (
-                <li key={preset.id}>
-                  <button
-                    type="button"
-                    onClick={() => loadPreset(preset.id)}
-                    className="group flex h-full w-full flex-col rounded-2xl border bg-card p-4 text-left transition-colors hover:border-primary/50"
-                  >
-                    <div className="flex items-baseline justify-between gap-2">
-                      <span className="font-display font-semibold text-foreground group-hover:text-primary">
-                        {preset.name}
-                      </span>
-                      <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-                        {preset.region}
-                      </span>
-                    </div>
-                    <p className="mt-1 text-sm text-muted-foreground">{preset.blurb}</p>
-                    <p className="mt-2 text-xs text-muted-foreground">
-                      {preset.base.length_cm}×{preset.base.width_cm}×{preset.base.height_cm} cm · ~
-                      {Math.round(litres)} L
-                    </p>
-                  </button>
-                </li>
-              );
-            })}
+            {TANK_IDEAS.map((idea) => (
+              <li key={idea.slug}>
+                <Link
+                  to="/tank-ideas/$slug"
+                  params={{ slug: idea.slug }}
+                  className="block h-full rounded-2xl border bg-card p-4 transition hover:border-primary"
+                >
+                  <h3 className="font-display font-semibold">{idea.title}</h3>
+                  <p className="mt-2 text-sm text-muted-foreground">{idea.summary}</p>
+                  <p className="mt-3 text-xs text-primary">View stocking and care →</p>
+                </Link>
+              </li>
+            ))}
           </ul>
         </div>
       </div>

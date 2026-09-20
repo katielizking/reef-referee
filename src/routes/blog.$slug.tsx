@@ -147,7 +147,10 @@ function ReadingProgress() {
   }, []);
   return (
     <div className="fixed inset-x-0 top-0 z-50 h-px bg-transparent" aria-hidden>
-      <div className="h-px bg-primary transition-[width] duration-150" style={{ width: `${pct}%` }} />
+      <div
+        className="h-px bg-primary transition-[width] duration-150"
+        style={{ width: `${pct}%` }}
+      />
     </div>
   );
 }
@@ -208,7 +211,8 @@ function BlogPostPage() {
               <footer className="mt-14 border-t border-foreground/25 pt-6">
                 <p className="data-mono text-xs text-muted-foreground">
                   Published {formatPostDate(post.published_at)}
-                  {post.updated_at && post.updated_at.slice(0, 10) !== post.published_at?.slice(0, 10)
+                  {post.updated_at &&
+                  post.updated_at.slice(0, 10) !== post.published_at?.slice(0, 10)
                     ? ` · updated ${formatPostDate(post.updated_at)}`
                     : ""}
                 </p>

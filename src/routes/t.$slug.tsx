@@ -52,7 +52,9 @@ export const Route = createFileRoute("/t/$slug")({
   errorComponent: ({ error }) => (
     <main className="mx-auto max-w-3xl px-4 py-12 text-center">
       <h1 className="font-display text-xl font-semibold">Couldn't load this tank</h1>
-      <p className="mt-2 text-sm text-muted-foreground">{error.message}</p>
+      <p className="mt-2 text-sm text-muted-foreground">
+        {error instanceof Error ? error.message : "Please try again."}
+      </p>
       <Link
         to="/calculator"
         className="mt-6 inline-flex rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:brightness-95"
@@ -163,8 +165,8 @@ function SharedTankBody() {
         </h1>
         <p className="text-sm text-muted-foreground">
           {displayLength(state.length_cm, units)}×{displayLength(state.width_cm, units)}×
-          {displayLength(state.height_cm, units)} {lengthLabel(units)} · {formatVolume(litres, units)} ·{" "}
-          {state.filter ? state.filter.name : "no filter set"}
+          {displayLength(state.height_cm, units)} {lengthLabel(units)} ·{" "}
+          {formatVolume(litres, units)} · {state.filter ? state.filter.name : "no filter set"}
         </p>
         <div className="mt-4 flex flex-wrap gap-2">
           <button

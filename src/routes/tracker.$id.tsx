@@ -431,7 +431,9 @@ function Trend({ rows }: { rows: WaterTest[] }) {
             strokeWidth={1}
             vectorEffect="non-scaling-stroke"
             points={series
-              .map((r, i) => `${x(i)},${y(typeof r[l.key] === "number" ? (r[l.key] as number) : 0)}`)
+              .map(
+                (r, i) => `${x(i)},${y(typeof r[l.key] === "number" ? (r[l.key] as number) : 0)}`,
+              )
               .join(" ")}
           />
         ))}

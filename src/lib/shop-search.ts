@@ -52,8 +52,8 @@ export function fishSearchTerms(fish: {
   common_name: string;
   scientific_name?: string | null;
 }): string[] {
-  const terms = [fish.scientific_name?.trim(), fish.common_name.trim()].filter(
-    (t): t is string => Boolean(t),
+  const terms = [fish.scientific_name?.trim(), fish.common_name.trim()].filter((t): t is string =>
+    Boolean(t),
   );
   return [...new Set(terms)];
 }
@@ -94,9 +94,7 @@ export function shipsTo(shop: ShopDirectoryEntry, place: Place | null): boolean 
 export function deliveryLabel(shop: ShopDirectoryEntry): string {
   if (shop.pickup_only || !shop.sells_online) return "In store only";
   if (!shop.ships_live_fish) {
-    return shop.delivery_reviewed_on
-      ? "Ships dry goods only"
-      : "Live fish delivery not confirmed";
+    return shop.delivery_reviewed_on ? "Ships dry goods only" : "Live fish delivery not confirmed";
   }
   const countries = shop.ships_to_countries;
   if (countries.length === 0) return "Ships live fish";
