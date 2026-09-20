@@ -316,6 +316,7 @@ export function TankWorkspace({ visualiser = false }: { visualiser?: boolean }) 
         </>}
       </div>
     </main>
+    <TankReport scorecard={scorecard} state={state} />
     <WorkInProgressBanner />
   </>;
 }
