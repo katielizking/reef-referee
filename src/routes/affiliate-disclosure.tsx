@@ -11,6 +11,14 @@ export const Route = createFileRoute("/affiliate-disclosure")({
         name: "description",
         content: "How FishTankr identifies referral links, featured shops and sponsorships.",
       },
+      {
+        property: "og:title",
+        content: "Affiliate and sponsorship disclosure | FishTankr",
+      },
+      {
+        property: "og:description",
+        content: "How FishTankr identifies referral links, featured shops and sponsorships.",
+      },
       { property: "og:url", content: absoluteUrl(path) },
     ],
     links: [{ rel: "canonical", href: absoluteUrl(path) }],

@@ -11,6 +11,11 @@ export const Route = createFileRoute("/terms")({
         name: "description",
         content: "Terms for using FishTankr's aquarium planning and directory tools.",
       },
+      { property: "og:title", content: "Terms of use | FishTankr" },
+      {
+        property: "og:description",
+        content: "Terms for using FishTankr's aquarium planning and directory tools.",
+      },
       { property: "og:url", content: absoluteUrl(path) },
     ],
     links: [{ rel: "canonical", href: absoluteUrl(path) }],

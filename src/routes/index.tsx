@@ -39,11 +39,20 @@ export const Route = createFileRoute("/")({
   }),
   head: () => ({
     meta: [
-      { title: "FishTankr | Smarter tanks. Happier fish." },
+      { title: "Tank builder: check your stocking before you buy | FishTankr" },
       {
         name: "description",
         content:
-          "Plan your setup, check your stocking and understand the biology behind a healthy aquarium with simple tools built around fish welfare.",
+          "Enter your tank size, add the fish you want, and see what needs to change before you buy.",
+      },
+      {
+        property: "og:title",
+        content: "Tank builder: check your stocking before you buy",
+      },
+      {
+        property: "og:description",
+        content:
+          "Enter your tank size, add the fish you want, and see what needs to change before you buy.",
       },
       { property: "og:url", content: absoluteUrl("/") },
     ],

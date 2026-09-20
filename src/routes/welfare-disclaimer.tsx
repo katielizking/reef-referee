@@ -11,6 +11,11 @@ export const Route = createFileRoute("/welfare-disclaimer")({
         name: "description",
         content: "What FishTankr's welfare score can and cannot tell you.",
       },
+      { property: "og:title", content: "Welfare disclaimer | FishTankr" },
+      {
+        property: "og:description",
+        content: "What FishTankr's welfare score can and cannot tell you.",
+      },
       { property: "og:url", content: absoluteUrl(path) },
     ],
     links: [{ rel: "canonical", href: absoluteUrl(path) }],
