@@ -1,6 +1,6 @@
 import { Link, useSearch } from "@tanstack/react-router";
 import { lazy, Suspense, useEffect, useMemo, useState } from "react";
-import { ImageDown, Loader2, Printer, Save, Share2 } from "lucide-react";
+import { ImageDown, Loader2, Printer, Redo2, RotateCcw, Save, Share2, Undo2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { TankSetupPanel, SpeciesAdder } from "@/components/TankSetupPanel";
@@ -17,6 +17,7 @@ import { scoringState } from "@/lib/tank-shape";
 import { SetupChecks } from "@/components/SetupChecks";
 
 import { PRESET_KEY, TANK_PRESETS } from "@/lib/presets";
+import { DEFAULT_STATE } from "@/lib/tank-draft";
 import type { TankState } from "@/lib/types";
 import { absoluteUrl } from "@/lib/site";
 import { shareScoreCard } from "@/lib/share-card";
