@@ -224,7 +224,7 @@ describe("scoreTank", () => {
       }),
     );
     expect(score.readiness.status).toBe("unverified");
-    expect(score.capReason).toBeUndefined();
+    expect(score.capReason).toBeNull();
     expect(score.priorityAction?.category).not.toBe("readiness");
   });
 
@@ -253,7 +253,7 @@ describe("scoreTank", () => {
     expect(score.readiness.status).toBe("unsafe");
     expect(score.readiness.issues.some((issue) => issue.code === "ammonia-detected")).toBe(true);
     // The plan is not capped for it; the tank tracker owns the stop signal now.
-    expect(score.capReason).toBeUndefined();
+    expect(score.capReason).toBeNull();
   });
 
   it("keeps regional catalogue status out of welfare scoring", () => {
