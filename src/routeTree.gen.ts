@@ -22,6 +22,7 @@ import { Route as CalculatorRouteImport } from './routes/calculator'
 import { Route as AttributionRouteImport } from './routes/attribution'
 import { Route as AffiliateDisclosureRouteImport } from './routes/affiliate-disclosure'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as TrackerIndexRouteImport } from './routes/tracker.index'
 import { Route as SpeciesIndexRouteImport } from './routes/species.index'
 import { Route as ShopsIndexRouteImport } from './routes/shops.index'
 import { Route as GuidesIndexRouteImport } from './routes/guides.index'
@@ -97,6 +98,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TrackerIndexRoute = TrackerIndexRouteImport.update({
+  id: '/tracker/',
+  path: '/tracker/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SpeciesIndexRoute = SpeciesIndexRouteImport.update({
   id: '/species/',
   path: '/species/',
@@ -166,6 +172,7 @@ export interface FileRoutesByFullPath {
   '/guides/': typeof GuidesIndexRoute
   '/shops/': typeof ShopsIndexRoute
   '/species/': typeof SpeciesIndexRoute
+  '/tracker/': typeof TrackerIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -190,6 +197,7 @@ export interface FileRoutesByTo {
   '/guides': typeof GuidesIndexRoute
   '/shops': typeof ShopsIndexRoute
   '/species': typeof SpeciesIndexRoute
+  '/tracker': typeof TrackerIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -215,6 +223,7 @@ export interface FileRoutesById {
   '/guides/': typeof GuidesIndexRoute
   '/shops/': typeof ShopsIndexRoute
   '/species/': typeof SpeciesIndexRoute
+  '/tracker/': typeof TrackerIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -241,6 +250,7 @@ export interface FileRouteTypes {
     | '/guides/'
     | '/shops/'
     | '/species/'
+    | '/tracker/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -265,6 +275,7 @@ export interface FileRouteTypes {
     | '/guides'
     | '/shops'
     | '/species'
+    | '/tracker'
   id:
     | '__root__'
     | '/'
@@ -289,6 +300,7 @@ export interface FileRouteTypes {
     | '/guides/'
     | '/shops/'
     | '/species/'
+    | '/tracker/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -314,6 +326,7 @@ export interface RootRouteChildren {
   GuidesIndexRoute: typeof GuidesIndexRoute
   ShopsIndexRoute: typeof ShopsIndexRoute
   SpeciesIndexRoute: typeof SpeciesIndexRoute
+  TrackerIndexRoute: typeof TrackerIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -409,6 +422,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tracker/': {
+      id: '/tracker/'
+      path: '/tracker'
+      fullPath: '/tracker/'
+      preLoaderRoute: typeof TrackerIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/species/': {
       id: '/species/'
       path: '/species'
@@ -498,6 +518,7 @@ const rootRouteChildren: RootRouteChildren = {
   GuidesIndexRoute: GuidesIndexRoute,
   ShopsIndexRoute: ShopsIndexRoute,
   SpeciesIndexRoute: SpeciesIndexRoute,
+  TrackerIndexRoute: TrackerIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

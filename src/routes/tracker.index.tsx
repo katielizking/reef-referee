@@ -13,7 +13,7 @@ import {
 } from "@/lib/cycle-status";
 import { useCreateTank, useDeleteTank, useTrackedTanks, useWaterTests } from "@/lib/tracker";
 
-export const Route = createFileRoute("/tracker")({
+export const Route = createFileRoute("/tracker/")({
   head: () => ({
     meta: [
       { title: "Tank tracker | FishTankr" },
