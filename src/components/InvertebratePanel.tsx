@@ -25,7 +25,7 @@ export function InvertebrateAdder({
   const [q, setQ] = useState("");
   const [open, setOpen] = useState(false);
   const boxRef = useRef<HTMLDivElement>(null);
-  useOutside(boxRef, () => setOpen(false), open);
+  useOutsideClick(boxRef, () => setOpen(false), open);
 
   const rows = state.invertebrates ?? [];
 
