@@ -238,7 +238,9 @@ export function TankWorkspace({ visualiser = false }: { visualiser?: boolean }) 
     setConfirmingReset(false);
     setState({ ...DEFAULT_STATE });
     setSavedId(undefined);
-    setSource(undefined);
+    // Mark any ?tank=/?remix= parameter as consumed so the load effect does
+    // not immediately re-fetch the tank and undo the reset.
+    setSource(requestedSource);
     toast.success("Plan reset to a blank tank", {
       description: "Use undo if you want your previous plan back.",
     });
