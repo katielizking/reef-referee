@@ -1,6 +1,6 @@
 import { Link, useSearch } from "@tanstack/react-router";
 import { lazy, Suspense, useEffect, useMemo, useState } from "react";
-import { Fish, ImageDown, Loader2, Printer, Ruler, Save, Share2, Waves } from "lucide-react";
+import { ImageDown, Loader2, Printer, Save, Share2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { TankSetupPanel, SpeciesAdder } from "@/components/TankSetupPanel";
@@ -201,7 +201,7 @@ export function TankWorkspace({ visualiser = false }: { visualiser?: boolean }) 
     try {
       setSaving(true);
       const row = await saveTank(state, savedId);
-      recordScoreEvent(scorecard);
+      if (!visualiser) recordScoreEvent(scorecard);
       setSavedId(row.id);
       if (share) {
         const url = `${window.location.origin}/t/${row.share_slug}`;
@@ -221,6 +221,10 @@ export function TankWorkspace({ visualiser = false }: { visualiser?: boolean }) 
   }
 
   function handleSave(share = false) {
+    if (visualiser) {
+      void doSave(share);
+      return;
+    }
     gate.requestSave(share, doSave);
   }
 
@@ -254,7 +258,7 @@ export function TankWorkspace({ visualiser = false }: { visualiser?: boolean }) 
               <Share2 className="h-4 w-4" />
               Share
             </button>
-            <button
+            {!visualiser && <button
               onClick={() =>
                 void shareScoreCard(scorecard, state)
                   .then((result) =>
@@ -278,8 +282,8 @@ export function TankWorkspace({ visualiser = false }: { visualiser?: boolean }) 
             >
               <ImageDown className="h-4 w-4" />
               Card
-            </button>
-            <button
+            </button>}
+            {!visualiser && <button
               onClick={() => window.print()}
               disabled={state.species.length === 0}
               title={
@@ -291,7 +295,7 @@ export function TankWorkspace({ visualiser = false }: { visualiser?: boolean }) 
             >
               <Printer className="h-4 w-4" />
               Print
-            </button>
+            </button>}
           </div>
         </div>
         {loadError || catalogError ? <div role="alert" className="planner-error">
@@ -302,9 +306,16 @@ export function TankWorkspace({ visualiser = false }: { visualiser?: boolean }) 
           <div className={visualiser ? "visualiser-workspace" : "calculator-workspace"}>
             {visualiser && <Suspense fallback={<p role="status">Loading visualiser…</p>}><VisualiserCanvas state={state} setState={setState} history={history} /></Suspense>}
             <section className="planner-column" aria-labelledby="tank-heading">
-              <h2 id="tank-heading">Your tank</h2>
-              <p className="planner-help">Dimensions, equipment and water.</p>
-              <TankSetupPanel state={state} setState={setState} species={species.data!} plants={plants.data ?? []} hardscape={hardscape.data ?? []} filters={filters.data!} openSteps={openSteps} setOpenSteps={setOpenSteps} sections={visualiser ? ["tank","filter","livestock","aquascape"] : ["tank","filter"]} />
+              <h2 id="tank-heading">{visualiser ? "Plan details" : "Your tank"}</h2>
+              <p className="planner-help">{visualiser ? "Shape the tank and arrange what goes inside it." : "Dimensions, equipment and water."}</p>
+              <TankSetupPanel state={state} setState={setState} species={species.data!} plants={plants.data ?? []} hardscape={hardscape.data ?? []} filters={filters.data!} openSteps={openSteps} setOpenSteps={setOpenSteps} sections={visualiser ? ["tank","filter","livestock","aquascape"] : ["tank","filter"]} visualOnly={visualiser} />
+              {visualiser && <div className="mt-4 border-t border-rule pt-4">
+                <p className="science-label text-muted-foreground">Shrimp, snails and crabs</p>
+                <p className="mt-1 text-sm text-muted-foreground">Add invertebrates to the scene.</p>
+                <div className="mt-3">
+                  <InvertebrateAdder state={state} setState={setState} invertebrates={invertebrates.data ?? []} />
+                </div>
+              </div>}
             </section>
             {!visualiser && <section id="your-fish" className="planner-column" aria-labelledby="fish-heading">
               <h2 id="fish-heading">Your fish</h2>
@@ -322,25 +333,15 @@ export function TankWorkspace({ visualiser = false }: { visualiser?: boolean }) 
                 <InvertebrateChecks state={state} />
               </div>
             </section>}
-            <section id="your-results" tabIndex={-1} className="planner-column planner-results" aria-labelledby="results-heading">
+            {!visualiser && <section id="your-results" tabIndex={-1} className="planner-column planner-results" aria-labelledby="results-heading">
               <h2 id="results-heading">Your results</h2>
               <p className="planner-help">What fits, and what needs attention.</p>
               {!state.filter && <p className="planner-notice">Filter details missing. Choose your filter to complete the equipment check.</p>}
               <PreStockChecklist scorecard={scorecard} state={state} pendingSave={gate.pendingSave} onCancelSave={gate.cancel} onConfirmSave={() => gate.confirm(doSave)} />
               <ScorecardPanel scorecard={scorecard} state={state} />
-              {visualiser && <>
-                <div className="fishtankr-panel mt-4 p-5">
-                  <p className="science-label text-muted-foreground">Shrimp, snails and crabs</p>
-                  <p className="mt-1 text-sm text-muted-foreground">Optional. Checked separately from your score.</p>
-                  <div className="mt-3">
-                    <InvertebrateAdder state={state} setState={setState} invertebrates={invertebrates.data ?? []} />
-                  </div>
-                </div>
-                <InvertebrateChecks state={state} />
-              </>}
               <SetupChecks state={state} />
               <CompatibleSuggestions state={state} setState={setState} species={species.data!} />
-              {!visualiser && <Link to="/visualiser" search={linkSearch} className="planner-primary">View this tank <span aria-hidden>→</span></Link>}
+              <Link to="/visualiser" search={linkSearch} className="planner-primary">Plan this tank in 3D <span aria-hidden>→</span></Link>
               <p className="data-mono text-xs text-muted-foreground">
                 Want a second opinion?{" "}
                 <Link to="/blog/$slug" params={{ slug: "aqadvisor-alternatives" }} className="text-primary hover:underline">
@@ -348,14 +349,14 @@ export function TankWorkspace({ visualiser = false }: { visualiser?: boolean }) 
                 </Link>
                 .
               </p>
-            </section>
+            </section>}
           </div>
           {!visualiser && <a className="planner-mobile-results" href="#your-results">View your results <span aria-hidden>↑</span></a>}
           <div className="planner-explore"><div><h3>Find your next freshwater setup.</h3><p>Start with an example and make it yours.</p></div><Link to="/saved">Explore example tanks →</Link></div>
         </>}
       </div>
     </main>
-    <TankReport scorecard={scorecard} state={state} />
+    {!visualiser && <TankReport scorecard={scorecard} state={state} />}
     <WorkInProgressBanner />
   </>;
 }
