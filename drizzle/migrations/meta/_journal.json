@@ -43,6 +43,13 @@
       "when": 1789872004220,
       "tag": "0005_tank_shape_substrate_equipment",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1789874608265,
+      "tag": "0006_create_tracked_tanks_and_water_tests",
+      "breakpoints": true
     }
   ]
 }
