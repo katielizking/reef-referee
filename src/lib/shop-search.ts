@@ -105,16 +105,12 @@ export function deliveryLabel(shop: ShopDirectoryEntry): string {
 }
 
 export function countryName(code: string): string {
-  const names: Record<string, string> = {
-    AU: "Australia",
-    CA: "Canada",
-    DE: "Germany",
-    NL: "Netherlands",
-    NZ: "New Zealand",
-    SG: "Singapore",
-    GB: "United Kingdom",
-    UK: "United Kingdom",
-    US: "United States",
-  };
-  return names[norm(code)] ?? code;
+  const regionCode = norm(code) === "UK" ? "GB" : norm(code);
+  if (!regionCode) return code;
+
+  try {
+    return new Intl.DisplayNames(["en-AU"], { type: "region" }).of(regionCode) ?? code;
+  } catch {
+    return code;
+  }
 }
