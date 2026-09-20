@@ -4,8 +4,6 @@ import { Link } from "@tanstack/react-router";
 import type {
   BiologicalMediaLevel,
   TankFilterSlot,
-  CycleMethod,
-  CycleStatus,
   Filter,
   FilterMaturity,
   FilterType,
@@ -272,12 +270,8 @@ export function TankSetupPanel({
         <AccordionTrigger className="min-h-14 py-3 hover:no-underline">
           <StepHeader
             n={2}
-            title="Filter, cycle & maintenance"
-            summary={
-              state.filter
-                ? `${state.filter.name} · ${state.cycle_status.replace("_", " ")}`
-                : "Pick a filter and verify the cycle"
-            }
+            title="Filter and maintenance"
+            summary={state.filter ? state.filter.name : "Pick a filter"}
           />
         </AccordionTrigger>
         <AccordionContent className="space-y-3 pb-3">
