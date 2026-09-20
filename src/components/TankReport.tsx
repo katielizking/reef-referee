@@ -91,6 +91,29 @@ export function TankReport({ scorecard, state }: { scorecard: Scorecard; state: 
         </tbody>
       </table>
 
+      {(state.invertebrates ?? []).length > 0 && (
+        <>
+          <h3>Invertebrates</h3>
+          <ul>
+            {(state.invertebrates ?? []).map((row) => (
+              <li key={row.invertebrate.id}>
+                {row.quantity} × {row.invertebrate.common_name}{" "}
+                <em>{row.invertebrate.scientific_name}</em> · {row.invertebrate.adult_size_cm} cm ·
+                min {row.invertebrate.min_tank_litres} L
+              </li>
+            ))}
+          </ul>
+          <ul>
+            {checkInvertebrates(state).map((issue, i) => (
+              <li key={`${issue.code}-${i}`}>
+                <strong>{issue.severity === "critical" ? "Critical: " : ""}</strong>
+                {issue.reason} {issue.fix}
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
+
       {scorecard.priorityAction && (
         <>
           <h3>Fix this first</h3>
