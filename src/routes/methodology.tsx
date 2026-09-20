@@ -193,7 +193,7 @@ function MethodologyPage() {
       <div className="mt-10 border-t pt-6">
         <div className="flex flex-wrap gap-3">
           <Link
-            to="/"
+            to="/calculator"
             className="inline-flex min-h-11 items-center justify-center rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:brightness-95"
           >
             Back to the tank builder

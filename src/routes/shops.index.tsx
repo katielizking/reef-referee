@@ -217,7 +217,7 @@ function ShopsIndex() {
           cycle details and water settings to the plan.
         </p>
         <Link
-          to="/"
+          to="/calculator"
           className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-xl bg-primary px-4 text-sm font-semibold text-primary-foreground"
         >
           Check my tank

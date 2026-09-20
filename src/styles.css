@@ -596,3 +596,45 @@ h3.font-display {
     font-size: 46px;
   }
 }
+
+/* Shared planning workspace. Keep these rules separate from the homepage hero. */
+.planner-surface { padding: clamp(24px, 4vw, 56px) 0 48px; }
+.planner-container { width: min(1440px, 100%); margin-inline: auto; padding-inline: clamp(16px, 4vw, 64px); }
+.planner-heading { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 24px; margin-bottom: 32px; }
+.planner-heading h2 { margin: 8px 0 12px; font-size: clamp(30px, 4vw, 48px); line-height: 1.12; }
+.planner-eyebrow { color: var(--glow); font-size: 11px; letter-spacing: .13em; }
+.planner-back { display: inline-flex; align-items: center; min-height: 44px; margin-bottom: 12px; color: var(--glow); font-size: 14px; }
+.calculator-workspace, .visualiser-workspace { display: grid; grid-template-columns: minmax(0, 1fr); gap: 20px; align-items: start; }
+.planner-column { min-width: 0; padding: clamp(16px, 2vw, 24px); background: var(--card); border: 1px solid var(--border); border-radius: 12px; overflow-wrap: anywhere; }
+.planner-column > h3 { font-size: 26px; line-height: 1.2; }
+.planner-help { margin: 8px 0 24px; color: var(--muted-foreground); font-size: 14px; line-height: 1.6; }
+.planner-results > * + * { margin-top: 16px; }
+.planner-notice { padding: 14px 16px; border: 1px solid color-mix(in srgb, var(--warn) 40%, transparent); border-radius: 8px; background: color-mix(in srgb, var(--warn) 8%, transparent); color: var(--foreground); font-size: 13px; line-height: 1.6; }
+.planner-primary { display: flex; min-height: 48px; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 18px; border-radius: 6px; background: var(--primary); color: var(--primary-foreground); font-size: 14px; font-weight: 600; }
+.planner-primary:hover { background: var(--glow); }
+.planner-text-link { display: inline-flex; align-items: center; min-height: 44px; margin-top: 16px; color: var(--glow); font-size: 14px; }
+.planner-back:hover, .planner-text-link:hover, .planner-explore a:hover { text-decoration: underline; text-underline-offset: 4px; }
+.planner-error { padding: 24px; border: 1px solid var(--border); border-radius: 12px; background: var(--card); }
+.planner-error h3 { font-size: 24px; }
+.planner-error p { margin: 12px 0; color: var(--muted-foreground); }
+.planner-error button { min-height: 44px; padding: 10px 18px; background: var(--primary); color: var(--primary-foreground); border-radius: 6px; cursor: pointer; }
+.planner-explore { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 20px; margin-top: 32px; padding-block: 24px; border-top: 1px solid var(--border); }
+.planner-explore h3 { font-size: 24px; }
+.planner-explore p { margin-top: 8px; color: var(--muted-foreground); font-size: 14px; }
+.planner-explore a { display: inline-flex; align-items: center; min-height: 44px; color: var(--glow); font-size: 14px; }
+.planner-mobile-results { position: sticky; bottom: max(12px, env(safe-area-inset-bottom)); z-index: 20; display: flex; align-items: center; justify-content: space-between; min-height: 48px; margin-top: 20px; padding: 12px 18px; border: 1px solid var(--glow); border-radius: 8px; background: var(--trench); color: var(--spray); box-shadow: var(--shadow-panel); font-size: 14px; }
+#your-results { scroll-margin-top: 88px; }
+@media (min-width: 768px) {
+  .calculator-workspace { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .calculator-workspace > .planner-results { grid-column: 1 / -1; }
+  .visualiser-workspace { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .visualiser-workspace > :first-child { grid-column: 1 / -1; }
+}
+@media (min-width: 1200px) {
+  .calculator-workspace { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.1fr); }
+  .calculator-workspace > .planner-results { grid-column: auto; }
+  .visualiser-workspace { grid-template-columns: minmax(0, 1.7fr) minmax(320px, 1fr); }
+  .visualiser-workspace > :first-child { grid-column: 1; grid-row: 1 / span 2; }
+  .visualiser-workspace > .planner-column { grid-column: 2; }
+  .planner-mobile-results { display: none; }
+}

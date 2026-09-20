@@ -177,7 +177,7 @@ const guides: Record<string, Guide> = {
           </p>
           <p>
             Not sure what to add? The{" "}
-            <Link to="/" className="text-primary underline">
+            <Link to="/calculator" className="text-primary underline">
               FishTankr builder
             </Link>{" "}
             checks compatibility, swimming space, water suitability and cycle readiness, while the{" "}
@@ -296,7 +296,7 @@ function GuidePage() {
               you build the plan.
             </p>
             <Link
-              to="/"
+              to="/calculator"
               className="mt-4 inline-flex rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:brightness-95"
             >
               Open the builder

@@ -57,7 +57,7 @@ function BlogIndex() {
           water settings to the builder as you read.
         </p>
         <Link
-          to="/"
+          to="/calculator"
           className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-xl bg-primary px-4 text-sm font-semibold text-primary-foreground"
         >
           Open builder

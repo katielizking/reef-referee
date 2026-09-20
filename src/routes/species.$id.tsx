@@ -127,7 +127,7 @@ function SpeciesNotFound() {
       <h1 className="font-display text-2xl font-semibold">Species not found</h1>
       <p className="mt-2 text-sm text-muted-foreground">It may no longer be in this guide.</p>
       <Link
-        to="/"
+        to="/calculator"
         className="mt-6 inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground"
       >
         <ArrowLeft className="h-4 w-4" /> Back to my tank
@@ -322,7 +322,7 @@ function SpeciesGuide() {
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 md:py-12">
       <Link
-        to="/"
+        to="/calculator"
         className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
       >
         <ArrowLeft className="h-4 w-4" /> Back to my tank
@@ -499,7 +499,7 @@ function AddToTankButton({ species }: { species: Species }) {
   const prohibited = species.legal_status === "prohibited";
   function handleAdd() {
     sessionStorage.setItem("fishtankr:pending-add", species.id);
-    navigate({ to: "/", hash: "builder" });
+    navigate({ to: "/calculator", hash: "builder" });
   }
   return (
     <div className="mt-2">

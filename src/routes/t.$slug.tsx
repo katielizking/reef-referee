@@ -49,7 +49,7 @@ export const Route = createFileRoute("/t/$slug")({
       <h1 className="font-display text-xl font-semibold">Couldn't load this tank</h1>
       <p className="mt-2 text-sm text-muted-foreground">{error.message}</p>
       <Link
-        to="/"
+        to="/calculator"
         className="mt-6 inline-flex rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:brightness-95"
       >
         Back to my tank
@@ -61,7 +61,7 @@ export const Route = createFileRoute("/t/$slug")({
       <h1 className="font-display text-xl font-semibold">Tank not found</h1>
       <p className="mt-2 text-sm text-muted-foreground">The share link may be wrong or expired.</p>
       <Link
-        to="/"
+        to="/calculator"
         className="mt-6 inline-flex rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:brightness-95"
       >
         Back to my tank
@@ -170,7 +170,7 @@ function SharedTankBody() {
             Copy link
           </button>
           <Link
-            to="/"
+            to="/calculator"
             search={{ remix: slug }}
             className="inline-flex items-center gap-1.5 rounded-xl border bg-card px-4 py-2 text-sm font-semibold text-foreground hover:bg-muted"
           >
@@ -189,7 +189,7 @@ function SharedTankBody() {
           <ScorecardPanel scorecard={scorecard} />
           <div className="mt-4">
             <Link
-              to="/"
+              to="/calculator"
               className="inline-flex rounded-xl border bg-card px-4 py-2 text-sm font-semibold text-foreground hover:bg-muted"
             >
               Start a tank

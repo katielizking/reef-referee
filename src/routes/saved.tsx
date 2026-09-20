@@ -53,7 +53,7 @@ function SavedTanks() {
 
   function loadPreset(id: string) {
     sessionStorage.setItem(PRESET_KEY, id);
-    navigate({ to: "/" });
+    navigate({ to: "/calculator" });
   }
 
   async function refreshTanks() {
@@ -68,7 +68,7 @@ function SavedTanks() {
       toast.success("Tank duplicated", {
         description: `Created ${copy.name}.`,
       });
-      navigate({ to: "/", search: { tank: copy.share_slug } });
+      navigate({ to: "/calculator", search: { tank: copy.share_slug } });
     } catch (error) {
       console.error(error);
       toast.error("Couldn't duplicate this tank", {
@@ -152,7 +152,7 @@ function SavedTanks() {
             </p>
             <p className="mt-1 text-sm text-muted-foreground">Build a tank, then save it here.</p>
             <Link
-              to="/"
+              to="/calculator"
               className="mt-5 inline-flex items-center justify-center rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:brightness-95"
             >
               Build a tank
@@ -178,7 +178,7 @@ function SavedTanks() {
 
                   <div className="mt-4 flex flex-wrap gap-2">
                     <Link
-                      to="/"
+                      to="/calculator"
                       search={{ tank: tank.share_slug }}
                       className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-3 py-2 text-xs font-semibold text-primary-foreground transition-colors hover:brightness-95"
                     >
