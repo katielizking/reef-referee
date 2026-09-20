@@ -583,36 +583,6 @@ function DimField({
   );
 }
 
-function WaterTestField({
-  label,
-  value,
-  step = 0.01,
-  onChange,
-}: {
-  label: string;
-  value: number | null;
-  step?: number;
-  onChange: (value: number | null) => void;
-}) {
-  return (
-    <label className="block text-sm">
-      <span className="mb-1 block text-xs text-muted-foreground">{label}</span>
-      <input
-        type="number"
-        min={0}
-        step={step}
-        inputMode="decimal"
-        value={value ?? ""}
-        placeholder="Not tested"
-        onChange={(e) => {
-          const raw = e.target.value;
-          onChange(raw === "" ? null : Math.max(0, Number(raw)));
-        }}
-        className="min-h-11 w-full rounded-xl border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
-      />
-    </label>
-  );
-}
 
 function Segmented<T extends string>({
   label,

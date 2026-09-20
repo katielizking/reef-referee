@@ -63,7 +63,6 @@ function issueTitle(issue: Issue): string {
 }
 
 function checklistSeverity(issue: Issue): ChecklistSeverity {
-  if (issue.category === "readiness") return "must-fix";
   if (issue.severity === "critical") return "must-fix";
   if (issue.severity === "high" || issue.severity === "medium") return "worth-look";
   return "info";
@@ -72,7 +71,6 @@ function checklistSeverity(issue: Issue): ChecklistSeverity {
 export function buildChecklist(scorecard: Scorecard, state: TankState): ChecklistItem[] {
   const items: ChecklistItem[] = [];
   const scoredIssues: Issue[] = [
-    ...scorecard.readiness.issues,
     ...scorecard.compatibility.issues,
     ...(scorecard.space.issues ?? []),
     ...(scorecard.water.issues ?? []),
