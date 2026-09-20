@@ -91,14 +91,16 @@ export function checkSetup(state: TankState): SetupIssue[] {
     issues.push({
       code: "co2_without_plants",
       severity: "caution",
-      reason: "There are no plants to use the CO2, and CO2 in a tank without plants drops the pH and stresses fish.",
+      reason:
+        "There are no plants to use the CO2, and CO2 in a tank without plants drops the pH and stresses fish.",
       fix: "Add plants, or turn the CO2 off.",
     });
   } else if (state.has_co2 && state.species.length > 0) {
     issues.push({
       code: "co2_needs_testing",
       severity: "note",
-      reason: "CO2 lowers pH through the day, so the water is not the same at lights-on and lights-off.",
+      reason:
+        "CO2 lowers pH through the day, so the water is not the same at lights-on and lights-off.",
       fix: "Test pH morning and evening for the first fortnight, and run it on a timer with the light.",
     });
   }

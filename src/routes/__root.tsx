@@ -170,15 +170,15 @@ function RootComponent() {
     };
   }, []);
 
-
   return (
     <QueryClientProvider client={queryClient}>
       <div className="site-shell flex min-h-dvh flex-col bg-background/80">
         <SiteHeader />
 
-
         <div className="flex-1">
-          <TankDraftProvider><Outlet /></TankDraftProvider>
+          <TankDraftProvider>
+            <Outlet />
+          </TankDraftProvider>
         </div>
 
         <SiteFooter />
@@ -221,19 +221,19 @@ function SiteHeader() {
         <div className="hidden items-center gap-2 xl:flex">
           <nav aria-label="Primary" className="flex items-center gap-1 text-sm">
             {NAV_ITEMS.map((item) => (
-            <Link
-              key={item.to}
-              to={item.to}
-              hash={item.hash}
-              className="rounded-md px-3 py-2 text-muted-foreground transition-colors hover:text-foreground"
-              activeProps={{
-                className:
-                  "rounded-md px-3 py-2 text-foreground underline decoration-blue decoration-1 underline-offset-8",
-              }}
-              activeOptions={item.exact ? { exact: true } : undefined}
-            >
-              {item.label}
-            </Link>
+              <Link
+                key={item.to}
+                to={item.to}
+                hash={item.hash}
+                className="rounded-md px-3 py-2 text-muted-foreground transition-colors hover:text-foreground"
+                activeProps={{
+                  className:
+                    "rounded-md px-3 py-2 text-foreground underline decoration-blue decoration-1 underline-offset-8",
+                }}
+                activeOptions={item.exact ? { exact: true } : undefined}
+              >
+                {item.label}
+              </Link>
             ))}
           </nav>
           {showThemeToggle && <ThemeToggle />}
@@ -241,53 +241,53 @@ function SiteHeader() {
         <div className="flex items-center gap-2 xl:hidden">
           {showThemeToggle && <ThemeToggle />}
           <Sheet open={open} onOpenChange={setOpen}>
-          <SheetTrigger asChild>
-            <button
-              type="button"
-              className="inline-flex size-11 items-center justify-center rounded-md border border-foreground/20 bg-transparent text-foreground md:hidden"
-              aria-label="Open navigation"
-            >
-              <Menu className="size-5" aria-hidden />
-            </button>
-          </SheetTrigger>
-          <SheetContent
-            side="right"
-            className="flex h-full w-[min(22rem,calc(100%-1.5rem))] flex-col gap-0 border-l border-foreground/10 bg-background p-0"
-          >
-            <SheetHeader className="border-b border-foreground/10 px-5 pb-5 pt-[max(1.5rem,calc(env(safe-area-inset-top)+1rem))] text-left">
-              <SheetTitle className="font-display text-ui-heading">FishTankr</SheetTitle>
-              <p className="text-ui-label text-muted-foreground">
-                Plan a tank that suits your fish.
-              </p>
-            </SheetHeader>
-            <nav aria-label="Mobile" className="flex flex-1 flex-col gap-1 overflow-y-auto p-3">
-              {NAV_ITEMS.map((item) => (
-                <Link
-                  key={item.to}
-                  to={item.to}
-              hash={item.hash}
-                  onClick={() => setOpen(false)}
-                  className="flex min-h-11 items-center rounded-xl px-3 text-ui-label font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-                  activeProps={{
-                    className:
-                      "flex min-h-11 items-center rounded-xl bg-muted px-3 text-ui-label font-semibold text-foreground",
-                  }}
-                  activeOptions={item.exact ? { exact: true } : undefined}
-                >
-                  {item.label}
-                </Link>
-              ))}
-            </nav>
-            <div className="border-t border-foreground/10 p-4 pb-[calc(env(safe-area-inset-bottom)+1rem)]">
-              <Link
-                to="/calculator"
-                onClick={() => setOpen(false)}
-                className="flex min-h-12 w-full items-center justify-center rounded-xl bg-primary px-4 text-ui-label font-semibold text-primary-foreground shadow-panel transition-colors hover:bg-primary/90"
+            <SheetTrigger asChild>
+              <button
+                type="button"
+                className="inline-flex size-11 items-center justify-center rounded-md border border-foreground/20 bg-transparent text-foreground md:hidden"
+                aria-label="Open navigation"
               >
-                Build your tank
-              </Link>
-            </div>
-          </SheetContent>
+                <Menu className="size-5" aria-hidden />
+              </button>
+            </SheetTrigger>
+            <SheetContent
+              side="right"
+              className="flex h-full w-[min(22rem,calc(100%-1.5rem))] flex-col gap-0 border-l border-foreground/10 bg-background p-0"
+            >
+              <SheetHeader className="border-b border-foreground/10 px-5 pb-5 pt-[max(1.5rem,calc(env(safe-area-inset-top)+1rem))] text-left">
+                <SheetTitle className="font-display text-ui-heading">FishTankr</SheetTitle>
+                <p className="text-ui-label text-muted-foreground">
+                  Plan a tank that suits your fish.
+                </p>
+              </SheetHeader>
+              <nav aria-label="Mobile" className="flex flex-1 flex-col gap-1 overflow-y-auto p-3">
+                {NAV_ITEMS.map((item) => (
+                  <Link
+                    key={item.to}
+                    to={item.to}
+                    hash={item.hash}
+                    onClick={() => setOpen(false)}
+                    className="flex min-h-11 items-center rounded-xl px-3 text-ui-label font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                    activeProps={{
+                      className:
+                        "flex min-h-11 items-center rounded-xl bg-muted px-3 text-ui-label font-semibold text-foreground",
+                    }}
+                    activeOptions={item.exact ? { exact: true } : undefined}
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+              </nav>
+              <div className="border-t border-foreground/10 p-4 pb-[calc(env(safe-area-inset-bottom)+1rem)]">
+                <Link
+                  to="/calculator"
+                  onClick={() => setOpen(false)}
+                  className="flex min-h-12 w-full items-center justify-center rounded-xl bg-primary px-4 text-ui-label font-semibold text-primary-foreground shadow-panel transition-colors hover:bg-primary/90"
+                >
+                  Build your tank
+                </Link>
+              </div>
+            </SheetContent>
           </Sheet>
         </div>
       </div>

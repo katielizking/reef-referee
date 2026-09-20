@@ -18,13 +18,7 @@ import type {
 } from "@/lib/types";
 import { BIOTOPE_LABEL, SUBSTRATE_LABEL, TANK_SHAPE_LABEL } from "@/lib/types";
 import { waterLitres } from "@/lib/tank-shape";
-import {
-  displayLength,
-  formatVolume,
-  lengthLabel,
-  lengthToCm,
-  useUnitSystem,
-} from "@/lib/units";
+import { displayLength, formatVolume, lengthLabel, lengthToCm, useUnitSystem } from "@/lib/units";
 import { submitSpeciesRequest } from "@/lib/requests";
 import { useOutsideClick } from "@/hooks/useOutsideClick";
 
@@ -71,7 +65,7 @@ export function TankSetupPanel({
   filters,
   openSteps,
   setOpenSteps,
-  sections = ["tank","filter","livestock","aquascape"],
+  sections = ["tank", "filter", "livestock", "aquascape"],
   visualOnly = false,
 }: Props) {
   const [units, setUnits] = useUnitSystem();
@@ -91,335 +85,348 @@ export function TankSetupPanel({
       onValueChange={(v) => setOpenSteps(v as StepId[])}
       className="space-y-2"
     >
-      {sections.includes("tank") && <AccordionItem
-        value="tank"
-        id="step-tank"
-        className="rounded-2xl border bg-background/60 px-3 scroll-mt-20"
-      >
-        <AccordionTrigger className="min-h-14 py-3 hover:no-underline">
-          <StepHeader
-            n={1}
-            title="Tank & water"
-            summary={
-              dimInvalid
-                ? `Set each side ≥ ${displayLength(MIN_DIM, units)} ${lengthLabel(units)}`
-                : visualOnly
-                  ? volume
-                  : `${volume} · pH ${state.target_ph.toFixed(1)} · ${state.target_temp_c}°C`
-            }
-          />
-        </AccordionTrigger>
-        <AccordionContent className="space-y-3 pb-3">
-          <label className="block text-sm">
-            <span className="mb-1 block text-foreground/80">Name</span>
-            <input
-              className="min-h-11 w-full rounded-xl border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
-              value={state.name}
-              onChange={(e) => setState((s) => ({ ...s, name: e.target.value }))}
-              placeholder="Living room 60"
-            />
-          </label>
-          <div className="flex items-center justify-between gap-2">
-            <span className="text-xs text-muted-foreground">Units</span>
-            <div className="flex rounded-lg bg-muted p-0.5">
-              {(["metric", "us"] as const).map((u) => (
-                <button
-                  key={u}
-                  type="button"
-                  aria-pressed={units === u}
-                  onClick={() => setUnits(u)}
-                  className={`min-h-9 rounded-md px-2.5 text-xs transition ${
-                    units === u
-                      ? "bg-card font-medium text-foreground shadow-sm"
-                      : "text-muted-foreground hover:text-foreground"
-                  }`}
-                >
-                  {u === "metric" ? "cm / L" : "in / gal"}
-                </button>
-              ))}
-            </div>
-          </div>
-          <div className="grid grid-cols-3 gap-2">
-            <DimField
-              label={`Length (${lengthLabel(units)})`}
-              value={displayLength(state.length_cm, units)}
-              min={displayLength(MIN_DIM, units)}
-              onChange={(v) => setState((s) => ({ ...s, length_cm: lengthToCm(v, units) }))}
-            />
-            <DimField
-              label={`Width (${lengthLabel(units)})`}
-              value={displayLength(state.width_cm, units)}
-              min={displayLength(MIN_DIM, units)}
-              onChange={(v) => setState((s) => ({ ...s, width_cm: lengthToCm(v, units) }))}
-            />
-            <DimField
-              label={`Height (${lengthLabel(units)})`}
-              value={displayLength(state.height_cm, units)}
-              min={displayLength(MIN_DIM, units)}
-              onChange={(v) => setState((s) => ({ ...s, height_cm: lengthToCm(v, units) }))}
-            />
-          </div>
-          {dimInvalid && (
-            <p className="flex items-center gap-1.5 text-xs font-medium text-coral">
-              <AlertTriangle className="h-3.5 w-3.5" aria-hidden />
-              Each side needs to be at least {displayLength(MIN_DIM, units)} {lengthLabel(units)}.
-            </p>
-          )}
-          <label className="block text-sm">
-            <span className="mb-1 block text-foreground/80">Shape</span>
-            <select
-              className="min-h-11 w-full rounded-xl border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
-              value={state.tank_shape ?? "rectangle"}
-              onChange={(e) =>
-                setState((st) => ({ ...st, tank_shape: e.target.value as TankShape }))
+      {sections.includes("tank") && (
+        <AccordionItem
+          value="tank"
+          id="step-tank"
+          className="rounded-2xl border bg-background/60 px-3 scroll-mt-20"
+        >
+          <AccordionTrigger className="min-h-14 py-3 hover:no-underline">
+            <StepHeader
+              n={1}
+              title="Tank & water"
+              summary={
+                dimInvalid
+                  ? `Set each side ≥ ${displayLength(MIN_DIM, units)} ${lengthLabel(units)}`
+                  : visualOnly
+                    ? volume
+                    : `${volume} · pH ${state.target_ph.toFixed(1)} · ${state.target_temp_c}°C`
               }
-            >
-              {(Object.keys(TANK_SHAPE_LABEL) as TankShape[]).map((k) => (
-                <option key={k} value={k}>
-                  {TANK_SHAPE_LABEL[k]}
-                </option>
-              ))}
-            </select>
-          </label>
-          <div className="rounded-xl bg-muted px-3 py-2 text-sm">
-            <span className="text-muted-foreground">Water volume</span>{" "}
-            <span className="font-semibold">{volume}</span>
-            {(state.tank_shape ?? "rectangle") !== "rectangle" && (
-              <span className="ml-1 text-xs text-muted-foreground">
-                for the shape, not the full box
-              </span>
+            />
+          </AccordionTrigger>
+          <AccordionContent className="space-y-3 pb-3">
+            <label className="block text-sm">
+              <span className="mb-1 block text-foreground/80">Name</span>
+              <input
+                className="min-h-11 w-full rounded-xl border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
+                value={state.name}
+                onChange={(e) => setState((s) => ({ ...s, name: e.target.value }))}
+                placeholder="Living room 60"
+              />
+            </label>
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-xs text-muted-foreground">Units</span>
+              <div className="flex rounded-lg bg-muted p-0.5">
+                {(["metric", "us"] as const).map((u) => (
+                  <button
+                    key={u}
+                    type="button"
+                    aria-pressed={units === u}
+                    onClick={() => setUnits(u)}
+                    className={`min-h-9 rounded-md px-2.5 text-xs transition ${
+                      units === u
+                        ? "bg-card font-medium text-foreground shadow-sm"
+                        : "text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    {u === "metric" ? "cm / L" : "in / gal"}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="grid grid-cols-3 gap-2">
+              <DimField
+                label={`Length (${lengthLabel(units)})`}
+                value={displayLength(state.length_cm, units)}
+                min={displayLength(MIN_DIM, units)}
+                onChange={(v) => setState((s) => ({ ...s, length_cm: lengthToCm(v, units) }))}
+              />
+              <DimField
+                label={`Width (${lengthLabel(units)})`}
+                value={displayLength(state.width_cm, units)}
+                min={displayLength(MIN_DIM, units)}
+                onChange={(v) => setState((s) => ({ ...s, width_cm: lengthToCm(v, units) }))}
+              />
+              <DimField
+                label={`Height (${lengthLabel(units)})`}
+                value={displayLength(state.height_cm, units)}
+                min={displayLength(MIN_DIM, units)}
+                onChange={(v) => setState((s) => ({ ...s, height_cm: lengthToCm(v, units) }))}
+              />
+            </div>
+            {dimInvalid && (
+              <p className="flex items-center gap-1.5 text-xs font-medium text-coral">
+                <AlertTriangle className="h-3.5 w-3.5" aria-hidden />
+                Each side needs to be at least {displayLength(MIN_DIM, units)} {lengthLabel(units)}.
+              </p>
             )}
-          </div>
-          <label className="block text-sm">
-            <span className="mb-1 block text-foreground/80">Substrate</span>
+            <label className="block text-sm">
+              <span className="mb-1 block text-foreground/80">Shape</span>
+              <select
+                className="min-h-11 w-full rounded-xl border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
+                value={state.tank_shape ?? "rectangle"}
+                onChange={(e) =>
+                  setState((st) => ({ ...st, tank_shape: e.target.value as TankShape }))
+                }
+              >
+                {(Object.keys(TANK_SHAPE_LABEL) as TankShape[]).map((k) => (
+                  <option key={k} value={k}>
+                    {TANK_SHAPE_LABEL[k]}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <div className="rounded-xl bg-muted px-3 py-2 text-sm">
+              <span className="text-muted-foreground">Water volume</span>{" "}
+              <span className="font-semibold">{volume}</span>
+              {(state.tank_shape ?? "rectangle") !== "rectangle" && (
+                <span className="ml-1 text-xs text-muted-foreground">
+                  for the shape, not the full box
+                </span>
+              )}
+            </div>
+            <label className="block text-sm">
+              <span className="mb-1 block text-foreground/80">Substrate</span>
+              <select
+                className="min-h-11 w-full rounded-xl border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
+                value={state.substrate ?? "gravel"}
+                onChange={(e) =>
+                  setState((st) => ({ ...st, substrate: e.target.value as Substrate }))
+                }
+              >
+                {(Object.keys(SUBSTRATE_LABEL) as Substrate[]).map((k) => (
+                  <option key={k} value={k}>
+                    {SUBSTRATE_LABEL[k]}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <fieldset className="space-y-1.5">
+              <legend className="mb-1 text-sm text-foreground/80">Equipment</legend>
+              {(
+                [
+                  ["has_heater", "Heater", true],
+                  ["has_light", "Light", true],
+                  ["has_co2", "CO2", false],
+                ] as const
+              ).map(([key, label, fallback]) => (
+                <label key={key} className="flex min-h-9 items-center gap-2 text-sm">
+                  <input
+                    type="checkbox"
+                    checked={state[key] ?? fallback}
+                    onChange={(e) => setState((st) => ({ ...st, [key]: e.target.checked }))}
+                    className="h-4 w-4 accent-[var(--color-teal)]"
+                  />
+                  {label}
+                </label>
+              ))}
+            </fieldset>
+            {!visualOnly && (
+              <>
+                <label className="block text-sm">
+                  <div className="mb-1 flex items-center justify-between text-foreground/80">
+                    <span>Target pH</span>
+                    <span className="font-medium">{state.target_ph.toFixed(1)}</span>
+                  </div>
+                  <input
+                    type="range"
+                    min={4}
+                    max={9}
+                    step={0.1}
+                    value={state.target_ph}
+                    onChange={(e) => setState((s) => ({ ...s, target_ph: Number(e.target.value) }))}
+                    className="w-full accent-[var(--color-teal)]"
+                    aria-label="Target pH"
+                  />
+                </label>
+                <label className="block text-sm">
+                  <div className="mb-1 flex items-center justify-between text-foreground/80">
+                    <span>Target temp</span>
+                    <span className="font-medium">{state.target_temp_c}°C</span>
+                  </div>
+                  <input
+                    type="range"
+                    min={15}
+                    max={32}
+                    step={1}
+                    value={state.target_temp_c}
+                    onChange={(e) =>
+                      setState((s) => ({
+                        ...s,
+                        target_temp_c: Number(e.target.value),
+                      }))
+                    }
+                    className="w-full accent-[var(--color-teal)]"
+                    aria-label="Target temperature"
+                  />
+                </label>
+              </>
+            )}
+          </AccordionContent>
+        </AccordionItem>
+      )}
+
+      {sections.includes("filter") && (
+        <AccordionItem
+          value="filter"
+          id="step-filter"
+          className="rounded-2xl border bg-background/60 px-3"
+        >
+          <AccordionTrigger className="min-h-14 py-3 hover:no-underline">
+            <StepHeader
+              n={2}
+              title={visualOnly ? "Filter" : "Filter and maintenance"}
+              summary={state.filter ? state.filter.name : "Pick a filter"}
+            />
+          </AccordionTrigger>
+          <AccordionContent className="space-y-3 pb-3">
             <select
-              className="min-h-11 w-full rounded-xl border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
-              value={state.substrate ?? "gravel"}
-              onChange={(e) =>
-                setState((st) => ({ ...st, substrate: e.target.value as Substrate }))
-              }
+              className="w-full rounded-xl border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
+              value={state.filter?.id ?? ""}
+              onChange={(e) => {
+                const f = filters.find((x) => x.id === e.target.value) ?? null;
+                setState((s) => ({
+                  ...s,
+                  filter: f,
+                  biological_media_level: f?.biological_media_level ?? s.biological_media_level,
+                }));
+              }}
+              aria-label="Filter"
             >
-              {(Object.keys(SUBSTRATE_LABEL) as Substrate[]).map((k) => (
-                <option key={k} value={k}>
-                  {SUBSTRATE_LABEL[k]}
+              <option value="">Choose a filter…</option>
+              {filters.map((f) => (
+                <option key={f.id} value={f.id}>
+                  {f.name}. {FILTER_TYPE_LABEL[f.filter_type]}, rated {f.rated_litres} L
                 </option>
               ))}
             </select>
-          </label>
-          <fieldset className="space-y-1.5">
-            <legend className="mb-1 text-sm text-foreground/80">Equipment</legend>
-            {(
-              [
-                ["has_heater", "Heater", true],
-                ["has_light", "Light", true],
-                ["has_co2", "CO2", false],
-              ] as const
-            ).map(([key, label, fallback]) => (
-              <label key={key} className="flex min-h-9 items-center gap-2 text-sm">
-                <input
-                  type="checkbox"
-                  checked={state[key] ?? fallback}
-                  onChange={(e) => setState((st) => ({ ...st, [key]: e.target.checked }))}
-                  className="h-4 w-4 accent-[var(--color-teal)]"
+            {!visualOnly && filterUndersized && (
+              <p className="flex items-start gap-1.5 rounded-lg bg-warn/15 px-2.5 py-1.5 text-xs font-medium text-foreground">
+                <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-warn" aria-hidden />
+                <span>
+                  This filter is rated for {formatVolume(state.filter!.rated_litres, units)} but
+                  your tank is {volume}. Consider a larger filter, or run a second one.
+                </span>
+              </p>
+            )}
+            {!visualOnly && state.filter && (
+              <div className="rounded-xl border border-primary/20 bg-primary/5 px-3 py-2 text-xs text-foreground/80">
+                <p className="font-semibold text-foreground">
+                  {FILTER_TYPE_LABEL[state.filter.filter_type]} · {state.filter.turnover_lph} L/h
+                  flow
+                </p>
+                <p className="mt-1 text-muted-foreground">
+                  Flow tells you how quickly water moves, not how much waste the filter can process.
+                  Add the amount and age of its biological media below.
+                </p>
+              </div>
+            )}
+            {!visualOnly && (
+              <>
+                <Segmented<BiologicalMediaLevel>
+                  label="Biological media"
+                  value={state.biological_media_level}
+                  options={[
+                    { value: "minimal", label: "Minimal" },
+                    { value: "standard", label: "Standard" },
+                    { value: "substantial", label: "Substantial" },
+                  ]}
+                  onChange={(v) => setState((s) => ({ ...s, biological_media_level: v }))}
                 />
-                {label}
-              </label>
-            ))}
-          </fieldset>
-          {!visualOnly && <>
-            <label className="block text-sm">
-              <div className="mb-1 flex items-center justify-between text-foreground/80">
-                <span>Target pH</span>
-                <span className="font-medium">{state.target_ph.toFixed(1)}</span>
-              </div>
-              <input
-                type="range"
-                min={4}
-                max={9}
-                step={0.1}
-                value={state.target_ph}
-                onChange={(e) => setState((s) => ({ ...s, target_ph: Number(e.target.value) }))}
-                className="w-full accent-[var(--color-teal)]"
-                aria-label="Target pH"
-              />
-            </label>
-            <label className="block text-sm">
-              <div className="mb-1 flex items-center justify-between text-foreground/80">
-                <span>Target temp</span>
-                <span className="font-medium">{state.target_temp_c}°C</span>
-              </div>
-              <input
-                type="range"
-                min={15}
-                max={32}
-                step={1}
-                value={state.target_temp_c}
-                onChange={(e) =>
-                  setState((s) => ({
-                    ...s,
-                    target_temp_c: Number(e.target.value),
-                  }))
-                }
-                className="w-full accent-[var(--color-teal)]"
-                aria-label="Target temperature"
-              />
-            </label>
-          </>}
-        </AccordionContent>
-      </AccordionItem>}
+                <ExtraFilters state={state} setState={setState} filters={filters} />
 
-      {sections.includes("filter") && <AccordionItem
-        value="filter"
-        id="step-filter"
-        className="rounded-2xl border bg-background/60 px-3"
-      >
-        <AccordionTrigger className="min-h-14 py-3 hover:no-underline">
-          <StepHeader
-            n={2}
-            title={visualOnly ? "Filter" : "Filter and maintenance"}
-            summary={state.filter ? state.filter.name : "Pick a filter"}
-          />
-        </AccordionTrigger>
-        <AccordionContent className="space-y-3 pb-3">
-          <select
-            className="w-full rounded-xl border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
-            value={state.filter?.id ?? ""}
-            onChange={(e) => {
-              const f = filters.find((x) => x.id === e.target.value) ?? null;
-              setState((s) => ({
-                ...s,
-                filter: f,
-                biological_media_level: f?.biological_media_level ?? s.biological_media_level,
-              }));
-            }}
-            aria-label="Filter"
-          >
-            <option value="">Choose a filter…</option>
-            {filters.map((f) => (
-              <option key={f.id} value={f.id}>
-                {f.name}. {FILTER_TYPE_LABEL[f.filter_type]}, rated {f.rated_litres} L
-              </option>
-            ))}
-          </select>
-          {!visualOnly && filterUndersized && (
-            <p className="flex items-start gap-1.5 rounded-lg bg-warn/15 px-2.5 py-1.5 text-xs font-medium text-foreground">
-              <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-warn" aria-hidden />
-              <span>
-                This filter is rated for {formatVolume(state.filter!.rated_litres, units)} but your
-                tank is {volume}. Consider a larger filter, or run a second one.
-              </span>
-            </p>
-          )}
-          {!visualOnly && state.filter && (
-            <div className="rounded-xl border border-primary/20 bg-primary/5 px-3 py-2 text-xs text-foreground/80">
-              <p className="font-semibold text-foreground">
-                {FILTER_TYPE_LABEL[state.filter.filter_type]} · {state.filter.turnover_lph} L/h flow
-              </p>
-              <p className="mt-1 text-muted-foreground">
-                Flow tells you how quickly water moves, not how much waste the filter can process.
-                Add the amount and age of its biological media below.
-              </p>
-            </div>
-          )}
-          {!visualOnly && <>
-            <Segmented<BiologicalMediaLevel>
-              label="Biological media"
-              value={state.biological_media_level}
-              options={[
-                { value: "minimal", label: "Minimal" },
-                { value: "standard", label: "Standard" },
-                { value: "substantial", label: "Substantial" },
-              ]}
-              onChange={(v) => setState((s) => ({ ...s, biological_media_level: v }))}
+                <div className="rounded-xl border bg-background px-3 py-2 text-xs text-muted-foreground">
+                  Cycling and water tests moved to the{" "}
+                  <Link to="/tracker" className="font-semibold text-foreground underline">
+                    tank tracker
+                  </Link>
+                  , where you can log each test for every tank you keep.
+                </div>
+                <Segmented<MaintenanceFrequency>
+                  label="Maintenance"
+                  value={state.maintenance_frequency}
+                  options={[
+                    { value: "weekly", label: "Weekly" },
+                    { value: "fortnightly", label: "Fortnightly" },
+                    { value: "monthly", label: "Monthly" },
+                  ]}
+                  onChange={(v) => setState((s) => ({ ...s, maintenance_frequency: v }))}
+                />
+              </>
+            )}
+          </AccordionContent>
+        </AccordionItem>
+      )}
+
+      {sections.includes("livestock") && (
+        <AccordionItem
+          value="livestock"
+          id="step-livestock"
+          className="rounded-2xl border bg-background/60 px-3"
+        >
+          <AccordionTrigger className="py-3 hover:no-underline">
+            <StepHeader
+              n={3}
+              title="Fish"
+              summary={
+                fishCount === 0
+                  ? "No fish yet"
+                  : `${fishCount} fish · ${state.species.length} species`
+              }
+              icon={<Fish className="h-3.5 w-3.5" aria-hidden />}
             />
-            <ExtraFilters state={state} setState={setState} filters={filters} />
+          </AccordionTrigger>
+          <AccordionContent className="pb-3">
+            <SpeciesAdder state={state} setState={setState} species={species} />
+          </AccordionContent>
+        </AccordionItem>
+      )}
 
-            <div className="rounded-xl border bg-background px-3 py-2 text-xs text-muted-foreground">
-              Cycling and water tests moved to the{" "}
-              <Link to="/tracker" className="font-semibold text-foreground underline">
-                tank tracker
-              </Link>
-              , where you can log each test for every tank you keep.
-            </div>
-            <Segmented<MaintenanceFrequency>
-              label="Maintenance"
-              value={state.maintenance_frequency}
-              options={[
-                { value: "weekly", label: "Weekly" },
-                { value: "fortnightly", label: "Fortnightly" },
-                { value: "monthly", label: "Monthly" },
-              ]}
-              onChange={(v) => setState((s) => ({ ...s, maintenance_frequency: v }))}
+      {sections.includes("aquascape") && (
+        <AccordionItem
+          value="aquascape"
+          id="step-aquascape"
+          className="rounded-2xl border bg-background/60 px-3"
+        >
+          <AccordionTrigger className="py-3 hover:no-underline">
+            <StepHeader
+              n={4}
+              title="Aquascape"
+              summary={
+                scapeCount === 0
+                  ? "No plants or hardscape yet"
+                  : `${state.plants.length} plants · ${state.hardscape.length} hardscape`
+              }
+              icon={<Sprout className="h-3.5 w-3.5" aria-hidden />}
             />
-          </>}
-        </AccordionContent>
-      </AccordionItem>}
-
-      {sections.includes("livestock") && <AccordionItem
-        value="livestock"
-        id="step-livestock"
-        className="rounded-2xl border bg-background/60 px-3"
-      >
-        <AccordionTrigger className="py-3 hover:no-underline">
-          <StepHeader
-            n={3}
-            title="Fish"
-            summary={
-              fishCount === 0
-                ? "No fish yet"
-                : `${fishCount} fish · ${state.species.length} species`
-            }
-            icon={<Fish className="h-3.5 w-3.5" aria-hidden />}
-          />
-        </AccordionTrigger>
-        <AccordionContent className="pb-3">
-          <SpeciesAdder state={state} setState={setState} species={species} />
-        </AccordionContent>
-      </AccordionItem>}
-
-      {sections.includes("aquascape") && <AccordionItem
-        value="aquascape"
-        id="step-aquascape"
-        className="rounded-2xl border bg-background/60 px-3"
-      >
-        <AccordionTrigger className="py-3 hover:no-underline">
-          <StepHeader
-            n={4}
-            title="Aquascape"
-            summary={
-              scapeCount === 0
-                ? "No plants or hardscape yet"
-                : `${state.plants.length} plants · ${state.hardscape.length} hardscape`
-            }
-            icon={<Sprout className="h-3.5 w-3.5" aria-hidden />}
-          />
-        </AccordionTrigger>
-        <AccordionContent className="space-y-3 pb-3">
-          <Segmented<PlantDensity>
-            label="Plant density"
-            value={state.plant_density}
-            options={[
-              { value: "none", label: "None" },
-              { value: "light", label: "Light" },
-              { value: "medium", label: "Medium" },
-              { value: "heavy", label: "Heavy" },
-            ]}
-            onChange={(v) => setState((s) => ({ ...s, plant_density: v }))}
-          />
-          <Tabs defaultValue="plants" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="plants">Plants</TabsTrigger>
-              <TabsTrigger value="hardscape">Hardscape</TabsTrigger>
-            </TabsList>
-            <TabsContent value="plants" className="mt-3">
-              <PlantAdder state={state} setState={setState} plants={plants} />
-            </TabsContent>
-            <TabsContent value="hardscape" className="mt-3">
-              <HardscapeAdder state={state} setState={setState} hardscape={hardscape} />
-            </TabsContent>
-          </Tabs>
-        </AccordionContent>
-      </AccordionItem>}
+          </AccordionTrigger>
+          <AccordionContent className="space-y-3 pb-3">
+            <Segmented<PlantDensity>
+              label="Plant density"
+              value={state.plant_density}
+              options={[
+                { value: "none", label: "None" },
+                { value: "light", label: "Light" },
+                { value: "medium", label: "Medium" },
+                { value: "heavy", label: "Heavy" },
+              ]}
+              onChange={(v) => setState((s) => ({ ...s, plant_density: v }))}
+            />
+            <Tabs defaultValue="plants" className="w-full">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="plants">Plants</TabsTrigger>
+                <TabsTrigger value="hardscape">Hardscape</TabsTrigger>
+              </TabsList>
+              <TabsContent value="plants" className="mt-3">
+                <PlantAdder state={state} setState={setState} plants={plants} />
+              </TabsContent>
+              <TabsContent value="hardscape" className="mt-3">
+                <HardscapeAdder state={state} setState={setState} hardscape={hardscape} />
+              </TabsContent>
+            </Tabs>
+          </AccordionContent>
+        </AccordionItem>
+      )}
     </Accordion>
   );
 }
@@ -591,7 +598,6 @@ function DimField({
   );
 }
 
-
 function Segmented<T extends string>({
   label,
   value,
@@ -677,7 +683,6 @@ export function SpeciesAdder({
 
   return (
     <section className="space-y-2">
-
       <div className="relative" ref={containerRef}>
         <Search
           className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"

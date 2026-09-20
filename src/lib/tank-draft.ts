@@ -33,24 +33,53 @@ export const DEFAULT_STATE: TankState = {
 };
 
 export const DRAFT_KEY = "fishtankr:draft:v1";
-export interface TankDraft { version: 1; state: TankState; savedId?: string; source?: string }
+export interface TankDraft {
+  version: 1;
+  state: TankState;
+  savedId?: string;
+  source?: string;
+}
 export function parseDraft(raw: string | null): TankDraft | null {
   if (!raw) return null;
   try {
     const draft = JSON.parse(raw);
     const s = draft?.state;
-    if (draft.version !== 1 || !s || typeof s.name !== "string" ||
-      ![s.length_cm,s.width_cm,s.height_cm,s.target_ph,s.target_temp_c].every(v => typeof v === "number" && Number.isFinite(v)) ||
-      ![s.species,s.plants,s.hardscape].every(Array.isArray)) return null;
+    if (
+      draft.version !== 1 ||
+      !s ||
+      typeof s.name !== "string" ||
+      ![s.length_cm, s.width_cm, s.height_cm, s.target_ph, s.target_temp_c].every(
+        (v) => typeof v === "number" && Number.isFinite(v),
+      ) ||
+      ![s.species, s.plants, s.hardscape].every(Array.isArray)
+    )
+      return null;
     if (s.invertebrates !== undefined && !Array.isArray(s.invertebrates)) return null;
-    for (const [rows, key] of [[s.species,"species"],[s.invertebrates ?? [],"invertebrate"],[s.plants,"plant"],[s.hardscape,"hardscape"]] as const) {
-      if (!rows.every((row: Record<string, unknown>) => {
-        const entry = row?.[key] as { id?: unknown } | undefined;
-        return typeof entry?.id === "string" && Number.isInteger(row?.quantity) && (row.quantity as number) > 0;
-      })) return null;
+    for (const [rows, key] of [
+      [s.species, "species"],
+      [s.invertebrates ?? [], "invertebrate"],
+      [s.plants, "plant"],
+      [s.hardscape, "hardscape"],
+    ] as const) {
+      if (
+        !rows.every((row: Record<string, unknown>) => {
+          const entry = row?.[key] as { id?: unknown } | undefined;
+          return (
+            typeof entry?.id === "string" &&
+            Number.isInteger(row?.quantity) &&
+            (row.quantity as number) > 0
+          );
+        })
+      )
+        return null;
     }
-    return {version: 1, state: {...DEFAULT_STATE, ...s, invertebrates: s.invertebrates ?? []},
+    return {
+      version: 1,
+      state: { ...DEFAULT_STATE, ...s, invertebrates: s.invertebrates ?? [] },
       savedId: typeof draft.savedId === "string" ? draft.savedId : undefined,
-      source: typeof draft.source === "string" ? draft.source : undefined};
-  } catch { return null; }
+      source: typeof draft.source === "string" ? draft.source : undefined,
+    };
+  } catch {
+    return null;
+  }
 }

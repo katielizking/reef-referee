@@ -133,9 +133,7 @@ function ShopPage() {
           <Truck className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
           <span>
             <strong>{deliveryLabel(shop)}.</strong>{" "}
-            {shop.ships_to_regions.length > 0 && (
-              <>States: {shop.ships_to_regions.join(", ")}. </>
-            )}
+            {shop.ships_to_regions.length > 0 && <>States: {shop.ships_to_regions.join(", ")}. </>}
             {shop.shipping_note ? `${shop.shipping_note} ` : ""}
             {shop.delivery_reviewed_on
               ? `Delivery details last checked ${shop.delivery_reviewed_on}.`
@@ -151,7 +149,10 @@ function ShopPage() {
           </p>
           <div className="mt-2 flex flex-wrap gap-1.5">
             {shop.specialties.map((s: string) => (
-              <span key={s} className="border border-rule px-2.5 py-1 text-xs text-muted-foreground">
+              <span
+                key={s}
+                className="border border-rule px-2.5 py-1 text-xs text-muted-foreground"
+              >
                 {s}
               </span>
             ))}

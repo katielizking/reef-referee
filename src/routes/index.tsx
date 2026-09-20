@@ -21,8 +21,7 @@ export const Route = createFileRoute("/")({
       },
       {
         property: "og:description",
-        content:
-          "Clear stocking checks, fish compatibility guidance and practical next steps.",
+        content: "Clear stocking checks, fish compatibility guidance and practical next steps.",
       },
       { property: "og:url", content: absoluteUrl("/") },
     ],

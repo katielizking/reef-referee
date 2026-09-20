@@ -32,10 +32,7 @@ export function useInvertebrates() {
   return useQuery({
     queryKey: ["invertebrates"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("invertebrates")
-        .select("*")
-        .order("common_name");
+      const { data, error } = await supabase.from("invertebrates").select("*").order("common_name");
       if (error) throw error;
       return data as unknown as Invertebrate[];
     },

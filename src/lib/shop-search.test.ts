@@ -111,9 +111,9 @@ describe("labels", () => {
   it("describes delivery plainly", () => {
     expect(deliveryLabel(shop({ pickup_only: true }))).toBe("In store only");
     expect(deliveryLabel(shop({ ships_live_fish: false }))).toBe("Ships dry goods only");
-    expect(
-      deliveryLabel(shop({ ships_live_fish: false, delivery_reviewed_on: null })),
-    ).toBe("Live fish delivery not confirmed");
+    expect(deliveryLabel(shop({ ships_live_fish: false, delivery_reviewed_on: null }))).toBe(
+      "Live fish delivery not confirmed",
+    );
     expect(deliveryLabel(shop())).toBe("Ships live fish within AU");
   });
 

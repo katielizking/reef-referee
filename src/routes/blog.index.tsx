@@ -20,7 +20,8 @@ export const Route = createFileRoute("/blog/")({
       { property: "og:title", content: "Field notes | FishTankr" },
       {
         property: "og:description",
-        content: "Sourced writing on freshwater stocking, fish welfare and aquarium planning tools.",
+        content:
+          "Sourced writing on freshwater stocking, fish welfare and aquarium planning tools.",
       },
       { property: "og:type", content: "website" },
       { property: "og:url", content: absoluteUrl("/blog") },

@@ -322,15 +322,29 @@ function scoreCompatibility(state: TankState): CompatibilitySubScore {
   for (const { species: sp, quantity } of state.species) {
     // Species-specific guidance must also work for older saved catalogue snapshots.
     if (sp.scientific_name.toLowerCase() === "carinotetraodon travancoricus") {
-      if (quantity < 6) add("shoal-shortfall", "high", 18,
-        `Pea puffers are social but territorial. This plan has ${quantity}; our group-care approach recommends at least 6. Small groups can concentrate aggression.`,
-        "Plan a group of 6+ only with adequate space and dense cover. Do not simply add fish to an undersized tank; seek experienced advice when introducing fish to an established solitary puffer.");
-      if (litresOf(state) < Math.max(60, quantity * 10)) add("tank-too-small", "high", 25,
-        "Pea puffer groups need room for territories. Our planning guideline is at least 60 L and roughly 10 L per puffer; a longer, larger tank is preferable.",
-        "Increase tank size before increasing the group. Volume is a guide, not a guarantee of compatibility.");
-      add("aggression-standing", state.plant_density === "heavy" ? "low" : "medium", state.plant_density === "heavy" ? 5 : 14,
+      if (quantity < 6)
+        add(
+          "shoal-shortfall",
+          "high",
+          18,
+          `Pea puffers are social but territorial. This plan has ${quantity}; our group-care approach recommends at least 6. Small groups can concentrate aggression.`,
+          "Plan a group of 6+ only with adequate space and dense cover. Do not simply add fish to an undersized tank; seek experienced advice when introducing fish to an established solitary puffer.",
+        );
+      if (litresOf(state) < Math.max(60, quantity * 10))
+        add(
+          "tank-too-small",
+          "high",
+          25,
+          "Pea puffer groups need room for territories. Our planning guideline is at least 60 L and roughly 10 L per puffer; a longer, larger tank is preferable.",
+          "Increase tank size before increasing the group. Volume is a guide, not a guarantee of compatibility.",
+        );
+      add(
+        "aggression-standing",
+        state.plant_density === "heavy" ? "low" : "medium",
+        state.plant_density === "heavy" ? 5 : 14,
         "Pea puffers can still bully one another in a full group. Group care does not eliminate aggression.",
-        "Use dense planting and broken sightlines, favour at least two females per male where sexable, and monitor feeding and bullying. Prefer a species-only setup; be ready to separate a persistently aggressive fish.");
+        "Use dense planting and broken sightlines, favour at least two females per male where sexable, and monitor feeding and bullying. Prefer a species-only setup; be ready to separate a persistently aggressive fish.",
+      );
       continue;
     }
     if (sp.is_schooling && quantity < sp.min_group_size) {

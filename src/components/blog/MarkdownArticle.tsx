@@ -80,7 +80,9 @@ export function MarkdownArticle({ body }: { body: string }) {
               {children}
             </th>
           ),
-          tr: ({ children }) => <tr className="border-b border-border last:border-0">{children}</tr>,
+          tr: ({ children }) => (
+            <tr className="border-b border-border last:border-0">{children}</tr>
+          ),
           td: ({ children }) => (
             <td className="data-mono py-3 pr-4 align-top text-[0.8125rem] text-foreground/80">
               {children}

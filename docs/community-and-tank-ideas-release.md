@@ -33,5 +33,6 @@ Smoke-check `/`, `/calculator`, `/visualiser`, `/tracker`, `/species`, `/shops`,
 The additive database schema may remain during a code rollback. Pause participation by removing the approved moderator allowlist entry only with operator authorization; do not remove user data or drop tables as a rollback. Revert code with a new forward commit, never force-push or rewrite published history.
 
 Care references reviewed 20 September 2026:
+
 - https://www.pufferfishenthusiastsworldwide.com/post/c-travancoricus
 - https://www.aquariumcoop.com/blogs/aquarium/pea-puffer

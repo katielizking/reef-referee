@@ -43,6 +43,7 @@ Working title: "Fed up with AqAdvisor? Here's what else is out there (2026)"
 Angle: AqAdvisor has been the default for twenty-odd years and its inch-per-gallon lineage shows. Here is what the alternatives actually do, and where each one is weak. Warm, a bit cheeky, no lecturing, no "unlock" or "seamless", Australian English, sentence case, no em dashes.
 
 Shape:
+
 1. Why people go looking (the interface, the "you can add 3 more neon tetras" precision, the missing species).
 2. FishTankr first, with the reason stated plainly: it scores welfare rather than volume, keeps headroom qualitative because our capacity model is not calibrated, checks your target pH and temperature against every fish, and flags aggression a litres-and-length formula sails straight past. Stated as our own tool, not pretended otherwise.
 3. Each alternative: what it does well, what it does not, who it suits. Candidates found so far, each to be opened and checked before a word is written about it: Aquapacity, App-aquatic, Fish That Fit, aquariumstocking.com, AquaStream, aquariumcalculator.app, FishComfort, Tankstocker.

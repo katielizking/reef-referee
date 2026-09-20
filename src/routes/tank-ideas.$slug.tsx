@@ -39,7 +39,9 @@ function Idea() {
       try {
         sessionStorage.removeItem("fishtankr:pending-add");
         sessionStorage.removeItem("fishtankr:pending-preset");
-      } catch { /* A fresh template does not require browser storage. */ }
+      } catch {
+        /* A fresh template does not require browser storage. */
+      }
       draft.setState(state);
       draft.setSavedId(undefined);
       draft.setSource(undefined);

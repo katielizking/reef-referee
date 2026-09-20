@@ -47,8 +47,19 @@ function PrivacyPage() {
         </p>
       </PolicySection>
       <PolicySection title="Community accounts and posts">
-        <p>Community participation uses an email-confirmed account. We store your email for sign-in, your public username, posts and replies, and the votes and saves associated with your account. Your email, saved-post list and individual votes are not publicly listed. Reports are visible to moderators.</p>
-        <p>Posts, usernames, replies and uploaded photographs are public. Photos are public as soon as they are uploaded, including before a post is published; do not upload private information. You can edit or remove your own posts and replies. Removed replies leave a placeholder so conversations remain understandable. Moderators may hide content, lock discussions and restrict accounts. Contact us to request account or uploaded-file removal.</p>
+        <p>
+          Community participation uses an email-confirmed account. We store your email for sign-in,
+          your public username, posts and replies, and the votes and saves associated with your
+          account. Your email, saved-post list and individual votes are not publicly listed. Reports
+          are visible to moderators.
+        </p>
+        <p>
+          Posts, usernames, replies and uploaded photographs are public. Photos are public as soon
+          as they are uploaded, including before a post is published; do not upload private
+          information. You can edit or remove your own posts and replies. Removed replies leave a
+          placeholder so conversations remain understandable. Moderators may hide content, lock
+          discussions and restrict accounts. Contact us to request account or uploaded-file removal.
+        </p>
       </PolicySection>
       <PolicySection title="Usage analytics">
         <p>

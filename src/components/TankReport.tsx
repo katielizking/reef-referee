@@ -18,7 +18,8 @@ function allIssues(s: Scorecard): Issue[] {
     ...(s.bioload.issues ?? []),
   ].sort(
     (a, b) =>
-      SEVERITY_ORDER.indexOf(a.severity) - SEVERITY_ORDER.indexOf(b.severity) || b.weight - a.weight,
+      SEVERITY_ORDER.indexOf(a.severity) - SEVERITY_ORDER.indexOf(b.severity) ||
+      b.weight - a.weight,
   );
 }
 
@@ -40,8 +41,8 @@ export function TankReport({ scorecard, state }: { scorecard: Scorecard; state: 
       <header>
         <h1>{state.name || "My tank"}</h1>
         <p>
-          FishTankr stocking plan · {new Date().toLocaleDateString("en-AU")} · a helpful guide, not a
-          guarantee
+          FishTankr stocking plan · {new Date().toLocaleDateString("en-AU")} · a helpful guide, not
+          a guarantee
         </p>
       </header>
 
@@ -53,8 +54,8 @@ export function TankReport({ scorecard, state }: { scorecard: Scorecard; state: 
       <h3>The tank</h3>
       <ul>
         <li>
-          {TANK_SHAPE_LABEL[state.tank_shape ?? "rectangle"]} · {state.length_cm} ×{" "}
-          {state.width_cm} × {state.height_cm} cm · {litres} L of water
+          {TANK_SHAPE_LABEL[state.tank_shape ?? "rectangle"]} · {state.length_cm} × {state.width_cm}{" "}
+          × {state.height_cm} cm · {litres} L of water
         </li>
         <li>
           Filters: {filtration.count || "none chosen"}

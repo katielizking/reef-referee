@@ -103,8 +103,7 @@ export function checkInvertebrates(state: TankState): InvertIssue[] {
         severity: "critical",
         subject: name,
         reason:
-          inv.fish_risk_note ??
-          `${hunters[0].species.common_name} is big enough to eat ${name}.`,
+          inv.fish_risk_note ?? `${hunters[0].species.common_name} is big enough to eat ${name}.`,
         fix: `Drop ${name}, or drop the fish that will hunt it.`,
       });
     }
@@ -119,8 +118,7 @@ export function checkInvertebrates(state: TankState): InvertIssue[] {
           code: "hunts_tank_mates",
           severity: "critical",
           subject: name,
-          reason:
-            inv.fish_risk_note ?? `${name} hunts smaller tank mates, usually at night.`,
+          reason: inv.fish_risk_note ?? `${name} hunts smaller tank mates, usually at night.`,
           fix: `Keep ${name} on its own, or remove the tank mates it can catch.`,
         });
       }
@@ -153,7 +151,8 @@ export function checkInvertebrates(state: TankState): InvertIssue[] {
         code: "check_local_rules",
         severity: "note",
         subject: name,
-        reason: inv.legal_note ?? `${name} may need a licence where you live. Local reference only.`,
+        reason:
+          inv.legal_note ?? `${name} may need a licence where you live. Local reference only.`,
         fix: "Check your state fisheries rules before buying.",
       });
     }

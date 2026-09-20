@@ -232,7 +232,19 @@ function SavedTanks() {
             Pick a starting point, then adjust it in the builder.
           </p>
           <ul className="grid gap-3 sm:grid-cols-2">
-            {TANK_IDEAS.map(idea => <li key={idea.slug}><Link to="/tank-ideas/$slug" params={{slug:idea.slug}} className="block h-full rounded-2xl border bg-card p-4 transition hover:border-primary"><h3 className="font-display font-semibold">{idea.title}</h3><p className="mt-2 text-sm text-muted-foreground">{idea.summary}</p><p className="mt-3 text-xs text-primary">View stocking and care →</p></Link></li>)}
+            {TANK_IDEAS.map((idea) => (
+              <li key={idea.slug}>
+                <Link
+                  to="/tank-ideas/$slug"
+                  params={{ slug: idea.slug }}
+                  className="block h-full rounded-2xl border bg-card p-4 transition hover:border-primary"
+                >
+                  <h3 className="font-display font-semibold">{idea.title}</h3>
+                  <p className="mt-2 text-sm text-muted-foreground">{idea.summary}</p>
+                  <p className="mt-3 text-xs text-primary">View stocking and care →</p>
+                </Link>
+              </li>
+            ))}
           </ul>
         </div>
       </div>

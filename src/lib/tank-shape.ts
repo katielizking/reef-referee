@@ -30,7 +30,9 @@ export function shapeFill(shape: TankShape | undefined): number {
 export function waterLitres(
   state: Pick<TankState, "length_cm" | "width_cm" | "height_cm" | "tank_shape">,
 ): number {
-  return ((state.length_cm * state.width_cm * state.height_cm) / 1000) * shapeFill(state.tank_shape);
+  return (
+    ((state.length_cm * state.width_cm * state.height_cm) / 1000) * shapeFill(state.tank_shape)
+  );
 }
 
 /**

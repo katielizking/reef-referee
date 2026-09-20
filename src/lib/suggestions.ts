@@ -19,7 +19,8 @@ function worstNewSeverity(before: Issue[], after: Issue[]): Issue["severity"] | 
       seen.set(issue.code, left - 1);
       continue;
     }
-    if (worst === null || order.indexOf(issue.severity) < order.indexOf(worst)) worst = issue.severity;
+    if (worst === null || order.indexOf(issue.severity) < order.indexOf(worst))
+      worst = issue.severity;
   }
   return worst;
 }
@@ -75,9 +76,7 @@ export function suggestCompatibleSpecies(
       score: scored.overall,
       reason: `Suits ${Math.round(litres)} L, and pH ${state.target_ph} at ${state.target_temp_c} °C sits inside its range of pH ${species.native_ph_min}–${species.native_ph_max} and ${species.native_temp_min_c}–${species.native_temp_max_c} °C.`,
       groupNote:
-        species.min_group_size > 1
-          ? `Keep at least ${species.min_group_size} together.`
-          : null,
+        species.min_group_size > 1 ? `Keep at least ${species.min_group_size} together.` : null,
     });
   }
 

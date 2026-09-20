@@ -26,7 +26,8 @@ const speciesByIdQuery = (id: string) =>
   queryOptions({
     queryKey: ["species", id],
     queryFn: async () => {
-      const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+      const uuidPattern =
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
       if (!uuidPattern.test(id)) throw notFound();
       const { data, error } = await supabase.from("species").select("*").eq("id", id).maybeSingle();
       if (error) throw error;
@@ -144,7 +145,9 @@ function SpeciesError({ error }: { error: unknown }) {
   return (
     <div className="mx-auto max-w-3xl px-4 py-16 text-center">
       <h1 className="font-display text-2xl font-semibold">Something went wrong</h1>
-      <p className="mt-2 text-sm text-muted-foreground">{error instanceof Error ? error.message : "Please try again."}</p>
+      <p className="mt-2 text-sm text-muted-foreground">
+        {error instanceof Error ? error.message : "Please try again."}
+      </p>
       <button
         onClick={() => router.invalidate()}
         className="mt-6 inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground"
