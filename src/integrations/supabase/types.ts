@@ -18,18 +18,30 @@ export type Database = {
         Row: {
           address: string | null
           affiliate_url: string | null
+          city: string | null
           claimed_at: string | null
           country_code: string
           created_at: string
+          delivery_reviewed_on: string | null
           description: string | null
           featured: boolean
           id: string
+          independent_note: string | null
           is_affiliate: boolean
           lat: number | null
           lng: number | null
           name: string
+          ownership: string
           phone: string | null
+          pickup_only: boolean
           postcode: string | null
+          region: string | null
+          search_url_template: string | null
+          sells_online: boolean
+          shipping_note: string | null
+          ships_live_fish: boolean
+          ships_to_countries: string[]
+          ships_to_regions: string[]
           slug: string
           specialties: string[]
           state: string | null
@@ -40,18 +52,30 @@ export type Database = {
         Insert: {
           address?: string | null
           affiliate_url?: string | null
+          city?: string | null
           claimed_at?: string | null
           country_code?: string
           created_at?: string
+          delivery_reviewed_on?: string | null
           description?: string | null
           featured?: boolean
           id?: string
+          independent_note?: string | null
           is_affiliate?: boolean
           lat?: number | null
           lng?: number | null
           name: string
+          ownership?: string
           phone?: string | null
+          pickup_only?: boolean
           postcode?: string | null
+          region?: string | null
+          search_url_template?: string | null
+          sells_online?: boolean
+          shipping_note?: string | null
+          ships_live_fish?: boolean
+          ships_to_countries?: string[]
+          ships_to_regions?: string[]
           slug: string
           specialties?: string[]
           state?: string | null
@@ -62,18 +86,30 @@ export type Database = {
         Update: {
           address?: string | null
           affiliate_url?: string | null
+          city?: string | null
           claimed_at?: string | null
           country_code?: string
           created_at?: string
+          delivery_reviewed_on?: string | null
           description?: string | null
           featured?: boolean
           id?: string
+          independent_note?: string | null
           is_affiliate?: boolean
           lat?: number | null
           lng?: number | null
           name?: string
+          ownership?: string
           phone?: string | null
+          pickup_only?: boolean
           postcode?: string | null
+          region?: string | null
+          search_url_template?: string | null
+          sells_online?: boolean
+          shipping_note?: string | null
+          ships_live_fish?: boolean
+          ships_to_countries?: string[]
+          ships_to_regions?: string[]
           slug?: string
           specialties?: string[]
           state?: string | null

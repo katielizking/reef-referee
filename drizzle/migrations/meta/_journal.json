@@ -50,6 +50,13 @@
       "when": 1789874608265,
       "tag": "0006_create_tracked_tanks_and_water_tests",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1789875571923,
+      "tag": "0007_shops_global_independent_directory",
+      "breakpoints": true
     }
   ]
 }
