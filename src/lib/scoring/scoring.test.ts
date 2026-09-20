@@ -211,6 +211,7 @@ describe("scoreTank", () => {
         (issue) => issue.code === "predation" || issue.code === "predation-risk",
       ),
     ).toBe(false);
+  });
 
   it("scores the selected water against every fish", () => {
     const softWaterFish = species({
