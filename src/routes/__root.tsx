@@ -293,66 +293,99 @@ function SiteHeader() {
   );
 }
 
+const footerLinkClass = "text-sm text-on-ink-muted transition-colors hover:text-on-ink";
+
+const footerGroups: Array<{
+  heading: string;
+  links: Array<{ to?: string; href?: string; label: string }>;
+}> = [
+  {
+    heading: "Plan",
+    links: [
+      { to: "/calculator", label: "Calculator" },
+      { to: "/visualiser", label: "3D planner" },
+      { to: "/species", label: "Species library" },
+      { to: "/tracker", label: "Tank tracker" },
+      { to: "/quiz", label: "Fish quiz" },
+    ],
+  },
+  {
+    heading: "Learn",
+    links: [
+      { to: "/guides", label: "Guides" },
+      { to: "/blog", label: "Blog" },
+      { to: "/methodology", label: "Methodology" },
+      { to: "/shops", label: "Shops" },
+    ],
+  },
+  {
+    heading: "About",
+    links: [
+      { to: "/contact", label: "Contact" },
+      { to: "/attribution", label: "3D credits" },
+      { href: SUPPORT_URL, label: "Support FishTankr" },
+      { href: "/sitemap.xml", label: "Sitemap" },
+    ],
+  },
+];
+
 function SiteFooter() {
   return (
-    <footer className="relative mt-20 overflow-hidden border-t border-foreground/10 bg-ink text-white">
-      <div className="mx-auto w-full max-w-[1440px] px-[clamp(24px,5.8vw,88px)] grid gap-8 py-10 sm:grid-cols-[1fr_auto] sm:items-start">
-        <div>
-          <div className="flex items-center gap-2">
-            <BrandLogo size={22} />
-            <span className="font-display text-base text-white">Smarter tanks. Happier fish.</span>
+    <footer className="relative mt-20 border-t border-foreground/10 bg-ink text-on-ink">
+      <div className="mx-auto w-full max-w-[1440px] px-[clamp(24px,5.8vw,88px)] pb-8 pt-12">
+        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-[1.4fr_repeat(3,1fr)]">
+          <div>
+            <div className="flex items-center gap-2">
+              <BrandLogo size={22} />
+              <span className="font-display text-base">Smarter tanks. Happier fish.</span>
+            </div>
+            <p className="mt-3 max-w-xs text-xs leading-relaxed text-on-ink-muted">
+              Check each species’ needs and the local rules before you stock.
+            </p>
           </div>
-          <p className="mt-2 max-w-md text-xs leading-relaxed text-white/60">
-            Check each species’ needs and the local rules before you stock.
-          </p>
+          {footerGroups.map((group) => (
+            <nav key={group.heading} aria-label={group.heading}>
+              <h3 className="text-ui-label font-semibold uppercase tracking-wide text-on-ink-muted">
+                {group.heading}
+              </h3>
+              <ul className="mt-3 space-y-2">
+                {group.links.map((link) => (
+                  <li key={link.label}>
+                    {link.to ? (
+                      <Link to={link.to} className={footerLinkClass}>
+                        {link.label}
+                      </Link>
+                    ) : (
+                      <a
+                        href={link.href}
+                        target={link.href!.startsWith("http") ? "_blank" : undefined}
+                        rel={link.href!.startsWith("http") ? "noopener noreferrer" : undefined}
+                        className={footerLinkClass}
+                      >
+                        {link.label}
+                      </a>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          ))}
         </div>
-        <nav aria-label="Footer" className="flex flex-wrap gap-x-4 gap-y-2 text-xs text-white/60">
-          <Link to="/quiz">Fish quiz</Link><Link to="/guides">Guides</Link><Link to="/shops">Shops</Link><Link to="/blog">Blog</Link>
-          <Link to="/species" className="transition-colors hover:text-white">
-            Species
-          </Link>
-          <Link to="/guides" className="transition-colors hover:text-white">
-            Guides
-          </Link>
-          <Link to="/methodology" className="transition-colors hover:text-white">
-            Methodology
-          </Link>
-          <Link to="/blog" className="transition-colors hover:text-white">
-            Blog
-          </Link>
-          <Link to="/shops" className="transition-colors hover:text-white">
-            Shops
-          </Link>
-          <Link to="/privacy" className="transition-colors hover:text-white">
+        <div className="mt-10 flex flex-wrap gap-x-6 gap-y-2 border-t border-on-ink/15 pt-6 text-xs text-on-ink-muted">
+          <span>© 2026 FishTankr</span>
+          <Link to="/privacy" className="transition-colors hover:text-on-ink">
             Privacy
           </Link>
-          <Link to="/terms" className="transition-colors hover:text-white">
+          <Link to="/terms" className="transition-colors hover:text-on-ink">
             Terms
           </Link>
-          <Link to="/welfare-disclaimer" className="transition-colors hover:text-white">
+          <Link to="/welfare-disclaimer" className="transition-colors hover:text-on-ink">
             Welfare disclaimer
           </Link>
-          <Link to="/affiliate-disclosure" className="transition-colors hover:text-white">
+          <Link to="/affiliate-disclosure" className="transition-colors hover:text-on-ink">
             Affiliate disclosure
           </Link>
-          <Link to="/attribution" className="transition-colors hover:text-white">
-            3D credits
-          </Link>
-          <Link to="/contact" className="transition-colors hover:text-white">
-            Contact
-          </Link>
-          <a
-            href={SUPPORT_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="font-semibold text-blue transition-colors hover:text-white"
-          >
-            Support FishTankr
-          </a>
-          <a href="/sitemap.xml" className="transition-colors hover:text-white">
-            Sitemap
-          </a>
-        </nav>
+        </div>
       </div>
     </footer>
   );
