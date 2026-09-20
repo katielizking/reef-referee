@@ -10,6 +10,7 @@ import { useEditorStore } from "@/components/tank3d/editorStore";
 import { ScorecardPanel } from "@/components/Scorecard";
 import { TankReport } from "@/components/TankReport";
 import { CompatibleSuggestions } from "@/components/CompatibleSuggestions";
+import { InvertebrateAdder, InvertebrateChecks } from "@/components/InvertebratePanel";
 import { PreStockChecklist, useSaveGate } from "@/components/PreStockChecklist";
 import { scoreTank } from "@/lib/scoring";
 
@@ -42,6 +43,7 @@ export function TankWorkspace({ visualiser = false }: { visualiser?: boolean }) 
   const [openSteps, setOpenSteps] = useState<StepId[]>(["tank"]);
 
   const species = useSpecies();
+  const invertebrates = useInvertebrates();
   const plants = usePlants();
   const hardscape = useHardscape();
   const filters = useFilters();
@@ -93,6 +95,7 @@ export function TankWorkspace({ visualiser = false }: { visualiser?: boolean }) 
           target_temp_c: data.tank.target_temp_c,
           plant_density: data.tank.plant_density,
           species: data.species,
+          invertebrates: data.invertebrates,
           plants: data.plants,
           hardscape: data.hardscape,
         });
@@ -309,6 +312,14 @@ export function TankWorkspace({ visualiser = false }: { visualiser?: boolean }) 
               {!state.filter && <p className="planner-notice">Filter details missing. Choose your filter to complete the equipment check.</p>}
               <PreStockChecklist scorecard={scorecard} state={state} pendingSave={gate.pendingSave} onCancelSave={gate.cancel} onConfirmSave={() => gate.confirm(doSave)} />
               <ScorecardPanel scorecard={scorecard} state={state} />
+              <div className="fishtankr-panel mt-4 p-5">
+                <p className="science-label text-muted-foreground">Shrimp, snails and crabs</p>
+                <p className="mt-1 text-sm text-muted-foreground">Optional. Checked separately from your score.</p>
+                <div className="mt-3">
+                  <InvertebrateAdder state={state} setState={setState} invertebrates={invertebrates.data ?? []} />
+                </div>
+              </div>
+              <InvertebrateChecks state={state} />
               <CompatibleSuggestions state={state} setState={setState} species={species.data!} />
               {!visualiser && <Link to="/visualiser" search={linkSearch} className="planner-primary">View this tank <span aria-hidden>→</span></Link>}
             </section>
