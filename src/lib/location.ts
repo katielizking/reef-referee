@@ -17,7 +17,11 @@ function read(): Place | null {
     if (!raw) return null;
     const parsed = JSON.parse(raw) as Place;
     if (typeof parsed?.country !== "string") return null;
-    return { country: parsed.country, region: parsed.region ?? null };
+    return {
+      country: parsed.country,
+      region: parsed.region ?? null,
+      city: parsed.city ?? null,
+    };
   } catch {
     return null;
   }
@@ -41,10 +45,12 @@ async function lookup(lat: number, lng: number): Promise<Place | null> {
   const data = (await res.json()) as {
     countryCode?: string;
     principalSubdivisionCode?: string;
+    city?: string;
+    locality?: string;
   };
   if (!data.countryCode) return null;
   const sub = data.principalSubdivisionCode?.split("-")[1] ?? null;
-  return { country: data.countryCode, region: sub };
+  return { country: data.countryCode, region: sub, city: data.city || data.locality || null };
 }
 
 export function useLocation(): LocationState {

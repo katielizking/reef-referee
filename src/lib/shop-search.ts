@@ -22,7 +22,7 @@ export type ShopDirectoryEntry = {
   lng: number | null;
 };
 
-export type Place = { country: string; region: string | null };
+export type Place = { country: string; region: string | null; city?: string | null };
 
 /**
  * Build the URL that searches a shop's own website for a fish.
@@ -62,12 +62,16 @@ function norm(value: string | null | undefined): string {
   return (value ?? "").trim().toUpperCase();
 }
 
-/** A shop you can walk into: same country, and same region when we know the region. */
+/**
+ * A shop you can walk into: same country, then same state and same suburb or
+ * city when we know both sides of the comparison.
+ */
 export function isNearby(shop: ShopDirectoryEntry, place: Place | null): boolean {
   if (!place) return false;
   if (norm(shop.country_code) !== norm(place.country)) return false;
-  if (!place.region || !shop.region) return true;
-  return norm(shop.region) === norm(place.region);
+  if (place.region && shop.region && norm(shop.region) !== norm(place.region)) return false;
+  if (place.city && shop.city && norm(shop.city) !== norm(place.city)) return false;
+  return true;
 }
 
 /**
