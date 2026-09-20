@@ -267,6 +267,19 @@ export function TankWorkspace({ visualiser = false }: { visualiser?: boolean }) 
               <ImageDown className="h-4 w-4" />
               Card
             </button>
+            <button
+              onClick={() => window.print()}
+              disabled={state.species.length === 0}
+              title={
+                state.species.length === 0
+                  ? "Add fish to print a plan"
+                  : "Print a one page plan to take to the shop"
+              }
+              className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-xl border bg-card px-3 py-2 text-sm font-semibold text-foreground transition-colors hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <Printer className="h-4 w-4" />
+              Print
+            </button>
           </div>
         </div>
         {loadError || catalogError ? <div role="alert" className="planner-error">
@@ -294,7 +307,7 @@ export function TankWorkspace({ visualiser = false }: { visualiser?: boolean }) 
               <p className="planner-help">What fits, and what needs attention.</p>
               {!state.filter && <p className="planner-notice">Filter details missing. Choose your filter to complete the equipment check.</p>}
               <PreStockChecklist scorecard={scorecard} state={state} pendingSave={gate.pendingSave} onCancelSave={gate.cancel} onConfirmSave={() => gate.confirm(doSave)} />
-              <ScorecardPanel scorecard={scorecard} />
+              <ScorecardPanel scorecard={scorecard} state={state} />
               {!visualiser && <Link to="/visualiser" search={linkSearch} className="planner-primary">View this tank <span aria-hidden>→</span></Link>}
             </section>
           </div>
