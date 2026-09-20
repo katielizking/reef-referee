@@ -114,25 +114,24 @@ function ShopsIndex() {
   const navigate = useNavigate({ from: "/shops/" });
   const { fish = "" } = Route.useSearch();
   const [text, setText] = useState("");
-  const [onlyMine, setOnlyMine] = useState(false);
   const location = useLocation();
   const { data, isLoading } = useQuery(shopsQuery);
 
   const shops = data ?? [];
+  const place = location.place;
 
   const filtered = useMemo(() => {
+    if (!place) return [];
     const q = text.trim().toLowerCase();
     return shops.filter((s) => {
-      if (onlyMine && location.place) {
-        if (!isNearby(s, location.place) && !shipsTo(s, location.place)) return false;
-      }
+      if (!isNearby(s, place) && !shipsTo(s, place)) return false;
       if (q) {
         const hay = `${s.name} ${s.city ?? ""} ${s.region ?? ""} ${countryName(s.country_code)} ${s.specialties.join(" ")}`.toLowerCase();
         if (!hay.includes(q)) return false;
       }
       return true;
     });
-  }, [shops, text, onlyMine, location.place]);
+  }, [shops, text, place]);
 
   const grouped = useMemo(() => {
     const map = new Map<string, ShopDirectoryEntry[]>();
