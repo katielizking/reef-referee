@@ -148,8 +148,8 @@ function SupabaseConfigError() {
           Configuration error
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          The app is missing its database configuration. Please connect Supabase
-          in Lovable Cloud and redeploy.
+          The app is missing its database configuration. Please connect Supabase in Lovable Cloud
+          and redeploy.
         </p>
       </div>
     </div>
