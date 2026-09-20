@@ -1,6 +1,7 @@
 import { useMemo, useRef, useState } from "react";
 import { Minus, Plus, Search, Trash2 } from "lucide-react";
 
+import { useOutsideClick } from "@/hooks/useOutsideClick";
 import { checkInvertebrates, invertebrateBioload } from "@/lib/invert-check";
 import type { Invertebrate, TankState } from "@/lib/types";
 
@@ -10,25 +11,6 @@ const GROUP_LABEL: Record<Invertebrate["invert_group"], string> = {
   crayfish: "Crayfish",
   crab: "Crab",
 };
-
-function useOutside(
-  ref: React.RefObject<HTMLElement | null>,
-  close: () => void,
-  active: boolean,
-) {
-  const handler = useRef(close);
-  handler.current = close;
-  useMemo(() => undefined, []);
-  if (typeof document !== "undefined" && active) {
-    const onDown = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) {
-        handler.current();
-        document.removeEventListener("mousedown", onDown);
-      }
-    };
-    document.addEventListener("mousedown", onDown);
-  }
-}
 
 /** Search, add and adjust shrimp, snails, crayfish and crabs. */
 export function InvertebrateAdder({
