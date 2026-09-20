@@ -1,1 +1,0 @@
-ALTER TABLE public.tanks ALTER COLUMN session_id DROP NOT NULL;

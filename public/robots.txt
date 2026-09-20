@@ -1,5 +1,0 @@
-User-agent: *
-Allow: /
-Disallow: /saved
-
-Sitemap: https://fishtankr.com/sitemap.xml
