@@ -1,7 +1,15 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { getSharedTank } from "./tanks.functions";
-import type { Filter, Hardscape, Plant, Species, TankFilterSlot, TankRow } from "./types";
+import type {
+  Filter,
+  Hardscape,
+  Invertebrate,
+  Plant,
+  Species,
+  TankFilterSlot,
+  TankRow,
+} from "./types";
 
 async function currentUserId(): Promise<string | null> {
   const { data } = await supabase.auth.getUser();
@@ -15,6 +23,21 @@ export function useSpecies() {
       const { data, error } = await supabase.from("species").select("*").order("common_name");
       if (error) throw error;
       return data as unknown as Species[];
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+}
+
+export function useInvertebrates() {
+  return useQuery({
+    queryKey: ["invertebrates"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("invertebrates")
+        .select("*")
+        .order("common_name");
+      if (error) throw error;
+      return data as unknown as Invertebrate[];
     },
     staleTime: 5 * 60 * 1000,
   });
