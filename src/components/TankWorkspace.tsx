@@ -9,6 +9,7 @@ import { useTankHistory } from "@/components/tank3d/useTankHistory";
 import { useEditorStore } from "@/components/tank3d/editorStore";
 import { ScorecardPanel } from "@/components/Scorecard";
 import { TankReport } from "@/components/TankReport";
+import { CompatibleSuggestions } from "@/components/CompatibleSuggestions";
 import { PreStockChecklist, useSaveGate } from "@/components/PreStockChecklist";
 import { scoreTank } from "@/lib/scoring";
 
@@ -308,6 +309,7 @@ export function TankWorkspace({ visualiser = false }: { visualiser?: boolean }) 
               {!state.filter && <p className="planner-notice">Filter details missing. Choose your filter to complete the equipment check.</p>}
               <PreStockChecklist scorecard={scorecard} state={state} pendingSave={gate.pendingSave} onCancelSave={gate.cancel} onConfirmSave={() => gate.confirm(doSave)} />
               <ScorecardPanel scorecard={scorecard} state={state} />
+              <CompatibleSuggestions state={state} setState={setState} species={species.data!} />
               {!visualiser && <Link to="/visualiser" search={linkSearch} className="planner-primary">View this tank <span aria-hidden>→</span></Link>}
             </section>
           </div>
