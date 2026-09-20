@@ -45,6 +45,7 @@ export function TankWorkspace({ visualiser = false }: { visualiser?: boolean }) 
   const [loadError, setLoadError] = useState(false);
   const [loadingTank, setLoadingTank] = useState(Boolean(sourceSlug));
   const [openSteps, setOpenSteps] = useState<StepId[]>(["tank"]);
+  const [confirmingReset, setConfirmingReset] = useState(false);
 
   const species = useSpecies();
   const invertebrates = useInvertebrates();
