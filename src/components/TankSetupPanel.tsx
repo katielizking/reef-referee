@@ -765,9 +765,7 @@ export function SpeciesAdder({
         />
         {showResults && (
           <div className="absolute z-10 mt-1 max-h-72 w-full overflow-auto rounded-xl border bg-popover shadow-lg">
-            {results.length === 0 && (
-              <div className="p-3 text-sm text-muted-foreground">No species match.</div>
-            )}
+            {results.length === 0 && <MissingSpecies query={q} />}
             {results.map((sp) => (
               <div
                 key={sp.id}
@@ -856,6 +854,56 @@ export function SpeciesAdder({
         </ul>
       )}
     </section>
+  );
+}
+
+/** Shown when a search finds nothing. Queues the fish for research. */
+function MissingSpecies({ query }: { query: string }) {
+  const [sent, setSent] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const name = query.trim();
+
+  if (sent) {
+    return (
+      <div className="p-3 text-sm">
+        <p className="font-medium text-foreground">Thanks, that one is on the list.</p>
+        <p className="mt-1 text-xs text-muted-foreground">
+          We only add a fish once we have a source for its size, water range and behaviour.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="p-3 text-sm">
+      <p className="text-muted-foreground">No fish match that search.</p>
+      {name.length >= 2 && (
+        <>
+          <button
+            type="button"
+            disabled={busy}
+            className="mt-2 min-h-10 w-full rounded-lg border px-3 text-xs font-medium hover:bg-muted disabled:opacity-60"
+            onClick={async (e) => {
+              e.preventDefault();
+              setBusy(true);
+              setError(null);
+              try {
+                await submitSpeciesRequest(name);
+                setSent(true);
+              } catch (err) {
+                setError(err instanceof Error ? err.message : "That did not send. Try again.");
+              } finally {
+                setBusy(false);
+              }
+            }}
+          >
+            {busy ? "Sending…" : `Ask us to add "${name}"`}
+          </button>
+          {error && <p className="mt-1.5 text-xs font-medium text-coral">{error}</p>}
+        </>
+      )}
+    </div>
   );
 }
 
