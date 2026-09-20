@@ -230,6 +230,16 @@ function ContentsList({ state }: { state: TankState }) {
           </li>
         ))}
       </ListCard>
+      {(state.invertebrates ?? []).length > 0 && (
+        <ListCard title="Invertebrates">
+          {(state.invertebrates ?? []).map((row) => (
+            <li key={row.invertebrate.id} className="flex justify-between py-1 text-sm">
+              <span>{row.invertebrate.common_name}</span>
+              <span className="text-muted-foreground">×{row.quantity}</span>
+            </li>
+          ))}
+        </ListCard>
+      )}
       <ListCard title="Plants">
         {state.plants.length === 0 && <Empty />}
         {state.plants.map((p) => (
