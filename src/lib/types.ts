@@ -153,7 +153,7 @@ export interface TankState {
   /** The main filter. Its media is described by the two fields below. */
   filter: Filter | null;
   /** Any further filters running on the same tank, each with its own media. */
-  extra_filters: TankFilterSlot[];
+  extra_filters?: TankFilterSlot[];
   maintenance_frequency: MaintenanceFrequency;
   biological_media_level: BiologicalMediaLevel;
   filter_maturity: FilterMaturity;

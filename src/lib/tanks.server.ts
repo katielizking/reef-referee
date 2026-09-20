@@ -1,11 +1,13 @@
 // Server-only helpers for shared tank reads.
 // get_shared_tank is SECURITY DEFINER and is no longer executable by anon/authenticated,
 // so it is invoked here with the service-role client after the slug has been validated.
-import type { Filter, Hardscape, Plant, Species, TankRow } from "./types";
+import type { Filter, Hardscape, Plant, Species, TankFilterSlot, TankRow } from "./types";
 
 export interface SharedTankPayload {
   tank: TankRow;
   filter: Filter | null;
+  /** Extra filters beyond the main one. */
+  filters: TankFilterSlot[];
   species: Array<{ quantity: number; species: Species }>;
   plants: Array<{ quantity: number; plant: Plant }>;
   hardscape: Array<{ quantity: number; hardscape: Hardscape }>;
