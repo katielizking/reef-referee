@@ -313,6 +313,14 @@ export function TankWorkspace({ visualiser = false }: { visualiser?: boolean }) 
               <p className="mt-5 text-sm text-muted-foreground">{state.species.length} species · {state.species.reduce((n,row) => n + row.quantity,0)} fish</p>
               <p className="mt-6 text-xs leading-relaxed text-muted-foreground">Water results compare your planned pH and temperature. They do not verify your actual water.</p>
               <Link to="/species" className="planner-text-link">Explore the fish library →</Link>
+              <div className="mt-6 border-t border-rule pt-5">
+                <p className="science-label text-muted-foreground">Shrimp, snails and crabs</p>
+                <p className="mt-1 text-sm text-muted-foreground">Optional. Checked separately from your score.</p>
+                <div className="mt-3">
+                  <InvertebrateAdder state={state} setState={setState} invertebrates={invertebrates.data ?? []} />
+                </div>
+                <InvertebrateChecks state={state} />
+              </div>
             </section>}
             <section id="your-results" tabIndex={-1} className="planner-column planner-results" aria-labelledby="results-heading">
               <h3 id="results-heading">Your results</h3>
@@ -320,14 +328,16 @@ export function TankWorkspace({ visualiser = false }: { visualiser?: boolean }) 
               {!state.filter && <p className="planner-notice">Filter details missing. Choose your filter to complete the equipment check.</p>}
               <PreStockChecklist scorecard={scorecard} state={state} pendingSave={gate.pendingSave} onCancelSave={gate.cancel} onConfirmSave={() => gate.confirm(doSave)} />
               <ScorecardPanel scorecard={scorecard} state={state} />
-              <div className="fishtankr-panel mt-4 p-5">
-                <p className="science-label text-muted-foreground">Shrimp, snails and crabs</p>
-                <p className="mt-1 text-sm text-muted-foreground">Optional. Checked separately from your score.</p>
-                <div className="mt-3">
-                  <InvertebrateAdder state={state} setState={setState} invertebrates={invertebrates.data ?? []} />
+              {visualiser && <>
+                <div className="fishtankr-panel mt-4 p-5">
+                  <p className="science-label text-muted-foreground">Shrimp, snails and crabs</p>
+                  <p className="mt-1 text-sm text-muted-foreground">Optional. Checked separately from your score.</p>
+                  <div className="mt-3">
+                    <InvertebrateAdder state={state} setState={setState} invertebrates={invertebrates.data ?? []} />
+                  </div>
                 </div>
-              </div>
-              <InvertebrateChecks state={state} />
+                <InvertebrateChecks state={state} />
+              </>}
               <SetupChecks state={state} />
               <CompatibleSuggestions state={state} setState={setState} species={species.data!} />
               {!visualiser && <Link to="/visualiser" search={linkSearch} className="planner-primary">View this tank <span aria-hidden>→</span></Link>}

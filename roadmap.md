@@ -7,5 +7,5 @@
 
 ## Calculator layout
 
-- [ ] Move invertebrate selection and checks beneath the fish area
-- [ ] Make compatible fish suggestions user-requested rather than automatic
+- [x] Move invertebrate selection and checks beneath the fish area
+- [x] Make compatible fish suggestions user-requested rather than automatic
