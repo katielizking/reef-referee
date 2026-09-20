@@ -1,9 +1,12 @@
 import type { Issue, Scorecard } from "@/lib/scoring";
 import { combinedFiltration } from "@/lib/scoring";
 import type { TankState } from "@/lib/types";
+import { SUBSTRATE_LABEL, TANK_SHAPE_LABEL } from "@/lib/types";
 import { welfareVerdictFor } from "@/lib/welfare-verdict";
 import { waterChangeGuidance } from "@/lib/water-change";
 import { checkInvertebrates } from "@/lib/invert-check";
+import { checkSetup } from "@/lib/setup-check";
+import { waterLitres } from "@/lib/tank-shape";
 
 const SEVERITY_ORDER: Issue["severity"][] = ["critical", "high", "medium", "low"];
 
@@ -25,7 +28,8 @@ function allIssues(s: Scorecard): Issue[] {
  * and for "print to PDF". Everything here is already on the scorecard.
  */
 export function TankReport({ scorecard, state }: { scorecard: Scorecard; state: TankState }) {
-  const litres = Math.round((state.length_cm * state.width_cm * state.height_cm) / 1000);
+  const litres = Math.round(waterLitres(state));
+  const setupIssues = checkSetup(state);
   const verdict = welfareVerdictFor(scorecard);
   const water = waterChangeGuidance(state, scorecard);
   const filtration = combinedFiltration(state);
@@ -50,7 +54,8 @@ export function TankReport({ scorecard, state }: { scorecard: Scorecard; state: 
       <h3>The tank</h3>
       <ul>
         <li>
-          {state.length_cm} × {state.width_cm} × {state.height_cm} cm · {litres} L
+          {TANK_SHAPE_LABEL[state.tank_shape ?? "rectangle"]} · {state.length_cm} ×{" "}
+          {state.width_cm} × {state.height_cm} cm · {litres} L of water
         </li>
         <li>
           Filters: {filtration.count || "none chosen"}
@@ -64,7 +69,26 @@ export function TankReport({ scorecard, state }: { scorecard: Scorecard; state: 
           Planting: {state.plant_density} · maintenance {state.maintenance_frequency}
         </li>
         <li>Cycle: {scorecard.readiness.status.replace("-", " ")}</li>
+        <li>
+          Substrate: {SUBSTRATE_LABEL[state.substrate ?? "gravel"]} · heater{" "}
+          {(state.has_heater ?? true) ? "yes" : "no"} · light{" "}
+          {(state.has_light ?? true) ? "yes" : "no"} · CO2 {state.has_co2 ? "yes" : "no"}
+        </li>
       </ul>
+
+      {setupIssues.length > 0 && (
+        <>
+          <h3>Substrate and equipment</h3>
+          <ul>
+            {setupIssues.map((issue) => (
+              <li key={issue.code}>
+                {issue.severity === "critical" ? "Fix first: " : ""}
+                {issue.reason} {issue.fix}
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
 
       <h3>
         Shopping list · {state.species.length} species, {fishCount} fish

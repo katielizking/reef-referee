@@ -7,6 +7,8 @@ import { toast } from "sonner";
 
 import { loadTankBySlug } from "@/lib/data";
 import { scoreTank, litresOf } from "@/lib/scoring";
+import { scoringState } from "@/lib/tank-shape";
+import { SetupChecks } from "@/components/SetupChecks";
 import { displayLength, formatVolume, lengthLabel, useUnitSystem } from "@/lib/units";
 import type { TankState } from "@/lib/types";
 import { ClientOnlyTankScene } from "@/components/tank3d/ClientOnlyTankScene";
@@ -113,12 +115,17 @@ function SharedTankBody() {
     target_ph: data.tank.target_ph,
     target_temp_c: data.tank.target_temp_c,
     plant_density: data.tank.plant_density,
+    tank_shape: data.tank.tank_shape ?? "rectangle",
+    substrate: data.tank.substrate ?? "gravel",
+    has_heater: data.tank.has_heater ?? true,
+    has_light: data.tank.has_light ?? true,
+    has_co2: data.tank.has_co2 ?? false,
     species: data.species,
     invertebrates: data.invertebrates,
     plants: data.plants,
     hardscape: data.hardscape,
   };
-  const scorecard = scoreTank(state);
+  const scorecard = scoreTank(scoringState(state));
   const [units] = useUnitSystem();
   const litres = Math.round(litresOf(state));
 
@@ -203,6 +210,7 @@ function SharedTankBody() {
         <div>
           <ScorecardPanel scorecard={scorecard} state={state} />
           <InvertebrateChecks state={state} />
+          <SetupChecks state={state} />
           <div className="mt-4">
             <Link
               to="/calculator"
