@@ -288,7 +288,7 @@ function TrackedTankPage() {
                 </thead>
                 <tbody>
                   {rows.map((row) => (
-                    <tr key={row.id} className="border-t border-rule">
+                    <tr key={row.id} className="border-t border-foreground/10">
                       <td className="data-mono py-2">{row.tested_on}</td>
                       <td className="data-mono py-2">{row.ammonia_mg_l ?? "–"}</td>
                       <td className="data-mono py-2">{row.nitrite_mg_l ?? "–"}</td>
