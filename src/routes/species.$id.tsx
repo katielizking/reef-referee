@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { SpeciesPortrait } from "@/components/SpeciesPortrait";
+import { WhereToBuy } from "@/components/WhereToBuy";
 import type { Species } from "@/lib/types";
 import { BIOTOPE_LABEL } from "@/lib/types";
 import { absoluteUrl } from "@/lib/site";
@@ -453,6 +454,8 @@ function SpeciesGuide() {
           <ScoreBlock title="Regional reference" body={legalityCopy(s)} />
         </div>
       </section>
+
+      <WhereToBuy commonName={s.common_name} scientificName={s.scientific_name} />
 
       {related.length > 0 && (
         <section className="mt-10">
