@@ -34,8 +34,11 @@ async function fetchSpeciesPhoto(scientificName: string) {
     taxon_name: scientificName,
     photos: "true",
     photo_license: "cc0,cc-by,cc-by-sa",
-    quality_grade: "research",
-    captive: "false",
+    // Captive observations only: aquarium and fishkeeping photos, not wild
+    // catches or fishing shots. Captive photos are graded "casual" on
+    // iNaturalist, so quality_grade must allow that tier.
+    quality_grade: "casual",
+    captive: "true",
     per_page: "8",
     order_by: "votes",
     order: "desc",
@@ -70,7 +73,7 @@ export function SpeciesPortrait({
   eager = false,
 }: SpeciesPortraitProps) {
   const { data, isLoading } = useQuery({
-    queryKey: ["species-photo", scientificName],
+    queryKey: ["species-photo-captive", scientificName],
     queryFn: () => fetchSpeciesPhoto(scientificName),
     staleTime: 24 * 60 * 60 * 1000,
     gcTime: 7 * 24 * 60 * 60 * 1000,
