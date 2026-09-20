@@ -640,7 +640,7 @@ h3.font-display {
 .planner-explore h3 { font-size: 24px; }
 .planner-explore p { margin-top: 8px; color: var(--muted-foreground); font-size: 14px; }
 .planner-explore a { display: inline-flex; align-items: center; min-height: 44px; color: var(--glow); font-size: 14px; }
-.planner-mobile-results { position: sticky; bottom: max(12px, env(safe-area-inset-bottom)); z-index: 20; display: flex; align-items: center; justify-content: space-between; min-height: 48px; margin-top: 20px; padding: 12px 18px; border: 1px solid var(--glow); border-radius: 8px; background: var(--trench); color: var(--spray); box-shadow: var(--shadow-panel); font-size: 14px; }
+.planner-mobile-results { position: sticky; bottom: max(12px, env(safe-area-inset-bottom)); z-index: 20; display: flex; align-items: center; justify-content: space-between; min-height: 48px; margin-top: 20px; padding: 12px 18px; border: 1px solid var(--blue); border-radius: 8px; background: var(--ink); color: var(--on-ink); box-shadow: var(--shadow-panel); font-size: 14px; }
 #your-results { scroll-margin-top: 88px; }
 @media (min-width: 768px) {
   .calculator-workspace { grid-template-columns: repeat(2, minmax(0, 1fr)); }
