@@ -12,6 +12,12 @@ export const Route = createFileRoute("/attribution")({
         content:
           "Creators, sources, licences and modifications for FishTankr's verified 3D fish models.",
       },
+      { property: "og:title", content: "3D model attribution | FishTankr" },
+      {
+        property: "og:description",
+        content:
+          "Creators, sources, licences and modifications for FishTankr's verified 3D fish models.",
+      },
       { property: "og:url", content: absoluteUrl(path) },
     ],
     links: [{ rel: "canonical", href: absoluteUrl(path) }],

@@ -1,4 +1,4 @@
-export const SITE_URL = "https://reef-referee.lovable.app";
+export const SITE_URL = "https://fishtankr.com";
 
 export function absoluteUrl(path = "/"): string {
   return new URL(path, SITE_URL).toString();

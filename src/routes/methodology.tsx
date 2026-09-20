@@ -11,6 +11,12 @@ export const Route = createFileRoute("/methodology")({
         content:
           "How FishTankr checks tank mates, space, water and cycle status, plus what the score cannot prove.",
       },
+      { property: "og:title", content: "How FishTankr scores a tank" },
+      {
+        property: "og:description",
+        content:
+          "How FishTankr checks tank mates, space, water and cycle status, plus what the score cannot prove.",
+      },
       { property: "og:url", content: absoluteUrl("/methodology") },
     ],
     links: [{ rel: "canonical", href: absoluteUrl("/methodology") }],

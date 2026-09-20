@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /saved
 
-Sitemap: https://reef-referee.lovable.app/sitemap.xml
+Sitemap: https://fishtankr.com/sitemap.xml

@@ -12,6 +12,12 @@ export const Route = createFileRoute("/privacy")({
         content:
           "How FishTankr handles anonymous sessions, saved tanks, waitlist details and local browser storage.",
       },
+      { property: "og:title", content: "Privacy and storage | FishTankr" },
+      {
+        property: "og:description",
+        content:
+          "How FishTankr handles anonymous sessions, saved tanks, waitlist details and local browser storage.",
+      },
       { property: "og:url", content: absoluteUrl(path) },
     ],
     links: [{ rel: "canonical", href: absoluteUrl(path) }],

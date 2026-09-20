@@ -16,6 +16,12 @@ export const Route = createFileRoute("/contact")({
         content:
           "Contact FishTankr about species evidence, privacy, corrections or aquarium shop listings.",
       },
+      { property: "og:title", content: "Contact FishTankr" },
+      {
+        property: "og:description",
+        content:
+          "Contact FishTankr about species evidence, privacy, corrections or aquarium shop listings.",
+      },
       { property: "og:url", content: absoluteUrl(path) },
     ],
     links: [{ rel: "canonical", href: absoluteUrl(path) }],
