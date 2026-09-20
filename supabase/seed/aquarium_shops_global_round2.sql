@@ -1,4 +1,3 @@
--- Round 2: independent aquarium shops verified from their own live sites, 2026-09-20
 insert into public.aquarium_shops (slug,name,city,region,country_code,website,specialties,description,ownership,independent_note,sells_online,ships_live_fish,pickup_only,search_url_template,delivery_reviewed_on)
 select slug,name,city,region,cc,web,array['freshwater fish','filtration'],
  'Independent aquarium shop in '||city||', listing live freshwater fish and filtration gear on its own website.',
