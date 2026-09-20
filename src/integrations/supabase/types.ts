@@ -200,6 +200,84 @@ export type Database = {
         }
         Relationships: []
       }
+      invertebrates: {
+        Row: {
+          adult_size_cm: number
+          algae_role: string | null
+          bioload_factor: number
+          biotope_region: string
+          care_confidence: string
+          care_notes: string | null
+          care_reviewed_on: string | null
+          care_source_label: string | null
+          care_source_url: string | null
+          common_name: string
+          created_at: string
+          fish_risk_note: string | null
+          id: string
+          invert_group: string
+          min_group_size: number
+          min_tank_litres: number
+          native_ph_max: number
+          native_ph_min: number
+          native_temp_max_c: number
+          native_temp_min_c: number
+          predatory: boolean
+          scientific_name: string
+          temperament: string
+        }
+        Insert: {
+          adult_size_cm: number
+          algae_role?: string | null
+          bioload_factor: number
+          biotope_region?: string
+          care_confidence?: string
+          care_notes?: string | null
+          care_reviewed_on?: string | null
+          care_source_label?: string | null
+          care_source_url?: string | null
+          common_name: string
+          created_at?: string
+          fish_risk_note?: string | null
+          id?: string
+          invert_group?: string
+          min_group_size?: number
+          min_tank_litres: number
+          native_ph_max: number
+          native_ph_min: number
+          native_temp_max_c: number
+          native_temp_min_c: number
+          predatory?: boolean
+          scientific_name: string
+          temperament?: string
+        }
+        Update: {
+          adult_size_cm?: number
+          algae_role?: string | null
+          bioload_factor?: number
+          biotope_region?: string
+          care_confidence?: string
+          care_notes?: string | null
+          care_reviewed_on?: string | null
+          care_source_label?: string | null
+          care_source_url?: string | null
+          common_name?: string
+          created_at?: string
+          fish_risk_note?: string | null
+          id?: string
+          invert_group?: string
+          min_group_size?: number
+          min_tank_litres?: number
+          native_ph_max?: number
+          native_ph_min?: number
+          native_temp_max_c?: number
+          native_temp_min_c?: number
+          predatory?: boolean
+          scientific_name?: string
+          temperament?: string
+        }
+        Relationships: []
+      }
       plants: {
         Row: {
           biotope_region: string
@@ -459,6 +537,39 @@ export type Database = {
           },
           {
             foreignKeyName: "tank_hardscape_tank_id_fkey"
+            columns: ["tank_id"]
+            isOneToOne: false
+            referencedRelation: "tanks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tank_invertebrates: {
+        Row: {
+          invertebrate_id: string
+          quantity: number
+          tank_id: string
+        }
+        Insert: {
+          invertebrate_id: string
+          quantity?: number
+          tank_id: string
+        }
+        Update: {
+          invertebrate_id?: string
+          quantity?: number
+          tank_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tank_invertebrates_invertebrate_id_fkey"
+            columns: ["invertebrate_id"]
+            isOneToOne: false
+            referencedRelation: "invertebrates"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tank_invertebrates_tank_id_fkey"
             columns: ["tank_id"]
             isOneToOne: false
             referencedRelation: "tanks"
