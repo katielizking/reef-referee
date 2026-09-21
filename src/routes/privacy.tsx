@@ -83,7 +83,7 @@ function PrivacyPage() {
           deliberately attach your email address or saved-tank identity to error reports.
         </p>
         <p>
-          We use browser storage to remember interface preferences, dismissed messages, quiz or fish
+          We use browser storage to remember interface preferences, dismissed messages, fish
           selections and the anonymous ID linked to your saved tanks. We use it to make the site
           work, not for advertising. Clearing your browser data may remove your access to anonymous
           saves.
