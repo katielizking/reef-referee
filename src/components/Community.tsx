@@ -1,11 +1,11 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState, type ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import type { User } from "@supabase/supabase-js";
 import { ArrowUp, ArrowDown, Bookmark, MessageCircle, Share2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { notifyOwner } from "@/lib/notify.functions";
+import { useAccount } from "@/lib/account";
 import {
   communityDb,
   communityWrite,
@@ -19,20 +19,7 @@ export const inputClass = "w-full rounded-xl border bg-background p-3 text-sm";
 export const buttonClass =
   "rounded-xl bg-primary px-4 py-2 font-semibold text-primary-foreground disabled:opacity-50";
 export function useCommunityAccount() {
-  const [user, setUser] = useState<User | null>(null);
-  const [ready, setReady] = useState(false);
-  useEffect(() => {
-    void supabase.auth.getUser().then(({ data }) => {
-      setUser(data.user);
-      setReady(true);
-    });
-    const { data } = supabase.auth.onAuthStateChange((_event, s) => {
-      setUser(s?.user ?? null);
-      setReady(true);
-    });
-    return () => data.subscription.unsubscribe();
-  }, []);
-  const member = !!user && !user.is_anonymous && !!user.email_confirmed_at;
+  const { user, ready, isMember: member } = useAccount();
   const profile = useQuery({
     queryKey: ["community", "profile", user?.id],
     enabled: member,
@@ -60,10 +47,8 @@ export function useCommunityAccount() {
 export function AccountGate({ children }: { children: ReactNode }) {
   const a = useCommunityAccount();
   const qc = useQueryClient();
-  const [email, setEmail] = useState("");
   const [handle, setHandle] = useState("");
   const [busy, setBusy] = useState(false);
-  const [sent, setSent] = useState(false);
   const launch = useQuery({
     queryKey: ["community", "launch"],
     queryFn: async () => {
@@ -72,78 +57,19 @@ export function AccountGate({ children }: { children: ReactNode }) {
       return data === true;
     },
   });
-  if (launch.isPending) return <p role="status">Loading community…</p>;
-  if (launch.isError)
-    return (
-      <p role="alert">
-        Community is temporarily unavailable.{" "}
-        <button className="underline" onClick={() => launch.refetch()}>
-          Retry
-        </button>
-      </p>
-    );
-  if (!launch.data)
-    return (
-      <div className="rounded-2xl border bg-card p-6">
-        <h2 className="font-display text-2xl">The conversation opens soon.</h2>
-        <p className="mt-3 text-muted-foreground">
-          We’re getting the community ready to welcome everyone. Posting and sign-in will open
-          shortly.
-        </p>
-        <Link to="/tank-ideas" className="mt-4 block text-primary underline">
-          Explore Tank Ideas while you wait →
-        </Link>
-      </div>
-    );
   if (!a.ready) return <p role="status">Checking your account…</p>;
   if (!a.member)
     return (
-      <form
-        className="space-y-3 rounded-xl border bg-card p-5"
-        onSubmit={async (e) => {
-          e.preventDefault();
-          setBusy(true);
-          try {
-            const { error } = await supabase.auth.signInWithOtp({
-              email,
-              options: { emailRedirectTo: `${window.location.origin}/community` },
-            });
-            if (error) throw error;
-            setSent(true);
-          } catch (e) {
-            toast.error(e instanceof Error ? e.message : "Could not send sign-in link.");
-          } finally {
-            setBusy(false);
-          }
-        }}
-      >
+      <div className="space-y-3 rounded-xl border bg-card p-5">
         <h2 className="text-xl font-semibold">Join the conversation</h2>
         <p className="text-sm text-muted-foreground">
-          Read freely. Sign in by email to post, reply, vote or save. Your email is never shown
-          publicly.
+          Create an account or sign in to post, reply, vote or save. Your email is never shown
+          publicly. You’ll need to confirm your email before posting.
         </p>
-        <label className="block text-sm">
-          Email
-          <input
-            type="email"
-            autoComplete="email"
-            required
-            className={`${inputClass} mt-1`}
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-        </label>
-        <button disabled={busy} className={buttonClass}>
-          {busy ? "Sending…" : "Email me a sign-in link"}
-        </button>
-        {sent && (
-          <p role="status">Check your inbox for the sign-in link. Return here after confirming.</p>
-        )}
-        <p className="text-xs text-muted-foreground">
-          Your calculator draft stays on this device. Tanks saved under a guest session remain
-          associated with that guest session; save a share link before switching accounts.
-        </p>
-      </form>
+        <Link to="/auth" className={buttonClass}>
+          Create account or sign in
+        </Link>
+      </div>
     );
   if (a.profile.isPending) return <p>Loading your profile…</p>;
   if (a.profile.isError)
@@ -193,6 +119,25 @@ export function AccountGate({ children }: { children: ReactNode }) {
           Save username
         </button>
       </form>
+    );
+  if (launch.isPending) return <p role="status">Loading community…</p>;
+  if (launch.isError)
+    return (
+      <p role="alert">
+        Community is temporarily unavailable.{" "}
+        <button className="underline" onClick={() => launch.refetch()}>
+          Retry
+        </button>
+      </p>
+    );
+  if (!launch.data)
+    return (
+      <div className="rounded-2xl border bg-card p-6">
+        <h2 className="font-display text-2xl">The conversation opens soon.</h2>
+        <p className="mt-3 text-muted-foreground">
+          Your account is ready. Posting will open shortly.
+        </p>
+      </div>
     );
   return <>{children}</>;
 }

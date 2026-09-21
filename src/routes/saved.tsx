@@ -29,7 +29,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { WaitlistSignup } from "@/components/WaitlistSignup";
+import { useAccount } from "@/lib/account";
 
 export const Route = createFileRoute("/saved")({
   head: () => ({
@@ -43,6 +43,7 @@ export const Route = createFileRoute("/saved")({
 });
 
 function SavedTanks() {
+  const account = useAccount();
   const { data, isLoading } = useSessionTanks();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -124,13 +125,15 @@ function SavedTanks() {
       <p className="mt-1 text-sm text-muted-foreground">
         Reopen, edit, copy or share your saved tanks.
       </p>
-      <div className="mt-4 rounded-xl border border-warn/40 bg-warn/10 p-3 text-sm text-foreground">
-        <strong>Saved in this browser:</strong> clearing browser data can remove these tanks. Keep
-        important share links somewhere safe.
-      </div>
-      <div className="mt-4">
-        <WaitlistSignup />
-      </div>
+      {!account.isSignedIn && (
+        <div className="mt-4 rounded-xl border border-warn/40 bg-warn/10 p-3 text-sm text-foreground">
+          <strong>Keep your tanks safe:</strong>{" "}
+          <Link to="/auth" className="underline">
+            create a free account
+          </Link>{" "}
+          so your saved tanks can follow you between devices.
+        </div>
+      )}
 
       <div className="mt-6">
         {isLoading ? (

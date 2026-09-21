@@ -10,13 +10,13 @@ export const Route = createFileRoute("/privacy")({
       {
         name: "description",
         content:
-          "How FishTankr handles anonymous sessions, saved tanks, waitlist details and local browser storage.",
+          "How FishTankr handles accounts, anonymous sessions, saved tanks and local browser storage.",
       },
       { property: "og:title", content: "Privacy and storage | FishTankr" },
       {
         property: "og:description",
         content:
-          "How FishTankr handles anonymous sessions, saved tanks, waitlist details and local browser storage.",
+          "How FishTankr handles accounts, anonymous sessions, saved tanks and local browser storage.",
       },
       { property: "og:url", content: absoluteUrl(path) },
     ],
@@ -36,8 +36,9 @@ function PrivacyPage() {
         <p>
           FishTankr creates an anonymous ID so you can save tanks without making an account. A saved
           plan includes the tank size, equipment, fish, cycle details and water settings. If you
-          join an update list, we store the email address you enter. If you contact us, we receive
-          your reply email, chosen topic and message.
+          create an account, we store your email address and sign-in details securely through our
+          authentication provider. If you contact us, we receive your reply email, chosen topic and
+          message.
         </p>
         <p>
           We may collect basic technical and product events in aggregate, for example which score
@@ -48,10 +49,11 @@ function PrivacyPage() {
       </PolicySection>
       <PolicySection title="Community accounts and posts">
         <p>
-          Community participation uses an email-confirmed account. We store your email for sign-in,
-          your public username, posts and replies, and the votes and saves associated with your
-          account. Your email, saved-post list and individual votes are not publicly listed. Reports
-          are visible to moderators.
+          An account can hold your saved tanks, tracker tanks and water tests. Community
+          participation requires a confirmed email. We store your email for sign-in, your public
+          username, posts and replies, and the votes and saves associated with your account. Your
+          email, saved-post list and individual votes are not publicly listed. Reports are visible
+          to moderators.
         </p>
         <p>
           Posts, usernames, replies and uploaded photographs are public. Photos are public as soon
@@ -99,8 +101,8 @@ function PrivacyPage() {
         <p>
           You can use the main planning tools without a named account. Please do not put personal
           information in a tank name. To ask us to access, correct or delete your information, or
-          remove you from an email list, use the contact form and include the relevant share link or
-          email address.
+          delete your information, use the contact form and include the relevant share link or email
+          address.
         </p>
         <p>
           See the{" "}
