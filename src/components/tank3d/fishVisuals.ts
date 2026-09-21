@@ -2,7 +2,13 @@ import type { Species } from "@/lib/types";
 import { hash01 } from "./palette";
 
 export type FishBodyStyle =
-  "streamlined" | "deep" | "round" | "bottom" | "disc" | "flowing" | "predator";
+  | "streamlined"
+  | "deep"
+  | "round"
+  | "bottom"
+  | "disc"
+  | "flowing"
+  | "predator";
 
 export type FishTailStyle = "forked" | "fan" | "rounded" | "flowing";
 export type FishPattern = "none" | "lateral-stripe" | "vertical-bands" | "spots";
