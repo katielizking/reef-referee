@@ -383,7 +383,6 @@ const footerGroups: Array<{
       { to: "/tracker", label: "Tank tracker" },
       { to: "/tank-ideas", label: "Tank Ideas" },
       { to: "/community", label: "Community" },
-      { to: "/quiz", label: "Fish quiz" },
     ],
   },
   {
