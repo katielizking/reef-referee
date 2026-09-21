@@ -296,6 +296,9 @@ export function PostComposer({ post, onDone }: { post?: Post; onDone?: () => voi
               link_url: url,
               flair,
             });
+            if (!post) {
+              void notifyOwner({ data: { type: "post", title, flair } }).catch(() => {});
+            }
             await qc.invalidateQueries({ queryKey: ["community"] });
             if (onDone) onDone();
             else await navigate({ to: "/community/$id", params: { id } });
