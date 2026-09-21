@@ -181,10 +181,10 @@ const guides: Record<string, Guide> = {
               FishTankr builder
             </Link>{" "}
             checks compatibility, swimming space, water suitability and cycle readiness, while the{" "}
-            <Link to="/quiz" className="text-primary underline">
-              fish quiz
+            <Link to="/species" className="text-primary underline">
+              species library
             </Link>{" "}
-            recommends species that suit your tank size and experience.
+            helps you compare freshwater fish before adding them to your plan.
           </p>
         </section>
       </>
