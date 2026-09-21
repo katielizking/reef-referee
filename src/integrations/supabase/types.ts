@@ -1258,6 +1258,10 @@ export type Database = {
       }
     }
     Functions: {
+      claim_guest_data: {
+        Args: { p_guest_id: string; p_member_id: string }
+        Returns: Json
+      }
       community_can_upload: { Args: never; Returns: boolean }
       community_is_moderator: { Args: never; Returns: boolean }
       community_is_ready: { Args: never; Returns: boolean }

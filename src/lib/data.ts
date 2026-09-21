@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { getSharedTank } from "./tanks.functions";
+import { useAccount } from "./account";
 import type {
   Filter,
   Hardscape,
@@ -77,10 +78,12 @@ export function useFilters() {
 }
 
 export function useSessionTanks() {
+  const { user, ready } = useAccount();
   return useQuery({
-    queryKey: ["tanks", "session"],
+    queryKey: ["tanks", "session", user?.id],
+    enabled: ready && !!user,
     queryFn: async () => {
-      const uid = await currentUserId();
+      const uid = user?.id;
       if (!uid) return [] as TankRow[];
       const { data, error } = await supabase
         .from("tanks")

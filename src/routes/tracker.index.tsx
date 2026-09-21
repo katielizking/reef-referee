@@ -12,6 +12,7 @@ import {
   type MediaMaturity,
 } from "@/lib/cycle-status";
 import { useCreateTank, useDeleteTank, useTrackedTanks, useWaterTests } from "@/lib/tracker";
+import { useAccount } from "@/lib/account";
 
 export const Route = createFileRoute("/tracker/")({
   head: () => ({
@@ -39,6 +40,7 @@ const STATUS_OPTIONS: CycleStatus[] = ["not_started", "cycling", "verified", "un
 const MATURITY_OPTIONS: MediaMaturity[] = ["new", "maturing", "established", "unknown"];
 
 function TrackerPage() {
+  const account = useAccount();
   const tanks = useTrackedTanks();
   const create = useCreateTank();
   const remove = useDeleteTank();
@@ -97,6 +99,16 @@ function TrackerPage() {
             <Plus className="h-4 w-4" /> Add a tank
           </button>
         </header>
+
+        {account.ready && !account.isSignedIn && (
+          <p className="mb-6 rounded-xl border bg-card p-4 text-sm text-muted-foreground">
+            Tracking as a guest.{" "}
+            <Link to="/auth" className="text-primary underline">
+              Create an account
+            </Link>{" "}
+            to keep your tanks and water tests available across devices.
+          </p>
+        )}
 
         {adding && (
           <form onSubmit={submit} className="fishtankr-panel mb-6 space-y-3 p-5">
