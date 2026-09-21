@@ -19,7 +19,13 @@ export type Temperament = "peaceful" | "semi-aggressive" | "aggressive";
 export type MaintenanceFrequency = "weekly" | "fortnightly" | "monthly";
 export type PlantDensity = "none" | "light" | "medium" | "heavy";
 export type FilterType =
-  "sponge" | "hang_on_back" | "internal" | "canister" | "sump" | "undergravel" | "other";
+  | "sponge"
+  | "hang_on_back"
+  | "internal"
+  | "canister"
+  | "sump"
+  | "undergravel"
+  | "other";
 export type BiologicalMediaLevel = "minimal" | "standard" | "substantial";
 export type FilterMaturity = "new" | "maturing" | "established" | "unknown";
 export type CycleStatus = "not_started" | "cycling" | "verified" | "unknown";
@@ -50,7 +56,10 @@ export interface Species {
   legal_status: "permitted" | "native" | "not_importable" | "prohibited";
   legal_note: string | null;
   legal_import_status:
-    "permitted_with_conditions" | "not_permitted" | "not_applicable_native" | "unknown";
+    | "permitted_with_conditions"
+    | "not_permitted"
+    | "not_applicable_native"
+    | "unknown";
   legal_possession_status:
     | "generally_permitted_check_state"
     | "check_state_permits"
@@ -65,7 +74,13 @@ export interface Species {
   care_reviewed_on?: string | null;
   care_confidence?: "unreviewed" | "low" | "medium" | "high";
   conspecific_strategy?:
-    "unreviewed" | "solitary" | "pair" | "harem" | "shoal" | "colony" | "territorial";
+    | "unreviewed"
+    | "solitary"
+    | "pair"
+    | "harem"
+    | "shoal"
+    | "colony"
+    | "territorial";
   conspecific_sex_ratio_note?: string | null;
   conspecific_notes?: string | null;
 }
