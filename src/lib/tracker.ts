@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { TrackedTank, WaterTest } from "./cycle-status";
+import { useAccount } from "./account";
 
 async function currentUserId(): Promise<string> {
   const { data } = await supabase.auth.getUser();
@@ -31,12 +32,15 @@ export type NewTestInput = {
 };
 
 export function useTrackedTanks() {
+  const { user, ready } = useAccount();
   return useQuery({
-    queryKey: ["tracked-tanks"],
+    queryKey: ["tracked-tanks", "list", user?.id],
+    enabled: ready && !!user,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("tracked_tanks")
         .select("*")
+        .eq("user_id", user!.id)
         .order("created_at", { ascending: false });
       if (error) throw error;
       return (data ?? []) as unknown as TrackedTank[];
@@ -45,13 +49,16 @@ export function useTrackedTanks() {
 }
 
 export function useTrackedTank(id: string) {
+  const { user, ready } = useAccount();
   return useQuery({
-    queryKey: ["tracked-tanks", id],
+    queryKey: ["tracked-tanks", id, user?.id],
+    enabled: ready && !!user,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("tracked_tanks")
         .select("*")
         .eq("id", id)
+        .eq("user_id", user!.id)
         .maybeSingle();
       if (error) throw error;
       return (data as unknown as TrackedTank | null) ?? null;
@@ -60,13 +67,16 @@ export function useTrackedTank(id: string) {
 }
 
 export function useWaterTests(tankId: string) {
+  const { user, ready } = useAccount();
   return useQuery({
-    queryKey: ["water-tests", tankId],
+    queryKey: ["water-tests", tankId, user?.id],
+    enabled: ready && !!user,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("water_tests")
         .select("*")
         .eq("tank_id", tankId)
+        .eq("user_id", user!.id)
         .order("tested_on", { ascending: false })
         .order("created_at", { ascending: false });
       if (error) throw error;

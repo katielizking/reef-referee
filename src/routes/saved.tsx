@@ -35,7 +35,7 @@ export const Route = createFileRoute("/saved")({
   head: () => ({
     meta: [
       { title: "My tanks | FishTankr" },
-      { name: "description", content: "Tanks you've saved in this browser." },
+      { name: "description", content: "Your saved FishTankr tank plans." },
       { name: "robots", content: "noindex" },
     ],
   }),

@@ -18,7 +18,6 @@ import { BrandLogo } from "@/components/BrandLogo";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { TankDraftProvider } from "@/components/TankDraftProvider";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { supabase } from "@/integrations/supabase/client";
 import { absoluteUrl, SUPPORT_URL } from "@/lib/site";
 import { initializePostHog } from "@/lib/posthog";
 import { captureSentryError } from "@/lib/sentry";
@@ -162,15 +161,6 @@ function RootComponent() {
 
   useEffect(() => {
     void initializePostHog();
-  }, []);
-
-  useEffect(() => {
-    (async () => {
-      const { data } = await supabase.auth.getSession();
-      if (!data.session) {
-        await supabase.auth.signInAnonymously();
-      }
-    })().catch(console.error);
   }, []);
 
   return (

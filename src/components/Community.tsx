@@ -5,7 +5,7 @@ import { ArrowUp, ArrowDown, Bookmark, MessageCircle, Share2 } from "lucide-reac
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { notifyOwner } from "@/lib/notify.functions";
-import { useAccount } from "@/lib/account";
+import { useAccount, useSignOut } from "@/lib/account";
 import {
   communityDb,
   communityWrite,
@@ -143,6 +143,7 @@ export function AccountGate({ children }: { children: ReactNode }) {
 }
 export function CommunityLayout({ children }: { children: ReactNode }) {
   const account = useCommunityAccount();
+  const signOut = useSignOut();
   return (
     <main className="mx-auto max-w-6xl px-4 py-9">
       <div className="flex flex-wrap items-center justify-between gap-4">
@@ -192,14 +193,7 @@ export function CommunityLayout({ children }: { children: ReactNode }) {
                   Moderation queue
                 </Link>
               )}
-              <button
-                className="mt-3 underline"
-                onClick={async () => {
-                  const { error } = await supabase.auth.signOut();
-                  if (error) toast.error(error.message);
-                  else window.location.assign("/community");
-                }}
-              >
+              <button className="mt-3 underline" onClick={() => void signOut()}>
                 Sign out
               </button>
             </div>
