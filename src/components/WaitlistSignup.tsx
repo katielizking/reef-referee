@@ -2,6 +2,7 @@ import { useState, type FormEvent } from "react";
 import { Loader2, Mail } from "lucide-react";
 import { toast } from "sonner";
 import { joinAccountWaitlist } from "@/lib/commercial";
+import { notifyOwner } from "@/lib/notify.functions";
 
 export function WaitlistSignup({ compact = false }: { compact?: boolean }) {
   const [email, setEmail] = useState("");
