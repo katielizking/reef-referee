@@ -5,6 +5,7 @@ import type { User } from "@supabase/supabase-js";
 import { ArrowUp, ArrowDown, Bookmark, MessageCircle, Share2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { notifyOwner } from "@/lib/notify.functions";
 import {
   communityDb,
   communityWrite,
@@ -296,6 +297,9 @@ export function PostComposer({ post, onDone }: { post?: Post; onDone?: () => voi
               link_url: url,
               flair,
             });
+            if (!post) {
+              void notifyOwner({ data: { type: "post", title, flair } }).catch(() => {});
+            }
             await qc.invalidateQueries({ queryKey: ["community"] });
             if (onDone) onDone();
             else await navigate({ to: "/community/$id", params: { id } });
