@@ -126,7 +126,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap",
+        href: "https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700;800&display=swap",
       },
       { rel: "icon", href: "/favicon.png", type: "image/png" },
     ],
@@ -158,6 +158,8 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const location = useLocation();
+  const isHome = location.pathname === "/";
 
   useEffect(() => {
     void initializePostHog();
@@ -166,7 +168,9 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <AccountProvider>
-        <div className="site-shell flex min-h-dvh flex-col bg-background/80">
+        <div
+          className={`site-shell flex min-h-dvh flex-col bg-background/80${isHome ? "" : " app-shell"}`}
+        >
           <SiteHeader />
 
           <div className="flex-1">
@@ -208,22 +212,22 @@ function SiteHeader() {
   }, [location.pathname]);
 
   return (
-    <header className="sticky top-0 z-30 border-b border-foreground/10 bg-background/90 backdrop-blur-md">
-      <div className="mx-auto w-full max-w-[1440px] px-[clamp(24px,5.8vw,88px)] flex min-h-16 items-center justify-between gap-4 pb-3 pt-[max(0.75rem,env(safe-area-inset-top))]">
+    <header className="app-header sticky top-0 z-30 border-b border-foreground/10 bg-background/90 backdrop-blur-md">
+      <div className="app-header-inner mx-auto flex min-h-16 w-full max-w-[1440px] items-center justify-between gap-4 px-[clamp(24px,5.8vw,88px)] pb-3 pt-[max(0.75rem,env(safe-area-inset-top))]">
         <Link to="/" aria-label="FishTankr home" className="rounded-lg">
           <BrandLogo size={30} />
         </Link>
         <div className="hidden items-center gap-2 xl:flex">
-          <nav aria-label="Primary" className="flex items-center gap-1 text-sm">
+          <nav aria-label="Primary" className="app-nav flex items-center gap-1 text-sm">
             {NAV_ITEMS.map((item) => (
               <Link
                 key={item.to}
                 to={item.to}
                 hash={item.hash}
-                className="rounded-md px-3 py-2 text-muted-foreground transition-colors hover:text-foreground"
+                className="app-nav-link rounded-md px-3 py-2 text-muted-foreground transition-colors hover:text-foreground"
                 activeProps={{
                   className:
-                    "rounded-md px-3 py-2 text-foreground underline decoration-blue decoration-1 underline-offset-8",
+                    "app-nav-link app-nav-link-active rounded-md px-3 py-2 text-foreground underline decoration-blue decoration-1 underline-offset-8",
                 }}
                 activeOptions={item.exact ? { exact: true } : undefined}
               >
@@ -404,7 +408,7 @@ const footerGroups: Array<{
 
 function SiteFooter() {
   return (
-    <footer className="relative mt-20 border-t border-foreground/10 bg-ink text-on-ink">
+    <footer className="app-footer relative mt-20 border-t border-foreground/10 bg-ink text-on-ink">
       <div className="mx-auto w-full max-w-[1440px] px-[clamp(24px,5.8vw,88px)] pb-8 pt-12">
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-[1.4fr_repeat(3,1fr)]">
           <div>
