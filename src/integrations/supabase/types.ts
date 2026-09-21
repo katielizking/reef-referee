@@ -170,6 +170,296 @@ export type Database = {
         }
         Relationships: []
       }
+      community_actions: {
+        Row: {
+          created_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      community_admin_emails: {
+        Row: {
+          email: string
+        }
+        Insert: {
+          email: string
+        }
+        Update: {
+          email?: string
+        }
+        Relationships: []
+      }
+      community_bans: {
+        Row: {
+          created_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      community_comments: {
+        Row: {
+          author_id: string
+          body: string
+          created_at: string
+          edited_at: string | null
+          id: string
+          parent_id: string | null
+          post_id: string
+          status: string
+        }
+        Insert: {
+          author_id: string
+          body: string
+          created_at?: string
+          edited_at?: string | null
+          id?: string
+          parent_id?: string | null
+          post_id: string
+          status?: string
+        }
+        Update: {
+          author_id?: string
+          body?: string
+          created_at?: string
+          edited_at?: string | null
+          id?: string
+          parent_id?: string | null
+          post_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "community_comments_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "community_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "community_comments_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "community_comments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "community_comments_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "community_feed"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "community_comments_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "community_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      community_posts: {
+        Row: {
+          author_id: string
+          body: string
+          comment_count: number
+          created_at: string
+          edited_at: string | null
+          flair: string
+          id: string
+          link_url: string | null
+          locked: boolean
+          score: number
+          status: string
+          title: string
+        }
+        Insert: {
+          author_id: string
+          body?: string
+          comment_count?: number
+          created_at?: string
+          edited_at?: string | null
+          flair?: string
+          id?: string
+          link_url?: string | null
+          locked?: boolean
+          score?: number
+          status?: string
+          title: string
+        }
+        Update: {
+          author_id?: string
+          body?: string
+          comment_count?: number
+          created_at?: string
+          edited_at?: string | null
+          flair?: string
+          id?: string
+          link_url?: string | null
+          locked?: boolean
+          score?: number
+          status?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "community_posts_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "community_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      community_profiles: {
+        Row: {
+          created_at: string
+          handle: string
+          id: string
+        }
+        Insert: {
+          created_at?: string
+          handle: string
+          id: string
+        }
+        Update: {
+          created_at?: string
+          handle?: string
+          id?: string
+        }
+        Relationships: []
+      }
+      community_reports: {
+        Row: {
+          comment_id: string | null
+          created_at: string
+          id: string
+          post_id: string
+          reason: string
+          reporter_id: string
+          resolved: boolean
+        }
+        Insert: {
+          comment_id?: string | null
+          created_at?: string
+          id?: string
+          post_id: string
+          reason: string
+          reporter_id: string
+          resolved?: boolean
+        }
+        Update: {
+          comment_id?: string | null
+          created_at?: string
+          id?: string
+          post_id?: string
+          reason?: string
+          reporter_id?: string
+          resolved?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "community_reports_comment_id_fkey"
+            columns: ["comment_id"]
+            isOneToOne: false
+            referencedRelation: "community_comments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "community_reports_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "community_feed"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "community_reports_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "community_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      community_saves: {
+        Row: {
+          post_id: string
+          user_id: string
+        }
+        Insert: {
+          post_id: string
+          user_id: string
+        }
+        Update: {
+          post_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "community_saves_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "community_feed"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "community_saves_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "community_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      community_votes: {
+        Row: {
+          post_id: string
+          user_id: string
+          value: number
+        }
+        Insert: {
+          post_id: string
+          user_id: string
+          value: number
+        }
+        Update: {
+          post_id?: string
+          user_id?: string
+          value?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "community_votes_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "community_feed"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "community_votes_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "community_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       contact_requests: {
         Row: {
           created_at: string
@@ -910,9 +1200,75 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      community_feed: {
+        Row: {
+          author_id: string | null
+          body: string | null
+          comment_count: number | null
+          created_at: string | null
+          edited_at: string | null
+          flair: string | null
+          hot_rank: number | null
+          id: string | null
+          link_url: string | null
+          locked: boolean | null
+          score: number | null
+          status: string | null
+          title: string | null
+        }
+        Insert: {
+          author_id?: string | null
+          body?: string | null
+          comment_count?: number | null
+          created_at?: string | null
+          edited_at?: string | null
+          flair?: string | null
+          hot_rank?: never
+          id?: string | null
+          link_url?: string | null
+          locked?: boolean | null
+          score?: number | null
+          status?: string | null
+          title?: string | null
+        }
+        Update: {
+          author_id?: string | null
+          body?: string | null
+          comment_count?: number | null
+          created_at?: string | null
+          edited_at?: string | null
+          flair?: string | null
+          hot_rank?: never
+          id?: string | null
+          link_url?: string | null
+          locked?: boolean | null
+          score?: number | null
+          status?: string | null
+          title?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "community_posts_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "community_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
+      community_can_upload: { Args: never; Returns: boolean }
+      community_is_moderator: { Args: never; Returns: boolean }
+      community_is_ready: { Args: never; Returns: boolean }
+      community_write: {
+        Args: { action: string; payload?: Json }
+        Returns: string
+      }
+      community_write_internal: {
+        Args: { action: string; payload?: Json }
+        Returns: string
+      }
       get_shared_tank: { Args: { p_slug: string }; Returns: Json }
       join_account_waitlist: { Args: { p_email: string }; Returns: undefined }
       record_score_event: {
