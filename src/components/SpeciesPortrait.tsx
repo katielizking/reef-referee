@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
 import { ExternalLink, Fish } from "lucide-react";
 
 const ALLOWED_LICENSES = new Set(["cc0", "cc-by", "cc-by-sa"]);
@@ -65,6 +65,54 @@ async function fetchSpeciesPhoto(scientificName: string) {
   return null;
 }
 
+type SpeciesPhoto = Awaited<ReturnType<typeof fetchSpeciesPhoto>>;
+type CachedPhoto = { data: SpeciesPhoto; expiresAt: number };
+
+const PHOTO_STALE_TIME = 24 * 60 * 60 * 1000;
+const photoCache = new Map<string, CachedPhoto>();
+const pendingPhotos = new Map<string, Promise<SpeciesPhoto>>();
+
+function cachedPhoto(scientificName: string): SpeciesPhoto | undefined {
+  const cached = photoCache.get(scientificName);
+  if (!cached || cached.expiresAt <= Date.now()) return undefined;
+  return cached.data;
+}
+
+function loadSpeciesPhoto(scientificName: string): Promise<SpeciesPhoto> {
+  const cached = cachedPhoto(scientificName);
+  if (cached !== undefined) return Promise.resolve(cached);
+
+  const pending = pendingPhotos.get(scientificName);
+  if (pending) return pending;
+
+  const request = fetchSpeciesPhoto(scientificName)
+    .catch(() => null)
+    .then((data) => {
+      photoCache.set(scientificName, { data, expiresAt: Date.now() + PHOTO_STALE_TIME });
+      return data;
+    })
+    .finally(() => pendingPhotos.delete(scientificName));
+  pendingPhotos.set(scientificName, request);
+  return request;
+}
+
+function useSpeciesPhoto(scientificName: string) {
+  const [data, setData] = useState<SpeciesPhoto | undefined>(() => cachedPhoto(scientificName));
+
+  useEffect(() => {
+    let active = true;
+    setData(cachedPhoto(scientificName));
+    void loadSpeciesPhoto(scientificName).then((photo) => {
+      if (active) setData(photo);
+    });
+    return () => {
+      active = false;
+    };
+  }, [scientificName]);
+
+  return { data, isLoading: data === undefined };
+}
+
 export function SpeciesPortrait({
   commonName,
   scientificName,
@@ -72,13 +120,7 @@ export function SpeciesPortrait({
   compact = false,
   eager = false,
 }: SpeciesPortraitProps) {
-  const { data, isLoading } = useQuery({
-    queryKey: ["species-photo-captive", scientificName],
-    queryFn: () => fetchSpeciesPhoto(scientificName),
-    staleTime: 24 * 60 * 60 * 1000,
-    gcTime: 7 * 24 * 60 * 60 * 1000,
-    retry: 1,
-  });
+  const { data, isLoading } = useSpeciesPhoto(scientificName);
 
   return (
     <figure
