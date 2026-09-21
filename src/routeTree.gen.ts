@@ -17,7 +17,6 @@ import { Route as CalculatorRouteImport } from './routes/calculator'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as MethodologyRouteImport } from './routes/methodology'
 import { Route as PrivacyRouteImport } from './routes/privacy'
-import { Route as QuizRouteImport } from './routes/quiz'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as SavedRouteImport } from './routes/saved'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
@@ -81,11 +80,6 @@ const MethodologyRoute = MethodologyRouteImport.update({
 const PrivacyRoute = PrivacyRouteImport.update({
   id: '/privacy',
   path: '/privacy',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const QuizRoute = QuizRouteImport.update({
-  id: '/quiz',
-  path: '/quiz',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
@@ -218,7 +212,6 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/methodology': typeof MethodologyRoute
   '/privacy': typeof PrivacyRoute
-  '/quiz': typeof QuizRoute
   '/reset-password': typeof ResetPasswordRoute
   '/saved': typeof SavedRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -253,7 +246,6 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/methodology': typeof MethodologyRoute
   '/privacy': typeof PrivacyRoute
-  '/quiz': typeof QuizRoute
   '/reset-password': typeof ResetPasswordRoute
   '/saved': typeof SavedRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -289,7 +281,6 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/methodology': typeof MethodologyRoute
   '/privacy': typeof PrivacyRoute
-  '/quiz': typeof QuizRoute
   '/reset-password': typeof ResetPasswordRoute
   '/saved': typeof SavedRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -326,7 +317,6 @@ export interface FileRouteTypes {
     | '/contact'
     | '/methodology'
     | '/privacy'
-    | '/quiz'
     | '/reset-password'
     | '/saved'
     | '/sitemap.xml'
@@ -361,7 +351,6 @@ export interface FileRouteTypes {
     | '/contact'
     | '/methodology'
     | '/privacy'
-    | '/quiz'
     | '/reset-password'
     | '/saved'
     | '/sitemap.xml'
@@ -396,7 +385,6 @@ export interface FileRouteTypes {
     | '/contact'
     | '/methodology'
     | '/privacy'
-    | '/quiz'
     | '/reset-password'
     | '/saved'
     | '/sitemap.xml'
@@ -432,7 +420,6 @@ export interface RootRouteChildren {
   ContactRoute: typeof ContactRoute
   MethodologyRoute: typeof MethodologyRoute
   PrivacyRoute: typeof PrivacyRoute
-  QuizRoute: typeof QuizRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SavedRoute: typeof SavedRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
@@ -514,13 +501,6 @@ declare module '@tanstack/react-router' {
       path: '/privacy'
       fullPath: '/privacy'
       preLoaderRoute: typeof PrivacyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/quiz': {
-      id: '/quiz'
-      path: '/quiz'
-      fullPath: '/quiz'
-      preLoaderRoute: typeof QuizRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/reset-password': {
@@ -713,7 +693,6 @@ const rootRouteChildren: RootRouteChildren = {
   ContactRoute: ContactRoute,
   MethodologyRoute: MethodologyRoute,
   PrivacyRoute: PrivacyRoute,
-  QuizRoute: QuizRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SavedRoute: SavedRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
