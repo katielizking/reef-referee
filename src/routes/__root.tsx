@@ -9,7 +9,7 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 import { useEffect, useState, type ReactNode } from "react";
-import { Menu } from "lucide-react";
+import { LogOut, Menu, UserRound } from "lucide-react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -22,6 +22,15 @@ import { supabase } from "@/integrations/supabase/client";
 import { absoluteUrl, SUPPORT_URL } from "@/lib/site";
 import { initializePostHog } from "@/lib/posthog";
 import { captureSentryError } from "@/lib/sentry";
+import { AccountProvider, useAccount, useSignOut } from "@/lib/account";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 function NotFoundComponent() {
   return (
@@ -150,41 +159,37 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
-  const [authReady, setAuthReady] = useState(false);
 
   useEffect(() => {
     void initializePostHog();
   }, []);
 
   useEffect(() => {
-    let cancelled = false;
     (async () => {
       const { data } = await supabase.auth.getSession();
       if (!data.session) {
         await supabase.auth.signInAnonymously();
       }
-      if (!cancelled) setAuthReady(true);
     })().catch(console.error);
-    return () => {
-      cancelled = true;
-    };
   }, []);
 
   return (
     <QueryClientProvider client={queryClient}>
-      <div className="site-shell flex min-h-dvh flex-col bg-background/80">
-        <SiteHeader />
+      <AccountProvider>
+        <div className="site-shell flex min-h-dvh flex-col bg-background/80">
+          <SiteHeader />
 
-        <div className="flex-1">
-          <TankDraftProvider>
-            <Outlet />
-          </TankDraftProvider>
+          <div className="flex-1">
+            <TankDraftProvider>
+              <Outlet />
+            </TankDraftProvider>
+          </div>
+
+          <SiteFooter />
+
+          <Toaster />
         </div>
-
-        <SiteFooter />
-
-        <Toaster />
-      </div>
+      </AccountProvider>
     </QueryClientProvider>
   );
 }
@@ -236,6 +241,7 @@ function SiteHeader() {
               </Link>
             ))}
           </nav>
+          <AccountMenu />
           {showThemeToggle && <ThemeToggle />}
         </div>
         <div className="flex items-center gap-2 xl:hidden">
@@ -244,7 +250,7 @@ function SiteHeader() {
             <SheetTrigger asChild>
               <button
                 type="button"
-                className="inline-flex size-11 items-center justify-center rounded-md border border-foreground/20 bg-transparent text-foreground md:hidden"
+                className="inline-flex size-11 items-center justify-center rounded-md border border-foreground/20 bg-transparent text-foreground"
                 aria-label="Open navigation"
               >
                 <Menu className="size-5" aria-hidden />
@@ -279,6 +285,7 @@ function SiteHeader() {
                 ))}
               </nav>
               <div className="border-t border-foreground/10 p-4 pb-[calc(env(safe-area-inset-bottom)+1rem)]">
+                <MobileAccountLinks close={() => setOpen(false)} />
                 <Link
                   to="/calculator"
                   onClick={() => setOpen(false)}
@@ -292,6 +299,78 @@ function SiteHeader() {
         </div>
       </div>
     </header>
+  );
+}
+
+function AccountMenu() {
+  const account = useAccount();
+  const signOut = useSignOut();
+  if (!account.ready) return <span className="size-9" aria-hidden />;
+  if (!account.isSignedIn)
+    return (
+      <Link
+        to="/auth"
+        className="rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground"
+      >
+        Sign in
+      </Link>
+    );
+  const label = account.handle ?? account.user?.email ?? "Account";
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger className="flex max-w-48 items-center gap-2 rounded-xl border px-3 py-2 text-sm font-semibold">
+        <UserRound className="size-4" aria-hidden />
+        <span className="truncate">{label}</span>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-56">
+        <DropdownMenuLabel className="truncate">{label}</DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem asChild>
+          <Link to="/saved">My tanks</Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link to="/tracker">Tracker</Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link to="/community">Community</Link>
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onSelect={() => void signOut()}>
+          <LogOut aria-hidden />
+          Sign out
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
+
+function MobileAccountLinks({ close }: { close: () => void }) {
+  const account = useAccount();
+  const signOut = useSignOut();
+  if (!account.isSignedIn)
+    return (
+      <Link
+        to="/auth"
+        onClick={close}
+        className="mb-3 flex min-h-11 items-center justify-center rounded-xl border font-semibold"
+      >
+        Sign in
+      </Link>
+    );
+  return (
+    <div className="mb-3">
+      <p className="truncate px-1 pb-2 text-xs text-muted-foreground">
+        Signed in as {account.handle ?? account.user?.email}
+      </p>
+      <button
+        type="button"
+        onClick={() => void signOut()}
+        className="flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border font-semibold"
+      >
+        <LogOut className="size-4" aria-hidden />
+        Sign out
+      </button>
+    </div>
   );
 }
 

@@ -9,90 +9,43 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as WelfareDisclaimerRouteImport } from './routes/welfare-disclaimer'
-import { Route as VisualiserRouteImport } from './routes/visualiser'
-import { Route as TermsRouteImport } from './routes/terms'
-import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
-import { Route as SavedRouteImport } from './routes/saved'
-import { Route as QuizRouteImport } from './routes/quiz'
-import { Route as PrivacyRouteImport } from './routes/privacy'
-import { Route as MethodologyRouteImport } from './routes/methodology'
-import { Route as ContactRouteImport } from './routes/contact'
-import { Route as CalculatorRouteImport } from './routes/calculator'
-import { Route as AttributionRouteImport } from './routes/attribution'
-import { Route as AffiliateDisclosureRouteImport } from './routes/affiliate-disclosure'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as TrackerIndexRouteImport } from './routes/tracker.index'
-import { Route as TankIdeasIndexRouteImport } from './routes/tank-ideas.index'
-import { Route as SpeciesIndexRouteImport } from './routes/species.index'
-import { Route as ShopsIndexRouteImport } from './routes/shops.index'
-import { Route as GuidesIndexRouteImport } from './routes/guides.index'
-import { Route as CommunityIndexRouteImport } from './routes/community.index'
+import { Route as AffiliateDisclosureRouteImport } from './routes/affiliate-disclosure'
+import { Route as AttributionRouteImport } from './routes/attribution'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as CalculatorRouteImport } from './routes/calculator'
+import { Route as ContactRouteImport } from './routes/contact'
+import { Route as MethodologyRouteImport } from './routes/methodology'
+import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as QuizRouteImport } from './routes/quiz'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as SavedRouteImport } from './routes/saved'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as TermsRouteImport } from './routes/terms'
+import { Route as VisualiserRouteImport } from './routes/visualiser'
+import { Route as WelfareDisclaimerRouteImport } from './routes/welfare-disclaimer'
+import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as BlogIndexRouteImport } from './routes/blog.index'
-import { Route as TrackerIdRouteImport } from './routes/tracker.$id'
-import { Route as TankIdeasSlugRouteImport } from './routes/tank-ideas.$slug'
-import { Route as TSlugRouteImport } from './routes/t.$slug'
-import { Route as SpeciesIdRouteImport } from './routes/species.$id'
-import { Route as ShopsSlugRouteImport } from './routes/shops.$slug'
-import { Route as GuidesSlugRouteImport } from './routes/guides.$slug'
-import { Route as CommunityNewRouteImport } from './routes/community.new'
-import { Route as CommunityModerationRouteImport } from './routes/community.moderation'
-import { Route as CommunityIdRouteImport } from './routes/community.$id'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
+import { Route as CommunityIndexRouteImport } from './routes/community.index'
+import { Route as CommunityIdRouteImport } from './routes/community.$id'
+import { Route as CommunityModerationRouteImport } from './routes/community.moderation'
+import { Route as CommunityNewRouteImport } from './routes/community.new'
+import { Route as GuidesIndexRouteImport } from './routes/guides.index'
+import { Route as GuidesSlugRouteImport } from './routes/guides.$slug'
+import { Route as ShopsIndexRouteImport } from './routes/shops.index'
+import { Route as ShopsSlugRouteImport } from './routes/shops.$slug'
+import { Route as SpeciesIndexRouteImport } from './routes/species.index'
+import { Route as SpeciesIdRouteImport } from './routes/species.$id'
+import { Route as TSlugRouteImport } from './routes/t.$slug'
+import { Route as TankIdeasIndexRouteImport } from './routes/tank-ideas.index'
+import { Route as TankIdeasSlugRouteImport } from './routes/tank-ideas.$slug'
+import { Route as TrackerIndexRouteImport } from './routes/tracker.index'
+import { Route as TrackerIdRouteImport } from './routes/tracker.$id'
 
-const WelfareDisclaimerRoute = WelfareDisclaimerRouteImport.update({
-  id: '/welfare-disclaimer',
-  path: '/welfare-disclaimer',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const VisualiserRoute = VisualiserRouteImport.update({
-  id: '/visualiser',
-  path: '/visualiser',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const TermsRoute = TermsRouteImport.update({
-  id: '/terms',
-  path: '/terms',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
-  id: '/sitemap.xml',
-  path: '/sitemap.xml',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SavedRoute = SavedRouteImport.update({
-  id: '/saved',
-  path: '/saved',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const QuizRoute = QuizRouteImport.update({
-  id: '/quiz',
-  path: '/quiz',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PrivacyRoute = PrivacyRouteImport.update({
-  id: '/privacy',
-  path: '/privacy',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MethodologyRoute = MethodologyRouteImport.update({
-  id: '/methodology',
-  path: '/methodology',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ContactRoute = ContactRouteImport.update({
-  id: '/contact',
-  path: '/contact',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CalculatorRoute = CalculatorRouteImport.update({
-  id: '/calculator',
-  path: '/calculator',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AttributionRoute = AttributionRouteImport.update({
-  id: '/attribution',
-  path: '/attribution',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AffiliateDisclosureRoute = AffiliateDisclosureRouteImport.update({
@@ -100,89 +53,79 @@ const AffiliateDisclosureRoute = AffiliateDisclosureRouteImport.update({
   path: '/affiliate-disclosure',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const AttributionRoute = AttributionRouteImport.update({
+  id: '/attribution',
+  path: '/attribution',
   getParentRoute: () => rootRouteImport,
 } as any)
-const TrackerIndexRoute = TrackerIndexRouteImport.update({
-  id: '/tracker/',
-  path: '/tracker/',
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
-const TankIdeasIndexRoute = TankIdeasIndexRouteImport.update({
-  id: '/tank-ideas/',
-  path: '/tank-ideas/',
+const CalculatorRoute = CalculatorRouteImport.update({
+  id: '/calculator',
+  path: '/calculator',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SpeciesIndexRoute = SpeciesIndexRouteImport.update({
-  id: '/species/',
-  path: '/species/',
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ShopsIndexRoute = ShopsIndexRouteImport.update({
-  id: '/shops/',
-  path: '/shops/',
+const MethodologyRoute = MethodologyRouteImport.update({
+  id: '/methodology',
+  path: '/methodology',
   getParentRoute: () => rootRouteImport,
 } as any)
-const GuidesIndexRoute = GuidesIndexRouteImport.update({
-  id: '/guides/',
-  path: '/guides/',
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
-const CommunityIndexRoute = CommunityIndexRouteImport.update({
-  id: '/community/',
-  path: '/community/',
+const QuizRoute = QuizRouteImport.update({
+  id: '/quiz',
+  path: '/quiz',
   getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SavedRoute = SavedRouteImport.update({
+  id: '/saved',
+  path: '/saved',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VisualiserRoute = VisualiserRouteImport.update({
+  id: '/visualiser',
+  path: '/visualiser',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WelfareDisclaimerRoute = WelfareDisclaimerRouteImport.update({
+  id: '/welfare-disclaimer',
+  path: '/welfare-disclaimer',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthCallbackRoute = AuthCallbackRouteImport.update({
+  id: '/callback',
+  path: '/callback',
+  getParentRoute: () => AuthRoute,
 } as any)
 const BlogIndexRoute = BlogIndexRouteImport.update({
   id: '/blog/',
   path: '/blog/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const TrackerIdRoute = TrackerIdRouteImport.update({
-  id: '/tracker/$id',
-  path: '/tracker/$id',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const TankIdeasSlugRoute = TankIdeasSlugRouteImport.update({
-  id: '/tank-ideas/$slug',
-  path: '/tank-ideas/$slug',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const TSlugRoute = TSlugRouteImport.update({
-  id: '/t/$slug',
-  path: '/t/$slug',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SpeciesIdRoute = SpeciesIdRouteImport.update({
-  id: '/species/$id',
-  path: '/species/$id',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ShopsSlugRoute = ShopsSlugRouteImport.update({
-  id: '/shops/$slug',
-  path: '/shops/$slug',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const GuidesSlugRoute = GuidesSlugRouteImport.update({
-  id: '/guides/$slug',
-  path: '/guides/$slug',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CommunityNewRoute = CommunityNewRouteImport.update({
-  id: '/community/new',
-  path: '/community/new',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CommunityModerationRoute = CommunityModerationRouteImport.update({
-  id: '/community/moderation',
-  path: '/community/moderation',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CommunityIdRoute = CommunityIdRouteImport.update({
-  id: '/community/$id',
-  path: '/community/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BlogSlugRoute = BlogSlugRouteImport.update({
@@ -190,21 +133,99 @@ const BlogSlugRoute = BlogSlugRouteImport.update({
   path: '/blog/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CommunityIndexRoute = CommunityIndexRouteImport.update({
+  id: '/community/',
+  path: '/community/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CommunityIdRoute = CommunityIdRouteImport.update({
+  id: '/community/$id',
+  path: '/community/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CommunityModerationRoute = CommunityModerationRouteImport.update({
+  id: '/community/moderation',
+  path: '/community/moderation',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CommunityNewRoute = CommunityNewRouteImport.update({
+  id: '/community/new',
+  path: '/community/new',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GuidesIndexRoute = GuidesIndexRouteImport.update({
+  id: '/guides/',
+  path: '/guides/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GuidesSlugRoute = GuidesSlugRouteImport.update({
+  id: '/guides/$slug',
+  path: '/guides/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ShopsIndexRoute = ShopsIndexRouteImport.update({
+  id: '/shops/',
+  path: '/shops/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ShopsSlugRoute = ShopsSlugRouteImport.update({
+  id: '/shops/$slug',
+  path: '/shops/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SpeciesIndexRoute = SpeciesIndexRouteImport.update({
+  id: '/species/',
+  path: '/species/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SpeciesIdRoute = SpeciesIdRouteImport.update({
+  id: '/species/$id',
+  path: '/species/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TSlugRoute = TSlugRouteImport.update({
+  id: '/t/$slug',
+  path: '/t/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TankIdeasIndexRoute = TankIdeasIndexRouteImport.update({
+  id: '/tank-ideas/',
+  path: '/tank-ideas/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TankIdeasSlugRoute = TankIdeasSlugRouteImport.update({
+  id: '/tank-ideas/$slug',
+  path: '/tank-ideas/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TrackerIndexRoute = TrackerIndexRouteImport.update({
+  id: '/tracker/',
+  path: '/tracker/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TrackerIdRoute = TrackerIdRouteImport.update({
+  id: '/tracker/$id',
+  path: '/tracker/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/affiliate-disclosure': typeof AffiliateDisclosureRoute
   '/attribution': typeof AttributionRoute
+  '/auth': typeof AuthRouteWithChildren
   '/calculator': typeof CalculatorRoute
   '/contact': typeof ContactRoute
   '/methodology': typeof MethodologyRoute
   '/privacy': typeof PrivacyRoute
   '/quiz': typeof QuizRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/saved': typeof SavedRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/visualiser': typeof VisualiserRoute
   '/welfare-disclaimer': typeof WelfareDisclaimerRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/community/$id': typeof CommunityIdRoute
   '/community/moderation': typeof CommunityModerationRoute
@@ -227,16 +248,19 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/affiliate-disclosure': typeof AffiliateDisclosureRoute
   '/attribution': typeof AttributionRoute
+  '/auth': typeof AuthRouteWithChildren
   '/calculator': typeof CalculatorRoute
   '/contact': typeof ContactRoute
   '/methodology': typeof MethodologyRoute
   '/privacy': typeof PrivacyRoute
   '/quiz': typeof QuizRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/saved': typeof SavedRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/visualiser': typeof VisualiserRoute
   '/welfare-disclaimer': typeof WelfareDisclaimerRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/community/$id': typeof CommunityIdRoute
   '/community/moderation': typeof CommunityModerationRoute
@@ -260,16 +284,19 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/affiliate-disclosure': typeof AffiliateDisclosureRoute
   '/attribution': typeof AttributionRoute
+  '/auth': typeof AuthRouteWithChildren
   '/calculator': typeof CalculatorRoute
   '/contact': typeof ContactRoute
   '/methodology': typeof MethodologyRoute
   '/privacy': typeof PrivacyRoute
   '/quiz': typeof QuizRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/saved': typeof SavedRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/visualiser': typeof VisualiserRoute
   '/welfare-disclaimer': typeof WelfareDisclaimerRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/community/$id': typeof CommunityIdRoute
   '/community/moderation': typeof CommunityModerationRoute
@@ -294,16 +321,19 @@ export interface FileRouteTypes {
     | '/'
     | '/affiliate-disclosure'
     | '/attribution'
+    | '/auth'
     | '/calculator'
     | '/contact'
     | '/methodology'
     | '/privacy'
     | '/quiz'
+    | '/reset-password'
     | '/saved'
     | '/sitemap.xml'
     | '/terms'
     | '/visualiser'
     | '/welfare-disclaimer'
+    | '/auth/callback'
     | '/blog/$slug'
     | '/community/$id'
     | '/community/moderation'
@@ -326,16 +356,19 @@ export interface FileRouteTypes {
     | '/'
     | '/affiliate-disclosure'
     | '/attribution'
+    | '/auth'
     | '/calculator'
     | '/contact'
     | '/methodology'
     | '/privacy'
     | '/quiz'
+    | '/reset-password'
     | '/saved'
     | '/sitemap.xml'
     | '/terms'
     | '/visualiser'
     | '/welfare-disclaimer'
+    | '/auth/callback'
     | '/blog/$slug'
     | '/community/$id'
     | '/community/moderation'
@@ -358,16 +391,19 @@ export interface FileRouteTypes {
     | '/'
     | '/affiliate-disclosure'
     | '/attribution'
+    | '/auth'
     | '/calculator'
     | '/contact'
     | '/methodology'
     | '/privacy'
     | '/quiz'
+    | '/reset-password'
     | '/saved'
     | '/sitemap.xml'
     | '/terms'
     | '/visualiser'
     | '/welfare-disclaimer'
+    | '/auth/callback'
     | '/blog/$slug'
     | '/community/$id'
     | '/community/moderation'
@@ -391,11 +427,13 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AffiliateDisclosureRoute: typeof AffiliateDisclosureRoute
   AttributionRoute: typeof AttributionRoute
+  AuthRoute: typeof AuthRouteWithChildren
   CalculatorRoute: typeof CalculatorRoute
   ContactRoute: typeof ContactRoute
   MethodologyRoute: typeof MethodologyRoute
   PrivacyRoute: typeof PrivacyRoute
   QuizRoute: typeof QuizRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   SavedRoute: typeof SavedRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
@@ -422,81 +460,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/welfare-disclaimer': {
-      id: '/welfare-disclaimer'
-      path: '/welfare-disclaimer'
-      fullPath: '/welfare-disclaimer'
-      preLoaderRoute: typeof WelfareDisclaimerRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/visualiser': {
-      id: '/visualiser'
-      path: '/visualiser'
-      fullPath: '/visualiser'
-      preLoaderRoute: typeof VisualiserRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/terms': {
-      id: '/terms'
-      path: '/terms'
-      fullPath: '/terms'
-      preLoaderRoute: typeof TermsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/sitemap.xml': {
-      id: '/sitemap.xml'
-      path: '/sitemap.xml'
-      fullPath: '/sitemap.xml'
-      preLoaderRoute: typeof SitemapDotxmlRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/saved': {
-      id: '/saved'
-      path: '/saved'
-      fullPath: '/saved'
-      preLoaderRoute: typeof SavedRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/quiz': {
-      id: '/quiz'
-      path: '/quiz'
-      fullPath: '/quiz'
-      preLoaderRoute: typeof QuizRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/privacy': {
-      id: '/privacy'
-      path: '/privacy'
-      fullPath: '/privacy'
-      preLoaderRoute: typeof PrivacyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/methodology': {
-      id: '/methodology'
-      path: '/methodology'
-      fullPath: '/methodology'
-      preLoaderRoute: typeof MethodologyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/contact': {
-      id: '/contact'
-      path: '/contact'
-      fullPath: '/contact'
-      preLoaderRoute: typeof ContactRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/calculator': {
-      id: '/calculator'
-      path: '/calculator'
-      fullPath: '/calculator'
-      preLoaderRoute: typeof CalculatorRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/attribution': {
-      id: '/attribution'
-      path: '/attribution'
-      fullPath: '/attribution'
-      preLoaderRoute: typeof AttributionRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/affiliate-disclosure': {
@@ -506,123 +474,109 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AffiliateDisclosureRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/attribution': {
+      id: '/attribution'
+      path: '/attribution'
+      fullPath: '/attribution'
+      preLoaderRoute: typeof AttributionRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/tracker/': {
-      id: '/tracker/'
-      path: '/tracker'
-      fullPath: '/tracker/'
-      preLoaderRoute: typeof TrackerIndexRouteImport
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/tank-ideas/': {
-      id: '/tank-ideas/'
-      path: '/tank-ideas'
-      fullPath: '/tank-ideas/'
-      preLoaderRoute: typeof TankIdeasIndexRouteImport
+    '/calculator': {
+      id: '/calculator'
+      path: '/calculator'
+      fullPath: '/calculator'
+      preLoaderRoute: typeof CalculatorRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/species/': {
-      id: '/species/'
-      path: '/species'
-      fullPath: '/species/'
-      preLoaderRoute: typeof SpeciesIndexRouteImport
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/shops/': {
-      id: '/shops/'
-      path: '/shops'
-      fullPath: '/shops/'
-      preLoaderRoute: typeof ShopsIndexRouteImport
+    '/methodology': {
+      id: '/methodology'
+      path: '/methodology'
+      fullPath: '/methodology'
+      preLoaderRoute: typeof MethodologyRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/guides/': {
-      id: '/guides/'
-      path: '/guides'
-      fullPath: '/guides/'
-      preLoaderRoute: typeof GuidesIndexRouteImport
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/community/': {
-      id: '/community/'
-      path: '/community'
-      fullPath: '/community/'
-      preLoaderRoute: typeof CommunityIndexRouteImport
+    '/quiz': {
+      id: '/quiz'
+      path: '/quiz'
+      fullPath: '/quiz'
+      preLoaderRoute: typeof QuizRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/saved': {
+      id: '/saved'
+      path: '/saved'
+      fullPath: '/saved'
+      preLoaderRoute: typeof SavedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/visualiser': {
+      id: '/visualiser'
+      path: '/visualiser'
+      fullPath: '/visualiser'
+      preLoaderRoute: typeof VisualiserRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/welfare-disclaimer': {
+      id: '/welfare-disclaimer'
+      path: '/welfare-disclaimer'
+      fullPath: '/welfare-disclaimer'
+      preLoaderRoute: typeof WelfareDisclaimerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/callback': {
+      id: '/auth/callback'
+      path: '/callback'
+      fullPath: '/auth/callback'
+      preLoaderRoute: typeof AuthCallbackRouteImport
+      parentRoute: typeof AuthRoute
     }
     '/blog/': {
       id: '/blog/'
       path: '/blog'
       fullPath: '/blog/'
       preLoaderRoute: typeof BlogIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/tracker/$id': {
-      id: '/tracker/$id'
-      path: '/tracker/$id'
-      fullPath: '/tracker/$id'
-      preLoaderRoute: typeof TrackerIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/tank-ideas/$slug': {
-      id: '/tank-ideas/$slug'
-      path: '/tank-ideas/$slug'
-      fullPath: '/tank-ideas/$slug'
-      preLoaderRoute: typeof TankIdeasSlugRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/t/$slug': {
-      id: '/t/$slug'
-      path: '/t/$slug'
-      fullPath: '/t/$slug'
-      preLoaderRoute: typeof TSlugRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/species/$id': {
-      id: '/species/$id'
-      path: '/species/$id'
-      fullPath: '/species/$id'
-      preLoaderRoute: typeof SpeciesIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/shops/$slug': {
-      id: '/shops/$slug'
-      path: '/shops/$slug'
-      fullPath: '/shops/$slug'
-      preLoaderRoute: typeof ShopsSlugRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/guides/$slug': {
-      id: '/guides/$slug'
-      path: '/guides/$slug'
-      fullPath: '/guides/$slug'
-      preLoaderRoute: typeof GuidesSlugRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/community/new': {
-      id: '/community/new'
-      path: '/community/new'
-      fullPath: '/community/new'
-      preLoaderRoute: typeof CommunityNewRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/community/moderation': {
-      id: '/community/moderation'
-      path: '/community/moderation'
-      fullPath: '/community/moderation'
-      preLoaderRoute: typeof CommunityModerationRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/community/$id': {
-      id: '/community/$id'
-      path: '/community/$id'
-      fullPath: '/community/$id'
-      preLoaderRoute: typeof CommunityIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/blog/$slug': {
@@ -632,18 +586,135 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BlogSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/community/': {
+      id: '/community/'
+      path: '/community'
+      fullPath: '/community/'
+      preLoaderRoute: typeof CommunityIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/community/$id': {
+      id: '/community/$id'
+      path: '/community/$id'
+      fullPath: '/community/$id'
+      preLoaderRoute: typeof CommunityIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/community/moderation': {
+      id: '/community/moderation'
+      path: '/community/moderation'
+      fullPath: '/community/moderation'
+      preLoaderRoute: typeof CommunityModerationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/community/new': {
+      id: '/community/new'
+      path: '/community/new'
+      fullPath: '/community/new'
+      preLoaderRoute: typeof CommunityNewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/guides/': {
+      id: '/guides/'
+      path: '/guides'
+      fullPath: '/guides/'
+      preLoaderRoute: typeof GuidesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/guides/$slug': {
+      id: '/guides/$slug'
+      path: '/guides/$slug'
+      fullPath: '/guides/$slug'
+      preLoaderRoute: typeof GuidesSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/shops/': {
+      id: '/shops/'
+      path: '/shops'
+      fullPath: '/shops/'
+      preLoaderRoute: typeof ShopsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/shops/$slug': {
+      id: '/shops/$slug'
+      path: '/shops/$slug'
+      fullPath: '/shops/$slug'
+      preLoaderRoute: typeof ShopsSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/species/': {
+      id: '/species/'
+      path: '/species'
+      fullPath: '/species/'
+      preLoaderRoute: typeof SpeciesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/species/$id': {
+      id: '/species/$id'
+      path: '/species/$id'
+      fullPath: '/species/$id'
+      preLoaderRoute: typeof SpeciesIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/t/$slug': {
+      id: '/t/$slug'
+      path: '/t/$slug'
+      fullPath: '/t/$slug'
+      preLoaderRoute: typeof TSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tank-ideas/': {
+      id: '/tank-ideas/'
+      path: '/tank-ideas'
+      fullPath: '/tank-ideas/'
+      preLoaderRoute: typeof TankIdeasIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tank-ideas/$slug': {
+      id: '/tank-ideas/$slug'
+      path: '/tank-ideas/$slug'
+      fullPath: '/tank-ideas/$slug'
+      preLoaderRoute: typeof TankIdeasSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tracker/': {
+      id: '/tracker/'
+      path: '/tracker'
+      fullPath: '/tracker/'
+      preLoaderRoute: typeof TrackerIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tracker/$id': {
+      id: '/tracker/$id'
+      path: '/tracker/$id'
+      fullPath: '/tracker/$id'
+      preLoaderRoute: typeof TrackerIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
+
+interface AuthRouteChildren {
+  AuthCallbackRoute: typeof AuthCallbackRoute
+}
+
+const AuthRouteChildren: AuthRouteChildren = {
+  AuthCallbackRoute: AuthCallbackRoute,
+}
+
+const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AffiliateDisclosureRoute: AffiliateDisclosureRoute,
   AttributionRoute: AttributionRoute,
+  AuthRoute: AuthRouteWithChildren,
   CalculatorRoute: CalculatorRoute,
   ContactRoute: ContactRoute,
   MethodologyRoute: MethodologyRoute,
   PrivacyRoute: PrivacyRoute,
   QuizRoute: QuizRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   SavedRoute: SavedRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,

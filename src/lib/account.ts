@@ -1,58 +1,67 @@
-import { useEffect, useState } from "react";
+import {
+  createContext,
+  createElement,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import type { User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 
-const GUEST_KEY = "fishtankr:guest-id";
+const GUEST_ID_KEY = "fishtankr:guest-id";
+const GUEST_TOKEN_KEY = "fishtankr:guest-token";
 
-/** Remember the guest session id so its tanks can be claimed after sign-in. */
-export function rememberGuestId(user: User | null) {
-  if (typeof window === "undefined") return;
-  if (user?.is_anonymous) window.localStorage.setItem(GUEST_KEY, user.id);
+export function rememberGuest(user: User | null, accessToken?: string | null) {
+  if (typeof window === "undefined" || !user?.is_anonymous) return;
+  window.sessionStorage.setItem(GUEST_ID_KEY, user.id);
+  if (accessToken) window.sessionStorage.setItem(GUEST_TOKEN_KEY, accessToken);
 }
 
-export function readGuestId(): string | null {
+export function readGuestClaim(): { guestId: string; guestToken: string } | null {
   if (typeof window === "undefined") return null;
-  return window.localStorage.getItem(GUEST_KEY);
+  const guestId = window.sessionStorage.getItem(GUEST_ID_KEY);
+  const guestToken = window.sessionStorage.getItem(GUEST_TOKEN_KEY);
+  return guestId && guestToken ? { guestId, guestToken } : null;
 }
 
-export function forgetGuestId() {
+export function forgetGuestClaim() {
   if (typeof window === "undefined") return;
-  window.localStorage.removeItem(GUEST_KEY);
+  window.sessionStorage.removeItem(GUEST_ID_KEY);
+  window.sessionStorage.removeItem(GUEST_TOKEN_KEY);
 }
 
 export type Account = {
   user: User | null;
   ready: boolean;
-  /** Signed in with a real email address. */
   isSignedIn: boolean;
-  /** Browser-only session with no email attached. */
   isGuest: boolean;
-  /** Email confirmed, so community posting is allowed. */
   isMember: boolean;
   handle: string | null;
 };
 
-export function useSession(): { user: User | null; ready: boolean } {
+const AccountContext = createContext<Account | null>(null);
+
+export function AccountProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [ready, setReady] = useState(false);
   useEffect(() => {
-    void supabase.auth.getUser().then(({ data }) => {
-      setUser(data.user);
+    void supabase.auth.getSession().then(({ data }) => {
+      setUser(data.session?.user ?? null);
+      rememberGuest(data.session?.user ?? null, data.session?.access_token);
       setReady(true);
     });
     const { data } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
+      rememberGuest(session?.user ?? null, session?.access_token);
       setReady(true);
     });
     return () => data.subscription.unsubscribe();
   }, []);
-  return { user, ready };
-}
 
-export function useAccount(): Account {
-  const { user, ready } = useSession();
-  const isGuest = !!user && !!user.is_anonymous;
+  const isGuest = !!user?.is_anonymous;
   const isSignedIn = !!user && !user.is_anonymous;
   const isMember = isSignedIn && !!user.email_confirmed_at;
   const profile = useQuery({
@@ -65,26 +74,28 @@ export function useAccount(): Account {
         .eq("id", user!.id)
         .maybeSingle();
       if (error) throw error;
-      return (data as { handle: string } | null) ?? null;
+      return data as { handle: string } | null;
     },
   });
-  return {
-    user,
-    ready,
-    isSignedIn,
-    isGuest,
-    isMember,
-    handle: profile.data?.handle ?? null,
-  };
+  const value = useMemo(
+    () => ({ user, ready, isSignedIn, isGuest, isMember, handle: profile.data?.handle ?? null }),
+    [user, ready, isSignedIn, isGuest, isMember, profile.data?.handle],
+  );
+  return createElement(AccountContext.Provider, { value }, children);
 }
 
-/** Sign out cleanly: stop queries, drop cached data, clear the session. */
+export function useAccount(): Account {
+  const account = useContext(AccountContext);
+  if (!account) throw new Error("useAccount must be used inside AccountProvider");
+  return account;
+}
+
 export function useSignOut() {
   const queryClient = useQueryClient();
   return async () => {
     await queryClient.cancelQueries();
     queryClient.clear();
-    forgetGuestId();
+    forgetGuestClaim();
     await supabase.auth.signOut();
     window.location.assign("/");
   };
