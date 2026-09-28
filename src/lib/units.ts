@@ -20,6 +20,13 @@ export function inToCm(inches: number) {
 export function litresToGallons(litres: number) {
   return litres / LITRES_PER_GALLON;
 }
+/** Turn a volume typed in the user's units back into litres. */
+export function volumeToLitres(value: number, system: UnitSystem) {
+  return system === "us" ? value * LITRES_PER_GALLON : value;
+}
+export function displayVolume(litres: number, system: UnitSystem) {
+  return system === "us" ? roundTo(litresToGallons(litres), 1) : Math.round(litres);
+}
 
 /** Round to a sensible number of decimals for an input field. */
 export function roundTo(n: number, dp: number) {

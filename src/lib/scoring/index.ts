@@ -1,4 +1,10 @@
-import { BIOTOPE_LABEL, BIOTOPE_WATER, type BiotopeRegion, type TankState } from "../types";
+import {
+  BIOTOPE_LABEL,
+  BIOTOPE_WATER,
+  type BiotopeRegion,
+  type Species,
+  type TankState,
+} from "../types";
 
 export interface SubScore {
   score: number;
@@ -832,6 +838,11 @@ function scoreBioload(state: TankState): Scorecard["bioload"] {
 
 // ============== 4. SPACE ==============
 
+/** Swimming length a species wants: six body lengths for active swimmers, four otherwise. */
+export function requiredSwimLengthCm(sp: Pick<Species, "adult_size_cm" | "active">): number {
+  return sp.adult_size_cm * (sp.active ? 6 : 4);
+}
+
 function scoreSpace(state: TankState): SubScore {
   if (state.species.length === 0) return { ...empty };
   const litres = litresOf(state);
@@ -856,7 +867,7 @@ function scoreSpace(state: TankState): SubScore {
         `Move ${sp.common_name} to a bigger tank, or choose a smaller species.`,
       );
     }
-    const requiredLength = sp.adult_size_cm * (sp.active ? 6 : 4);
+    const requiredLength = requiredSwimLengthCm(sp);
     if (length < requiredLength) {
       add(
         "tank-too-short",
