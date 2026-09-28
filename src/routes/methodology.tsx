@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { absoluteUrl } from "@/lib/site";
 import { TwoChecks } from "@/components/TwoChecks";
+import { WEIGHTS } from "@/lib/scoring";
 import { TEST_MAX_AGE_DAYS } from "@/lib/cycle-status";
 import { TWO_CHECKS } from "@/lib/two-checks";
 import { ExternalLink, ShieldCheck, TriangleAlert } from "lucide-react";
@@ -45,6 +46,8 @@ const SOURCES = [
   },
 ];
 
+const pct = (weight: number) => `${Math.round(weight * 100)}%`;
+
 function MethodologyPage() {
   return (
     <main className="mx-auto max-w-4xl px-4 py-8 sm:py-12">
@@ -63,17 +66,17 @@ function MethodologyPage() {
       <section className="mt-10 grid gap-4 sm:grid-cols-3" aria-label="Headline score weights">
         <WeightCard
           label="Compatibility"
-          weight="45%"
+          weight={pct(WEIGHTS.compatibility)}
           detail="Group needs, aggression, predation and species conflicts."
         />
         <WeightCard
           label="Swimming space"
-          weight="35%"
+          weight={pct(WEIGHTS.space)}
           detail="Adult size, minimum tank volume and swimming length."
         />
         <WeightCard
           label="Water suitability"
-          weight="20%"
+          weight={pct(WEIGHTS.water)}
           detail="The selected pH and temperature against each species."
         />
       </section>
