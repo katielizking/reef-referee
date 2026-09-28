@@ -24,6 +24,7 @@ import { WhereToBuy } from "@/components/WhereToBuy";
 import type { Species } from "@/lib/types";
 import { BIOTOPE_LABEL } from "@/lib/types";
 import { absoluteUrl } from "@/lib/site";
+import { alsoKnownAs, lookAlikesOf, telltale, varietiesOf } from "@/lib/species-names";
 import { requiredSwimLengthCm } from "@/lib/scoring";
 import { formatLength, formatVolume, useUnitSystem } from "@/lib/units";
 import { useTankDraft } from "@/components/TankDraftProvider";
@@ -292,6 +293,56 @@ function EvidenceSummary({ items }: { items: EvidenceItem[] }) {
   );
 }
 
+function NameNotes({ s, catalogue }: { s: Species; catalogue: Species[] }) {
+  const lookAlikes = lookAlikesOf(s, catalogue);
+  const varieties = varietiesOf(s, catalogue);
+  if (lookAlikes.length === 0 && varieties.length === 0) return null;
+  const species = s.scientific_name.split(/\s+/).slice(0, 2).join(" ");
+  return (
+    <section
+      aria-label="Similar names"
+      className="mt-6 rounded-2xl border border-dashed bg-card p-4 text-sm"
+    >
+      {varieties.length > 0 && (
+        <p className="text-foreground">
+          <span className="font-semibold">A bred variety of </span>
+          <i>{species}</i>. Other varieties in our catalogue:{" "}
+          {varieties.map((v, i) => (
+            <span key={v.id}>
+              {i > 0 && ", "}
+              <Link to="/species/$id" params={{ id: v.id }} className="text-primary underline">
+                {v.common_name}
+              </Link>
+            </span>
+          ))}
+          . Varieties of one species can differ in size, speed and fins, so check each page before
+          keeping them together.
+        </p>
+      )}
+      {lookAlikes.length > 0 && (
+        <div className={varieties.length > 0 ? "mt-3" : ""}>
+          <p className="font-semibold text-foreground">
+            Not the same fish as{lookAlikes.length > 1 ? ":" : ""}
+          </p>
+          <ul className="mt-1 space-y-1">
+            {lookAlikes.map((o) => (
+              <li key={o.id} className="text-muted-foreground">
+                <Link to="/species/$id" params={{ id: o.id }} className="text-primary underline">
+                  {o.common_name}
+                </Link>{" "}
+                (<i>{o.scientific_name}</i>): {telltale(o)}.
+              </li>
+            ))}
+          </ul>
+          <p className="mt-1 text-xs text-muted-foreground">
+            This page: {s.common_name} ({s.scientific_name}), {telltale(s)}.
+          </p>
+        </div>
+      )}
+    </section>
+  );
+}
+
 function CareRequirements({ s }: { s: Species }) {
   const [units] = useUnitSystem();
   const group =
@@ -441,6 +492,11 @@ function SpeciesGuide() {
           <p className="mt-2 font-display text-sm italic text-muted-foreground">
             {s.scientific_name}
           </p>
+          {alsoKnownAs(s).length > 0 && (
+            <p className="mt-1 text-sm text-muted-foreground">
+              Also sold as {alsoKnownAs(s).join(", ")}
+            </p>
+          )}
           <p className="mt-6 max-w-md text-sm leading-relaxed text-muted-foreground">
             Adult needs, habitat, social behaviour and care sources for this fish.
           </p>
@@ -448,6 +504,7 @@ function SpeciesGuide() {
         </div>
       </header>
 
+      <NameNotes s={s} catalogue={allSpecies} />
       <CareRequirements s={s} />
       <LikelyConflicts s={s} catalogue={allSpecies} />
       <PlanFitPanel s={s} />
