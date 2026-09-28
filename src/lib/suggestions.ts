@@ -1,5 +1,6 @@
 import { litresOf, scoreTank, type Issue } from "./scoring";
 import type { Species, TankState } from "./types";
+import { newIssues } from "./species-fit";
 
 export interface Suggestion {
   species: Species;
@@ -8,21 +9,11 @@ export interface Suggestion {
   groupNote: string | null;
 }
 
+const SEVERITY_ORDER: Issue["severity"][] = ["critical", "high", "medium", "low"];
+
 function worstNewSeverity(before: Issue[], after: Issue[]): Issue["severity"] | null {
-  const seen = new Map<string, number>();
-  for (const issue of before) seen.set(issue.code, (seen.get(issue.code) ?? 0) + 1);
-  const order: Issue["severity"][] = ["critical", "high", "medium", "low"];
-  let worst: Issue["severity"] | null = null;
-  for (const issue of after) {
-    const left = seen.get(issue.code) ?? 0;
-    if (left > 0) {
-      seen.set(issue.code, left - 1);
-      continue;
-    }
-    if (worst === null || order.indexOf(issue.severity) < order.indexOf(worst))
-      worst = issue.severity;
-  }
-  return worst;
+  const added = newIssues(before, after).map((i) => SEVERITY_ORDER.indexOf(i.severity));
+  return added.length > 0 ? SEVERITY_ORDER[Math.min(...added)] : null;
 }
 
 function allIssues(state: TankState): Issue[] {

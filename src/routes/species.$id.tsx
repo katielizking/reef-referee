@@ -24,6 +24,17 @@ import { WhereToBuy } from "@/components/WhereToBuy";
 import type { Species } from "@/lib/types";
 import { BIOTOPE_LABEL } from "@/lib/types";
 import { absoluteUrl } from "@/lib/site";
+import { requiredSwimLengthCm } from "@/lib/scoring";
+import { formatLength, formatVolume, useUnitSystem } from "@/lib/units";
+import { useTankDraft } from "@/components/TankDraftProvider";
+import {
+  FIT_LABEL,
+  SWIM_ZONE_LABEL,
+  habitatLabel,
+  likelyConflicts,
+  planFit,
+  type FitVerdict,
+} from "@/lib/species-fit";
 import { regionalEvidence, speciesEvidence, type EvidenceItem } from "@/lib/species-evidence";
 
 const speciesByIdQuery = (id: string) =>
@@ -111,7 +122,7 @@ export const Route = createFileRoute("/species/$id")({
     }
     const s = loaderData;
     const title = `${s.common_name} (${s.scientific_name}) | FishTankr`;
-    const desc = `Care guide for ${s.common_name}: adult size ${s.adult_size_cm} cm, minimum ${s.min_tank_litres} L, ${BIOTOPE_LABEL[s.biotope_region]}. See welfare notes and how FishTankr scores this fish.`;
+    const desc = `Care guide for ${s.common_name}: adult size ${s.adult_size_cm} cm, minimum ${s.min_tank_litres} L, ${BIOTOPE_LABEL[s.biotope_region]}. See care requirements, likely tank-mate conflicts and sources.`;
     return {
       meta: [
         { title },
@@ -185,7 +196,7 @@ function LegalityEvidence({ s }: { s: Species }) {
   const regional = regionalEvidence(s);
 
   return (
-    <section className="mt-10 rounded-2xl border bg-card p-5">
+    <section className="mt-4 rounded-2xl border bg-card p-5">
       <div className="flex items-start gap-3">
         <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-primary" aria-hidden />
         <div className="min-w-0 flex-1">
@@ -252,7 +263,7 @@ function LegalityEvidence({ s }: { s: Species }) {
 
 function EvidenceSummary({ items }: { items: EvidenceItem[] }) {
   return (
-    <section aria-labelledby="evidence-heading" className="mt-6 rounded-2xl border bg-card p-5">
+    <section aria-labelledby="evidence-heading" className="mt-4 rounded-2xl border bg-card p-5">
       <h2 id="evidence-heading" className="font-display text-lg font-semibold text-foreground">
         What we have checked
       </h2>
@@ -281,14 +292,115 @@ function EvidenceSummary({ items }: { items: EvidenceItem[] }) {
   );
 }
 
-function Stat({ icon: Icon, label, value }: { icon: typeof Ruler; label: string; value: string }) {
+function CareRequirements({ s }: { s: Species }) {
+  const [units] = useUnitSystem();
+  const group =
+    s.min_group_size > 1
+      ? `At least ${s.min_group_size}. Smaller groups leave ${s.common_name} stressed and more likely to hide or nip.`
+      : s.temperament === "aggressive"
+        ? `Keep one on its own.`
+        : "Can be kept singly.";
+  const rows: Array<{ icon: typeof Ruler; label: string; value: string }> = [
+    { icon: Droplet, label: "Minimum tank", value: formatVolume(s.min_tank_litres, units) },
+    {
+      icon: Ruler,
+      label: "Tank length",
+      value: `${formatLength(requiredSwimLengthCm(s), units)} or longer${s.active ? ", it is an active swimmer" : ""}`,
+    },
+    {
+      icon: Thermometer,
+      label: "Water",
+      value: `${s.native_temp_min_c}–${s.native_temp_max_c} °C · pH ${s.native_ph_min}–${s.native_ph_max}`,
+    },
+    { icon: Users, label: "Group", value: group },
+    { icon: Waves, label: "Swims", value: SWIM_ZONE_LABEL[s.swim_zone] },
+    {
+      icon: Fish,
+      label: "Adult size",
+      value: `${s.adult_size_cm} cm · ${s.temperament.replace("-", " ")}`,
+    },
+  ];
   return (
-    <div className="rounded-2xl border bg-card p-4">
-      <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-        <Icon className="h-3.5 w-3.5" /> {label}
-      </div>
-      <div className="mt-1 font-display text-xl font-semibold text-foreground">{value}</div>
-    </div>
+    <section aria-labelledby="care-heading" className="mt-8">
+      <h2 id="care-heading" className="font-display text-xl font-semibold text-foreground">
+        Care requirements
+      </h2>
+      <p className="mt-1 text-sm text-muted-foreground">
+        Wild home: {habitatLabel(s.native_habitat_type)} in {BIOTOPE_LABEL[s.biotope_region]}.
+      </p>
+      <dl className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {rows.map(({ icon: Icon, label, value }) => (
+          <div key={label} className="rounded-2xl border bg-card p-4">
+            <dt className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              <Icon className="h-3.5 w-3.5" aria-hidden /> {label}
+            </dt>
+            <dd className="mt-1 text-sm font-semibold text-foreground">{value}</dd>
+          </div>
+        ))}
+      </dl>
+    </section>
+  );
+}
+
+function LikelyConflicts({ s, catalogue }: { s: Species; catalogue: Species[] }) {
+  const conflicts = likelyConflicts(s, catalogue);
+  return (
+    <section aria-labelledby="conflicts-heading" className="mt-10">
+      <h2 id="conflicts-heading" className="font-display text-xl font-semibold text-foreground">
+        Likely conflicts
+      </h2>
+      {conflicts.length === 0 ? (
+        <p className="mt-2 text-sm text-muted-foreground">
+          No known fin-nipping, predation or aggression risks for {s.common_name}. Still check the
+          full group in the calculator.
+        </p>
+      ) : (
+        <ul className="mt-3 space-y-2">
+          {conflicts.map((c) => (
+            <li key={c.title} className="rounded-xl border bg-card px-4 py-3 text-sm">
+              <p className="font-semibold text-foreground">{c.title}</p>
+              <p className="mt-0.5 text-muted-foreground">{c.detail}</p>
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
+  );
+}
+
+const FIT_ACCENT: Record<FitVerdict, string> = {
+  fits: "var(--verdict-good)",
+  caution: "var(--verdict-caution)",
+  conflict: "var(--verdict-critical)",
+  "in-plan": "var(--primary)",
+};
+
+function PlanFitPanel({ s }: { s: Species }) {
+  const { state, hydrated } = useTankDraft();
+  if (!hydrated) return null;
+  const fit = planFit(state, s);
+  return (
+    <section
+      aria-labelledby="fit-heading"
+      className="fishtankr-panel mt-10 border-l-4 p-5"
+      style={{ borderLeftColor: FIT_ACCENT[fit.verdict] }}
+    >
+      <p className="science-label text-muted-foreground">With your plan</p>
+      <h2 id="fit-heading" className="mt-2 font-display text-lg font-semibold text-foreground">
+        {FIT_LABEL[fit.verdict]}
+      </h2>
+      <ul className="mt-2 space-y-1 text-sm text-foreground">
+        {fit.reasons.map((r) => (
+          <li key={r}>{r}</li>
+        ))}
+      </ul>
+      <ul className="mt-3 space-y-0.5 text-xs text-muted-foreground">
+        {fit.limitations.map((l) => (
+          <li key={l}>{l}</li>
+        ))}
+      </ul>
+      {fit.verdict !== "in-plan" && <AddToTankButton species={s} />}
+    </section>
   );
 }
 
@@ -298,34 +410,6 @@ function SpeciesGuide() {
   const { data: allSpecies } = useSuspenseQuery(allSpeciesQuery);
   const related = findRelated(s, allSpecies);
   const evidence = speciesEvidence(s);
-
-  const zoneLabel = { top: "Top", mid: "Mid-water", bottom: "Bottom" }[s.swim_zone];
-  const temperament = s.temperament.charAt(0).toUpperCase() + s.temperament.slice(1);
-  const groupText = s.is_schooling ? `Schools of ${s.min_group_size}+` : "Can be kept singly";
-
-  const welfare: string[] = [];
-  if (s.is_schooling) {
-    welfare.push(
-      `This is a social species. Keep in groups of at least ${s.min_group_size}; smaller groups cause chronic stress.`,
-    );
-  }
-  if (s.fin_nipper) {
-    welfare.push(
-      "Known to nip fins. Avoid keeping with long-finned tank mates such as bettas, angelfish or guppies.",
-    );
-  }
-  if (s.long_finned) {
-    welfare.push("Has long, delicate fins. Vulnerable to fin-nippers and strong currents.");
-  }
-  if (s.predatory) {
-    welfare.push("A predator. Will eat any tank mate small enough to fit in its mouth.");
-  }
-  if (s.temperament === "aggressive") {
-    welfare.push(
-      "Territorial and aggressive. Needs careful tank-mate selection and often more space than the minimum suggests.",
-    );
-  }
-  welfare.push(`Native habitat: ${s.native_habitat_type}.`);
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-8 md:py-12">
@@ -364,88 +448,63 @@ function SpeciesGuide() {
         </div>
       </header>
 
-      <EvidenceSummary items={[evidence.photo, evidence.care, evidence.regional]} />
+      <CareRequirements s={s} />
+      <LikelyConflicts s={s} catalogue={allSpecies} />
+      <PlanFitPanel s={s} />
 
-      <section className="mt-8">
-        <h2 className="font-display text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-          At a glance
+      <section aria-labelledby="sources-heading" className="mt-10">
+        <h2 id="sources-heading" className="font-display text-xl font-semibold text-foreground">
+          Sources and checks
         </h2>
-        <div className="mt-3 grid grid-cols-2 gap-3 md:grid-cols-3">
-          <Stat icon={Ruler} label="Adult size" value={`${s.adult_size_cm} cm`} />
-          <Stat icon={Droplet} label="Minimum tank" value={`${s.min_tank_litres} L`} />
-          <Stat icon={Waves} label="Swim zone" value={zoneLabel} />
-          <Stat icon={Users} label="Temperament" value={temperament} />
-          <Stat icon={Fish} label="Group size" value={groupText} />
-          <Stat
-            icon={Thermometer}
-            label="Native pH / temp"
-            value={`${s.native_ph_min}–${s.native_ph_max} · ${s.native_temp_min_c}–${s.native_temp_max_c} °C`}
-          />
-        </div>
-      </section>
-
-      <section className="mt-10">
-        <h2 className="font-display text-xl font-semibold text-foreground">Welfare notes</h2>
-        <ul className="mt-3 space-y-2">
-          {welfare.map((w, i) => (
-            <li
-              key={i}
-              className="flex gap-2 rounded-xl border bg-card px-4 py-3 text-sm text-foreground"
-            >
-              <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
-              <span>{w}</span>
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      <section className="mt-10 rounded-2xl border bg-card p-5">
-        <div className="flex items-start gap-3">
-          <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-primary" aria-hidden />
-          <div className="min-w-0 flex-1">
-            <h2 className="font-display text-xl font-semibold text-foreground">
-              Where this care information comes from
-            </h2>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Care data:{" "}
-              <span className="font-semibold text-foreground">{evidence.care.label}</span>
-            </p>
-            <p
-              className={`mt-3 text-sm text-muted-foreground ${evidence.care.state === "not_verified" ? "rounded-xl bg-warn/10 p-3" : ""}`}
-            >
-              {evidence.care.detail}
-            </p>
-            {s.care_source_url && (
-              <a
-                href={s.care_source_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-primary underline"
-              >
-                {s.care_source_label ?? "View care source"}
-                <ExternalLink className="h-3.5 w-3.5" aria-hidden />
-              </a>
-            )}
-            {s.conspecific_strategy && s.conspecific_strategy !== "unreviewed" && (
-              <p className="mt-3 text-sm text-muted-foreground">
-                <span className="font-semibold text-foreground">Same-species strategy:</span>{" "}
-                {s.conspecific_strategy.replace("_", " ")}
-                {s.conspecific_sex_ratio_note ? ` · ${s.conspecific_sex_ratio_note}` : ""}
+        <EvidenceSummary items={[evidence.photo, evidence.care, evidence.regional]} />
+        <section className="mt-4 rounded-2xl border bg-card p-5">
+          <div className="flex items-start gap-3">
+            <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-primary" aria-hidden />
+            <div className="min-w-0 flex-1">
+              <h2 className="font-display text-xl font-semibold text-foreground">
+                Where this care information comes from
+              </h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Care data:{" "}
+                <span className="font-semibold text-foreground">{evidence.care.label}</span>
               </p>
-            )}
-            {s.conspecific_notes && (
-              <p className="mt-2 text-sm text-muted-foreground">{s.conspecific_notes}</p>
-            )}
+              <p
+                className={`mt-3 text-sm text-muted-foreground ${evidence.care.state === "not_verified" ? "rounded-xl bg-warn/10 p-3" : ""}`}
+              >
+                {evidence.care.detail}
+              </p>
+              {s.care_source_url && (
+                <a
+                  href={s.care_source_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-primary underline"
+                >
+                  {s.care_source_label ?? "View care source"}
+                  <ExternalLink className="h-3.5 w-3.5" aria-hidden />
+                </a>
+              )}
+              {s.conspecific_strategy && s.conspecific_strategy !== "unreviewed" && (
+                <p className="mt-3 text-sm text-muted-foreground">
+                  <span className="font-semibold text-foreground">Same-species strategy:</span>{" "}
+                  {s.conspecific_strategy.replace("_", " ")}
+                  {s.conspecific_sex_ratio_note ? ` · ${s.conspecific_sex_ratio_note}` : ""}
+                </p>
+              )}
+              {s.conspecific_notes && (
+                <p className="mt-2 text-sm text-muted-foreground">{s.conspecific_notes}</p>
+              )}
+            </div>
           </div>
-        </div>
+        </section>
+
+        <LegalityEvidence s={s} />
       </section>
 
-      <LegalityEvidence s={s} />
-
-      <section className="mt-10">
-        <h2 className="font-display text-xl font-semibold text-foreground">
-          How FishTankr checks this fish
-        </h2>
+      <details className="mt-10 rounded-2xl border bg-card p-5">
+        <summary className="cursor-pointer font-display text-lg font-semibold text-foreground">
+          How FishTankr scores this fish
+        </summary>
         <p className="mt-2 text-sm text-muted-foreground">
           This fish affects tank mates, swimming room and water. Waste load and biotope match stay
           separate. {TWO_CHECKS.summary}
@@ -457,7 +516,7 @@ function SpeciesGuide() {
           <ScoreBlock title="Biotope match" body={biomeCopy(s)} />
           <ScoreBlock title="Regional reference" body={evidence.regional.summary} />
         </div>
-      </section>
+      </details>
 
       <WhereToBuy commonName={s.common_name} scientificName={s.scientific_name} />
 
@@ -555,5 +614,5 @@ function spaceCopy(s: Species): string {
 }
 
 function biomeCopy(s: Species): string {
-  return `This fish comes from ${BIOTOPE_LABEL[s.biotope_region]} (${s.native_habitat_type}), where the pH is typically ${s.native_ph_min}–${s.native_ph_max} and the temperature ${s.native_temp_min_c}–${s.native_temp_max_c} °C. The optional biotope match looks for fish, water and décor from the same region.`;
+  return `This fish comes from ${BIOTOPE_LABEL[s.biotope_region]} (${habitatLabel(s.native_habitat_type)}), where the pH is typically ${s.native_ph_min}–${s.native_ph_max} and the temperature ${s.native_temp_min_c}–${s.native_temp_max_c} °C. The optional biotope match looks for fish, water and décor from the same region.`;
 }
