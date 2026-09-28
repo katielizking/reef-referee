@@ -1,4 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { planReview, testChanges, useLinkedPlan, type LinkedTrackedTank } from "@/lib/tank-journey";
+import { TankJourney } from "@/components/TankJourney";
 import { TWO_CHECKS } from "@/lib/two-checks";
 import { TwoChecks } from "@/components/TwoChecks";
 import { useState } from "react";
@@ -91,6 +93,7 @@ function TrackedTankPage() {
 
   const rows = tests.data ?? [];
   const latest = rows[0] ?? null;
+  const previous = rows[1] ?? null;
   const verdict = cycleVerdict(tank.data, latest);
   const nitrate_note = nitrateNote(latest);
   const stale = latest !== null && !isTestCurrent(latest.tested_on);
@@ -155,6 +158,15 @@ function TrackedTankPage() {
             </p>
           </div>
         </header>
+
+        <TrackedPlan
+          name={tank.data.name}
+          planId={(tank.data as LinkedTrackedTank).plan_id ?? null}
+          trackedId={tank.data.id}
+          reviewed={rows.length > 0}
+          latest={latest}
+          previous={previous}
+        />
 
         {/* Cycle verdict */}
         <section className="fishtankr-panel p-5" style={{ borderLeft: `3px solid ${colour}` }}>
@@ -441,6 +453,123 @@ function Trend({ rows }: { rows: WaterTest[] }) {
       <p className="data-mono mt-1 text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
         {lines.map((l) => l.label).join(" · ")} · peak {max} mg/L
       </p>
+    </div>
+  );
+}
+
+/**
+ * The saved plan this tank came from: its identity at the top, and a review
+ * of how the newest readings compare with the previous test and the plan.
+ */
+function TrackedPlan({
+  name,
+  planId,
+  trackedId,
+  reviewed,
+  latest,
+  previous,
+}: {
+  name: string;
+  planId: string | null;
+  trackedId: string;
+  reviewed: boolean;
+  latest: WaterTest | null;
+  previous: WaterTest | null;
+}) {
+  const plan = useLinkedPlan(planId);
+  const changes = testChanges(latest, previous);
+  const review = plan.data ? planReview(plan.data.state, latest) : [];
+  const notes = [...review, ...changes];
+  const toneColour = {
+    good: "var(--verdict-good)",
+    caution: "var(--verdict-caution)",
+    critical: "var(--verdict-critical)",
+  } as const;
+
+  return (
+    <div className="mb-4 space-y-4">
+      <TankJourney
+        name={name}
+        reached={reviewed ? "review" : "track"}
+        planSlug={plan.data?.row.share_slug}
+        trackedId={trackedId}
+      />
+      {plan.data ? (
+        <section aria-labelledby="plan-heading" className="fishtankr-panel p-5">
+          <p className="science-label text-muted-foreground">From your plan</p>
+          <h2 id="plan-heading" className="mt-2 text-lg font-semibold text-foreground">
+            {plan.data.state.name}
+          </h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {plan.data.state.length_cm} × {plan.data.state.width_cm} × {plan.data.state.height_cm}{" "}
+            cm · targets pH {plan.data.state.target_ph.toFixed(1)} at{" "}
+            {plan.data.state.target_temp_c} °C
+            {plan.data.state.filter ? ` · ${plan.data.state.filter.name}` : ""}
+          </p>
+          <p className="mt-2 text-sm text-foreground">
+            {plan.data.state.species.length > 0
+              ? plan.data.state.species
+                  .map((r) => `${r.quantity} × ${r.species.common_name}`)
+                  .join(", ")
+              : "No fish in the plan yet."}
+          </p>
+          <div className="mt-3 flex flex-wrap gap-4 text-sm">
+            <Link
+              to="/calculator"
+              search={{ tank: plan.data.row.share_slug }}
+              className="font-semibold text-primary underline"
+            >
+              Edit the plan
+            </Link>
+            <Link
+              to="/t/$slug"
+              params={{ slug: plan.data.row.share_slug }}
+              className="font-semibold text-primary underline"
+            >
+              View the shared plan
+            </Link>
+          </div>
+        </section>
+      ) : planId && plan.isLoading ? (
+        <p role="status" className="text-sm text-muted-foreground">
+          Loading the plan…
+        </p>
+      ) : null}
+      <section id="review" aria-labelledby="review-heading" className="fishtankr-panel p-5">
+        <p className="science-label text-muted-foreground">Review changes</p>
+        <h2 id="review-heading" className="mt-2 text-lg font-semibold text-foreground">
+          {latest ? `Since your last test on ${latest.tested_on}` : "Nothing to review yet"}
+        </h2>
+        {notes.length === 0 ? (
+          <p className="mt-2 text-sm text-muted-foreground">
+            {latest
+              ? "Log another test to see what changed. Include pH and temperature to compare with the plan."
+              : "Log your first water test below. Each new test is compared with the one before and with your plan."}
+          </p>
+        ) : (
+          <ul className="mt-3 space-y-2">
+            {notes.map((n) => (
+              <li
+                key={n.text}
+                className="border-l-2 pl-3 text-sm text-foreground"
+                style={{ borderColor: toneColour[n.tone] }}
+              >
+                {n.text}
+              </li>
+            ))}
+          </ul>
+        )}
+        {!planId && (
+          <p className="mt-3 text-xs text-muted-foreground">
+            This tank is not linked to a saved plan, so readings are not compared with plan targets.
+            Start tracking from{" "}
+            <Link to="/saved" className="underline">
+              My tanks
+            </Link>{" "}
+            to link one.
+          </p>
+        )}
+      </section>
     </div>
   );
 }

@@ -1096,6 +1096,7 @@ export type Database = {
           litres: number | null
           name: string
           notes: string | null
+          plan_id: string | null
           seeded_media: boolean
           tank_age_weeks: number | null
           updated_at: string
@@ -1111,6 +1112,7 @@ export type Database = {
           litres?: number | null
           name: string
           notes?: string | null
+          plan_id?: string | null
           seeded_media?: boolean
           tank_age_weeks?: number | null
           updated_at?: string
@@ -1126,6 +1128,7 @@ export type Database = {
           litres?: number | null
           name?: string
           notes?: string | null
+          plan_id?: string | null
           seeded_media?: boolean
           tank_age_weeks?: number | null
           updated_at?: string

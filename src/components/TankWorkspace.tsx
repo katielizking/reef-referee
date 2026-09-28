@@ -39,6 +39,8 @@ import { SetupChecks } from "@/components/SetupChecks";
 import { DEFAULT_STATE } from "@/lib/tank-draft";
 import { TANK_IDEAS, buildIdeaTank } from "@/lib/tank-ideas";
 import { parseSizeParam } from "@/lib/tank-links";
+import { stateFromFullTank } from "@/lib/tank-journey";
+import { PlanNextSteps } from "@/components/PlanNextSteps";
 import type { TankState } from "@/lib/types";
 import { absoluteUrl } from "@/lib/site";
 import { shareScoreCard } from "@/lib/share-card";
@@ -72,6 +74,10 @@ export function TankWorkspace({ visualiser = false }: { visualiser?: boolean }) 
   const [loadingTank, setLoadingTank] = useState(Boolean(sourceSlug));
   const [openSteps, setOpenSteps] = useState<SectionId[]>(["tank"]);
   const [showInverts, setShowInverts] = useState(false);
+  const [savedShareSlug, setSavedShareSlug] = useState<string>();
+  // The plan's share link, from the latest save or the saved plan that was opened.
+  const planShareSlug =
+    savedShareSlug ?? (savedId && source?.startsWith("tank:") ? source.slice(5) : undefined);
   const [confirmingReset, setConfirmingReset] = useState(false);
 
   const species = useSpecies();
@@ -147,38 +153,7 @@ export function TankWorkspace({ visualiser = false }: { visualiser?: boolean }) 
         if (cancelled) return;
         if (!data) throw new Error("Tank not found");
 
-        setState({
-          name: remixSlug ? `${data.tank.name} remix` : data.tank.name,
-          length_cm: data.tank.length_cm,
-          width_cm: data.tank.width_cm,
-          height_cm: data.tank.height_cm,
-          filter: data.filter,
-          extra_filters: data.filters,
-          maintenance_frequency: data.tank.maintenance_frequency,
-          biological_media_level:
-            data.tank.biological_media_level ?? data.filter?.biological_media_level ?? "standard",
-          filter_maturity: data.tank.filter_maturity ?? "unknown",
-          cycle_status: data.tank.cycle_status ?? "unknown",
-          cycle_method: data.tank.cycle_method ?? "unknown",
-          tank_age_weeks: data.tank.tank_age_weeks ?? null,
-          ammonia_mg_l: data.tank.ammonia_mg_l ?? null,
-          nitrite_mg_l: data.tank.nitrite_mg_l ?? null,
-          nitrate_mg_l: data.tank.nitrate_mg_l ?? null,
-          water_tested_on: data.tank.water_tested_on ?? null,
-          seeded_media: data.tank.seeded_media ?? false,
-          target_ph: data.tank.target_ph,
-          target_temp_c: data.tank.target_temp_c,
-          plant_density: data.tank.plant_density,
-          tank_shape: data.tank.tank_shape ?? "rectangle",
-          substrate: data.tank.substrate ?? "gravel",
-          has_heater: data.tank.has_heater ?? true,
-          has_light: data.tank.has_light ?? true,
-          has_co2: data.tank.has_co2 ?? false,
-          species: data.species,
-          invertebrates: data.invertebrates,
-          plants: data.plants,
-          hardscape: data.hardscape,
-        });
+        setState(stateFromFullTank(data, remixSlug ? `${data.tank.name} remix` : data.tank.name));
         setSavedId(remixSlug ? undefined : data.tank.id);
         setSource(requestedSource);
         toast.success(remixSlug ? `Ready to remix ${data.tank.name}` : `Loaded ${data.tank.name}`);
@@ -304,6 +279,7 @@ export function TankWorkspace({ visualiser = false }: { visualiser?: boolean }) 
       const row = await saveTank(state, savedId);
       if (!visualiser) recordScoreEvent(scorecard);
       setSavedId(row.id);
+      setSavedShareSlug(row.share_slug);
       if (share) {
         const url = `${window.location.origin}/t/${row.share_slug}`;
         await navigator.clipboard.writeText(url).catch(() => {});
@@ -625,6 +601,17 @@ export function TankWorkspace({ visualiser = false }: { visualiser?: boolean }) 
                           state={state}
                           setState={setState}
                           species={species.data!}
+                        />
+                        <PlanNextSteps
+                          name={state.name}
+                          savedId={savedId}
+                          shareSlug={planShareSlug}
+                          saveNow={async () => {
+                            const row = await saveTank(state, savedId);
+                            setSavedId(row.id);
+                            setSavedShareSlug(row.share_slug);
+                            return row;
+                          }}
                         />
                       </>
                     )}

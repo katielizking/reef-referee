@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { Copy, Eye, FishSymbol, Loader2, Pencil, Sparkles, Trash2 } from "lucide-react";
+import { Copy, Droplets, Eye, FishSymbol, Loader2, Pencil, Sparkles, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 import {
@@ -30,6 +30,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useAccount } from "@/lib/account";
+import { useTrackedTanks } from "@/lib/tracker";
+import { useStartTracking, type LinkedTrackedTank } from "@/lib/tank-journey";
 
 export const Route = createFileRoute("/saved")({
   head: () => ({
@@ -51,6 +53,31 @@ function SavedTanks() {
   const [renameTarget, setRenameTarget] = useState<TankRow | null>(null);
   const [renameValue, setRenameValue] = useState("");
   const [deleteTarget, setDeleteTarget] = useState<TankRow | null>(null);
+
+  const tracked = useTrackedTanks();
+  const startTracking = useStartTracking();
+  const trackedByPlan = new Map(
+    ((tracked.data ?? []) as LinkedTrackedTank[])
+      .filter((t) => t.plan_id)
+      .map((t) => [t.plan_id!, t.id] as const),
+  );
+
+  async function handleTrack(tank: TankRow) {
+    setBusyId(tank.id);
+    try {
+      const row = await startTracking.mutateAsync(tank);
+      toast.success(`Tracking ${tank.name}`, {
+        description: "Log your first water test to see whether it is ready for fish.",
+      });
+      await navigate({ to: "/tracker/$id", params: { id: row.id } });
+    } catch (error) {
+      toast.error("Couldn't start tracking", {
+        description: error instanceof Error ? error.message : "Try again in a moment.",
+      });
+    } finally {
+      setBusyId(null);
+    }
+  }
 
   async function refreshTanks() {
     await queryClient.invalidateQueries({ queryKey: ["tanks", "session"] });
@@ -191,6 +218,26 @@ function SavedTanks() {
                       <Eye className="h-3.5 w-3.5" aria-hidden />
                       View
                     </Link>
+                    {trackedByPlan.get(tank.id) ? (
+                      <Link
+                        to="/tracker/$id"
+                        params={{ id: trackedByPlan.get(tank.id)! }}
+                        className="inline-flex items-center gap-1.5 rounded-xl border px-3 py-2 text-xs font-semibold text-foreground transition-colors hover:bg-muted"
+                      >
+                        <Droplets className="h-3.5 w-3.5" aria-hidden />
+                        Open water log
+                      </Link>
+                    ) : (
+                      <button
+                        type="button"
+                        disabled={busy}
+                        onClick={() => handleTrack(tank)}
+                        className="inline-flex items-center gap-1.5 rounded-xl border px-3 py-2 text-xs font-semibold text-foreground transition-colors hover:bg-muted disabled:opacity-50"
+                      >
+                        <Droplets className="h-3.5 w-3.5" aria-hidden />
+                        Track water
+                      </button>
+                    )}
                     <button
                       type="button"
                       disabled={busy}
