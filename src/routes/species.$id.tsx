@@ -56,7 +56,7 @@ const speciesByIdQuery = (id: string) =>
       const { data, error } = await supabase
         .from("species")
         .select("*")
-        .eq(isUuid(id) ? "id" : "slug", isUuid(id) ? id : id.toLowerCase())
+        .eq(isUuid(id) ? "id" : ("slug" as "id"), isUuid(id) ? id : id.toLowerCase())
         .maybeSingle();
       if (error && !isUuid(id)) {
         // Before the slug column exists, match the slug against common names instead.
