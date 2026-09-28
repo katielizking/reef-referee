@@ -22,6 +22,7 @@ import { displayLength, formatVolume, lengthLabel, lengthToCm, useUnitSystem } f
 import { submitSpeciesRequest } from "@/lib/requests";
 import { useOutsideClick } from "@/hooks/useOutsideClick";
 import { confirmValues, isExample } from "@/lib/example-values";
+import { searchableNames } from "@/lib/species-names";
 
 import {
   Accordion,
@@ -733,13 +734,7 @@ export function SpeciesAdder({
   const results = useMemo(() => {
     const term = q.trim().toLowerCase();
     if (!term) return species.slice(0, 8);
-    return species
-      .filter(
-        (s) =>
-          s.common_name.toLowerCase().includes(term) ||
-          s.scientific_name.toLowerCase().includes(term),
-      )
-      .slice(0, 12);
+    return species.filter((s) => searchableNames(s).some((n) => n.includes(term))).slice(0, 12);
   }, [q, species]);
 
   function add(sp: Species) {

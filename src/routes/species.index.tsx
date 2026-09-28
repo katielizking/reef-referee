@@ -5,6 +5,7 @@ import { ClipboardCheck, Loader2, Search, SlidersHorizontal } from "lucide-react
 import { useSpecies } from "@/lib/data";
 import { SpeciesPortrait } from "@/components/SpeciesPortrait";
 import { useTankDraft } from "@/components/TankDraftProvider";
+import { alsoKnownAs, searchableNames } from "@/lib/species-names";
 import {
   BIOTOPE_LABEL,
   type BiotopeRegion,
@@ -115,12 +116,7 @@ function SpeciesIndex() {
       if (size === "small" && s.adult_size_cm >= 6) return false;
       if (size === "medium" && (s.adult_size_cm < 6 || s.adult_size_cm > 15)) return false;
       if (size === "large" && s.adult_size_cm <= 15) return false;
-      if (
-        term &&
-        !s.common_name.toLowerCase().includes(term) &&
-        !s.scientific_name.toLowerCase().includes(term)
-      )
-        return false;
+      if (term && !searchableNames(s).some((n) => n.includes(term))) return false;
       return true;
     });
   }, [data, q, filters, region, temperament, size]);
@@ -415,6 +411,11 @@ function SpeciesCard({
       <div className="p-4">
         <p className="font-display font-semibold text-foreground">{s.common_name}</p>
         <p className="truncate text-xs italic text-muted-foreground">{s.scientific_name}</p>
+        {alsoKnownAs(s).length > 0 && (
+          <p className="truncate text-xs text-muted-foreground">
+            Also sold as {alsoKnownAs(s).join(", ")}
+          </p>
+        )}
         {fit && (
           <div className="mt-2">
             <span
