@@ -8,14 +8,14 @@ Here is what else is out there, what each tool actually does, and where each one
 
 Ours. Saying so up front seems fairer than pretending we stumbled across it.
 
-The difference is what gets scored. Most calculators answer one question: how much waste can this volume of water carry? [FishTankr](/calculator) answers a harder one: will these particular fish be all right in this particular tank? The score is built from compatibility, bioload, space and water, and that last one is the part almost nothing else checks. Set your tank to pH 7.0 and 25 degrees, add discus, and you get told plainly that the water you are planning is not the water they need.
+The difference is what gets scored. Most calculators answer one question: how much waste can this volume of water carry? [FishTankr](/calculator) answers a harder one: will these particular fish be all right in this particular tank? The score is built from compatibility, space and water, and that last one is the part almost nothing else checks. Set your tank to pH 7.0 and 25 degrees, add discus, and you get told plainly that the water you are planning is not the water they need.
 
-It also refuses to do the thing every other calculator does, which is tell you that you have room for three more neon tetras. Our capacity model is the inherited litres per five centimetres of fish rule and it has never been calibrated, so headroom stays a sentence, not a number. Two male bettas in 40 litres score 40 out of 100 with a critical conflict, not 93 with a shrug.
+It also refuses to do the thing every other calculator does, which is tell you that you have room for three more neon tetras. Waste load is shown as a rough beta band beside the score and never changes it. The estimate compares each species' waste factor with an inherited litres-divided-by-five reference that has never been calibrated, so headroom stays a sentence, not a number. Two male bettas in 40 litres score 40 out of 100 with a critical conflict, not 93 with a shrug.
 
-- 201 freshwater fish and 31 shrimp, snails and crabs, each row carrying its source link.
+- 201 freshwater fish and 31 shrimp, snails and crabs. Each fish profile says whether its care data and Australian status have been checked against a source, and says "Not verified" where they have not.
 - Centimetres and litres or inches and gallons, your choice, remembered next visit.
 - A 3D tank you can arrange, a shareable link, and a one page plan you can print and take to the shop.
-- Cycling, substrate, heater, light and CO2 are all checked, because new tank syndrome kills more beginner fish than every compatibility mistake put together.
+- Substrate, heater, light and CO2 are checked beside the score, and the [tank tracker](/tracker) tells you when the tank has cycled and is ready for fish, because new tank syndrome kills more beginner fish than every compatibility mistake put together.
 - Free, no account, no email.
 
 Where it falls short: 201 species is a fraction of what AqAdvisor lists, no marine support, and we will not name a specific number of fish you could still add. If you want a precise stocking percentage as your verdict, we are the wrong tool on purpose.
