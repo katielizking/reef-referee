@@ -37,6 +37,8 @@ import { scoringState } from "@/lib/tank-shape";
 import { SetupChecks } from "@/components/SetupChecks";
 
 import { DEFAULT_STATE } from "@/lib/tank-draft";
+import { TANK_IDEAS, buildIdeaTank } from "@/lib/tank-ideas";
+import { parseSizeParam } from "@/lib/tank-links";
 import type { TankState } from "@/lib/types";
 import { absoluteUrl } from "@/lib/site";
 import { shareScoreCard } from "@/lib/share-card";
@@ -55,7 +57,12 @@ import { useTankDraft } from "./TankDraftProvider";
 import { WorkInProgressBanner } from "./WorkInProgressBanner";
 const VisualiserCanvas = lazy(() => import("./VisualiserCanvas"));
 export function TankWorkspace({ visualiser = false }: { visualiser?: boolean }) {
-  const { tank: tankSlug, remix: remixSlug } = useSearch({ strict: false });
+  const {
+    tank: tankSlug,
+    remix: remixSlug,
+    idea: ideaSlug,
+    size: sizeParam,
+  } = useSearch({ strict: false });
   const sourceSlug = tankSlug ?? remixSlug;
   const { state, setState, savedId, setSavedId, source, setSource, hydrated, storageStatus } =
     useTankDraft();
@@ -192,6 +199,57 @@ export function TankWorkspace({ visualiser = false }: { visualiser?: boolean }) 
       cancelled = true;
     };
   }, [sourceSlug, remixSlug, hydrated, source, requestedSource]);
+
+  // ?idea=<slug> opens a tank idea and ?size=LxWxH starts a plan at that size. Each link
+  // applies once (tracked in `source`), and Undo brings back the plan it replaced.
+  useEffect(() => {
+    if (!hydrated || !species.data || sourceSlug) return;
+    if (ideaSlug) {
+      const key = `idea:${ideaSlug}`;
+      if (source === key) return;
+      const idea = TANK_IDEAS.find((i) => i.slug === ideaSlug);
+      setSource(key);
+      if (!idea) {
+        toast.error("That tank idea no longer exists.");
+        return;
+      }
+      try {
+        setState(buildIdeaTank(idea, species.data));
+        setSavedId(undefined);
+        toast.success(`Loaded ${idea.title}`, {
+          description: "Use Undo to get your previous plan back.",
+        });
+      } catch (error) {
+        toast.error(error instanceof Error ? error.message : "Could not load this idea.");
+      }
+      return;
+    }
+    if (sizeParam) {
+      const key = `size:${sizeParam}`;
+      if (source === key) return;
+      setSource(key);
+      const dims = parseSizeParam(sizeParam);
+      if (!dims) return;
+      setState((prev) => ({
+        ...prev,
+        length_cm: dims[0],
+        width_cm: dims[1],
+        height_cm: dims[2],
+        exampleValues: { ...prev.exampleValues, size: false },
+      }));
+      toast.success(`Tank set to ${dims.join(" × ")} cm`);
+    }
+  }, [
+    hydrated,
+    species.data,
+    sourceSlug,
+    ideaSlug,
+    sizeParam,
+    source,
+    setState,
+    setSavedId,
+    setSource,
+  ]);
 
   useEffect(() => {
     if (!hydrated || !species.data || sourceSlug) return;

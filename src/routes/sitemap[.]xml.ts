@@ -3,7 +3,9 @@ import type {} from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { absoluteUrl } from "@/lib/site";
 import { LISTED_OWNERSHIP } from "@/lib/shop-search";
+import { speciesPath } from "@/lib/species-url";
 import { TANK_IDEAS } from "@/lib/tank-ideas";
+import { IDEA_COLLECTIONS, TANK_SIZE_PAGES, collectionPath } from "@/lib/tank-idea-collections";
 
 interface Entry {
   path: string;
@@ -29,6 +31,18 @@ export const Route = createFileRoute("/sitemap.xml")({
           { path: "/guides", changefreq: "monthly", priority: "0.7" },
           { path: "/methodology", changefreq: "monthly", priority: "0.8" },
           { path: "/guides/cycling", changefreq: "monthly", priority: "0.8" },
+          { path: "/guides/betta-tank-setup", changefreq: "monthly", priority: "0.8" },
+          { path: "/species", changefreq: "weekly", priority: "0.8" },
+          ...IDEA_COLLECTIONS.map((c) => ({
+            path: collectionPath(c),
+            changefreq: "monthly",
+            priority: "0.7",
+          })),
+          ...TANK_SIZE_PAGES.map((p) => ({
+            path: `/fish-for/${p.slug}`,
+            changefreq: "monthly",
+            priority: "0.7",
+          })),
           { path: "/blog", changefreq: "weekly", priority: "0.7" },
           { path: "/shops", changefreq: "weekly", priority: "0.7" },
           { path: "/privacy", changefreq: "yearly", priority: "0.3" },
@@ -53,7 +67,8 @@ export const Route = createFileRoute("/sitemap.xml")({
             .from("aquarium_shops")
             .select("slug")
             .in("ownership", [...LISTED_OWNERSHIP]),
-          supabase.from("species").select("id"),
+          // "*" rather than naming slug, so the sitemap survives until the slug migration runs.
+          supabase.from("species").select("*"),
         ]);
 
         (posts.data ?? []).forEach((p: { slug: string; published_at: string | null }) => {
@@ -71,9 +86,9 @@ export const Route = createFileRoute("/sitemap.xml")({
             priority: "0.5",
           });
         });
-        (species.data ?? []).forEach((s: { id: string }) => {
+        (species.data ?? []).forEach((s: { id: string; slug?: string }) => {
           entries.push({
-            path: `/species/${s.id}`,
+            path: speciesPath(s),
             changefreq: "monthly",
             priority: "0.5",
           });

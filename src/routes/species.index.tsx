@@ -1,11 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { absoluteUrl } from "@/lib/site";
+import { absoluteUrl, ogImage } from "@/lib/site";
 import { useMemo, useState } from "react";
 import { ClipboardCheck, Loader2, Search, SlidersHorizontal } from "lucide-react";
-import { useSpecies } from "@/lib/data";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { speciesListQuery } from "@/lib/data";
 import { SpeciesPortrait } from "@/components/SpeciesPortrait";
 import { useTankDraft } from "@/components/TankDraftProvider";
 import { alsoKnownAs, searchableNames } from "@/lib/species-names";
+import { speciesParam } from "@/lib/species-url";
 import {
   BIOTOPE_LABEL,
   type BiotopeRegion,
@@ -38,6 +40,8 @@ import {
 } from "@/lib/species-fit";
 
 export const Route = createFileRoute("/species/")({
+  // Render the full list on the server so the fish are in the HTML, not only after JavaScript.
+  loader: ({ context }) => context.queryClient.ensureQueryData(speciesListQuery),
   head: () => ({
     meta: [
       { title: "What fish can I keep? Freshwater fish library | FishTankr" },
@@ -53,6 +57,7 @@ export const Route = createFileRoute("/species/")({
           "Practical care, habitat and behaviour notes for popular freshwater aquarium fish.",
       },
       { property: "og:url", content: absoluteUrl("/species") },
+      ...ogImage("/og/species.png"),
     ],
     links: [{ rel: "canonical", href: absoluteUrl("/species") }],
   }),
@@ -79,7 +84,8 @@ const FIT_STYLE: Record<FitVerdict, string> = {
 };
 
 function SpeciesIndex() {
-  const { data, isLoading } = useSpecies();
+  const { data } = useSuspenseQuery(speciesListQuery);
+  const isLoading = false;
   const { state: plan, hydrated } = useTankDraft();
   const [units] = useUnitSystem();
   const [q, setQ] = useState("");
@@ -399,7 +405,7 @@ function SpeciesCard({
   return (
     <Link
       to="/species/$id"
-      params={{ id: s.id }}
+      params={{ id: speciesParam(s) }}
       className="depth-card group block h-full overflow-hidden rounded-[1.25rem] sm:rounded-[1.5rem] border bg-card transition hover:border-primary/60"
     >
       <SpeciesPortrait

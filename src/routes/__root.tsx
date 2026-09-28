@@ -18,7 +18,7 @@ import { BrandLogo } from "@/components/BrandLogo";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { TankDraftProvider } from "@/components/TankDraftProvider";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { absoluteUrl, SUPPORT_URL } from "@/lib/site";
+import { absoluteUrl, ogImage, SUPPORT_URL } from "@/lib/site";
 import { initializePostHog } from "@/lib/posthog";
 import { captureSentryError } from "@/lib/sentry";
 import { AccountProvider, useAccount, useSignOut } from "@/lib/account";
@@ -112,9 +112,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:type", content: "website" },
       { property: "og:site_name", content: "FishTankr" },
       { property: "og:url", content: absoluteUrl("/") },
-      { property: "og:image", content: absoluteUrl("/favicon.png") },
-      { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:image", content: absoluteUrl("/favicon.png") },
+      ...ogImage("/og/default.png"),
     ],
     links: [
       { rel: "stylesheet", href: appCss },

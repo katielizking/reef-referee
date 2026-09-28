@@ -1,5 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { absoluteUrl } from "@/lib/site";
+import { absoluteUrl, ogImage } from "@/lib/site";
 import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
 import { Suspense } from "react";
 import { Copy, Loader2, Printer, Share2, WandSparkles } from "lucide-react";
@@ -44,6 +44,7 @@ export const Route = createFileRoute("/t/$slug")({
         },
         { property: "og:type", content: "article" },
         { property: "og:url", content: absoluteUrl(`/t/${params.slug}`) },
+        ...ogImage("/og/plan.png"),
       ],
       links: [{ rel: "canonical", href: absoluteUrl(`/t/${params.slug}`) }],
     };

@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { speciesParam } from "@/lib/species-url";
 import { Link } from "@tanstack/react-router";
 import { Fish, Plus, X } from "lucide-react";
 
@@ -103,7 +104,11 @@ export function CompatibleSuggestions({
               </div>
               <p className="mt-1 text-sm text-muted-foreground">{reason}</p>
               {groupNote && <p className="text-sm text-muted-foreground">{groupNote}</p>}
-              <Link to="/species/$id" params={{ id: sp.id }} className="planner-text-link">
+              <Link
+                to="/species/$id"
+                params={{ id: speciesParam(sp) }}
+                className="planner-text-link"
+              >
                 Read its care notes →
               </Link>
             </li>

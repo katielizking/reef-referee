@@ -18,3 +18,26 @@ describe("tank idea handoff", () => {
     expect(() => buildIdeaTank(TANK_IDEAS[0], [])).toThrow("unavailable");
   });
 });
+
+// Catalogue rows for the fish the ideas use, taken from supabase/migrations.
+// Refresh this snapshot when a species' care data changes.
+import catalogue from "./__fixtures__/idea-species.json";
+import { scoreTank } from "./scoring";
+
+describe("every tank idea is a sound plan", () => {
+  it.each(TANK_IDEAS.map((i) => [i.slug, i] as const))(
+    "%s has no serious welfare issue",
+    (_slug, idea) => {
+      const s = scoreTank(buildIdeaTank(idea, catalogue as unknown as Species[]));
+      const serious = [
+        ...s.compatibility.issues,
+        ...(s.space.issues ?? []),
+        ...(s.water.issues ?? []),
+      ]
+        .filter((i) => i.severity === "critical" || i.severity === "high")
+        .map((i) => i.reason);
+      expect(serious).toEqual([]);
+      expect(s.overall).toBeGreaterThanOrEqual(75);
+    },
+  );
+});

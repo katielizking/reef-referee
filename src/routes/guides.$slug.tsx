@@ -196,13 +196,150 @@ const guides: Record<string, Guide> = {
       </>
     ),
   },
+  "betta-tank-setup": {
+    slug: "betta-tank-setup",
+    title: "Betta tank setup: a complete guide",
+    description:
+      "How to set up a tank for one betta (Siamese fighting fish): tank size, heater, gentle filtration, water, plants, tank mates and a step-by-step setup order.",
+    minutes: 7,
+    sections: [
+      { id: "needs", heading: "What a betta needs" },
+      { id: "tank", heading: "Tank size and shape" },
+      { id: "equipment", heading: "Heater, filter and lid" },
+      { id: "water", heading: "Water" },
+      { id: "scape", heading: "Plants and décor" },
+      { id: "tank-mates", heading: "Tank mates" },
+      { id: "steps", heading: "Setting up, step by step" },
+    ],
+    faqs: [
+      {
+        q: "What size tank does a betta need?",
+        a: "Our catalogue minimum for a betta is 20 litres. Our betta plan uses 45 × 30 × 30 cm (about 40 litres gross) because the extra surface area and stability make care easier, and a betta spends much of its time near the top.",
+      },
+      {
+        q: "Can two bettas live together?",
+        a: "No. Keep one betta per tank. Two or more in the same tank are likely to fight, causing serious injury or death. FishTankr treats this as a critical conflict.",
+      },
+      {
+        q: "Does a betta need a heater?",
+        a: "In most homes, yes. Bettas are tropical fish; our catalogue range is 24–28 °C. A small adjustable heater keeps the temperature steady through the day and night.",
+      },
+      {
+        q: "Does a betta need a filter?",
+        a: "Yes. A filter holds the bacteria that break down waste. Choose a gentle one, such as a sponge filter, because long fins make strong currents tiring.",
+      },
+    ],
+    body: () => (
+      <>
+        <section id="needs">
+          <h2>What a betta needs</h2>
+          <p>
+            The betta (<em>Betta splendens</em>, also sold as the Siamese fighting fish) is a
+            tropical fish from still, heavily planted water. It breathes air from the surface as
+            well as through its gills, has long fins that make it a slow swimmer, and is aggressive
+            towards other bettas. A good setup gives it warm, stable water, gentle flow, cover to
+            rest in and easy access to the surface.
+          </p>
+        </section>
+
+        <section id="tank">
+          <h2>Tank size and shape</h2>
+          <p>
+            Our catalogue minimum is 20 litres, with at least 24 cm of swimming length. That is a
+            floor, not a target. Our{" "}
+            <Link to="/tank-ideas/$slug" params={{ slug: "betta-shaded-garden" }}>
+              betta&apos;s shaded garden
+            </Link>{" "}
+            plan uses 45 × 30 × 30 cm, about 40 litres before substrate and décor. Larger volumes
+            hold temperature and water quality more steadily, which matters more than looks.
+          </p>
+          <p>
+            Favour length and surface area over height. A betta rests near the top and needs to
+            reach the surface easily to breathe.
+          </p>
+        </section>
+
+        <section id="equipment">
+          <h2>Heater, filter and lid</h2>
+          <ul>
+            <li>
+              <strong>Heater.</strong> An adjustable heater sized for the tank, with a thermometer
+              you can read at a glance.
+            </li>
+            <li>
+              <strong>Filter.</strong> A gentle filter, such as a sponge filter, with plenty of
+              biological media. If the outflow pushes the fish around, baffle it.
+            </li>
+            <li>
+              <strong>Lid.</strong> Bettas can jump. A secure lid with an air gap above the water
+              keeps the fish in and the air it breathes warm and humid.
+            </li>
+          </ul>
+        </section>
+
+        <section id="water">
+          <h2>Water</h2>
+          <p>
+            Our catalogue range for bettas is 24–28 °C and pH 6.0–7.5. Stable water inside that
+            range matters more than hitting an exact number, so avoid chasing pH with chemicals.
+            Cycle the tank before the fish goes in: our{" "}
+            <Link to="/guides/$slug" params={{ slug: "cycling" }}>
+              cycling guide
+            </Link>{" "}
+            explains how, and the <Link to="/tracker">tank tracker</Link> tells you when ammonia and
+            nitrite readings say the tank is ready.
+          </p>
+        </section>
+
+        <section id="scape">
+          <h2>Plants and décor</h2>
+          <p>
+            Use plenty of plants, especially broad leaves near the surface where the betta can rest.
+            Floating plants give shade and calm the surface. Choose smooth décor without sharp edges
+            that could tear long fins, and keep an open route to the surface.
+          </p>
+        </section>
+
+        <section id="tank-mates">
+          <h2>Tank mates</h2>
+          <p>
+            Plan for one betta and no other fish. Bettas are aggressive towards their own kind, and
+            their long fins attract fin-nippers, so many community fish are a poor match. Our betta
+            plan is deliberately single-species. If you want to check a particular fish, add both to
+            the <Link to="/calculator">calculator</Link>, which flags conflicts such as fin nipping
+            and aggression.
+          </p>
+        </section>
+
+        <section id="steps">
+          <h2>Setting up, step by step</h2>
+          <ol>
+            <li>Place the tank on a level, strong stand away from direct sun and draughts.</li>
+            <li>Add substrate, décor and plants, leaving open water near the surface.</li>
+            <li>Fill with dechlorinated water, then fit the filter, heater and lid.</li>
+            <li>Cycle the tank until ammonia and nitrite read zero on repeated tests.</li>
+            <li>Set the heater within 24–28 °C and check it holds steady for a few days.</li>
+            <li>Acclimate the betta slowly, then keep testing through the first weeks.</li>
+          </ol>
+          <p>
+            Want the numbers filled in for you?{" "}
+            <Link to="/calculator" search={{ idea: "betta-shaded-garden" }}>
+              Open the betta plan in the calculator
+            </Link>
+            , then change the size to match your tank.
+          </p>
+        </section>
+      </>
+    ),
+  },
 };
 
 export const Route = createFileRoute("/guides/$slug")({
+  // Return only the slug: loader data is serialised into the page, and a guide's
+  // body is a render function, which cannot be serialised (it made SSR return 500).
   loader: ({ params }) => {
-    const guide = guides[params.slug];
-    if (!guide) throw notFound();
-    return { guide };
+    if (!guides[params.slug]) throw notFound();
+    return { slug: params.slug };
   },
   head: ({ loaderData, params }) => {
     if (!loaderData) {
@@ -210,7 +347,7 @@ export const Route = createFileRoute("/guides/$slug")({
         meta: [{ title: "Guide not found | FishTankr" }, { name: "robots", content: "noindex" }],
       };
     }
-    const g = loaderData.guide;
+    const g = guides[loaderData.slug];
     const url = absoluteUrl(`/guides/${params.slug}`);
     return {
       meta: [
@@ -254,7 +391,7 @@ export const Route = createFileRoute("/guides/$slug")({
 });
 
 function GuidePage() {
-  const { guide } = Route.useLoaderData();
+  const guide = guides[Route.useLoaderData().slug];
   return (
     <main className="mx-auto max-w-6xl px-4 py-10">
       <div className="grid gap-10 lg:grid-cols-[240px_1fr]">

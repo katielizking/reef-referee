@@ -139,6 +139,31 @@ export const TANK_IDEAS: TankIdea[] = [
       "Plan suitable live or frozen foods before buying. Avoid adding snails or shrimp as decorative tankmates: puffers may eat them.",
     ],
   },
+  {
+    slug: "calm-asian-community",
+    title: "A calm 120 L community",
+    style: "Community",
+    experience: "Everyday care",
+    summary:
+      "Cherry barbs in the open water, kuhli loaches below and one honey gourami at the top.",
+    dimensions: [100, 30, 40],
+    temperature: 25,
+    ph: 6.8,
+    planting: "heavy",
+    colour: "#c9544b",
+    stock: [
+      { name: "Cherry barb", scientific: "Puntius titteya", quantity: 8 },
+      { name: "Kuhli loach", scientific: "Pangio kuhlii", quantity: 6 },
+      { name: "Honey gourami", scientific: "Trichogaster chuna", quantity: 1 },
+    ],
+    layout:
+      "Plant densely along the back and sides, leaving the front third open for the barbs. Use soft sand with a layer of leaf litter and a few caves or tangled roots for the loaches, which hide by day. Floating plants in one corner give the gourami a calm surface to patrol.",
+    care: [
+      "Each fish uses a different level of the tank: gourami at the top, barbs in open water, loaches on the bottom. That spread is what makes a 100 cm tank comfortable for 15 fish.",
+      "Kuhli loaches prefer slightly soft, neutral to acidic water, so this plan targets pH 6.8. Check your tap water before buying rather than chasing a number with chemicals.",
+      "Add the fish in stages after the tank has cycled, starting with the barbs, and keep testing ammonia and nitrite after each addition.",
+    ],
+  },
 ];
 
 export function buildIdeaTank(idea: TankIdea, catalogue: Species[]): TankState {

@@ -23,6 +23,7 @@ import { submitSpeciesRequest } from "@/lib/requests";
 import { useOutsideClick } from "@/hooks/useOutsideClick";
 import { confirmValues, isExample } from "@/lib/example-values";
 import { searchableNames } from "@/lib/species-names";
+import { speciesParam } from "@/lib/species-url";
 
 import {
   Accordion,
@@ -801,7 +802,7 @@ export function SpeciesAdder({
                 </button>
                 <Link
                   to="/species/$id"
-                  params={{ id: sp.id }}
+                  params={{ id: speciesParam(sp) }}
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={(e) => e.stopPropagation()}
@@ -836,7 +837,7 @@ export function SpeciesAdder({
                 </div>
                 <Link
                   to="/species/$id"
-                  params={{ id: s.species.id }}
+                  params={{ id: speciesParam(s.species) }}
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={`View guide for ${s.species.common_name}`}
