@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { ExternalLink, Fish } from "lucide-react";
+import { NOT_VERIFIED } from "@/lib/species-evidence";
 
 const ALLOWED_LICENSES = new Set(["cc0", "cc-by", "cc-by-sa"]);
 
@@ -145,22 +146,19 @@ export function SpeciesPortrait({
       )}
 
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink/45 via-transparent to-white/10 opacity-70" />
-      <div className="absolute left-3 top-3 rounded-full border border-white/60 bg-white/75 px-2 py-1 text-[9px] font-bold uppercase tracking-[.13em] text-ink shadow-sm backdrop-blur">
-        Species verified
-      </div>
 
       {data && (
         <figcaption
           className={`absolute inset-x-0 bottom-0 flex items-end justify-between gap-2 p-3 text-[10px] leading-tight text-white transition-opacity ${compact ? "opacity-0 group-hover/portrait:opacity-100 group-focus-within/portrait:opacity-100" : ""}`}
         >
           <span className="line-clamp-2">
-            {data.attribution} · {data.license}
+            {data.attribution} · {data.license} · Photo ID {NOT_VERIFIED.toLowerCase()}
           </span>
           <a
             href={data.sourceUrl}
             target="_blank"
             rel="noreferrer"
-            aria-label={`View ${commonName} photo source on iNaturalist`}
+            aria-label={`View ${commonName} photo source on iNaturalist. The identification is not verified.`}
             className="pointer-events-auto shrink-0 rounded-full bg-white/15 p-1.5 backdrop-blur transition hover:bg-white/30"
           >
             <ExternalLink className="h-3 w-3" aria-hidden />

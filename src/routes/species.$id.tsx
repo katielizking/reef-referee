@@ -10,6 +10,8 @@ import {
   Users,
   Waves,
   AlertTriangle,
+  CheckCircle2,
+  CircleDashed,
   ExternalLink,
   Info,
   Leaf,
@@ -22,6 +24,7 @@ import { WhereToBuy } from "@/components/WhereToBuy";
 import type { Species } from "@/lib/types";
 import { BIOTOPE_LABEL } from "@/lib/types";
 import { absoluteUrl } from "@/lib/site";
+import { regionalEvidence, speciesEvidence, type EvidenceItem } from "@/lib/species-evidence";
 
 const speciesByIdQuery = (id: string) =>
   queryOptions({
@@ -160,55 +163,26 @@ function SpeciesError({ error }: { error: unknown }) {
 }
 
 function LegalBadge({ s }: { s: Species }) {
-  if (s.legal_status === "prohibited") {
-    return (
-      <span className="inline-flex items-center gap-1 rounded-full bg-coral/20 px-2.5 py-1 text-xs font-semibold text-foreground">
-        <AlertTriangle className="h-3.5 w-3.5" /> Australia: restricted
-      </span>
-    );
-  }
-  if (s.legal_status === "native") {
-    return (
-      <span className="inline-flex items-center gap-1 rounded-full bg-lime/30 px-2.5 py-1 text-xs font-semibold text-foreground">
-        <Leaf className="h-3.5 w-3.5" /> Australia: native
-      </span>
-    );
-  }
-  if (s.legal_status === "not_importable") {
-    return (
-      <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2.5 py-1 text-xs font-semibold text-foreground">
-        <Info className="h-3.5 w-3.5" /> Australia: local stock only
-      </span>
-    );
-  }
+  const regional = regionalEvidence(s);
+  const style =
+    regional.kind === "restricted"
+      ? "bg-coral/20 text-foreground"
+      : regional.kind === "native"
+        ? "bg-lime/30 text-foreground"
+        : "bg-muted text-muted-foreground";
+  const Icon =
+    regional.kind === "restricted" ? AlertTriangle : regional.kind === "native" ? Leaf : Info;
   return (
-    <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2.5 py-1 text-xs font-semibold text-muted-foreground">
-      <Info className="h-3.5 w-3.5" /> Australia: listed
+    <span
+      className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold ${style}`}
+    >
+      <Icon className="h-3.5 w-3.5" /> {regional.badge}
     </span>
   );
 }
 
 function LegalityEvidence({ s }: { s: Species }) {
-  const importLabel = {
-    permitted_with_conditions: "Permitted for import with conditions",
-    not_permitted: "Not on the permitted import pathway",
-    not_applicable_native: "Not applicable. Australian native.",
-    unknown: "Import status not yet verified",
-  }[s.legal_import_status ?? "unknown"];
-
-  const possessionLabel = {
-    generally_permitted_check_state: "Generally kept; check state and territory rules",
-    check_state_permits: "State or territory permits may apply",
-    prohibited_or_restricted: "Prohibited or restricted; check your jurisdiction",
-    check_state_rules: "Check state or territory rules",
-  }[s.legal_possession_status ?? "check_state_rules"];
-
-  const confidence = s.legal_confidence ?? "incomplete";
-  const confidenceLabel = {
-    verified: "Verified",
-    medium: "Government source found; species details still need review",
-    incomplete: "Incomplete. Check the current rules before relying on this.",
-  }[confidence];
+  const regional = regionalEvidence(s);
 
   return (
     <section className="mt-10 rounded-2xl border bg-card p-5">
@@ -229,46 +203,42 @@ function LegalityEvidence({ s }: { s: Species }) {
           <dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
             Federal import
           </dt>
-          <dd className="mt-1 text-sm font-medium text-foreground">{importLabel}</dd>
+          <dd className="mt-1 text-sm font-medium text-foreground">{regional.importLabel}</dd>
         </div>
         <div className="rounded-xl bg-muted/50 p-3">
           <dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
             Keeping this species
           </dt>
-          <dd className="mt-1 text-sm font-medium text-foreground">{possessionLabel}</dd>
+          <dd className="mt-1 text-sm font-medium text-foreground">{regional.possessionLabel}</dd>
         </div>
         <div className="rounded-xl bg-muted/50 p-3">
           <dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
             Evidence confidence
           </dt>
-          <dd className="mt-1 text-sm font-medium text-foreground">{confidenceLabel}</dd>
+          <dd className="mt-1 text-sm font-medium text-foreground">{regional.confidenceLabel}</dd>
         </div>
         <div className="rounded-xl bg-muted/50 p-3">
           <dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
             Last reviewed
           </dt>
-          <dd className="mt-1 text-sm font-medium text-foreground">
-            {s.legal_reviewed_on
-              ? new Date(`${s.legal_reviewed_on}T00:00:00`).toLocaleDateString()
-              : "Not recorded"}
-          </dd>
+          <dd className="mt-1 text-sm font-medium text-foreground">{regional.reviewedLabel}</dd>
         </div>
       </dl>
 
-      {s.legal_source_url ? (
+      <p className="mt-4 text-sm text-foreground">{regional.summary}</p>
+      {regional.note && <p className="mt-2 text-sm text-muted-foreground">{regional.note}</p>}
+      {regional.source ? (
         <a
-          href={s.legal_source_url}
+          href={regional.source.url}
           target="_blank"
           rel="noreferrer"
-          className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
+          className="mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
         >
-          {s.legal_source_label ?? "View government source"}
+          {regional.source.label}
           <ExternalLink className="h-3.5 w-3.5" aria-hidden />
         </a>
       ) : (
-        <p className="mt-4 text-sm text-muted-foreground">
-          {s.legal_source_label ?? "We still need to add a source for this jurisdiction."}
-        </p>
+        <p className="mt-3 text-sm text-muted-foreground">{regional.detail}</p>
       )}
 
       <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
@@ -276,6 +246,37 @@ function LegalityEvidence({ s }: { s: Species }) {
         check with your local fisheries or wildlife authority before buying, moving or collecting
         fish.
       </p>
+    </section>
+  );
+}
+
+function EvidenceSummary({ items }: { items: EvidenceItem[] }) {
+  return (
+    <section aria-labelledby="evidence-heading" className="mt-6 rounded-2xl border bg-card p-5">
+      <h2 id="evidence-heading" className="font-display text-lg font-semibold text-foreground">
+        What we have checked
+      </h2>
+      <dl className="mt-3 grid gap-3 md:grid-cols-3">
+        {items.map((item) => (
+          <div key={item.subject} data-evidence={item.state} className="rounded-xl bg-muted/50 p-3">
+            <dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              {item.subject}
+            </dt>
+            <dd className="mt-1 flex items-start gap-1.5 text-sm font-medium text-foreground">
+              {item.state === "checked" ? (
+                <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-verdict-good" aria-hidden />
+              ) : (
+                <CircleDashed
+                  className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground"
+                  aria-hidden
+                />
+              )}
+              {item.label}
+            </dd>
+            <dd className="mt-1 text-xs leading-relaxed text-muted-foreground">{item.detail}</dd>
+          </div>
+        ))}
+      </dl>
     </section>
   );
 }
@@ -296,6 +297,7 @@ function SpeciesGuide() {
   const { data: s } = useSuspenseQuery(speciesByIdQuery(id));
   const { data: allSpecies } = useSuspenseQuery(allSpeciesQuery);
   const related = findRelated(s, allSpecies);
+  const evidence = speciesEvidence(s);
 
   const zoneLabel = { top: "Top", mid: "Mid-water", bottom: "Bottom" }[s.swim_zone];
   const temperament = s.temperament.charAt(0).toUpperCase() + s.temperament.slice(1);
@@ -324,7 +326,6 @@ function SpeciesGuide() {
     );
   }
   welfare.push(`Native habitat: ${s.native_habitat_type}.`);
-  if (s.legal_note) welfare.push(s.legal_note);
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-8 md:py-12">
@@ -362,6 +363,8 @@ function SpeciesGuide() {
           <AddToTankButton species={s} />
         </div>
       </header>
+
+      <EvidenceSummary items={[evidence.photo, evidence.care, evidence.regional]} />
 
       <section className="mt-8">
         <h2 className="font-display text-sm font-semibold uppercase tracking-wide text-muted-foreground">
@@ -404,15 +407,15 @@ function SpeciesGuide() {
               Where this care information comes from
             </h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              Confidence:{" "}
-              <span className="font-semibold capitalize text-foreground">
-                {s.care_confidence ?? "unreviewed"}
-              </span>
-              {s.care_reviewed_on
-                ? ` · reviewed ${new Date(`${s.care_reviewed_on}T00:00:00`).toLocaleDateString()}`
-                : " · not reviewed yet"}
+              Care data:{" "}
+              <span className="font-semibold text-foreground">{evidence.care.label}</span>
             </p>
-            {s.care_source_url ? (
+            <p
+              className={`mt-3 text-sm text-muted-foreground ${evidence.care.state === "not_verified" ? "rounded-xl bg-warn/10 p-3" : ""}`}
+            >
+              {evidence.care.detail}
+            </p>
+            {s.care_source_url && (
               <a
                 href={s.care_source_url}
                 target="_blank"
@@ -422,11 +425,6 @@ function SpeciesGuide() {
                 {s.care_source_label ?? "View care source"}
                 <ExternalLink className="h-3.5 w-3.5" aria-hidden />
               </a>
-            ) : (
-              <p className="mt-3 rounded-xl bg-warn/10 p-3 text-sm text-muted-foreground">
-                We have not linked a care source to this profile yet. Check another reputable source
-                before adding this fish to your tank.
-              </p>
             )}
             {s.conspecific_strategy && s.conspecific_strategy !== "unreviewed" && (
               <p className="mt-3 text-sm text-muted-foreground">
@@ -457,7 +455,7 @@ function SpeciesGuide() {
           <ScoreBlock title="Waste load (beta)" body={bioloadCopy(s)} />
           <ScoreBlock title="Space to swim" body={spaceCopy(s)} />
           <ScoreBlock title="Biotope match" body={biomeCopy(s)} />
-          <ScoreBlock title="Regional reference" body={legalityCopy(s)} />
+          <ScoreBlock title="Regional reference" body={evidence.regional.summary} />
         </div>
       </section>
 
@@ -505,7 +503,7 @@ function SpeciesGuide() {
 
 function AddToTankButton({ species }: { species: Species }) {
   const navigate = useNavigate();
-  const prohibited = species.legal_status === "prohibited";
+  const warning = regionalEvidence(species).addWarning;
   function handleAdd() {
     sessionStorage.setItem("fishtankr:pending-add", species.id);
     navigate({ to: "/calculator", hash: "builder" });
@@ -518,12 +516,7 @@ function AddToTankButton({ species }: { species: Species }) {
       >
         <Plus className="h-4 w-4" /> Add to my tank
       </button>
-      {prohibited && (
-        <p className="mt-2 text-xs text-muted-foreground">
-          Australian reference data lists this fish as prohibited or restricted. This does not
-          affect the welfare score. Check the rules where you live.
-        </p>
-      )}
+      {warning && <p className="mt-2 text-xs text-muted-foreground">{warning}</p>}
     </div>
   );
 }
@@ -563,17 +556,4 @@ function spaceCopy(s: Species): string {
 
 function biomeCopy(s: Species): string {
   return `This fish comes from ${BIOTOPE_LABEL[s.biotope_region]} (${s.native_habitat_type}), where the pH is typically ${s.native_ph_min}–${s.native_ph_max} and the temperature ${s.native_temp_min_c}–${s.native_temp_max_c} °C. The optional biotope match looks for fish, water and décor from the same region.`;
-}
-
-function legalityCopy(s: Species): string {
-  if (s.legal_status === "prohibited") {
-    return "Our Australian reference data lists this fish as prohibited or restricted. Those rules may not apply where you live, so check local import and keeping laws before buying.";
-  }
-  if (s.legal_status === "not_importable") {
-    return "This fish is not on the federal permitted import list, so any sold in Australia must come from local breeding. Some of these are well established in the hobby and some are barely here at all. Ask the shop where the fish came from, and check your state or territory rules before buying.";
-  }
-  if (s.legal_status === "native") {
-    return "This fish is native to Australia. Rules for collecting, importing and keeping it vary by region, so check your local guidance before buying.";
-  }
-  return "Australian federal records list this fish as permitted for import with conditions. State or territory rules may still apply, so check the source before buying.";
 }
