@@ -144,6 +144,18 @@ describe("scoreTank", () => {
     expect(score.compatibility.issues).toEqual([]);
   });
 
+  it("treats a catalogue region the app does not know as unmapped instead of crashing", () => {
+    const stray = species({
+      id: "stray",
+      common_name: "Stray region fish",
+      biotope_region: "Amazon Blackwater" as BiotopeRegion,
+    });
+    const score = scoreTank(tank({ species: [{ species: stray, quantity: 6 }] }));
+    expect(score.overall).not.toBeNull();
+    expect(score.biome.dominantRegion).toBe("unmapped");
+    expect(score.biome.badge).toBeUndefined();
+  });
+
   it("keeps a healthy compatible setup in the looking-good range", () => {
     const score = scoreTank(tank({ species: [{ species: tetra, quantity: 8 }], target_ph: 6.8 }));
     expect(score.overall).not.toBeNull();
