@@ -1,4 +1,13 @@
-import { createFileRoute, Link, useRouter, useNavigate, notFound } from "@tanstack/react-router";
+import {
+  createFileRoute,
+  Link,
+  useRouter,
+  useNavigate,
+  notFound,
+  redirect,
+} from "@tanstack/react-router";
+import { isUuid, speciesParam, speciesPath } from "@/lib/species-url";
+import { slugify } from "@/lib/tank-idea-collections";
 import { TWO_CHECKS } from "@/lib/two-checks";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import {
@@ -23,7 +32,7 @@ import { SpeciesPortrait } from "@/components/SpeciesPortrait";
 import { WhereToBuy } from "@/components/WhereToBuy";
 import type { Species } from "@/lib/types";
 import { BIOTOPE_LABEL } from "@/lib/types";
-import { absoluteUrl } from "@/lib/site";
+import { absoluteUrl, ogImage } from "@/lib/site";
 import { alsoKnownAs, lookAlikesOf, telltale, varietiesOf } from "@/lib/species-names";
 import { requiredSwimLengthCm } from "@/lib/scoring";
 import { formatLength, formatVolume, useUnitSystem } from "@/lib/units";
@@ -38,14 +47,27 @@ import {
 } from "@/lib/species-fit";
 import { regionalEvidence, speciesEvidence, type EvidenceItem } from "@/lib/species-evidence";
 
+/** Looks a species up by its readable slug, or by the UUID older links used. */
 const speciesByIdQuery = (id: string) =>
   queryOptions({
     queryKey: ["species", id],
     queryFn: async () => {
-      const uuidPattern =
-        /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-      if (!uuidPattern.test(id)) throw notFound();
-      const { data, error } = await supabase.from("species").select("*").eq("id", id).maybeSingle();
+      if (!/^[a-z0-9-]+$/i.test(id)) throw notFound();
+      const { data, error } = await supabase
+        .from("species")
+        .select("*")
+        .eq(isUuid(id) ? "id" : "slug", isUuid(id) ? id : id.toLowerCase())
+        .maybeSingle();
+      if (error && !isUuid(id)) {
+        // Before the slug column exists, match the slug against common names instead.
+        const all = await supabase.from("species").select("*");
+        if (all.error) throw all.error;
+        const match = (all.data as unknown as Species[]).find(
+          (s) => slugify(s.common_name) === id.toLowerCase(),
+        );
+        if (!match) throw notFound();
+        return match;
+      }
       if (error) throw error;
       if (!data) throw notFound();
       return data as unknown as Species;
@@ -110,11 +132,17 @@ function findRelated(target: Species, all: Species[]): Array<{ s: Species; reaso
 }
 
 export const Route = createFileRoute("/species/$id")({
-  loader: ({ context, params }) =>
-    Promise.all([
+  loader: async ({ context, params }) => {
+    const [s] = await Promise.all([
       context.queryClient.ensureQueryData(speciesByIdQuery(params.id)),
       context.queryClient.ensureQueryData(allSpeciesQuery),
-    ]).then(([s]) => s),
+    ]);
+    // Old UUID links (and any other spelling) move permanently to the readable URL.
+    if (s.slug && params.id !== s.slug) {
+      throw redirect({ to: "/species/$id", params: { id: s.slug }, statusCode: 301 });
+    }
+    return s;
+  },
   head: ({ loaderData }) => {
     if (!loaderData) {
       return {
@@ -131,9 +159,10 @@ export const Route = createFileRoute("/species/$id")({
         { property: "og:title", content: title },
         { property: "og:description", content: desc },
         { property: "og:type", content: "article" },
-        { property: "og:url", content: absoluteUrl(`/species/${s.id}`) },
+        { property: "og:url", content: absoluteUrl(speciesPath(s)) },
+        ...ogImage("/og/species.png"),
       ],
-      links: [{ rel: "canonical", href: absoluteUrl(`/species/${s.id}`) }],
+      links: [{ rel: "canonical", href: absoluteUrl(speciesPath(s)) }],
     };
   },
   notFoundComponent: SpeciesNotFound,
@@ -310,7 +339,11 @@ function NameNotes({ s, catalogue }: { s: Species; catalogue: Species[] }) {
           {varieties.map((v, i) => (
             <span key={v.id}>
               {i > 0 && ", "}
-              <Link to="/species/$id" params={{ id: v.id }} className="text-primary underline">
+              <Link
+                to="/species/$id"
+                params={{ id: speciesParam(v) }}
+                className="text-primary underline"
+              >
                 {v.common_name}
               </Link>
             </span>
@@ -327,7 +360,11 @@ function NameNotes({ s, catalogue }: { s: Species; catalogue: Species[] }) {
           <ul className="mt-1 space-y-1">
             {lookAlikes.map((o) => (
               <li key={o.id} className="text-muted-foreground">
-                <Link to="/species/$id" params={{ id: o.id }} className="text-primary underline">
+                <Link
+                  to="/species/$id"
+                  params={{ id: speciesParam(o) }}
+                  className="text-primary underline"
+                >
                   {o.common_name}
                 </Link>{" "}
                 (<i>{o.scientific_name}</i>): {telltale(o)}.
@@ -589,7 +626,7 @@ function SpeciesGuide() {
               <Link
                 key={r.id}
                 to="/species/$id"
-                params={{ id: r.id }}
+                params={{ id: speciesParam(r) }}
                 className="group flex flex-col gap-1 rounded-2xl border bg-card p-4 transition hover:border-primary hover:shadow-sm"
               >
                 <div className="flex items-start justify-between gap-2">

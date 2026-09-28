@@ -1,6 +1,6 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { absoluteUrl } from "@/lib/site";
-import { useQuery } from "@tanstack/react-query";
+import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { formatPostDate, formatShortDate, tagCounts, type BlogSummary } from "@/lib/blog";
@@ -8,7 +8,22 @@ import { formatPostDate, formatShortDate, tagCounts, type BlogSummary } from "@/
 const LIST_COLUMNS =
   "id, slug, title, excerpt, cover_image_url, author_name, tags, published_at" as const;
 
+const blogListQuery = queryOptions({
+  queryKey: ["blog", "list"],
+  queryFn: async () => {
+    const { data, error } = await supabase
+      .from("blog_posts")
+      .select(LIST_COLUMNS)
+      .eq("published", true)
+      .order("published_at", { ascending: false });
+    if (error) throw error;
+    return data as BlogSummary[];
+  },
+});
+
 export const Route = createFileRoute("/blog/")({
+  // Render the article list on the server so crawlers see the links, not "0 notes".
+  loader: ({ context }) => context.queryClient.ensureQueryData(blogListQuery),
   head: () => ({
     meta: [
       { title: "Field notes | FishTankr" },
@@ -32,18 +47,8 @@ export const Route = createFileRoute("/blog/")({
 });
 
 function BlogIndex() {
-  const { data, isLoading } = useQuery({
-    queryKey: ["blog", "list"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("blog_posts")
-        .select(LIST_COLUMNS)
-        .eq("published", true)
-        .order("published_at", { ascending: false });
-      if (error) throw error;
-      return data as BlogSummary[];
-    },
-  });
+  const { data } = useSuspenseQuery(blogListQuery);
+  const isLoading = false;
 
   const [tag, setTag] = useState<string | null>(null);
   const posts = data ?? [];

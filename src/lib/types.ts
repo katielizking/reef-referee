@@ -33,6 +33,8 @@ export type CycleMethod = "fishless" | "fish_in" | "unknown";
 
 export interface Species {
   id: string;
+  /** Readable URL segment. Optional because saved drafts predate it. */
+  slug?: string;
   common_name: string;
   scientific_name: string;
   min_tank_litres: number;

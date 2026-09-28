@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { queryOptions, useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { getSharedTank } from "./tanks.functions";
 import { useAccount } from "./account";
@@ -17,16 +17,19 @@ async function currentUserId(): Promise<string | null> {
   return data.user?.id ?? null;
 }
 
+/** The whole catalogue, A–Z. Shared by route loaders (server rendering) and components. */
+export const speciesListQuery = queryOptions({
+  queryKey: ["species"],
+  queryFn: async () => {
+    const { data, error } = await supabase.from("species").select("*").order("common_name");
+    if (error) throw error;
+    return data as unknown as Species[];
+  },
+  staleTime: 5 * 60 * 1000,
+});
+
 export function useSpecies() {
-  return useQuery({
-    queryKey: ["species"],
-    queryFn: async () => {
-      const { data, error } = await supabase.from("species").select("*").order("common_name");
-      if (error) throw error;
-      return data as unknown as Species[];
-    },
-    staleTime: 5 * 60 * 1000,
-  });
+  return useQuery(speciesListQuery);
 }
 
 export function useInvertebrates() {

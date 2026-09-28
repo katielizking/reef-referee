@@ -30,6 +30,7 @@ import { Route as CommunityIndexRouteImport } from './routes/community.index'
 import { Route as CommunityIdRouteImport } from './routes/community.$id'
 import { Route as CommunityModerationRouteImport } from './routes/community.moderation'
 import { Route as CommunityNewRouteImport } from './routes/community.new'
+import { Route as FishForSizeRouteImport } from './routes/fish-for.$size'
 import { Route as GuidesIndexRouteImport } from './routes/guides.index'
 import { Route as GuidesSlugRouteImport } from './routes/guides.$slug'
 import { Route as ShopsIndexRouteImport } from './routes/shops.index'
@@ -41,6 +42,9 @@ import { Route as TankIdeasIndexRouteImport } from './routes/tank-ideas.index'
 import { Route as TankIdeasSlugRouteImport } from './routes/tank-ideas.$slug'
 import { Route as TrackerIndexRouteImport } from './routes/tracker.index'
 import { Route as TrackerIdRouteImport } from './routes/tracker.$id'
+import { Route as TankIdeasFishFishRouteImport } from './routes/tank-ideas.fish.$fish'
+import { Route as TankIdeasSizeSizeRouteImport } from './routes/tank-ideas.size.$size'
+import { Route as TankIdeasTypeTypeRouteImport } from './routes/tank-ideas.type.$type'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -147,6 +151,11 @@ const CommunityNewRoute = CommunityNewRouteImport.update({
   path: '/community/new',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FishForSizeRoute = FishForSizeRouteImport.update({
+  id: '/fish-for/$size',
+  path: '/fish-for/$size',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const GuidesIndexRoute = GuidesIndexRouteImport.update({
   id: '/guides/',
   path: '/guides/',
@@ -202,6 +211,21 @@ const TrackerIdRoute = TrackerIdRouteImport.update({
   path: '/tracker/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TankIdeasFishFishRoute = TankIdeasFishFishRouteImport.update({
+  id: '/tank-ideas/fish/$fish',
+  path: '/tank-ideas/fish/$fish',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TankIdeasSizeSizeRoute = TankIdeasSizeSizeRouteImport.update({
+  id: '/tank-ideas/size/$size',
+  path: '/tank-ideas/size/$size',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TankIdeasTypeTypeRoute = TankIdeasTypeTypeRouteImport.update({
+  id: '/tank-ideas/type/$type',
+  path: '/tank-ideas/type/$type',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -223,6 +247,7 @@ export interface FileRoutesByFullPath {
   '/community/$id': typeof CommunityIdRoute
   '/community/moderation': typeof CommunityModerationRoute
   '/community/new': typeof CommunityNewRoute
+  '/fish-for/$size': typeof FishForSizeRoute
   '/guides/$slug': typeof GuidesSlugRoute
   '/shops/$slug': typeof ShopsSlugRoute
   '/species/$id': typeof SpeciesIdRoute
@@ -236,6 +261,9 @@ export interface FileRoutesByFullPath {
   '/species/': typeof SpeciesIndexRoute
   '/tank-ideas/': typeof TankIdeasIndexRoute
   '/tracker/': typeof TrackerIndexRoute
+  '/tank-ideas/fish/$fish': typeof TankIdeasFishFishRoute
+  '/tank-ideas/size/$size': typeof TankIdeasSizeSizeRoute
+  '/tank-ideas/type/$type': typeof TankIdeasTypeTypeRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -257,6 +285,7 @@ export interface FileRoutesByTo {
   '/community/$id': typeof CommunityIdRoute
   '/community/moderation': typeof CommunityModerationRoute
   '/community/new': typeof CommunityNewRoute
+  '/fish-for/$size': typeof FishForSizeRoute
   '/guides/$slug': typeof GuidesSlugRoute
   '/shops/$slug': typeof ShopsSlugRoute
   '/species/$id': typeof SpeciesIdRoute
@@ -270,6 +299,9 @@ export interface FileRoutesByTo {
   '/species': typeof SpeciesIndexRoute
   '/tank-ideas': typeof TankIdeasIndexRoute
   '/tracker': typeof TrackerIndexRoute
+  '/tank-ideas/fish/$fish': typeof TankIdeasFishFishRoute
+  '/tank-ideas/size/$size': typeof TankIdeasSizeSizeRoute
+  '/tank-ideas/type/$type': typeof TankIdeasTypeTypeRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -292,6 +324,7 @@ export interface FileRoutesById {
   '/community/$id': typeof CommunityIdRoute
   '/community/moderation': typeof CommunityModerationRoute
   '/community/new': typeof CommunityNewRoute
+  '/fish-for/$size': typeof FishForSizeRoute
   '/guides/$slug': typeof GuidesSlugRoute
   '/shops/$slug': typeof ShopsSlugRoute
   '/species/$id': typeof SpeciesIdRoute
@@ -305,6 +338,9 @@ export interface FileRoutesById {
   '/species/': typeof SpeciesIndexRoute
   '/tank-ideas/': typeof TankIdeasIndexRoute
   '/tracker/': typeof TrackerIndexRoute
+  '/tank-ideas/fish/$fish': typeof TankIdeasFishFishRoute
+  '/tank-ideas/size/$size': typeof TankIdeasSizeSizeRoute
+  '/tank-ideas/type/$type': typeof TankIdeasTypeTypeRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -328,6 +364,7 @@ export interface FileRouteTypes {
     | '/community/$id'
     | '/community/moderation'
     | '/community/new'
+    | '/fish-for/$size'
     | '/guides/$slug'
     | '/shops/$slug'
     | '/species/$id'
@@ -341,6 +378,9 @@ export interface FileRouteTypes {
     | '/species/'
     | '/tank-ideas/'
     | '/tracker/'
+    | '/tank-ideas/fish/$fish'
+    | '/tank-ideas/size/$size'
+    | '/tank-ideas/type/$type'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -362,6 +402,7 @@ export interface FileRouteTypes {
     | '/community/$id'
     | '/community/moderation'
     | '/community/new'
+    | '/fish-for/$size'
     | '/guides/$slug'
     | '/shops/$slug'
     | '/species/$id'
@@ -375,6 +416,9 @@ export interface FileRouteTypes {
     | '/species'
     | '/tank-ideas'
     | '/tracker'
+    | '/tank-ideas/fish/$fish'
+    | '/tank-ideas/size/$size'
+    | '/tank-ideas/type/$type'
   id:
     | '__root__'
     | '/'
@@ -396,6 +440,7 @@ export interface FileRouteTypes {
     | '/community/$id'
     | '/community/moderation'
     | '/community/new'
+    | '/fish-for/$size'
     | '/guides/$slug'
     | '/shops/$slug'
     | '/species/$id'
@@ -409,6 +454,9 @@ export interface FileRouteTypes {
     | '/species/'
     | '/tank-ideas/'
     | '/tracker/'
+    | '/tank-ideas/fish/$fish'
+    | '/tank-ideas/size/$size'
+    | '/tank-ideas/type/$type'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -430,6 +478,7 @@ export interface RootRouteChildren {
   CommunityIdRoute: typeof CommunityIdRoute
   CommunityModerationRoute: typeof CommunityModerationRoute
   CommunityNewRoute: typeof CommunityNewRoute
+  FishForSizeRoute: typeof FishForSizeRoute
   GuidesSlugRoute: typeof GuidesSlugRoute
   ShopsSlugRoute: typeof ShopsSlugRoute
   SpeciesIdRoute: typeof SpeciesIdRoute
@@ -443,6 +492,9 @@ export interface RootRouteChildren {
   SpeciesIndexRoute: typeof SpeciesIndexRoute
   TankIdeasIndexRoute: typeof TankIdeasIndexRoute
   TrackerIndexRoute: typeof TrackerIndexRoute
+  TankIdeasFishFishRoute: typeof TankIdeasFishFishRoute
+  TankIdeasSizeSizeRoute: typeof TankIdeasSizeSizeRoute
+  TankIdeasTypeTypeRoute: typeof TankIdeasTypeTypeRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -594,6 +646,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CommunityNewRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/fish-for/$size': {
+      id: '/fish-for/$size'
+      path: '/fish-for/$size'
+      fullPath: '/fish-for/$size'
+      preLoaderRoute: typeof FishForSizeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/guides/': {
       id: '/guides/'
       path: '/guides'
@@ -671,6 +730,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TrackerIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tank-ideas/fish/$fish': {
+      id: '/tank-ideas/fish/$fish'
+      path: '/tank-ideas/fish/$fish'
+      fullPath: '/tank-ideas/fish/$fish'
+      preLoaderRoute: typeof TankIdeasFishFishRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tank-ideas/size/$size': {
+      id: '/tank-ideas/size/$size'
+      path: '/tank-ideas/size/$size'
+      fullPath: '/tank-ideas/size/$size'
+      preLoaderRoute: typeof TankIdeasSizeSizeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tank-ideas/type/$type': {
+      id: '/tank-ideas/type/$type'
+      path: '/tank-ideas/type/$type'
+      fullPath: '/tank-ideas/type/$type'
+      preLoaderRoute: typeof TankIdeasTypeTypeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -703,6 +783,7 @@ const rootRouteChildren: RootRouteChildren = {
   CommunityIdRoute: CommunityIdRoute,
   CommunityModerationRoute: CommunityModerationRoute,
   CommunityNewRoute: CommunityNewRoute,
+  FishForSizeRoute: FishForSizeRoute,
   GuidesSlugRoute: GuidesSlugRoute,
   ShopsSlugRoute: ShopsSlugRoute,
   SpeciesIdRoute: SpeciesIdRoute,
@@ -716,6 +797,9 @@ const rootRouteChildren: RootRouteChildren = {
   SpeciesIndexRoute: SpeciesIndexRoute,
   TankIdeasIndexRoute: TankIdeasIndexRoute,
   TrackerIndexRoute: TrackerIndexRoute,
+  TankIdeasFishFishRoute: TankIdeasFishFishRoute,
+  TankIdeasSizeSizeRoute: TankIdeasSizeSizeRoute,
+  TankIdeasTypeTypeRoute: TankIdeasTypeTypeRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

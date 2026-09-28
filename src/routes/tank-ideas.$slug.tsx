@@ -1,11 +1,9 @@
-import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useState } from "react";
-import { toast } from "sonner";
-import { TANK_IDEAS, buildIdeaTank } from "@/lib/tank-ideas";
+import { TANK_IDEAS } from "@/lib/tank-ideas";
 import { TankIdeaArt } from "@/components/TankIdeaArt";
 import { useTankDraft } from "@/components/TankDraftProvider";
-import { useSpecies } from "@/lib/data";
-import { absoluteUrl } from "@/lib/site";
+import { absoluteUrl, ogImage } from "@/lib/site";
 export const Route = createFileRoute("/tank-ideas/$slug")({
   loader: ({ params }) => {
     const idea = TANK_IDEAS.find((i) => i.slug === params.slug);
@@ -20,6 +18,8 @@ export const Route = createFileRoute("/tank-ideas/$slug")({
             { name: "description", content: i.summary },
             { property: "og:title", content: i.title },
             { property: "og:description", content: i.summary },
+            { property: "og:url", content: absoluteUrl(`/tank-ideas/${i.slug}`) },
+            ...ogImage(`/og/ideas/${i.slug}.png`),
           ],
           links: [{ rel: "canonical", href: absoluteUrl(`/tank-ideas/${i.slug}`) }],
         }
@@ -28,29 +28,8 @@ export const Route = createFileRoute("/tank-ideas/$slug")({
 });
 function Idea() {
   const idea = Route.useLoaderData();
-  const catalogue = useSpecies();
   const draft = useTankDraft();
-  const navigate = useNavigate();
   const [confirm, setConfirm] = useState(false);
-  async function open() {
-    try {
-      if (!catalogue.data) throw new Error("The fish catalogue is not ready yet.");
-      const state = buildIdeaTank(idea, catalogue.data);
-      try {
-        sessionStorage.removeItem("fishtankr:pending-add");
-        sessionStorage.removeItem("fishtankr:pending-preset");
-      } catch {
-        /* A fresh template does not require browser storage. */
-      }
-      draft.setState(state);
-      draft.setSavedId(undefined);
-      draft.setSource(undefined);
-      await navigate({ to: "/calculator" });
-      toast.success("Idea loaded — choose your filter and review the plan.");
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Could not load this idea.");
-    }
-  }
   return (
     <main className="mx-auto max-w-6xl px-5 py-10">
       <Link to="/tank-ideas" className="text-sm text-primary">
@@ -95,20 +74,12 @@ function Idea() {
               unknown.
             </p>
             <button
-              disabled={!draft.hydrated || !catalogue.data}
+              disabled={!draft.hydrated}
               className="mt-5 w-full rounded-xl bg-primary p-3 font-semibold text-primary-foreground disabled:opacity-50"
               onClick={() => setConfirm(true)}
             >
               Make this tank in the calculator
             </button>
-            {catalogue.isError && (
-              <p role="alert" className="mt-3">
-                Catalogue unavailable.{" "}
-                <button className="underline" onClick={() => catalogue.refetch()}>
-                  Retry
-                </button>
-              </p>
-            )}
             {confirm && (
               <div className="mt-4 rounded-xl border p-4" role="alert">
                 <p>
@@ -116,9 +87,13 @@ function Idea() {
                   tanks.
                 </p>
                 <div className="mt-3 flex gap-4">
-                  <button className="font-semibold text-primary" onClick={open}>
+                  <Link
+                    to="/calculator"
+                    search={{ idea: idea.slug }}
+                    className="font-semibold text-primary"
+                  >
                     Replace draft and open
-                  </button>
+                  </Link>
                   <button onClick={() => setConfirm(false)}>Cancel</button>
                 </div>
               </div>

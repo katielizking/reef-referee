@@ -717,6 +717,7 @@ export type Database = {
           native_temp_min_c: number
           predatory: boolean
           scientific_name: string
+          slug: string
           swim_zone: string
           temperament: string
         }
@@ -749,6 +750,7 @@ export type Database = {
           native_temp_min_c: number
           predatory?: boolean
           scientific_name: string
+          slug?: string
           swim_zone: string
           temperament: string
         }
@@ -781,6 +783,7 @@ export type Database = {
           native_temp_min_c?: number
           predatory?: boolean
           scientific_name?: string
+          slug?: string
           swim_zone?: string
           temperament?: string
         }

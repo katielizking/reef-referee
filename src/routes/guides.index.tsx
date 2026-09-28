@@ -1,5 +1,6 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { absoluteUrl } from "@/lib/site";
+import { TANK_SIZE_PAGES } from "@/lib/tank-idea-collections";
 
 export const Route = createFileRoute("/guides/")({
   head: () => ({
@@ -8,7 +9,7 @@ export const Route = createFileRoute("/guides/")({
       {
         name: "description",
         content:
-          "Clear guides to cycling, filtration, planted tanks and planning your first freshwater aquarium.",
+          "Complete guides to cycling a freshwater aquarium and setting up a betta tank, plus fish lists for every common tank size.",
       },
       {
         property: "og:title",
@@ -17,7 +18,7 @@ export const Route = createFileRoute("/guides/")({
       {
         property: "og:description",
         content:
-          "Clear guides to cycling, filtration, planted tanks and planning your first freshwater aquarium.",
+          "Complete guides to cycling a freshwater aquarium and setting up a betta tank, plus fish lists for every common tank size.",
       },
       { property: "og:url", content: absoluteUrl("/guides") },
     ],
@@ -27,14 +28,14 @@ export const Route = createFileRoute("/guides/")({
 });
 
 interface GuideItem {
-  slug?: string;
+  slug: string;
   title: string;
   excerpt: string;
-  minutes?: number;
+  minutes: number;
   category: string;
-  soon?: boolean;
 }
 
+// Only finished guides are listed. Unfinished topics stay off the page until they are ready.
 const guides: GuideItem[] = [
   {
     slug: "cycling",
@@ -44,34 +45,11 @@ const guides: GuideItem[] = [
     category: "Fishless cycle",
   },
   {
-    title: "Water chemistry: pH, GH, KH",
-    excerpt: "What your water readings mean, and when to leave them alone.",
-    category: "Water chemistry",
-    soon: true,
-  },
-  {
-    title: "Choosing a filter",
-    excerpt: "Sponge, HOB or canister. Start with flow and biological media.",
-    category: "Filtration",
-    soon: true,
-  },
-  {
-    title: "Planted tank basics",
-    excerpt: "Light, CO₂, substrate and hardy starter plants.",
-    category: "Plants",
-    soon: true,
-  },
-  {
-    title: "Quarantine for new fish",
-    excerpt: "A simple routine to keep a sick fish from spreading illness.",
-    category: "Quarantine",
-    soon: true,
-  },
-  {
-    title: "Water changes done right",
-    excerpt: "How much water to change and how to avoid shocking fish.",
-    category: "Maintenance",
-    soon: true,
+    slug: "betta-tank-setup",
+    title: "Betta tank setup",
+    excerpt: "Tank size, heater, gentle filtration, water, plants and tank mates for one betta.",
+    minutes: 7,
+    category: "Single species",
   },
 ];
 
@@ -84,37 +62,43 @@ function GuidesIndex() {
         rules where you live.
       </p>
       <div className="mt-8 grid gap-4 sm:grid-cols-2">
-        {guides.map((g) =>
-          g.soon || !g.slug ? (
-            <div key={g.title} className="block rounded-2xl border bg-card/60 p-6 opacity-80">
-              <div className="flex items-baseline justify-between gap-4">
-                <h2 className="font-display text-lg font-semibold text-foreground">{g.title}</h2>
-                <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-                  Coming soon
-                </span>
-              </div>
-              <p className="mt-1 text-xs text-muted-foreground">{g.category}</p>
-              <p className="mt-2 text-sm text-muted-foreground">{g.excerpt}</p>
+        {guides.map((g) => (
+          <Link
+            key={g.slug}
+            to="/guides/$slug"
+            params={{ slug: g.slug }}
+            className="group block rounded-2xl border bg-card p-6 transition-colors hover:border-primary/50"
+          >
+            <div className="flex items-baseline justify-between gap-4">
+              <h2 className="font-display text-lg font-semibold text-foreground group-hover:text-primary">
+                {g.title}
+              </h2>
+              <span className="text-xs text-muted-foreground">{g.minutes} min read</span>
             </div>
-          ) : (
-            <Link
-              key={g.slug}
-              to="/guides/$slug"
-              params={{ slug: g.slug }}
-              className="group block rounded-2xl border bg-card p-6 transition-colors hover:border-primary/50"
-            >
-              <div className="flex items-baseline justify-between gap-4">
-                <h2 className="font-display text-lg font-semibold text-foreground group-hover:text-primary">
-                  {g.title}
-                </h2>
-                <span className="text-xs text-muted-foreground">{g.minutes} min read</span>
-              </div>
-              <p className="mt-1 text-xs text-muted-foreground">{g.category}</p>
-              <p className="mt-2 text-sm text-muted-foreground">{g.excerpt}</p>
-            </Link>
-          ),
-        )}
+            <p className="mt-1 text-xs text-muted-foreground">{g.category}</p>
+            <p className="mt-2 text-sm text-muted-foreground">{g.excerpt}</p>
+          </Link>
+        ))}
       </div>
+      <section className="mt-12">
+        <h2 className="font-display text-2xl font-semibold text-foreground">Plan by tank size</h2>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Fish that fit your tank, with ready-made plans to open in the calculator.
+        </p>
+        <ul className="mt-4 flex flex-wrap gap-2 text-sm">
+          {TANK_SIZE_PAGES.map((p) => (
+            <li key={p.slug}>
+              <Link
+                to="/fish-for/$size"
+                params={{ size: p.slug }}
+                className="inline-block rounded-full border px-3 py-1.5 text-foreground hover:bg-muted"
+              >
+                Fish for a {p.litres} L tank
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </section>
     </main>
   );
 }
