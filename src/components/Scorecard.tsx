@@ -56,8 +56,17 @@ function IssueList({ issues }: { issues: Issue[] }) {
   );
 }
 
+const NOT_ASSESSED = "Not assessed";
+const ADD_FISH_NOTE = "Add fish to assess this.";
+
+function NotAssessedLabel() {
+  return <span className="data-mono shrink-0 text-sm text-muted-foreground">{NOT_ASSESSED}</span>;
+}
+
 interface RowProps {
   title: string;
+  /** False until fish are added. Empty inputs must never read as a pass. */
+  assessed: boolean;
   score?: number;
   statusLabel?: string;
   weightPct?: number;
@@ -67,7 +76,17 @@ interface RowProps {
   reasons: string[];
 }
 
-function ScoreRow({ title, score, statusLabel, weightPct, note, tag, issues, reasons }: RowProps) {
+function ScoreRow({
+  title,
+  assessed,
+  score,
+  statusLabel,
+  weightPct,
+  note,
+  tag,
+  issues,
+  reasons,
+}: RowProps) {
   const list = issues ?? [];
   return (
     <div className="border-t border-rule py-4 first:border-t-0">
@@ -85,7 +104,9 @@ function ScoreRow({ title, score, statusLabel, weightPct, note, tag, issues, rea
             </span>
           )}
         </p>
-        {typeof score === "number" ? (
+        {!assessed ? (
+          <NotAssessedLabel />
+        ) : typeof score === "number" ? (
           <span className="data-mono shrink-0 text-sm text-foreground">
             {score}
             <span className="text-muted-foreground">/100</span>
@@ -97,18 +118,27 @@ function ScoreRow({ title, score, statusLabel, weightPct, note, tag, issues, rea
         ) : null}
       </div>
 
-      {typeof score === "number" && (
-        <div className="mt-2 h-[3px] w-full" style={{ background: "var(--rule)" }} aria-hidden>
-          <div className="h-full" style={{ width: `${score}%`, background: barColour(score) }} />
-        </div>
-      )}
-
-      {note && <p className="mt-2 text-sm text-muted-foreground">{note}</p>}
-
-      {list.length > 0 ? (
-        <IssueList issues={list} />
+      {!assessed ? (
+        <p className="mt-2 text-sm text-muted-foreground">{ADD_FISH_NOTE}</p>
       ) : (
-        reasons.length > 0 && <p className="mt-2 text-sm text-muted-foreground">{reasons[0]}</p>
+        <>
+          {typeof score === "number" && (
+            <div className="mt-2 h-[3px] w-full" style={{ background: "var(--rule)" }} aria-hidden>
+              <div
+                className="h-full"
+                style={{ width: `${score}%`, background: barColour(score) }}
+              />
+            </div>
+          )}
+
+          {note && <p className="mt-2 text-sm text-muted-foreground">{note}</p>}
+
+          {list.length > 0 ? (
+            <IssueList issues={list} />
+          ) : (
+            reasons.length > 0 && <p className="mt-2 text-sm text-muted-foreground">{reasons[0]}</p>
+          )}
+        </>
       )}
     </div>
   );
@@ -118,6 +148,8 @@ export function ScorecardPanel({ scorecard, state }: { scorecard: Scorecard; sta
   const s = scorecard;
   const [units] = useUnitSystem();
   const water = state ? waterChangeGuidance(state, s) : null;
+  // scoreTank only withholds the overall score when there are no fish to assess.
+  const assessed = s.overall !== null;
 
   return (
     <div className="space-y-4">
@@ -127,6 +159,7 @@ export function ScorecardPanel({ scorecard, state }: { scorecard: Scorecard; sta
       <div className="fishtankr-panel px-5 py-2">
         <ScoreRow
           title="Tank mates"
+          assessed={assessed}
           score={s.compatibility.score}
           weightPct={Math.round(WEIGHTS.compatibility * 100)}
           issues={s.compatibility.issues}
@@ -134,6 +167,7 @@ export function ScorecardPanel({ scorecard, state }: { scorecard: Scorecard; sta
         />
         <ScoreRow
           title="Swimming room"
+          assessed={assessed}
           score={s.space.score}
           weightPct={Math.round(WEIGHTS.space * 100)}
           issues={s.space.issues}
@@ -141,6 +175,7 @@ export function ScorecardPanel({ scorecard, state }: { scorecard: Scorecard; sta
         />
         <ScoreRow
           title="Water match"
+          assessed={assessed}
           score={s.water.score}
           weightPct={Math.round(WEIGHTS.water * 100)}
           issues={s.water.issues}
@@ -148,6 +183,7 @@ export function ScorecardPanel({ scorecard, state }: { scorecard: Scorecard; sta
         />
         <ScoreRow
           title="Waste load"
+          assessed={assessed}
           statusLabel={s.bioload.loadBand}
           tag="Beta · not scored"
           note={s.bioload.reasons[0]}
@@ -215,18 +251,24 @@ export function ScorecardPanel({ scorecard, state }: { scorecard: Scorecard; sta
               </span>
             )}
           </p>
-          <span className="data-mono shrink-0 text-sm text-foreground">
-            {s.biome.score}
-            <span className="text-muted-foreground">/100</span>
-          </span>
+          {assessed ? (
+            <span className="data-mono shrink-0 text-sm text-foreground">
+              {s.biome.score}
+              <span className="text-muted-foreground">/100</span>
+            </span>
+          ) : (
+            <NotAssessedLabel />
+          )}
         </div>
-        <div className="mt-2 h-[3px] w-full" style={{ background: "var(--rule)" }} aria-hidden>
-          <div
-            className="h-full"
-            style={{ width: `${s.biome.score}%`, background: "var(--water)" }}
-          />
-        </div>
-        {s.biome.badge === "true-biotope" && (
+        {assessed && (
+          <div className="mt-2 h-[3px] w-full" style={{ background: "var(--rule)" }} aria-hidden>
+            <div
+              className="h-full"
+              style={{ width: `${s.biome.score}%`, background: "var(--water)" }}
+            />
+          </div>
+        )}
+        {assessed && s.biome.badge === "true-biotope" && (
           <span className="ink-stamp mt-3 inline-block">True biotope</span>
         )}
         {s.biome.reasons.length > 0 && (
