@@ -1,4 +1,5 @@
 import { Link, createFileRoute, notFound } from "@tanstack/react-router";
+import { TWO_CHECKS } from "@/lib/two-checks";
 import { absoluteUrl } from "@/lib/site";
 import type { ReactNode } from "react";
 
@@ -180,11 +181,16 @@ const guides: Record<string, Guide> = {
             <Link to="/calculator" className="text-primary underline">
               FishTankr builder
             </Link>{" "}
-            checks compatibility, swimming space, water suitability and cycle readiness, while the{" "}
+            scores compatibility, swimming space and water suitability, while the{" "}
             <Link to="/species" className="text-primary underline">
               species library
             </Link>{" "}
-            helps you compare freshwater fish before adding them to your plan.
+            helps you compare freshwater fish before adding them to your plan. The score never
+            includes cycling: log your tests in the{" "}
+            <Link to="/tracker" className="text-primary underline">
+              tank tracker
+            </Link>{" "}
+            to see whether the tank is ready for fish. {TWO_CHECKS.reminder}
           </p>
         </section>
       </>
@@ -292,8 +298,8 @@ function GuidePage() {
           <div className="mt-10 rounded-2xl border bg-card p-6 not-prose">
             <p className="font-display text-lg font-semibold">Ready to plan a tank?</p>
             <p className="mt-1 text-sm text-muted-foreground">
-              Add your fish to the builder and see compatibility, space, water and cycle concerns as
-              you build the plan.
+              Add your fish to the builder to score compatibility, space and water.{" "}
+              {TWO_CHECKS.summary}
             </p>
             <Link
               to="/calculator"

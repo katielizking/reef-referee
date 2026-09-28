@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { TwoChecks } from "@/components/TwoChecks";
 import { useState } from "react";
 import { Loader2, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
@@ -87,8 +88,8 @@ function TrackerPage() {
             <p className="planner-eyebrow">TANK TRACKER</p>
             <h1>Keep an eye on your water.</h1>
             <p className="mt-2 max-w-prose text-sm text-muted-foreground">
-              Cycling and water tests live here, not in the stocking calculator. Add a tank, log
-              each test, and see whether it is safe to add fish.
+              Add a tank, log each test, and see whether it is ready for fish. This readiness check
+              is separate from the stocking score, which never includes cycling.
             </p>
           </div>
           <button
@@ -210,13 +211,9 @@ function TrackerPage() {
           </ul>
         )}
 
-        <p className="mt-8 text-sm text-muted-foreground">
-          Planning the fish instead?{" "}
-          <Link to="/calculator" className="font-semibold text-water underline">
-            Open the stocking calculator
-          </Link>
-          .
-        </p>
+        <div className="mt-8">
+          <TwoChecks current="readiness" />
+        </div>
       </div>
     </main>
   );

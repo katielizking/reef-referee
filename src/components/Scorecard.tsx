@@ -2,6 +2,7 @@ import { BIOTOPE_LABEL, type TankState } from "@/lib/types";
 import { WEIGHTS, type Issue, type Scorecard } from "@/lib/scoring";
 import { Link } from "@tanstack/react-router";
 import { WelfareVerdictCard } from "@/components/WelfareVerdictCard";
+import { TwoChecks } from "@/components/TwoChecks";
 import { waterChangeGuidance } from "@/lib/water-change";
 import { formatVolume, useUnitSystem } from "@/lib/units";
 
@@ -276,17 +277,7 @@ export function ScorecardPanel({ scorecard, state }: { scorecard: Scorecard; sta
         )}
       </div>
 
-      <div className="fishtankr-panel p-5">
-        <p className="science-label text-muted-foreground">Cycling · tracked separately</p>
-        <p className="mt-2 text-sm text-muted-foreground">
-          This score assumes the tank is already cycled. Log your ammonia, nitrite and nitrate
-          results in the{" "}
-          <Link to="/tracker" className="font-semibold text-water underline">
-            tank tracker
-          </Link>{" "}
-          to check that before you buy fish.
-        </p>
-      </div>
+      <TwoChecks current="suitability" />
 
       {s.overall !== null && (
         <p className="text-sm text-muted-foreground">

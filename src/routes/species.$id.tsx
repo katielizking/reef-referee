@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useRouter, useNavigate, notFound } from "@tanstack/react-router";
+import { TWO_CHECKS } from "@/lib/two-checks";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import {
   ArrowLeft,
@@ -448,8 +449,8 @@ function SpeciesGuide() {
           How FishTankr checks this fish
         </h2>
         <p className="mt-2 text-sm text-muted-foreground">
-          This fish affects tank mates, swimming room and water. The cycle can limit the score.
-          Waste load and biotope match stay separate.
+          This fish affects tank mates, swimming room and water. Waste load and biotope match stay
+          separate. {TWO_CHECKS.summary}
         </p>
         <div className="mt-4 space-y-3">
           <ScoreBlock title="Species compatibility" body={compatibilityCopy(s)} />
