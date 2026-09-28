@@ -13,13 +13,14 @@ import {
   deliveryLabel,
   hasShopSearch,
   isNearby,
+  ownershipStatement,
   shipsTo,
   type ShopDirectoryEntry,
 } from "@/lib/shop-search";
 
-const title = "Independent aquarium shops, worldwide | FishTankr";
+const title = "Aquarium shops worldwide, chains left out | FishTankr";
 const description =
-  "A free directory of independently owned aquarium shops around the world, with delivery areas for live fish and a search for the fish you are after.";
+  "A free directory of aquarium shops around the world with chains left out, delivery areas for live fish and a search for the fish you are after.";
 
 export const Route = createFileRoute("/shops/")({
   validateSearch: (search: Record<string, unknown>): { fish?: string } => ({
@@ -61,6 +62,7 @@ function SearchLink({ shop, fish }: { shop: ShopDirectoryEntry; fish: string }) 
 
 function ShopCard({ shop, fish }: { shop: ShopDirectoryEntry; fish: string }) {
   const place = [shop.city, shop.region].filter(Boolean).join(", ");
+  const ownership = ownershipStatement(shop);
   return (
     <article className="border-4 border-ink bg-paper p-4">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
@@ -77,12 +79,13 @@ function ShopCard({ shop, fish }: { shop: ShopDirectoryEntry; fish: string }) {
         </span>
       </div>
       {shop.description && <p className="mt-2 text-sm text-muted-foreground">{shop.description}</p>}
-      {shop.independent_note && (
-        <p className="mt-2 flex items-start gap-1.5 text-xs text-muted-foreground">
-          <Store className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden />
-          {shop.independent_note}
-        </p>
-      )}
+      <p className="mt-2 flex items-start gap-1.5 text-xs text-muted-foreground">
+        <Store className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden />
+        <span>
+          <span className="font-semibold text-foreground">{ownership.label}.</span>{" "}
+          {ownership.confirmed ? ownership.detail : "We have not checked this shop's owner yet."}
+        </span>
+      </p>
       <p className="mt-2 flex items-start gap-1.5 text-xs text-muted-foreground">
         <Truck className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden />
         {deliveryLabel(shop)}
@@ -148,11 +151,11 @@ function ShopsIndex() {
   return (
     <main className="mx-auto max-w-5xl px-3 py-6 sm:px-4 sm:py-10">
       <h1 className="font-display text-4xl font-bold text-foreground">
-        Independent aquarium shops
+        Aquarium shops, chains left out
       </h1>
       <p className="mt-2 max-w-2xl text-muted-foreground">
-        A free directory of independently owned shops around the world. No chains, no paid
-        placements, nobody pays to be listed.
+        A free directory of aquarium shops around the world, with chains and franchises left out. No
+        paid placements, and nobody pays to be listed.
       </p>
 
       <div className="mt-6 border-4 border-ink bg-paper p-4">
@@ -242,10 +245,11 @@ function ShopsIndex() {
 
       <div className="mt-10 border-4 border-ink bg-muted/40 p-4 text-xs leading-relaxed text-muted-foreground">
         <p>
-          <strong className="text-foreground">How this list works.</strong> We list independently
-          owned shops only: single stores, family businesses and small groups, not chains or
-          franchise pet superstores. A listing is not an endorsement of a shop's animal care, and no
-          shop can pay to be listed or to rank higher.
+          <strong className="text-foreground">How this list works.</strong> We leave out chains and
+          franchise pet superstores. A listing says "Independently owned" only when we have a reason
+          specific to that shop, usually from its own website; otherwise it says ownership is not
+          confirmed. A listing is not an endorsement of a shop's animal care, and no shop can pay to
+          be listed or to rank higher.
         </p>
         <p className="mt-2">
           Shop missing, or a detail wrong?{" "}

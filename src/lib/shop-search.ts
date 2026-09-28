@@ -25,6 +25,52 @@ export type ShopDirectoryEntry = {
 export type Place = { country: string; region: string | null; city?: string | null };
 
 /**
+ * Ownership values the directory will show. Chains are removed from the data
+ * and never listed; "unverified" shops are listed without an ownership claim.
+ */
+export const LISTED_OWNERSHIP = ["independent", "unverified"] as const;
+
+/**
+ * Blanket notes that were once copied onto every listing. They say nothing
+ * about the particular shop, so they never count as evidence. Mirrored in
+ * supabase/migrations/20260928010000_shop_ownership_audit.sql.
+ */
+export const GENERIC_NOTE_PATTERNS = [
+  String.raw`^\s*(a\s+)?(single\s+)?(independent(ly owned)?|independently run)(\s+(store|shop|business))?[,.]?\s*(not part of a (chain|retail group)( or franchise( group)?)?)?\.?\s*$`,
+  String.raw`^\s*not part of a (chain|retail group)`,
+];
+const GENERIC_NOTE = new RegExp(GENERIC_NOTE_PATTERNS.join("|"), "i");
+
+export function isGenericOwnershipNote(note: string | null | undefined): boolean {
+  return !note || GENERIC_NOTE.test(note);
+}
+
+export interface OwnershipStatement {
+  confirmed: boolean;
+  label: string;
+  detail: string;
+}
+
+/**
+ * What a listing may say about who owns the shop. "Independently owned" needs
+ * the record to say so and a note specific to this shop; anything less is
+ * reported as not confirmed rather than assumed.
+ */
+export function ownershipStatement(
+  shop: Pick<ShopDirectoryEntry, "ownership" | "independent_note">,
+): OwnershipStatement {
+  if (shop.ownership === "independent" && !isGenericOwnershipNote(shop.independent_note)) {
+    return { confirmed: true, label: "Independently owned", detail: shop.independent_note! };
+  }
+  return {
+    confirmed: false,
+    label: "Ownership not confirmed",
+    detail:
+      "We have not yet checked who owns this shop. We leave out chains and franchises we know about.",
+  };
+}
+
+/**
  * Build the URL that searches a shop's own website for a fish.
  * We never claim a shop has stock; the link runs their live search.
  * Returns null when we have no website at all.

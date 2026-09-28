@@ -43,8 +43,9 @@ function AffiliateDisclosure() {
       <PolicySection title="The shops directory">
         <p>
           The shops directory is free. No shop pays to be listed, and no shop can pay to rank
-          higher. We list independently owned shops only, not chains or franchise pet superstores. A
-          listing is not an endorsement of a shop, its stock or its animal-care practices.
+          higher. We leave out chains and franchise pet superstores, and we only call a shop
+          independently owned when we have checked. A listing is not an endorsement of a shop, its
+          stock or its animal-care practices.
         </p>
         <p>
           Links that search a shop's website are plain links. We earn nothing from them and we do

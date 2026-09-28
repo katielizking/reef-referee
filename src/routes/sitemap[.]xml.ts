@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import type {} from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { absoluteUrl } from "@/lib/site";
+import { LISTED_OWNERSHIP } from "@/lib/shop-search";
 import { TANK_IDEAS } from "@/lib/tank-ideas";
 
 interface Entry {
@@ -48,7 +49,10 @@ export const Route = createFileRoute("/sitemap.xml")({
 
         const [posts, shops, species] = await Promise.all([
           supabase.from("blog_posts").select("slug, published_at").eq("published", true),
-          supabase.from("aquarium_shops").select("slug"),
+          supabase
+            .from("aquarium_shops")
+            .select("slug")
+            .in("ownership", [...LISTED_OWNERSHIP]),
           supabase.from("species").select("id"),
         ]);
 
