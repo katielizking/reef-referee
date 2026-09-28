@@ -963,7 +963,10 @@ function scoreBiome(
   const counts: Record<string, number> = {};
   let total = 0;
   for (const { species: sp, quantity } of state.species) {
-    counts[sp.biotope_region] = (counts[sp.biotope_region] ?? 0) + quantity;
+    // biotope_region is free text in the catalogue. A value we have no water
+    // ranges for would crash the whole calculator, so count it as unmapped.
+    const region = Object.hasOwn(BIOTOPE_WATER, sp.biotope_region) ? sp.biotope_region : "unmapped";
+    counts[region] = (counts[region] ?? 0) + quantity;
     total += quantity;
   }
   const dominant = Object.entries(counts).sort((a, b) => b[1] - a[1])[0][0] as BiotopeRegion;
