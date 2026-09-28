@@ -1,10 +1,30 @@
 import { Link, useSearch } from "@tanstack/react-router";
 import { lazy, Suspense, useEffect, useMemo, useState } from "react";
-import { ImageDown, Loader2, Printer, Redo2, RotateCcw, Save, Share2, Undo2 } from "lucide-react";
+import {
+  ChevronDown,
+  Download,
+  ImageDown,
+  Loader2,
+  Plus,
+  Printer,
+  Redo2,
+  RotateCcw,
+  Save,
+  Share2,
+  Undo2,
+} from "lucide-react";
 import { toast } from "sonner";
 
-import { TankSetupPanel, SpeciesAdder } from "@/components/TankSetupPanel";
-import { type StepId } from "@/components/BuilderSteps";
+import { TankSetupPanel, SpeciesAdder, type SectionId } from "@/components/TankSetupPanel";
+import { NextActionCard } from "@/components/NextActionCard";
+import { nextAction } from "@/lib/next-action";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { isExample } from "@/lib/example-values";
 import { useTankHistory } from "@/components/tank3d/useTankHistory";
 import { useEditorStore } from "@/components/tank3d/editorStore";
 import { ScorecardPanel } from "@/components/Scorecard";
@@ -43,7 +63,8 @@ export function TankWorkspace({ visualiser = false }: { visualiser?: boolean }) 
   const [saving, setSaving] = useState(false);
   const [loadError, setLoadError] = useState(false);
   const [loadingTank, setLoadingTank] = useState(Boolean(sourceSlug));
-  const [openSteps, setOpenSteps] = useState<StepId[]>(["tank"]);
+  const [openSteps, setOpenSteps] = useState<SectionId[]>(["tank"]);
+  const [showInverts, setShowInverts] = useState(false);
   const [confirmingReset, setConfirmingReset] = useState(false);
 
   const species = useSpecies();
@@ -69,6 +90,32 @@ export function TankWorkspace({ visualiser = false }: { visualiser?: boolean }) 
 
   const scorecard = useMemo(() => scoreTank(scoringState(state)), [state]);
   const gate = useSaveGate(scorecard, state);
+  const hasFish = state.species.length > 0;
+  const next = useMemo(() => nextAction(scorecard, state), [scorecard, state]);
+  // Size and fish come first. Water, equipment and filter settings appear once
+  // there is a fish to check them against, or when the plan already uses them.
+  const showAdvanced = hasFish || !isExample(state, "water") || state.filter !== null;
+
+  function openSection(section: SectionId) {
+    setOpenSteps((prev) => (prev.includes(section) ? prev : [...prev, section]));
+    requestAnimationFrame(() =>
+      document
+        .getElementById(`step-${section}`)
+        ?.scrollIntoView({ behavior: "smooth", block: "start" }),
+    );
+  }
+
+  function shareCard() {
+    void shareScoreCard(scorecard, state)
+      .then((result) =>
+        toast.success(result === "shared" ? "Score card shared" : "Score card image downloaded"),
+      )
+      .catch((error) =>
+        toast.error("Couldn't create score card", {
+          description: error instanceof Error ? error.message : "Try again.",
+        }),
+      );
+  }
   const history = useTankHistory(state, setState);
   const selected = useEditorStore((s) => s.selected);
 
@@ -320,46 +367,44 @@ export function TankWorkspace({ visualiser = false }: { visualiser?: boolean }) 
                 Share
               </button>
               {!visualiser && (
-                <button
-                  onClick={() =>
-                    void shareScoreCard(scorecard, state)
-                      .then((result) =>
-                        toast.success(
-                          result === "shared" ? "Score card shared" : "Score card downloaded",
-                        ),
-                      )
-                      .catch((error) =>
-                        toast.error("Couldn't create score card", {
-                          description: error instanceof Error ? error.message : "Try again.",
-                        }),
-                      )
-                  }
-                  disabled={scorecard.overall === null}
-                  title={
-                    scorecard.overall === null
-                      ? "Add fish to create a score card"
-                      : "Share your score as an image"
-                  }
-                  className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-xl border bg-card px-3 py-2 text-sm font-semibold text-foreground transition-colors hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  <ImageDown className="h-4 w-4" />
-                  Card
-                </button>
-              )}
-              {!visualiser && (
-                <button
-                  onClick={() => window.print()}
-                  disabled={state.species.length === 0}
-                  title={
-                    state.species.length === 0
-                      ? "Add fish to print a plan"
-                      : "Print a one page plan to take to the shop"
-                  }
-                  className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-xl border bg-card px-3 py-2 text-sm font-semibold text-foreground transition-colors hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  <Printer className="h-4 w-4" />
-                  Print
-                </button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger
+                    disabled={!hasFish}
+                    title={hasFish ? "Download or print this plan" : "Add fish to export a plan"}
+                    className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-xl border bg-card px-3 py-2 text-sm font-semibold text-foreground transition-colors hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    <Download className="h-4 w-4" />
+                    Export
+                    <ChevronDown className="h-3.5 w-3.5" aria-hidden />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-64">
+                    <DropdownMenuItem
+                      disabled={scorecard.overall === null}
+                      onSelect={shareCard}
+                      className="items-start gap-2 py-2"
+                    >
+                      <ImageDown className="mt-0.5 h-4 w-4 shrink-0" />
+                      <span>
+                        <span className="block font-medium">Score card image (PNG)</span>
+                        <span className="block text-xs text-muted-foreground">
+                          Your score and top issues, sized to share
+                        </span>
+                      </span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onSelect={() => window.print()}
+                      className="items-start gap-2 py-2"
+                    >
+                      <Printer className="mt-0.5 h-4 w-4 shrink-0" />
+                      <span>
+                        <span className="block font-medium">Print one-page plan</span>
+                        <span className="block text-xs text-muted-foreground">
+                          Fish list and checks to take to the shop
+                        </span>
+                      </span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               )}
             </div>
           </div>
@@ -382,11 +427,11 @@ export function TankWorkspace({ visualiser = false }: { visualiser?: boolean }) 
                   </Suspense>
                 )}
                 <section className="planner-column" aria-labelledby="tank-heading">
-                  <h2 id="tank-heading">{visualiser ? "Plan details" : "Your tank"}</h2>
+                  <h2 id="tank-heading">{visualiser ? "Plan details" : "1 · Your tank"}</h2>
                   <p className="planner-help">
                     {visualiser
                       ? "Shape the tank and arrange what goes inside it."
-                      : "Dimensions, equipment and water."}
+                      : "Start with its size."}
                   </p>
                   <TankSetupPanel
                     state={state}
@@ -398,10 +443,20 @@ export function TankWorkspace({ visualiser = false }: { visualiser?: boolean }) 
                     openSteps={openSteps}
                     setOpenSteps={setOpenSteps}
                     sections={
-                      visualiser ? ["tank", "filter", "livestock", "aquascape"] : ["tank", "filter"]
+                      visualiser
+                        ? ["tank", "filter", "livestock", "aquascape"]
+                        : showAdvanced
+                          ? ["tank", "water", "filter"]
+                          : ["tank"]
                     }
                     visualOnly={visualiser}
                   />
+                  {!visualiser && !showAdvanced && (
+                    <p className="mt-3 rounded-xl border border-dashed px-3 py-2 text-xs text-muted-foreground">
+                      Water, equipment and filter settings appear here after you add your first
+                      fish.
+                    </p>
+                  )}
                   {visualiser && (
                     <div className="mt-4 border-t border-rule pt-4">
                       <p className="science-label text-muted-foreground">
@@ -422,7 +477,7 @@ export function TankWorkspace({ visualiser = false }: { visualiser?: boolean }) 
                 </section>
                 {!visualiser && (
                   <section id="your-fish" className="planner-column" aria-labelledby="fish-heading">
-                    <h2 id="fish-heading">Your fish</h2>
+                    <h2 id="fish-heading">2 · Your fish</h2>
                     <p className="planner-help">Search a species, then adjust its group.</p>
                     <SpeciesAdder state={state} setState={setState} species={species.data!} />
                     <p className="mt-5 text-sm text-muted-foreground">
@@ -436,22 +491,33 @@ export function TankWorkspace({ visualiser = false }: { visualiser?: boolean }) 
                     <Link to="/species" className="planner-text-link">
                       Explore the fish library →
                     </Link>
-                    <div className="mt-6 border-t border-rule pt-5">
-                      <p className="science-label text-muted-foreground">
-                        Shrimp, snails and crabs
-                      </p>
-                      <p className="mt-1 text-sm text-muted-foreground">
-                        Optional. Checked separately from your score.
-                      </p>
-                      <div className="mt-3">
-                        <InvertebrateAdder
-                          state={state}
-                          setState={setState}
-                          invertebrates={invertebrates.data ?? []}
-                        />
+                    {showInverts || (state.invertebrates ?? []).length > 0 ? (
+                      <div className="mt-6 border-t border-rule pt-5">
+                        <p className="science-label text-muted-foreground">
+                          Shrimp, snails and crabs
+                        </p>
+                        <p className="mt-1 text-sm text-muted-foreground">
+                          Optional. Checked separately from your score.
+                        </p>
+                        <div className="mt-3">
+                          <InvertebrateAdder
+                            state={state}
+                            setState={setState}
+                            invertebrates={invertebrates.data ?? []}
+                          />
+                        </div>
+                        <InvertebrateChecks state={state} />
                       </div>
-                      <InvertebrateChecks state={state} />
-                    </div>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => setShowInverts(true)}
+                        className="mt-6 inline-flex min-h-11 items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
+                      >
+                        <Plus className="h-4 w-4" aria-hidden /> Add shrimp, snails or crabs
+                        (optional)
+                      </button>
+                    )}
                   </section>
                 )}
                 {!visualiser && (
@@ -463,25 +529,47 @@ export function TankWorkspace({ visualiser = false }: { visualiser?: boolean }) 
                   >
                     <h2 id="results-heading">Your results</h2>
                     <p className="planner-help">What fits, and what needs attention.</p>
-                    {!state.filter && (
-                      <p className="planner-notice">
-                        Filter details missing. Choose your filter to complete the equipment check.
-                      </p>
+                    {!hasFish ? (
+                      <div className="fishtankr-panel p-5">
+                        <p className="science-label text-muted-foreground">How to start</p>
+                        <ol className="mt-3 list-decimal space-y-2 pl-5 text-sm text-foreground">
+                          <li>Enter your tank size, or keep the example to explore.</li>
+                          <li>Search for a fish and add the group you want.</li>
+                          <li>Then set your water, equipment and filter.</li>
+                        </ol>
+                        <p className="mt-3 text-sm text-muted-foreground">
+                          Results appear here once you add a fish.
+                        </p>
+                      </div>
+                    ) : (
+                      <>
+                        {next && <NextActionCard action={next} onOpenSection={openSection} />}
+                        {!state.filter && (
+                          <p className="planner-notice">
+                            Filter details missing. Choose your filter to complete the equipment
+                            check.
+                          </p>
+                        )}
+                        <PreStockChecklist
+                          scorecard={scorecard}
+                          state={state}
+                          pendingSave={gate.pendingSave}
+                          onCancelSave={gate.cancel}
+                          onConfirmSave={() => gate.confirm(doSave)}
+                        />
+                        <ScorecardPanel
+                          scorecard={scorecard}
+                          state={state}
+                          showPriorityAction={false}
+                        />
+                        <SetupChecks state={state} />
+                        <CompatibleSuggestions
+                          state={state}
+                          setState={setState}
+                          species={species.data!}
+                        />
+                      </>
                     )}
-                    <PreStockChecklist
-                      scorecard={scorecard}
-                      state={state}
-                      pendingSave={gate.pendingSave}
-                      onCancelSave={gate.cancel}
-                      onConfirmSave={() => gate.confirm(doSave)}
-                    />
-                    <ScorecardPanel scorecard={scorecard} state={state} />
-                    <SetupChecks state={state} />
-                    <CompatibleSuggestions
-                      state={state}
-                      setState={setState}
-                      species={species.data!}
-                    />
                     <Link to="/visualiser" search={linkSearch} className="planner-primary">
                       Plan this tank in 3D <span aria-hidden>→</span>
                     </Link>
@@ -499,7 +587,7 @@ export function TankWorkspace({ visualiser = false }: { visualiser?: boolean }) 
                   <h3>Find your next freshwater setup.</h3>
                   <p>Start with an example and make it yours.</p>
                 </div>
-                <Link to="/saved">Explore example tanks →</Link>
+                <Link to="/tank-ideas">Explore Tank Ideas →</Link>
               </div>
             </>
           )}

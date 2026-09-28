@@ -21,6 +21,7 @@ import { waterLitres } from "@/lib/tank-shape";
 import { displayLength, formatVolume, lengthLabel, lengthToCm, useUnitSystem } from "@/lib/units";
 import { submitSpeciesRequest } from "@/lib/requests";
 import { useOutsideClick } from "@/hooks/useOutsideClick";
+import { confirmValues, isExample } from "@/lib/example-values";
 
 import {
   Accordion,
@@ -31,8 +32,11 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { StepId } from "@/components/BuilderSteps";
 
+/** Accordion sections. "water" is the calculator's own step; the visualiser keeps it in "tank". */
+export type SectionId = StepId | "water";
+
 interface Props {
-  sections?: StepId[];
+  sections?: SectionId[];
   visualOnly?: boolean;
   state: TankState;
   setState: (updater: (prev: TankState) => TankState) => void;
@@ -40,8 +44,8 @@ interface Props {
   plants: Plant[];
   hardscape: Hardscape[];
   filters: Filter[];
-  openSteps: StepId[];
-  setOpenSteps: (v: StepId[]) => void;
+  openSteps: SectionId[];
+  setOpenSteps: (v: SectionId[]) => void;
 }
 
 const MIN_DIM = 10;
@@ -75,6 +79,14 @@ export function TankSetupPanel({
     state.length_cm < MIN_DIM || state.width_cm < MIN_DIM || state.height_cm < MIN_DIM;
   const filterUndersized = state.filter && litres > 0 && state.filter.rated_litres < litres;
 
+  const sizeExample = !visualOnly && isExample(state, "size");
+  const waterExample = isExample(state, "water");
+  // Any edit to a group turns its example values into the user's own.
+  const setSize = (fn: (prev: TankState) => TankState) =>
+    setState((s) => confirmValues(fn(s), "size"));
+  const setWater = (fn: (prev: TankState) => TankState) =>
+    setState((s) => confirmValues(fn(s), "water"));
+
   const fishCount = state.species.reduce((n, x) => n + x.quantity, 0);
   const scapeCount = state.plants.length + state.hardscape.length;
 
@@ -82,7 +94,7 @@ export function TankSetupPanel({
     <Accordion
       type="multiple"
       value={openSteps}
-      onValueChange={(v) => setOpenSteps(v as StepId[])}
+      onValueChange={(v) => setOpenSteps(v as SectionId[])}
       className="space-y-2"
     >
       {sections.includes("tank") && (
@@ -94,26 +106,24 @@ export function TankSetupPanel({
           <AccordionTrigger className="min-h-14 py-3 hover:no-underline">
             <StepHeader
               n={1}
-              title="Tank & water"
+              title={visualOnly ? "Tank & water" : "Tank size"}
               summary={
                 dimInvalid
                   ? `Set each side ≥ ${displayLength(MIN_DIM, units)} ${lengthLabel(units)}`
                   : visualOnly
                     ? volume
-                    : `${volume} · pH ${state.target_ph.toFixed(1)} · ${state.target_temp_c}°C`
+                    : `${volume} gross${sizeExample ? " · example size" : ""}`
               }
             />
           </AccordionTrigger>
           <AccordionContent className="space-y-3 pb-3">
-            <label className="block text-sm">
-              <span className="mb-1 block text-foreground/80">Name</span>
-              <input
-                className="min-h-11 w-full rounded-xl border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
-                value={state.name}
-                onChange={(e) => setState((s) => ({ ...s, name: e.target.value }))}
-                placeholder="Living room 60"
+            {sizeExample && (
+              <ExampleNotice
+                what="This is an example tank size."
+                action="Keep this size"
+                onConfirm={() => setState((st) => confirmValues(st, "size"))}
               />
-            </label>
+            )}
             <div className="flex items-center justify-between gap-2">
               <span className="text-xs text-muted-foreground">Units</span>
               <div className="flex rounded-lg bg-muted p-0.5">
@@ -139,19 +149,19 @@ export function TankSetupPanel({
                 label={`Length (${lengthLabel(units)})`}
                 value={displayLength(state.length_cm, units)}
                 min={displayLength(MIN_DIM, units)}
-                onChange={(v) => setState((s) => ({ ...s, length_cm: lengthToCm(v, units) }))}
+                onChange={(v) => setSize((s) => ({ ...s, length_cm: lengthToCm(v, units) }))}
               />
               <DimField
                 label={`Width (${lengthLabel(units)})`}
                 value={displayLength(state.width_cm, units)}
                 min={displayLength(MIN_DIM, units)}
-                onChange={(v) => setState((s) => ({ ...s, width_cm: lengthToCm(v, units) }))}
+                onChange={(v) => setSize((s) => ({ ...s, width_cm: lengthToCm(v, units) }))}
               />
               <DimField
                 label={`Height (${lengthLabel(units)})`}
                 value={displayLength(state.height_cm, units)}
                 min={displayLength(MIN_DIM, units)}
-                onChange={(v) => setState((s) => ({ ...s, height_cm: lengthToCm(v, units) }))}
+                onChange={(v) => setSize((s) => ({ ...s, height_cm: lengthToCm(v, units) }))}
               />
             </div>
             {dimInvalid && (
@@ -166,7 +176,7 @@ export function TankSetupPanel({
                 className="min-h-11 w-full rounded-xl border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
                 value={state.tank_shape ?? "rectangle"}
                 onChange={(e) =>
-                  setState((st) => ({ ...st, tank_shape: e.target.value as TankShape }))
+                  setSize((st) => ({ ...st, tank_shape: e.target.value as TankShape }))
                 }
               >
                 {(Object.keys(TANK_SHAPE_LABEL) as TankShape[]).map((k) => (
@@ -177,91 +187,88 @@ export function TankSetupPanel({
               </select>
             </label>
             <div className="rounded-xl bg-muted px-3 py-2 text-sm">
-              <span className="text-muted-foreground">Water volume</span>{" "}
+              <span className="text-muted-foreground">Gross tank volume</span>{" "}
               <span className="font-semibold">{volume}</span>
-              {(state.tank_shape ?? "rectangle") !== "rectangle" && (
-                <span className="ml-1 text-xs text-muted-foreground">
-                  for the shape, not the full box
-                </span>
-              )}
+              <p className="mt-0.5 text-xs text-muted-foreground">
+                {(state.tank_shape ?? "rectangle") !== "rectangle"
+                  ? "Worked out for the shape, not the full box. "
+                  : ""}
+                Substrate, décor and the gap at the top mean the tank holds less water than this.
+              </p>
             </div>
             <label className="block text-sm">
-              <span className="mb-1 block text-foreground/80">Substrate</span>
-              <select
+              <span className="mb-1 block text-foreground/80">Name</span>
+              <input
                 className="min-h-11 w-full rounded-xl border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
-                value={state.substrate ?? "gravel"}
-                onChange={(e) =>
-                  setState((st) => ({ ...st, substrate: e.target.value as Substrate }))
-                }
-              >
-                {(Object.keys(SUBSTRATE_LABEL) as Substrate[]).map((k) => (
-                  <option key={k} value={k}>
-                    {SUBSTRATE_LABEL[k]}
-                  </option>
-                ))}
-              </select>
+                value={state.name}
+                onChange={(e) => setState((s) => ({ ...s, name: e.target.value }))}
+                placeholder="Living room 60"
+              />
             </label>
-            <fieldset className="space-y-1.5">
-              <legend className="mb-1 text-sm text-foreground/80">Equipment</legend>
-              {(
-                [
-                  ["has_heater", "Heater", true],
-                  ["has_light", "Light", true],
-                  ["has_co2", "CO2", false],
-                ] as const
-              ).map(([key, label, fallback]) => (
-                <label key={key} className="flex min-h-9 items-center gap-2 text-sm">
-                  <input
-                    type="checkbox"
-                    checked={state[key] ?? fallback}
-                    onChange={(e) => setState((st) => ({ ...st, [key]: e.target.checked }))}
-                    className="h-4 w-4 accent-[var(--color-teal)]"
-                  />
-                  {label}
-                </label>
-              ))}
-            </fieldset>
-            {!visualOnly && (
-              <>
-                <label className="block text-sm">
-                  <div className="mb-1 flex items-center justify-between text-foreground/80">
-                    <span>Target pH</span>
-                    <span className="font-medium">{state.target_ph.toFixed(1)}</span>
-                  </div>
-                  <input
-                    type="range"
-                    min={4}
-                    max={9}
-                    step={0.1}
-                    value={state.target_ph}
-                    onChange={(e) => setState((s) => ({ ...s, target_ph: Number(e.target.value) }))}
-                    className="w-full accent-[var(--color-teal)]"
-                    aria-label="Target pH"
-                  />
-                </label>
-                <label className="block text-sm">
-                  <div className="mb-1 flex items-center justify-between text-foreground/80">
-                    <span>Target temp</span>
-                    <span className="font-medium">{state.target_temp_c}°C</span>
-                  </div>
-                  <input
-                    type="range"
-                    min={15}
-                    max={32}
-                    step={1}
-                    value={state.target_temp_c}
-                    onChange={(e) =>
-                      setState((s) => ({
-                        ...s,
-                        target_temp_c: Number(e.target.value),
-                      }))
-                    }
-                    className="w-full accent-[var(--color-teal)]"
-                    aria-label="Target temperature"
-                  />
-                </label>
-              </>
+            {visualOnly && <SubstrateAndEquipment state={state} setState={setState} />}
+          </AccordionContent>
+        </AccordionItem>
+      )}
+
+      {sections.includes("water") && (
+        <AccordionItem
+          value="water"
+          id="step-water"
+          className="rounded-2xl border bg-background/60 px-3 scroll-mt-20"
+        >
+          <AccordionTrigger className="min-h-14 py-3 hover:no-underline">
+            <StepHeader
+              n={3}
+              title="Water and equipment"
+              summary={`pH ${state.target_ph.toFixed(1)} · ${state.target_temp_c}°C${waterExample ? " · example values" : ""}`}
+            />
+          </AccordionTrigger>
+          <AccordionContent className="space-y-3 pb-3">
+            {waterExample && (
+              <ExampleNotice
+                what="pH 7.0 and 25 °C are example targets."
+                action="Keep these targets"
+                onConfirm={() => setState((st) => confirmValues(st, "water"))}
+              />
             )}
+            <label className="block text-sm">
+              <div className="mb-1 flex items-center justify-between text-foreground/80">
+                <span>Target pH</span>
+                <span className="font-medium">{state.target_ph.toFixed(1)}</span>
+              </div>
+              <input
+                type="range"
+                min={4}
+                max={9}
+                step={0.1}
+                value={state.target_ph}
+                onChange={(e) => setWater((s) => ({ ...s, target_ph: Number(e.target.value) }))}
+                className="w-full accent-[var(--color-teal)]"
+                aria-label="Target pH"
+              />
+            </label>
+            <label className="block text-sm">
+              <div className="mb-1 flex items-center justify-between text-foreground/80">
+                <span>Target temp</span>
+                <span className="font-medium">{state.target_temp_c}°C</span>
+              </div>
+              <input
+                type="range"
+                min={15}
+                max={32}
+                step={1}
+                value={state.target_temp_c}
+                onChange={(e) =>
+                  setWater((s) => ({
+                    ...s,
+                    target_temp_c: Number(e.target.value),
+                  }))
+                }
+                className="w-full accent-[var(--color-teal)]"
+                aria-label="Target temperature"
+              />
+            </label>
+            <SubstrateAndEquipment state={state} setState={setState} />
           </AccordionContent>
         </AccordionItem>
       )}
@@ -274,7 +281,7 @@ export function TankSetupPanel({
         >
           <AccordionTrigger className="min-h-14 py-3 hover:no-underline">
             <StepHeader
-              n={2}
+              n={visualOnly ? 2 : 4}
               title={visualOnly ? "Filter" : "Filter and maintenance"}
               summary={state.filter ? state.filter.name : "Pick a filter"}
             />
@@ -538,6 +545,82 @@ function ExtraFilters({
           Media adds up across filters. How mature that media is belongs in the tank tracker.
         </p>
       )}
+    </div>
+  );
+}
+
+function SubstrateAndEquipment({
+  state,
+  setState,
+}: {
+  state: TankState;
+  setState: Props["setState"];
+}) {
+  return (
+    <>
+      <label className="block text-sm">
+        <span className="mb-1 block text-foreground/80">Substrate</span>
+        <select
+          className="min-h-11 w-full rounded-xl border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
+          value={state.substrate ?? "gravel"}
+          onChange={(e) => setState((st) => ({ ...st, substrate: e.target.value as Substrate }))}
+        >
+          {(Object.keys(SUBSTRATE_LABEL) as Substrate[]).map((k) => (
+            <option key={k} value={k}>
+              {SUBSTRATE_LABEL[k]}
+            </option>
+          ))}
+        </select>
+      </label>
+      <fieldset className="space-y-1.5">
+        <legend className="mb-1 text-sm text-foreground/80">Equipment</legend>
+        {(
+          [
+            ["has_heater", "Heater", true],
+            ["has_light", "Light", true],
+            ["has_co2", "CO2", false],
+          ] as const
+        ).map(([key, label, fallback]) => (
+          <label key={key} className="flex min-h-9 items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              checked={state[key] ?? fallback}
+              onChange={(e) => setState((st) => ({ ...st, [key]: e.target.checked }))}
+              className="h-4 w-4 accent-[var(--color-teal)]"
+            />
+            {label}
+          </label>
+        ))}
+      </fieldset>
+    </>
+  );
+}
+
+function ExampleNotice({
+  what,
+  action,
+  onConfirm,
+}: {
+  what: string;
+  action: string;
+  onConfirm: () => void;
+}) {
+  return (
+    <div
+      role="note"
+      className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-dashed border-warn/50 bg-warn/10 px-3 py-2 text-xs text-foreground"
+    >
+      <p>
+        <span className="font-semibold">Example · </span>
+        {what} Change it to match your tank, or keep it.
+      </p>
+      <button
+        type="button"
+        onClick={onConfirm}
+        className="min-h-9 rounded-lg border bg-card px-2.5 font-semibold hover:bg-muted"
+      >
+        {action}
+      </button>
     </div>
   );
 }

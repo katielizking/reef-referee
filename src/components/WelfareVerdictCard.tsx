@@ -5,9 +5,12 @@ import { TWO_CHECKS } from "@/lib/two-checks";
 export function WelfareVerdictCard({
   scorecard,
   compact = false,
+  showPriorityAction = true,
 }: {
   scorecard: Scorecard;
   compact?: boolean;
+  /** False where the page already shows the next action above the score. */
+  showPriorityAction?: boolean;
 }) {
   const verdict = welfareVerdictFor(scorecard);
   const { Icon } = verdict;
@@ -59,7 +62,7 @@ export function WelfareVerdictCard({
         </div>
       </div>
 
-      {scorecard.priorityAction && (
+      {showPriorityAction && scorecard.priorityAction && (
         <div className="mt-4 border-t border-rule pt-4">
           <p className="data-mono text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
             Fix this first · {scorecard.priorityAction.category}

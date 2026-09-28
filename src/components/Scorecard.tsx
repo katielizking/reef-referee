@@ -145,7 +145,15 @@ function ScoreRow({
   );
 }
 
-export function ScorecardPanel({ scorecard, state }: { scorecard: Scorecard; state?: TankState }) {
+export function ScorecardPanel({
+  scorecard,
+  state,
+  showPriorityAction = true,
+}: {
+  scorecard: Scorecard;
+  state?: TankState;
+  showPriorityAction?: boolean;
+}) {
   const s = scorecard;
   const [units] = useUnitSystem();
   const water = state ? waterChangeGuidance(state, s) : null;
@@ -154,7 +162,7 @@ export function ScorecardPanel({ scorecard, state }: { scorecard: Scorecard; sta
 
   return (
     <div className="space-y-4">
-      <WelfareVerdictCard scorecard={s} />
+      <WelfareVerdictCard scorecard={s} showPriorityAction={showPriorityAction} />
 
       {/* Instrument panel */}
       <div className="fishtankr-panel px-5 py-2">
