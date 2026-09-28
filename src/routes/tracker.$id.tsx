@@ -1,4 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { TWO_CHECKS } from "@/lib/two-checks";
+import { TwoChecks } from "@/components/TwoChecks";
 import { useState } from "react";
 import { AlertTriangle, CheckCircle2, Loader2, Trash2 } from "lucide-react";
 import { toast } from "sonner";
@@ -156,7 +158,9 @@ function TrackedTankPage() {
 
         {/* Cycle verdict */}
         <section className="fishtankr-panel p-5" style={{ borderLeft: `3px solid ${colour}` }}>
-          <p className="science-label text-muted-foreground">Cycle</p>
+          <p className="science-label text-muted-foreground">
+            {TWO_CHECKS.readiness.name} · not part of the stocking score
+          </p>
           <p className="mt-2 flex items-center gap-2 text-lg font-semibold text-foreground">
             {verdict.severity === "good" ? (
               <CheckCircle2 className="h-5 w-5 text-verdict-good" aria-hidden />
@@ -324,13 +328,9 @@ function TrackedTankPage() {
           </section>
         )}
 
-        <p className="mt-8 text-sm text-muted-foreground">
-          Working out which fish to buy?{" "}
-          <Link to="/calculator" className="font-semibold text-water underline">
-            Open the stocking calculator
-          </Link>
-          .
-        </p>
+        <div className="mt-8">
+          <TwoChecks current="readiness" />
+        </div>
       </div>
     </main>
   );

@@ -156,6 +156,24 @@ describe("scoreTank", () => {
     expect(score.biome.badge).toBeUndefined();
   });
 
+  it("never lets cycling or water tests change the stocking score", () => {
+    const base = { species: [{ species: tetra, quantity: 8 }], target_ph: 6.8 };
+    const cycled = scoreTank(
+      tank({ ...base, cycle_status: "verified", filter_maturity: "established" }),
+    );
+    const uncycled = scoreTank(
+      tank({
+        ...base,
+        cycle_status: "not_started",
+        filter_maturity: "new",
+        ammonia_mg_l: 2,
+        nitrite_mg_l: 1,
+      }),
+    );
+    expect(uncycled.overall).toBe(cycled.overall);
+    expect(uncycled.capReason).toBe(cycled.capReason);
+  });
+
   it("keeps a healthy compatible setup in the looking-good range", () => {
     const score = scoreTank(tank({ species: [{ species: tetra, quantity: 8 }], target_ph: 6.8 }));
     expect(score.overall).not.toBeNull();

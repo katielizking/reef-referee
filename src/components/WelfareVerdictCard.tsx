@@ -1,5 +1,6 @@
 import type { Scorecard } from "@/lib/scoring";
 import { welfareVerdictFor } from "@/lib/welfare-verdict";
+import { TWO_CHECKS } from "@/lib/two-checks";
 
 export function WelfareVerdictCard({
   scorecard,
@@ -21,7 +22,7 @@ export function WelfareVerdictCard({
     >
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
-          <p className="science-label text-primary">Welfare check</p>
+          <p className="science-label text-primary">{TWO_CHECKS.suitability.name}</p>
           <div className="mt-3 flex items-center gap-2">
             <span
               className="flex size-8 shrink-0 items-center justify-center rounded-full"

@@ -1,5 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { absoluteUrl } from "@/lib/site";
+import { TwoChecks } from "@/components/TwoChecks";
+import { TEST_MAX_AGE_DAYS } from "@/lib/cycle-status";
+import { TWO_CHECKS } from "@/lib/two-checks";
 import { ExternalLink, ShieldCheck, TriangleAlert } from "lucide-react";
 
 export const Route = createFileRoute("/methodology")({
@@ -9,13 +12,13 @@ export const Route = createFileRoute("/methodology")({
       {
         name: "description",
         content:
-          "How FishTankr checks tank mates, space, water and cycle status, plus what the score cannot prove.",
+          "How FishTankr scores tank mates, space and water, why cycling is a separate readiness check, and what the score cannot prove.",
       },
       { property: "og:title", content: "How FishTankr scores a tank" },
       {
         property: "og:description",
         content:
-          "How FishTankr checks tank mates, space, water and cycle status, plus what the score cannot prove.",
+          "How FishTankr scores tank mates, space and water, why cycling is a separate readiness check, and what the score cannot prove.",
       },
       { property: "og:url", content: absoluteUrl("/methodology") },
     ],
@@ -80,23 +83,23 @@ function MethodologyPage() {
           <ShieldCheck className="mt-1 h-5 w-5 shrink-0 text-primary" aria-hidden />
           <div>
             <h2 className="font-display text-xl font-bold text-foreground">
-              The cycle can limit the score
+              Cycling is not part of the score
             </h2>
-            <p className="mt-2 leading-relaxed text-muted-foreground">
-              A fast pump does not automatically mean strong biological filtration. We check the
-              filter, biological media, tank age, cycling method and recent water tests. If the
-              cycle is unfinished or unverified, the score is limited. If ammonia or nitrite is
-              present, do not add fish.
-            </p>
+            <p className="mt-2 leading-relaxed text-muted-foreground">{TWO_CHECKS.summary}</p>
             <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-              We ask for zero-ammonia and zero-nitrite results from the past seven days. That keeps
-              the plan tied to reasonably recent information; it does not mean one test can predict
-              what happens next. No single reading or fixed number of weeks proves that a tank is
-              ready.
+              The tracker asks for zero ammonia and zero nitrite on a test from the past{" "}
+              {TEST_MAX_AGE_DAYS} days, and marks a tank that is still cycling, not yet started or
+              running brand-new filter media. If ammonia or nitrite is present, do not add fish. A
+              fast pump does not automatically mean strong biological filtration, and no single
+              reading or fixed number of weeks proves that a tank is ready.
             </p>
           </div>
         </div>
       </section>
+
+      <div className="mt-4">
+        <TwoChecks />
+      </div>
 
       <section className="mt-8 rounded-[1.75rem] border border-primary/25 bg-primary/5 p-5 sm:p-7">
         <div className="flex items-start gap-3">
