@@ -26,6 +26,7 @@ export const DEFAULT_STATE: TankState = {
   has_heater: true,
   has_light: true,
   has_co2: false,
+  exampleValues: { size: true, water: true },
   species: [],
   invertebrates: [],
   plants: [],
@@ -75,7 +76,13 @@ export function parseDraft(raw: string | null): TankDraft | null {
     }
     return {
       version: 1,
-      state: { ...DEFAULT_STATE, ...s, invertebrates: s.invertebrates ?? [] },
+      state: {
+        ...DEFAULT_STATE,
+        ...s,
+        invertebrates: s.invertebrates ?? [],
+        // Drafts saved before example values existed hold the user's own numbers.
+        exampleValues: s.exampleValues ?? {},
+      },
       savedId: typeof draft.savedId === "string" ? draft.savedId : undefined,
       source: typeof draft.source === "string" ? draft.source : undefined,
     };
