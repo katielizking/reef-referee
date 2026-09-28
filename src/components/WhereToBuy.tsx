@@ -85,7 +85,7 @@ export function WhereToBuy({ commonName, scientificName, compact }: Props) {
       <h2 className="font-display text-2xl font-bold text-foreground">Where to buy</h2>
       <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
         We do not track shop stock. Pick your location and we will run a live search for{" "}
-        {commonName} on each independent shop's own website.
+        {commonName} on each shop's own website.
       </p>
 
       <div className="mt-4">

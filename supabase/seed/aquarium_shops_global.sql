@@ -5,13 +5,13 @@
 -- delivery, so the app says so rather than guessing. search_url_template values were each
 -- tested with a live search for "tetra" and returned product results.
 
-UPDATE public.aquarium_shops SET ownership = 'chain' WHERE slug = 'petbarn-generic-au';
+-- Chains are not listed. See supabase/migrations/20260928010000_shop_ownership_audit.sql.
+DELETE FROM public.aquarium_shops WHERE slug = 'petbarn-generic-au';
 
 UPDATE public.aquarium_shops SET sells_online = true, search_url_template = 'https://amazingamazon.com.au/search?q={q}' WHERE slug = 'amazing-amazon-sydney';
 UPDATE public.aquarium_shops SET sells_online = true, search_url_template = 'https://coburgaquarium.com.au/search?q={q}' WHERE slug = 'coburg-aquarium';
 UPDATE public.aquarium_shops SET sells_online = true, search_url_template = 'https://thetechden.com.au/search?q={q}' WHERE slug = 'the-tech-den-brisbane';
 UPDATE public.aquarium_shops SET sells_online = true, ships_live_fish = true, ships_to_countries = '{AU}', shipping_note = 'They state Australia-wide live fish delivery.', city = 'National', region = NULL WHERE slug = 'livefish-online';
-UPDATE public.aquarium_shops SET independent_note = 'Single independent store, not part of a chain.' WHERE independent_note IS NULL AND ownership = 'independent';
 
 INSERT INTO public.aquarium_shops
   (slug, name, city, region, country_code, suburb, state, website, phone, specialties, description, ownership, independent_note, sells_online, ships_live_fish, pickup_only, ships_to_countries, ships_to_regions, shipping_note, delivery_reviewed_on, search_url_template)

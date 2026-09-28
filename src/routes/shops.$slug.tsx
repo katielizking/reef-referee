@@ -3,7 +3,13 @@ import { absoluteUrl } from "@/lib/site";
 import { supabase } from "@/integrations/supabase/client";
 import { ExternalLink, MapPin, Phone, Store, Truck } from "lucide-react";
 import { recordShopOutbound } from "@/lib/commercial";
-import { countryName, deliveryLabel, type ShopDirectoryEntry } from "@/lib/shop-search";
+import {
+  LISTED_OWNERSHIP,
+  countryName,
+  deliveryLabel,
+  ownershipStatement,
+  type ShopDirectoryEntry,
+} from "@/lib/shop-search";
 
 type Shop = ShopDirectoryEntry & {
   address: string | null;
@@ -18,6 +24,7 @@ async function fetchShop(slug: string): Promise<Shop | null> {
     .from("aquarium_shops")
     .select("*")
     .eq("slug", slug)
+    .in("ownership", [...LISTED_OWNERSHIP])
     .maybeSingle();
   if (error) throw error;
   return (data as unknown as Shop | null) ?? null;
@@ -40,9 +47,7 @@ export const Route = createFileRoute("/shops/$slug")({
       .filter(Boolean)
       .join(", ");
     const title = `${s.name}${loc ? `, ${loc}` : ""} | FishTankr`;
-    const desc =
-      s.description ??
-      (loc ? `Independent aquarium shop in ${loc}.` : "Independent aquarium shop listing.");
+    const desc = s.description ?? (loc ? `Aquarium shop in ${loc}.` : "Aquarium shop listing.");
     const url = absoluteUrl(`/shops/${params.slug}`);
     return {
       meta: [
@@ -101,6 +106,7 @@ export const Route = createFileRoute("/shops/$slug")({
 
 function ShopPage() {
   const { shop } = Route.useLoaderData();
+  const ownership = ownershipStatement(shop);
   const loc = [shop.address, shop.city ?? shop.suburb, shop.region ?? shop.state, shop.postcode]
     .filter(Boolean)
     .join(" ");
@@ -125,8 +131,7 @@ function ShopPage() {
         <p className="flex items-start gap-2 text-foreground">
           <Store className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
           <span>
-            <strong>Independently owned.</strong>{" "}
-            {shop.independent_note ?? "Not part of a chain or franchise group."}
+            <strong>{ownership.label}.</strong> {ownership.detail}
           </span>
         </p>
         <p className="flex items-start gap-2 text-foreground">
